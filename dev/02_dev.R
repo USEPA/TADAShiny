@@ -31,17 +31,19 @@ usethis::use_package("DT")
 ## Add modules ----
 ## Create a module infrastructure in R/
 ##golem::add_module( name = "name_of_module1" ) # Name of the module
-golem::add_module( name = "import" ) # Name of the module
-golem::add_module( name = "tables" ) # Name of the module
+golem::add_module( name = "import" ) # Name of the import module
+golem::add_module( name = "tables" ) # Name of the tables module
 golem::add_module( name = "import_summary" ) 
 golem::add_module( name = "import_check")
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*
-golem::add_fct( "helpers" ) 
-golem::add_utils( "helpers" )
-golem::add_fct("import_error_checking")
+##golem::add_fct( "helpers" ) 
+##golem::add_utils( "helpers" )
 
+##hui added a function - check import errors
+golem::add_fct("import_error_checking")
+## hui added the utils function to check summary info
 golem::add_utils("summarize_import")
 
 ## External resources
