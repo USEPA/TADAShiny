@@ -5,7 +5,7 @@ Authors@R:
     person(given = "firstname",
            family = "lastname",
            role = c("aut", "cre"),
-           email = "your@email.com")
+           email = "zhou.hui@epa.gov")
 Description: What the package does (one paragraph).
 License: What license is it under?
 Imports: 
@@ -17,10 +17,12 @@ Imports:
     golem,
     magrittr,
     NADA,
+    pkgload,
     readr,
     readxl,
     shiny,
     shinycssloaders,
+    shinyjs,
     stringr,
     thinkr,
     xlsx

@@ -23,11 +23,12 @@ usethis::use_package("xlsx")
 usethis::use_package("readr")
 usethis::use_pipe()
 usethis::use_package("bootstrap") 
-usethis::use_package("EnvStats")
 usethis::use_package("stringr")
 usethis::use_package("NADA")
 usethis::use_package("readxl")
 usethis::use_package("DT")
+usethis::use_package("EnvStats")
+usethis::use_package("shinyjs")
 
 ## Add modules ----
 ## Create a module infrastructure in R/
