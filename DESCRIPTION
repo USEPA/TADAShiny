@@ -17,6 +17,7 @@ Imports:
     golem,
     magrittr,
     NADA,
+    readr,
     readxl,
     shiny,
     shinycssloaders,
