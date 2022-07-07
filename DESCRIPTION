@@ -14,7 +14,7 @@ Authors@R: c(person(given="Cristina",
                     email = "thawley.michelle@epa.gov",
                     role="aut"))
 Description: Assists data partners in performing automated assessments with data from the Water Quality Portal.
-License: CCO 1.0 Universal
+License: CC0
 Copyright: This software is in the public domain because it contains materials that originally came from the U.S. Environmental Protection Agency.
 Imports: 
     bootstrap,
