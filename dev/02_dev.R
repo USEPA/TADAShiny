@@ -10,7 +10,7 @@
 ###################################
 #### CURRENT FILE: DEV SCRIPT #####
 ###################################
-
+usethis::use_cc0_license()
 # Engineering
 
 ## Dependencies ----
