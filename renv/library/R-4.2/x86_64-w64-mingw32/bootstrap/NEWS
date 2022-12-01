@@ -1,0 +1,49 @@
+2019.6
+
+- Move development to GitLab, and update URLs accordingly.
+- Register native routines (thanks to Don Tawanpitak).
+
+2017.2
+
+- Fix the GPA variable in the "law" dataset. The values are now of the form
+  3.39, instead of 339. This is consistent with the book and with the "law82"
+  dataset (thanks to Hon Hwang).
+- Update maintainer email address.
+
+2015.2
+
+- Use stats::quantile with type = 1, instead of a manually coded
+  quantile operation that resulted in a bug that lead to a zero
+  index being used if small nboot, and alpha close to boundary
+  (thanks to David Flater of NIST).
+- Give warning if nboot not larger than 1/min(alpha, 1 - alpha)
+  (thanks to David Flater of NIST).
+- Give error if alpha values are not in (0,1).
+- Add some regression tests.
+- Fix typo in bcanon.Rd (thanks to Paul Donner).
+- Fix some typos in scor.Rd (thanks to Jeffrey Racine).
+
+2014.4
+
+- Remove executable bit from all files that had it set.
+
+Changes in 2012:
+
+ - Introduced file NAMESPACE.
+ - Introduced date-based version numbers.
+ - Fixed an error in the examples section of abcnon.Rd.
+
+Changes 2005 - 2009:
+
+ - Returns of the form return(  ,  ,  ,  ...) changed to
+                            return(list(  ,  ,  ,  ...)).
+ - Code - documentation inconsistencies removed.
+ - Added help pages for all the datasets, and removed the dummy one. 
+ - Added examples, some new datasets added.
+
+Changes from original:
+
+ - Changed all dyn.load2 calls to use dyn.load.
+ - Fixed call of boott (had 2 variable argument lists).
+ - Restructered help files for R consistency.
+ - Added dummy help page for data and internal functions.

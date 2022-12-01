@@ -1,0 +1,6 @@
+ad.test                 Anderson-Darling test for normality
+cvm.test                Cramer-von Mises test for normality
+lillie.test             Lilliefors (Kolmogorov-Smirnov) test for
+                        normality
+pearson.test            Pearson chi-square test for normality
+sf.test                 Shapiro-Francia test for normality

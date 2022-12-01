@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Functions related to Excel</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Functions related to Excel</h1>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(thinkr)</span></code></pre></div>
+<div id="excel_names-dealing-with-column-names-and-position-number" class="section level1">
+<h1><code>excel_names</code> : dealing with column names and position
+number</h1>
+<ul>
+<li><code>ncol_to_excel()</code> returns Excel column name from a
+position number.</li>
+<li><code>excel_to_ncol()</code> returns Excel column position number
+from a column name.</li>
+<li><code>excel_col()</code> returns all Excel column name.</li>
+</ul>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ncol_to_excel</span>(<span class="dv">35</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;AI&quot;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">excel_to_ncol</span>(<span class="st">&quot;BF&quot;</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 58</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">excel_col</span>()</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   [1] &quot;A&quot;  &quot;B&quot;  &quot;C&quot;  &quot;D&quot;  &quot;E&quot;  &quot;F&quot;  &quot;G&quot;  &quot;H&quot;  &quot;I&quot;  &quot;J&quot;  &quot;K&quot;  &quot;L&quot;  &quot;M&quot;  &quot;N&quot;  &quot;O&quot; </span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [16] &quot;P&quot;  &quot;Q&quot;  &quot;R&quot;  &quot;S&quot;  &quot;T&quot;  &quot;U&quot;  &quot;V&quot;  &quot;W&quot;  &quot;X&quot;  &quot;Y&quot;  &quot;Z&quot;  &quot;AA&quot; &quot;AB&quot; &quot;AC&quot; &quot;AD&quot;</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [31] &quot;AE&quot; &quot;AF&quot; &quot;AG&quot; &quot;AH&quot; &quot;AI&quot; &quot;AJ&quot; &quot;AK&quot; &quot;AL&quot; &quot;AM&quot; &quot;AN&quot; &quot;AO&quot; &quot;AP&quot; &quot;AQ&quot; &quot;AR&quot; &quot;AS&quot;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [46] &quot;AT&quot; &quot;AU&quot; &quot;AV&quot; &quot;AW&quot; &quot;AX&quot; &quot;AY&quot; &quot;AZ&quot; &quot;BA&quot; &quot;BB&quot; &quot;BC&quot; &quot;BD&quot; &quot;BE&quot; &quot;BF&quot; &quot;BG&quot; &quot;BH&quot;</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [61] &quot;BI&quot; &quot;BJ&quot; &quot;BK&quot; &quot;BL&quot; &quot;BM&quot; &quot;BN&quot; &quot;BO&quot; &quot;BP&quot; &quot;BQ&quot; &quot;BR&quot; &quot;BS&quot; &quot;BT&quot; &quot;BU&quot; &quot;BV&quot; &quot;BW&quot;</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [76] &quot;BX&quot; &quot;BY&quot; &quot;BZ&quot; &quot;CA&quot; &quot;CB&quot; &quot;CC&quot; &quot;CD&quot; &quot;CE&quot; &quot;CF&quot; &quot;CG&quot; &quot;CH&quot; &quot;CI&quot; &quot;CJ&quot; &quot;CK&quot; &quot;CL&quot;</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [91] &quot;CM&quot; &quot;CN&quot; &quot;CO&quot; &quot;CP&quot; &quot;CQ&quot; &quot;CR&quot; &quot;CS&quot; &quot;CT&quot; &quot;CU&quot; &quot;CV&quot; &quot;CW&quot; &quot;CX&quot; &quot;CY&quot; &quot;CZ&quot; &quot;DA&quot;</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [106] &quot;DB&quot; &quot;DC&quot; &quot;DD&quot; &quot;DE&quot; &quot;DF&quot; &quot;DG&quot; &quot;DH&quot; &quot;DI&quot; &quot;DJ&quot; &quot;DK&quot; &quot;DL&quot; &quot;DM&quot; &quot;DN&quot; &quot;DO&quot; &quot;DP&quot;</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [121] &quot;DQ&quot; &quot;DR&quot; &quot;DS&quot; &quot;DT&quot; &quot;DU&quot; &quot;DV&quot; &quot;DW&quot; &quot;DX&quot; &quot;DY&quot; &quot;DZ&quot; &quot;EA&quot; &quot;EB&quot; &quot;EC&quot; &quot;ED&quot; &quot;EE&quot;</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [136] &quot;EF&quot; &quot;EG&quot; &quot;EH&quot; &quot;EI&quot; &quot;EJ&quot; &quot;EK&quot; &quot;EL&quot; &quot;EM&quot; &quot;EN&quot; &quot;EO&quot; &quot;EP&quot; &quot;EQ&quot; &quot;ER&quot; &quot;ES&quot; &quot;ET&quot;</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [151] &quot;EU&quot; &quot;EV&quot; &quot;EW&quot; &quot;EX&quot; &quot;EY&quot; &quot;EZ&quot; &quot;FA&quot; &quot;FB&quot; &quot;FC&quot; &quot;FD&quot; &quot;FE&quot; &quot;FF&quot; &quot;FG&quot; &quot;FH&quot; &quot;FI&quot;</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [166] &quot;FJ&quot; &quot;FK&quot; &quot;FL&quot; &quot;FM&quot; &quot;FN&quot; &quot;FO&quot; &quot;FP&quot; &quot;FQ&quot; &quot;FR&quot; &quot;FS&quot; &quot;FT&quot; &quot;FU&quot; &quot;FV&quot; &quot;FW&quot; &quot;FX&quot;</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [181] &quot;FY&quot; &quot;FZ&quot; &quot;GA&quot; &quot;GB&quot; &quot;GC&quot; &quot;GD&quot; &quot;GE&quot; &quot;GF&quot; &quot;GG&quot; &quot;GH&quot; &quot;GI&quot; &quot;GJ&quot; &quot;GK&quot; &quot;GL&quot; &quot;GM&quot;</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [196] &quot;GN&quot; &quot;GO&quot; &quot;GP&quot; &quot;GQ&quot; &quot;GR&quot; &quot;GS&quot; &quot;GT&quot; &quot;GU&quot; &quot;GV&quot; &quot;GW&quot; &quot;GX&quot; &quot;GY&quot; &quot;GZ&quot; &quot;HA&quot; &quot;HB&quot;</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [211] &quot;HC&quot; &quot;HD&quot; &quot;HE&quot; &quot;HF&quot; &quot;HG&quot; &quot;HH&quot; &quot;HI&quot; &quot;HJ&quot; &quot;HK&quot; &quot;HL&quot; &quot;HM&quot; &quot;HN&quot; &quot;HO&quot; &quot;HP&quot; &quot;HQ&quot;</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [226] &quot;HR&quot; &quot;HS&quot; &quot;HT&quot; &quot;HU&quot; &quot;HV&quot; &quot;HW&quot; &quot;HX&quot; &quot;HY&quot; &quot;HZ&quot; &quot;IA&quot; &quot;IB&quot; &quot;IC&quot; &quot;ID&quot; &quot;IE&quot; &quot;IF&quot;</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [241] &quot;IG&quot; &quot;IH&quot; &quot;II&quot; &quot;IJ&quot; &quot;IK&quot; &quot;IL&quot; &quot;IM&quot; &quot;IN&quot; &quot;IO&quot; &quot;IP&quot; &quot;IQ&quot; &quot;IR&quot; &quot;IS&quot; &quot;IT&quot; &quot;IU&quot;</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [256] &quot;IV&quot; &quot;IW&quot; &quot;IX&quot; &quot;IY&quot; &quot;IZ&quot; &quot;JA&quot; &quot;JB&quot; &quot;JC&quot; &quot;JD&quot; &quot;JE&quot; &quot;JF&quot; &quot;JG&quot; &quot;JH&quot; &quot;JI&quot; &quot;JJ&quot;</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [271] &quot;JK&quot; &quot;JL&quot; &quot;JM&quot; &quot;JN&quot; &quot;JO&quot; &quot;JP&quot; &quot;JQ&quot; &quot;JR&quot; &quot;JS&quot; &quot;JT&quot; &quot;JU&quot; &quot;JV&quot; &quot;JW&quot; &quot;JX&quot; &quot;JY&quot;</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [286] &quot;JZ&quot; &quot;KA&quot; &quot;KB&quot; &quot;KC&quot; &quot;KD&quot; &quot;KE&quot; &quot;KF&quot; &quot;KG&quot; &quot;KH&quot; &quot;KI&quot; &quot;KJ&quot; &quot;KK&quot; &quot;KL&quot; &quot;KM&quot; &quot;KN&quot;</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [301] &quot;KO&quot; &quot;KP&quot; &quot;KQ&quot; &quot;KR&quot; &quot;KS&quot; &quot;KT&quot; &quot;KU&quot; &quot;KV&quot; &quot;KW&quot; &quot;KX&quot; &quot;KY&quot; &quot;KZ&quot; &quot;LA&quot; &quot;LB&quot; &quot;LC&quot;</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [316] &quot;LD&quot; &quot;LE&quot; &quot;LF&quot; &quot;LG&quot; &quot;LH&quot; &quot;LI&quot; &quot;LJ&quot; &quot;LK&quot; &quot;LL&quot; &quot;LM&quot; &quot;LN&quot; &quot;LO&quot; &quot;LP&quot; &quot;LQ&quot; &quot;LR&quot;</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [331] &quot;LS&quot; &quot;LT&quot; &quot;LU&quot; &quot;LV&quot; &quot;LW&quot; &quot;LX&quot; &quot;LY&quot; &quot;LZ&quot; &quot;MA&quot; &quot;MB&quot; &quot;MC&quot; &quot;MD&quot; &quot;ME&quot; &quot;MF&quot; &quot;MG&quot;</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [346] &quot;MH&quot; &quot;MI&quot; &quot;MJ&quot; &quot;MK&quot; &quot;ML&quot; &quot;MM&quot; &quot;MN&quot; &quot;MO&quot; &quot;MP&quot; &quot;MQ&quot; &quot;MR&quot; &quot;MS&quot; &quot;MT&quot; &quot;MU&quot; &quot;MV&quot;</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [361] &quot;MW&quot; &quot;MX&quot; &quot;MY&quot; &quot;MZ&quot; &quot;NA&quot; &quot;NB&quot; &quot;NC&quot; &quot;ND&quot; &quot;NE&quot; &quot;NF&quot; &quot;NG&quot; &quot;NH&quot; &quot;NI&quot; &quot;NJ&quot; &quot;NK&quot;</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [376] &quot;NL&quot; &quot;NM&quot; &quot;NN&quot; &quot;NO&quot; &quot;NP&quot; &quot;NQ&quot; &quot;NR&quot; &quot;NS&quot; &quot;NT&quot; &quot;NU&quot; &quot;NV&quot; &quot;NW&quot; &quot;NX&quot; &quot;NY&quot; &quot;NZ&quot;</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [391] &quot;OA&quot; &quot;OB&quot; &quot;OC&quot; &quot;OD&quot; &quot;OE&quot; &quot;OF&quot; &quot;OG&quot; &quot;OH&quot; &quot;OI&quot; &quot;OJ&quot; &quot;OK&quot; &quot;OL&quot; &quot;OM&quot; &quot;ON&quot; &quot;OO&quot;</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [406] &quot;OP&quot; &quot;OQ&quot; &quot;OR&quot; &quot;OS&quot; &quot;OT&quot; &quot;OU&quot; &quot;OV&quot; &quot;OW&quot; &quot;OX&quot; &quot;OY&quot; &quot;OZ&quot; &quot;PA&quot; &quot;PB&quot; &quot;PC&quot; &quot;PD&quot;</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [421] &quot;PE&quot; &quot;PF&quot; &quot;PG&quot; &quot;PH&quot; &quot;PI&quot; &quot;PJ&quot; &quot;PK&quot; &quot;PL&quot; &quot;PM&quot; &quot;PN&quot; &quot;PO&quot; &quot;PP&quot; &quot;PQ&quot; &quot;PR&quot; &quot;PS&quot;</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [436] &quot;PT&quot; &quot;PU&quot; &quot;PV&quot; &quot;PW&quot; &quot;PX&quot; &quot;PY&quot; &quot;PZ&quot; &quot;QA&quot; &quot;QB&quot; &quot;QC&quot; &quot;QD&quot; &quot;QE&quot; &quot;QF&quot; &quot;QG&quot; &quot;QH&quot;</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [451] &quot;QI&quot; &quot;QJ&quot; &quot;QK&quot; &quot;QL&quot; &quot;QM&quot; &quot;QN&quot; &quot;QO&quot; &quot;QP&quot; &quot;QQ&quot; &quot;QR&quot; &quot;QS&quot; &quot;QT&quot; &quot;QU&quot; &quot;QV&quot; &quot;QW&quot;</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [466] &quot;QX&quot; &quot;QY&quot; &quot;QZ&quot; &quot;RA&quot; &quot;RB&quot; &quot;RC&quot; &quot;RD&quot; &quot;RE&quot; &quot;RF&quot; &quot;RG&quot; &quot;RH&quot; &quot;RI&quot; &quot;RJ&quot; &quot;RK&quot; &quot;RL&quot;</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [481] &quot;RM&quot; &quot;RN&quot; &quot;RO&quot; &quot;RP&quot; &quot;RQ&quot; &quot;RR&quot; &quot;RS&quot; &quot;RT&quot; &quot;RU&quot; &quot;RV&quot; &quot;RW&quot; &quot;RX&quot; &quot;RY&quot; &quot;RZ&quot; &quot;SA&quot;</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [496] &quot;SB&quot; &quot;SC&quot; &quot;SD&quot; &quot;SE&quot; &quot;SF&quot; &quot;SG&quot; &quot;SH&quot; &quot;SI&quot; &quot;SJ&quot; &quot;SK&quot; &quot;SL&quot; &quot;SM&quot; &quot;SN&quot; &quot;SO&quot; &quot;SP&quot;</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [511] &quot;SQ&quot; &quot;SR&quot; &quot;SS&quot; &quot;ST&quot; &quot;SU&quot; &quot;SV&quot; &quot;SW&quot; &quot;SX&quot; &quot;SY&quot; &quot;SZ&quot; &quot;TA&quot; &quot;TB&quot; &quot;TC&quot; &quot;TD&quot; &quot;TE&quot;</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [526] &quot;TF&quot; &quot;TG&quot; &quot;TH&quot; &quot;TI&quot; &quot;TJ&quot; &quot;TK&quot; &quot;TL&quot; &quot;TM&quot; &quot;TN&quot; &quot;TO&quot; &quot;TP&quot; &quot;TQ&quot; &quot;TR&quot; &quot;TS&quot; &quot;TT&quot;</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [541] &quot;TU&quot; &quot;TV&quot; &quot;TW&quot; &quot;TX&quot; &quot;TY&quot; &quot;TZ&quot; &quot;UA&quot; &quot;UB&quot; &quot;UC&quot; &quot;UD&quot; &quot;UE&quot; &quot;UF&quot; &quot;UG&quot; &quot;UH&quot; &quot;UI&quot;</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [556] &quot;UJ&quot; &quot;UK&quot; &quot;UL&quot; &quot;UM&quot; &quot;UN&quot; &quot;UO&quot; &quot;UP&quot; &quot;UQ&quot; &quot;UR&quot; &quot;US&quot; &quot;UT&quot; &quot;UU&quot; &quot;UV&quot; &quot;UW&quot; &quot;UX&quot;</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [571] &quot;UY&quot; &quot;UZ&quot; &quot;VA&quot; &quot;VB&quot; &quot;VC&quot; &quot;VD&quot; &quot;VE&quot; &quot;VF&quot; &quot;VG&quot; &quot;VH&quot; &quot;VI&quot; &quot;VJ&quot; &quot;VK&quot; &quot;VL&quot; &quot;VM&quot;</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [586] &quot;VN&quot; &quot;VO&quot; &quot;VP&quot; &quot;VQ&quot; &quot;VR&quot; &quot;VS&quot; &quot;VT&quot; &quot;VU&quot; &quot;VV&quot; &quot;VW&quot; &quot;VX&quot; &quot;VY&quot; &quot;VZ&quot; &quot;WA&quot; &quot;WB&quot;</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [601] &quot;WC&quot; &quot;WD&quot; &quot;WE&quot; &quot;WF&quot; &quot;WG&quot; &quot;WH&quot; &quot;WI&quot; &quot;WJ&quot; &quot;WK&quot; &quot;WL&quot; &quot;WM&quot; &quot;WN&quot; &quot;WO&quot; &quot;WP&quot; &quot;WQ&quot;</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [616] &quot;WR&quot; &quot;WS&quot; &quot;WT&quot; &quot;WU&quot; &quot;WV&quot; &quot;WW&quot; &quot;WX&quot; &quot;WY&quot; &quot;WZ&quot; &quot;XA&quot; &quot;XB&quot; &quot;XC&quot; &quot;XD&quot; &quot;XE&quot; &quot;XF&quot;</span></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [631] &quot;XG&quot; &quot;XH&quot; &quot;XI&quot; &quot;XJ&quot; &quot;XK&quot; &quot;XL&quot; &quot;XM&quot; &quot;XN&quot; &quot;XO&quot; &quot;XP&quot; &quot;XQ&quot; &quot;XR&quot; &quot;XS&quot; &quot;XT&quot; &quot;XU&quot;</span></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [646] &quot;XV&quot; &quot;XW&quot; &quot;XX&quot; &quot;XY&quot; &quot;XZ&quot; &quot;YA&quot; &quot;YB&quot; &quot;YC&quot; &quot;YD&quot; &quot;YE&quot; &quot;YF&quot; &quot;YG&quot; &quot;YH&quot; &quot;YI&quot; &quot;YJ&quot;</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [661] &quot;YK&quot; &quot;YL&quot; &quot;YM&quot; &quot;YN&quot; &quot;YO&quot; &quot;YP&quot; &quot;YQ&quot; &quot;YR&quot; &quot;YS&quot; &quot;YT&quot; &quot;YU&quot; &quot;YV&quot; &quot;YW&quot; &quot;YX&quot; &quot;YY&quot;</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [676] &quot;YZ&quot; &quot;ZA&quot; &quot;ZB&quot; &quot;ZC&quot; &quot;ZD&quot; &quot;ZE&quot; &quot;ZF&quot; &quot;ZG&quot; &quot;ZH&quot; &quot;ZI&quot; &quot;ZJ&quot; &quot;ZK&quot; &quot;ZL&quot; &quot;ZM&quot; &quot;ZN&quot;</span></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [691] &quot;ZO&quot; &quot;ZP&quot; &quot;ZQ&quot; &quot;ZR&quot; &quot;ZS&quot; &quot;ZT&quot; &quot;ZU&quot; &quot;ZV&quot; &quot;ZW&quot; &quot;ZX&quot; &quot;ZY&quot; &quot;ZZ&quot;</span></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a><span class="fu">ncol_to_excel</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>)</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;A&quot; &quot;B&quot; &quot;C&quot; &quot;D&quot; &quot;E&quot; &quot;F&quot;</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a><span class="fu">excel_to_ncol</span>(<span class="fu">c</span>(<span class="st">&#39;AF&#39;</span>, <span class="st">&#39;AG&#39;</span>, <span class="st">&#39;AH&#39;</span>))</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 32 33 34</span></span></code></pre></div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,615 @@
+EnvStats-package	EnvStats-package
+ACE.13.TCE.df	ACE.13.TCE.df
+Air.df	Environmental
+Aldicarb	EPA.89b.aldicarb2.df
+anovaPE	anovaPE
+aovN	aovN
+aovPower	aovPower
+base	base
+Benthic.df	Benthic.df
+Benzene	EPA.89b.benzene.df
+Box-Cox	boxcox
+Box-Cox Censored	boxcoxCensored
+Box-Cox Transformation	boxcox
+Box-Cox Transformation for Censored Data	boxcoxCensored
+BoxCox	boxcox
+boxcox	boxcox
+BoxCox Censored	boxcoxCensored
+BoxCox Transformation	boxcox
+BoxCox Transformation for Censored Data	boxcoxCensored
+boxcox.default	boxcox
+boxcox.lm	boxcox
+boxcox.object	boxcox.object
+boxcoxCensored	boxcoxCensored
+boxcoxCensored.object	boxcoxCensored.object
+boxcoxLm.object	boxcoxLm.object
+boxcoxTransform	boxcoxTransform
+Cadmium	EPA.89b.cadmium.df
+calibrate	calibrate
+calibrate.object	calibrate.object
+Calibration	FcnsByCatCalibration
+Castillo and Hadi 1994	CastilloAndHadi1994
+CastilloAndHadi1994	CastilloAndHadi1994
+cdfCompare	cdfCompare
+cdfCompareCensored	cdfCompareCensored
+cdfPlot	cdfPlot
+Censored Data	FcnsByCatCensoredData
+chenTTest	chenTTest
+Chi	Chi
+Chlordane	EPA.89b.chlordane1.df
+ciBinomHalfWidth	ciBinomHalfWidth
+ciBinomN	ciBinomN
+ciNormHalfWidth	ciNormHalfWidth
+ciNormN	ciNormN
+ciNparConfLevel	ciNparConfLevel
+ciNparN	ciNparN
+ciTableMean	ciTableMean
+ciTableProp	ciTableProp
+Coefficient of Variation	cv
+coefficient of variation	cv
+Compare CDFs	cdfCompare
+Compare CDFs for Censored Data	cdfCompareCensored
+Cumulative Distribution	cdfPlot
+CV	cv
+cv	cv
+Data Transformations	FcnsByCatDataTrans
+dchi	Chi
+Delta Distribution	ZeroModifiedLognormal
+Delta Distribution (Alternative Parameterization)	ZeroModifiedLognormalAlt
+DeltaDist	ZeroModifiedLognormal
+DeltaDistAlt	ZeroModifiedLognormalAlt
+demp	Empirical
+Detection Limit	detectionLimitCalibrate
+detection limit	detectionLimitCalibrate
+detectionLimitCalibrate	detectionLimitCalibrate
+devd	EVD
+dgammaAlt	GammaAlt
+dgevd	GEVD
+distChoose	distChoose
+distChoose.default	distChoose
+distChoose.formula	distChoose
+distChoose.object	distChoose.object
+distChooseCensored	distChooseCensored
+distChooseCensored.object	distChooseCensored.object
+Distribution.df	Distribution.df
+dlnorm3	Lognormal3
+dlnormAlt	LognormalAlt
+dlnormMix	LognormalMix
+dlnormMixAlt	LognormalMixAlt
+dlnormTrunc	LognormalTrunc
+dlnormTruncAlt	LognormalTruncAlt
+dnormMix	NormalMix
+dnormTrunc	NormalTrunc
+dpareto	Pareto
+dtri	Triangular
+dzmlnorm	ZeroModifiedLognormal
+dzmlnormAlt	ZeroModifiedLognormalAlt
+dzmnorm	ZeroModifiedNormal
+ebeta	ebeta
+ebinom	ebinom
+ecdfPlot	ecdfPlot
+ecdfPlotCensored	ecdfPlotCensored
+eevd	eevd
+eexp	eexp
+egamma	egamma
+egammaAlt	egamma
+egammaAltCensored	egammaAltCensored
+egammaCensored	egammaCensored
+egeom	egeom
+egevd	egevd
+ehyper	ehyper
+elnorm	elnorm
+elnorm3	elnorm3
+elnormAlt	elnormAlt
+elnormAltCensored	elnormAltCensored
+elnormCensored	elnormCensored
+elogis	elogis
+Empirical	Empirical
+empirical PDF	epdfPlot
+enbinom	enbinom
+enorm	enorm
+enormCensored	enormCensored
+enparCensored	enparCensored
+Environmental	Environmental
+Environmental.df	Environmental
+EnvStats	EnvStats-package
+EnvStats Functions for Censored Data	FcnsByCatCensoredData
+EnvStats Functions for Goodness-of-Fit Tests	FcnsByCatGOFTests
+EPA.02d.Ex.2.ug.per.L.vec	EPA.02d.Ex.2.ug.per.L.vec
+EPA.02d.Ex.4.mg.per.kg.vec	EPA.02d.Ex.4.mg.per.kg.vec
+EPA.02d.Ex.6.mg.per.kg.vec	EPA.02d.Ex.6.mg.per.kg.vec
+EPA.02d.Ex.9.mg.per.L.vec	EPA.02d.Ex.9.mg.per.L.vec
+EPA.09.Ex.10.1.nickel.df	EPA.09.Ex.10.1.nickel.df
+EPA.09.Ex.11.1.arsenic.df	EPA.09.Ex.11.1.arsenic.df
+EPA.09.Ex.12.1.ccl4.df	EPA.09.Ex.12.1.ccl4.df
+EPA.09.Ex.12.4.naphthalene.df	EPA.09.Ex.12.4.naphthalene.df
+EPA.09.Ex.13.1.iron.df	EPA.09.Ex.13.1.iron.df
+EPA.09.Ex.14.1.manganese.df	EPA.09.Ex.14.1.manganese.df
+EPA.09.Ex.14.3.alkalinity.df	EPA.09.Ex.14.3.alkalinity.df
+EPA.09.Ex.14.4.arsenic.df	EPA.09.Ex.14.4.arsenic.df
+EPA.09.Ex.14.8.df	EPA.09.Ex.14.8.df
+EPA.09.Ex.15.1.manganese.df	EPA.09.Ex.15.1.manganese.df
+EPA.09.Ex.16.1.sulfate.df	EPA.09.Ex.16.1.sulfate.df
+EPA.09.Ex.16.2.benzene.df	EPA.09.Ex.16.2.benzene.df
+EPA.09.Ex.16.4.copper.df	EPA.09.Ex.16.4.copper.df
+EPA.09.Ex.16.5.PCE.df	EPA.09.Ex.16.5.PCE.df
+EPA.09.Ex.17.1.loglead.df	EPA.09.Ex.17.1.loglead.df
+EPA.09.Ex.17.2.toluene.df	EPA.09.Ex.17.2.toluene.df
+EPA.09.Ex.17.3.chrysene.df	EPA.09.Ex.17.3.chrysene.df
+EPA.09.Ex.17.3.log.chrysene.df	EPA.09.Ex.17.3.log.chrysene.df
+EPA.09.Ex.17.4.copper.df	EPA.09.Ex.17.4.copper.df
+EPA.09.Ex.17.5.chloride.df	EPA.09.Ex.17.5.chloride.df
+EPA.09.Ex.17.6.sulfate.df	EPA.09.Ex.17.6.sulfate.df
+EPA.09.Ex.17.7.sodium.df	EPA.09.Ex.17.7.sodium.df
+EPA.09.Ex.18.1.arsenic.df	EPA.09.Ex.18.1.arsenic.df
+EPA.09.Ex.18.2.chrysene.df	EPA.09.Ex.18.2.chrysene.df
+EPA.09.Ex.18.3.TCE.df	EPA.09.Ex.18.3.TCE.df
+EPA.09.Ex.18.4.xylene.df	EPA.09.Ex.18.4.xylene.df
+EPA.09.Ex.19.1.sulfate.df	EPA.09.Ex.19.1.sulfate.df
+EPA.09.Ex.19.2.chloride.df	EPA.09.Ex.19.2.chloride.df
+EPA.09.Ex.19.5.mercury.df	EPA.09.Ex.19.5.mercury.df
+EPA.09.Ex.20.1.nickel.df	EPA.09.Ex.20.1.nickel.df
+EPA.09.Ex.21.1.aldicarb.df	EPA.09.Ex.21.1.aldicarb.df
+EPA.09.Ex.21.2.benzene.df	EPA.09.Ex.21.2.benzene.df
+EPA.09.Ex.21.5.beryllium.df	EPA.09.Ex.21.5.beryllium.df
+EPA.09.Ex.21.6.nitrate.df	EPA.09.Ex.21.6.nitrate.df
+EPA.09.Ex.21.7.TCE.df	EPA.09.Ex.21.7.TCE.df
+EPA.09.Ex.22.1.VC.df	EPA.09.Ex.22.1.VC.df
+EPA.09.Ex.22.2.Specific.Conductance.df	EPA.09.Ex.22.2.Specific.Conductance.df
+EPA.09.Ex.6.3.sulfate.df	EPA.09.Ex.6.3.sulfate.df
+EPA.09.Ex.7.1.arsenic.df	EPA.09.Ex.7.1.arsenic.df
+EPA.09.Table.9.1.TCE.df	EPA.09.Table.9.1.TCE.df
+EPA.09.Table.9.3.df	EPA.09.Table.9.3.df
+EPA.09.Table.9.4.nickel.vec	EPA.09.Table.9.4.nickel.vec
+EPA.89b.aldicarb1.df	EPA.89b.aldicarb1.df
+EPA.89b.aldicarb2.df	EPA.89b.aldicarb2.df
+EPA.89b.benzene.df	EPA.89b.benzene.df
+EPA.89b.cadmium.df	EPA.89b.cadmium.df
+EPA.89b.chlordane1.df	EPA.89b.chlordane1.df
+EPA.89b.chlordane2.df	EPA.89b.chlordane2.df
+EPA.89b.edb.df	EPA.89b.edb.df
+EPA.89b.lead.df	EPA.89b.lead.df
+EPA.89b.loglead.df	EPA.89b.loglead.df
+EPA.89b.manganese.df	EPA.89b.manganese.df
+EPA.89b.sulfate.df	EPA.89b.sulfate.df
+EPA.89b.t29.df	EPA.89b.t29.df
+EPA.89b.toc.vec	EPA.89b.toc.vec
+EPA.92c.arsenic1.df	EPA.92c.arsenic1.df
+EPA.92c.arsenic2.df	EPA.92c.arsenic2.df
+EPA.92c.arsenic3.df	EPA.92c.arsenic3.df
+EPA.92c.benzene1.df	EPA.92c.benzene1.df
+EPA.92c.benzene2.df	EPA.92c.benzene2.df
+EPA.92c.ccl4.df	EPA.92c.ccl4.df
+EPA.92c.chrysene.df	EPA.92c.chrysene.df
+EPA.92c.copper1.df	EPA.92c.copper1.df
+EPA.92c.copper2.df	EPA.92c.copper2.df
+EPA.92c.lognickel1.df	EPA.92c.lognickel1.df
+EPA.92c.nickel1.df	EPA.92c.nickel1.df
+EPA.92c.nickel2.df	EPA.92c.nickel2.df
+EPA.92c.toluene.df	EPA.92c.toluene.df
+EPA.92c.zinc.df	EPA.92c.zinc.df
+EPA.92d.chromium.df	EPA.92d.chromium.df
+EPA.92d.chromium.vec	EPA.92d.chromium.vec
+EPA.94b.lead.df	EPA.94b.lead.df
+EPA.94b.tccb.df	EPA.94b.tccb.df
+EPA.97.cadmium.111.df	EPA.97.cadmium.111.df
+epareto	epareto
+epdfPlot	epdfPlot
+epois	epois
+epoisCensored	epoisCensored
+eqbeta	eqbeta
+eqbinom	eqbinom
+eqevd	eqevd
+eqexp	eqexp
+eqgamma	eqgamma
+eqgammaAlt	eqgamma
+eqgeom	eqgeom
+eqgevd	eqgevd
+eqhyper	eqhyper
+eqlnorm	eqlnorm
+eqlnorm3	eqlnorm3
+eqlnormCensored	eqlnormCensored
+eqlogis	eqlogis
+eqnbinom	eqnbinom
+eqnorm	eqnorm
+eqnormCensored	eqnormCensored
+eqnpar	eqnpar
+eqpareto	eqpareto
+eqpois	eqpois
+equnif	equnif
+eqweibull	eqweibull
+eqzmlnorm	eqzmlnorm
+eqzmlnormAlt	eqzmlnorm
+eqzmnorm	eqzmnorm
+errorBar	errorBar
+estimate	estimate.object
+estimate.object	estimate.object
+estimateCensored	estimateCensored.object
+estimateCensored.object	estimateCensored.object
+Estimating Distribution Parameters	FcnsByCatEstDistParams
+Estimating Distribution Quantiles	FcnsByCatEstDistQuants
+Eulers Constant	EulersConstant
+EulersConstant	EulersConstant
+eunif	eunif
+EVD	EVD
+evNormOrdStats	evNormOrdStats
+evNormOrdStatsScalar	evNormOrdStats
+eweibull	eweibull
+Extreme Value Distribution	EVD
+ezmlnorm	ezmlnorm
+ezmlnormAlt	ezmlnorm
+ezmnorm	ezmnorm
+FcnsByCat	FcnsByCat
+FcnsByCatCalibration	FcnsByCatCalibration
+FcnsByCatCensoredData	FcnsByCatCensoredData
+FcnsByCatDataTrans	FcnsByCatDataTrans
+FcnsByCatEstDistParams	FcnsByCatEstDistParams
+FcnsByCatEstDistQuants	FcnsByCatEstDistQuants
+FcnsByCatGOFTests	FcnsByCatGOFTests
+FcnsByCatHypothTests	FcnsByCatHypothTests
+FcnsByCatMCandRisk	FcnsByCatMCandRisk
+FcnsByCatPlotProbDists	FcnsByCatPlotProbDists
+FcnsByCatPlotUsingggplot2	FcnsByCatPlotUsingggplot2
+FcnsByCatPower	FcnsByCatPower
+FcnsByCatPredInts	FcnsByCatPredInts
+FcnsByCatPrintPlot	FcnsByCatPrintPlot
+FcnsByCatProbDists	FcnsByCatProbDists
+FcnsByCatSumStats	FcnsByCatSumStats
+FcnsByCatTolInts	FcnsByCatTolInts
+FcnsByCatTrend	FcnsByCatTrend
+Functions By Category	FcnsByCat
+Functions for Censored Data	FcnsByCatCensoredData
+Gamma Distribution	GammaAlt
+GammaAlt	GammaAlt
+Generalized Extreme Value Distribution	GEVD
+geoMean	geoMean
+Geometric Mean	geoMean
+geometric mean	geoMean
+Geometric SD	geoSD
+geometric SD	geoSD
+Geometric Standard Deviation	geoSD
+geometric standard deviation	geoSD
+geom_stripchart	geom_stripchart
+geoSD	geoSD
+GEVD	GEVD
+Gibbons.et.al.09.Alkilinity.vec	Gibbons.et.al.09.Alkilinity.vec
+Gibbons.et.al.09.Vinyl.Chloride.vec	Gibbons.et.al.09.Vinyl.Chloride.vec
+GOF	FcnsByCatGOFTests
+gof	gof.object
+gof.object	gof.object
+gofCensored	gofCensored.object
+gofCensored.object	gofCensored.object
+gofGroup	gofGroup.object
+gofGroup.object	gofGroup.object
+gofGroupTest	gofGroupTest
+gofGroupTest.data.frame	gofGroupTest
+gofGroupTest.default	gofGroupTest
+gofGroupTest.formula	gofGroupTest
+gofGroupTest.list	gofGroupTest
+gofGroupTest.matrix	gofGroupTest
+gofOutlier	gofOutlier.object
+gofOutlier.object	gofOutlier.object
+gofTest	gofTest
+gofTest.default	gofTest
+gofTest.formula	gofTest
+gofTestCensored	gofTestCensored
+gofTwoSample	gofTwoSample.object
+gofTwoSample.object	gofTwoSample.object
+Goodness-of-Fit Tests	FcnsByCatGOFTests
+gpqCiNormCensored	gpqCiNormCensored
+gpqCiNormMultiplyCensored	gpqCiNormCensored
+gpqCiNormSinglyCensored	gpqCiNormCensored
+gpqTolIntNormCensored	gpqTolIntNormCensored
+gpqTolIntNormMultiplyCensored	gpqTolIntNormCensored
+gpqTolIntNormSinglyCensored	gpqTolIntNormCensored
+Graham.et.al.75.etu.df	Graham.et.al.75.etu.df
+Grice.Bain.80.mat	Grice.Bain.80.mat
+Gumbel Distribution	EVD
+Helsel.Cohn.88.app.b.df	Helsel.Cohn.88.app.b.df
+Helsel.Cohn.88.silver.df	Helsel.Cohn.88.silver.df
+Helsel.Hirsch.02.Mayfly.df	Helsel.Hirsch.02.Mayfly.df
+Hosking et al 1985	HoskingEtAl1985
+HoskingEtAl1985	HoskingEtAl1985
+htest.object	htest.object
+htestCensored.object	htestCensored.object
+Hypothesis Tests	FcnsByCatHypothTests
+Interquartile Range	iqr
+inversePredictCalibrate	inversePredictCalibrate
+iqr	iqr
+kendallSeasonalTrendTest	kendallSeasonalTrendTest
+kendallSeasonalTrendTest.data.frame	kendallSeasonalTrendTest
+kendallSeasonalTrendTest.default	kendallSeasonalTrendTest
+kendallSeasonalTrendTest.formula	kendallSeasonalTrendTest
+kendallSeasonalTrendTest.matrix	kendallSeasonalTrendTest
+kendallTrendTest	kendallTrendTest
+kendallTrendTest.default	kendallTrendTest
+kendallTrendTest.formula	kendallTrendTest
+Kurtosis	kurtosis
+kurtosis	kurtosis
+Lin.Evans.80.df	Lin.Evans.80.df
+linearTrendTestN	linearTrendTestN
+linearTrendTestPower	linearTrendTestPower
+linearTrendTestScaledMds	linearTrendTestScaledMds
+lMoment	lMoment
+Lognormal3	Lognormal3
+LognormalAlt	LognormalAlt
+LognormalMix	LognormalMix
+LognormalMixAlt	LognormalMixAlt
+LognormalTrunc	LognormalTrunc
+LognormalTruncAlt	LognormalTruncAlt
+longToWide	longToWide
+Millard.Deverel.88.df	Millard.Deverel.88.df
+Modified.TcCB.df	Modified.TcCB.df
+Monte Carlo Simulation and Risk Assessment	FcnsByCatMCandRisk
+newsEnvStats	newsEnvStats
+NIOSH.89.air.lead.vec	NIOSH.89.air.lead.vec
+Nonparametric Prediction Interval	predIntNpar
+Nonparametric Simultaneous Prediction Interval	predIntNparSimultaneous
+NormalMix	NormalMix
+NormalTrunc	NormalTrunc
+Olympic.NH4.df	Olympic.NH4.df
+oneSamplePermutationTest	oneSamplePermutationTest
+Outlier Test	rosnerTest
+outlier test	rosnerTest
+Ozone.NE.df	Ozone.NE.df
+Pareto	Pareto
+pchi	Chi
+pdfPlot	pdfPlot
+pemp	Empirical
+permutationTest.object	permutationTest.object
+pevd	EVD
+pgammaAlt	GammaAlt
+pgevd	GEVD
+plnorm3	Lognormal3
+plnormAlt	LognormalAlt
+plnormMix	LognormalMix
+plnormMixAlt	LognormalMixAlt
+plnormTrunc	LognormalTrunc
+plnormTruncAlt	LognormalTruncAlt
+Plot CDF	cdfPlot
+Plot Cumulative Distribution	cdfPlot
+Plot PDF	pdfPlot
+Plot Probability Density	pdfPlot
+Plot Probability Distributions	FcnsByCatPlotProbDists
+Plot Using ggplot2	FcnsByCatPlotUsingggplot2
+plot.boxcox	plot.boxcox
+plot.boxcoxCensored	plot.boxcoxCensored
+plot.boxcoxLm	plot.boxcoxLm
+plot.gof	plot.gof
+plot.gofCensored	plot.gofCensored
+plot.gofGroup	plot.gofGroup
+plot.gofTwoSample	plot.gofTwoSample
+plot.permutationTest	plot.permutationTest
+plotAovDesign	plotAovDesign
+plotCiBinomDesign	plotCiBinomDesign
+plotCiNormDesign	plotCiNormDesign
+plotCiNparDesign	plotCiNparDesign
+plotLinearTrendTestDesign	plotLinearTrendTestDesign
+plotPredIntLnormAltSimultaneousTestPowerCurve	plotPredIntLnormAltSimultaneousTestPowerCurve
+plotPredIntLnormAltTestPowerCurve	plotPredIntLnormAltTestPowerCurve
+plotPredIntNormDesign	plotPredIntNormDesign
+plotPredIntNormSimultaneousTestPowerCurve	plotPredIntNormSimultaneousTestPowerCurve
+plotPredIntNormTestPowerCurve	plotPredIntNormTestPowerCurve
+plotPredIntNparDesign	plotPredIntNparDesign
+plotPredIntNparSimultaneousDesign	plotPredIntNparSimultaneousDesign
+plotPredIntNparSimultaneousTestPowerCurve	plotPredIntNparSimultaneousTestPowerCurve
+plotPropTestDesign	plotPropTestDesign
+Plotting Probability Distributions	FcnsByCatPlotProbDists
+Plotting Using ggplot2	FcnsByCatPlotUsingggplot2
+plotTolIntNormDesign	plotTolIntNormDesign
+plotTolIntNparDesign	plotTolIntNparDesign
+plotTTestDesign	plotTTestDesign
+plotTTestLnormAltDesign	plotTTestLnormAltDesign
+pnormMix	NormalMix
+pnormTrunc	NormalTrunc
+pointwise	pointwise
+Power and Sample Size	FcnsByCatPower
+Power and Sample Size Calculations	FcnsByCatPower
+Power t-test	tTestPower
+power t-test	tTestPower
+ppareto	Pareto
+ppointsCensored	ppointsCensored
+predict	predict
+predict.default	predict
+predict.lm	predict.lm
+Prediction Intervals	FcnsByCatPredInts
+predIntGamma	predIntGamma
+predIntGammaAlt	predIntGamma
+predIntGammaAltSimultaneous	predIntGammaSimultaneous
+predIntGammaSimultaneous	predIntGammaSimultaneous
+predIntLnorm	predIntLnorm
+predIntLnormAlt	predIntLnorm
+predIntLnormAltSimultaneous	predIntLnormSimultaneous
+predIntLnormAltSimultaneousTestPower	predIntLnormAltSimultaneousTestPower
+predIntLnormAltTestPower	predIntLnormAltTestPower
+predIntLnormSimultaneous	predIntLnormSimultaneous
+predIntNorm	predIntNorm
+predIntNormHalfWidth	predIntNormHalfWidth
+predIntNormK	predIntNormK
+predIntNormN	predIntNormN
+predIntNormSimultaneous	predIntNormSimultaneous
+predIntNormSimultaneousK	predIntNormSimultaneousK
+predIntNormSimultaneousTestPower	predIntNormSimultaneousTestPower
+predIntNormTestPower	predIntNormTestPower
+predIntNpar	predIntNpar
+predIntNparConfLevel	predIntNparConfLevel
+predIntNparN	predIntNparN
+predIntNparSimultaneous	predIntNparSimultaneous
+predIntNparSimultaneousConfLevel	predIntNparSimultaneousConfLevel
+predIntNparSimultaneousN	predIntNparSimultaneousN
+predIntNparSimultaneousTestPower	predIntNparSimultaneousTestPower
+predIntPois	predIntPois
+print	print
+print.boxcox	print.boxcox
+print.boxcoxCensored	print.boxcoxCensored
+print.boxcoxLm	print.boxcoxLm
+print.default	print
+print.distChoose	print.distChoose
+print.distChooseCensored	print.distChooseCensored
+print.estimate	print.estimate
+print.estimateCensored	print.estimateCensored
+print.gof	print.gof
+print.gofCensored	print.gofCensored
+print.gofGroup	print.gofGroup
+print.gofOutlier	print.gofOutlier
+print.gofTwoSample	print.gofTwoSample
+print.htestCensored	print.htestCensored
+print.htestEnvStats	print.htestEnvStats
+print.permutationTest	print.permutationTest
+print.summaryStats	print.summaryStats
+Printing and Plotting Methods	FcnsByCatPrintPlot
+Probability Density	pdfPlot
+Probability Distributions	FcnsByCatProbDists
+Probability Distributions and Random Numbers	FcnsByCatProbDists
+propTestMdd	propTestMdd
+propTestN	propTestN
+propTestPower	propTestPower
+ProUCL.Crit.Vals.for.AD.Test.for.Gamma.array	ProUCL.Crit.Vals.for.AD.Test.for.Gamma.array
+ProUCL.Crit.Vals.for.KS.Test.for.Gamma.array	ProUCL.Crit.Vals.for.KS.Test.for.Gamma.array
+ptri	Triangular
+pwMoment	pwMoment
+pzmlnorm	ZeroModifiedLognormal
+pzmlnormAlt	ZeroModifiedLognormalAlt
+pzmnorm	ZeroModifiedNormal
+qchi	Chi
+qemp	Empirical
+qevd	EVD
+qgammaAlt	GammaAlt
+qgevd	GEVD
+qlnorm3	Lognormal3
+qlnormAlt	LognormalAlt
+qlnormMix	LognormalMix
+qlnormMixAlt	LognormalMixAlt
+qlnormTrunc	LognormalTrunc
+qlnormTruncAlt	LognormalTruncAlt
+qnormMix	NormalMix
+qnormTrunc	NormalTrunc
+qpareto	Pareto
+qqPlot	qqPlot
+qqPlotCensored	qqPlotCensored
+qqPlotGestalt	qqPlotGestalt
+qtri	Triangular
+quantileTest	quantileTest
+quantileTestPValue	quantileTestPValue
+qzmlnorm	ZeroModifiedLognormal
+qzmlnormAlt	ZeroModifiedLognormalAlt
+qzmnorm	ZeroModifiedNormal
+rchi	Chi
+Refinery.CO.df	Refinery.CO.df
+remp	Empirical
+revd	EVD
+rgammaAlt	GammaAlt
+rgevd	GEVD
+rlnorm3	Lognormal3
+rlnormAlt	LognormalAlt
+rlnormMix	LognormalMix
+rlnormMixAlt	LognormalMixAlt
+rlnormTrunc	LognormalTrunc
+rlnormTruncAlt	LognormalTruncAlt
+rnormMix	NormalMix
+rnormTrunc	NormalTrunc
+Rosner	rosnerTest
+rosnerTest	rosnerTest
+rpareto	Pareto
+rtri	Triangular
+rzmlnorm	ZeroModifiedLognormal
+rzmlnormAlt	ZeroModifiedLognormalAlt
+rzmnorm	ZeroModifiedNormal
+sample kurtosis	kurtosis
+serial correlation	serialCorrelationTest
+serial correlation test	serialCorrelationTest
+serialCorrelationTest	serialCorrelationTest
+serialCorrelationTest.default	serialCorrelationTest
+serialCorrelationTest.lm	serialCorrelationTest
+sign test	signTest
+signTest	signTest
+simulateMvMatrix	simulateMvMatrix
+simulateVector	simulateVector
+Skagit.NH3_N.df	Skagit.NH3_N.df
+Skew	skewness
+skew	skewness
+Skewness	skewness
+skewness	skewness
+StatMeanSDText	EnvStats-internal
+StatMedianIQRText	EnvStats-internal
+StatNText	EnvStats-internal
+StatTestText	EnvStats-internal
+stat_mean_sd_text	stat_mean_sd_text
+stat_median_iqr_text	stat_median_iqr_text
+stat_n_text	stat_n_text
+stat_test_text	stat_test_text
+stripChart	stripChart
+stripChart.default	stripChart
+stripChart.formula	stripChart
+Summary Plots	FcnsByCatSumStats
+Summary Statistics	FcnsByCatSumStats
+summaryFull	summaryFull
+summaryFull.data.frame	summaryFull
+summaryFull.default	summaryFull
+summaryFull.factor	summaryFull
+summaryFull.formula	summaryFull
+summaryFull.list	summaryFull
+summaryFull.matrix	summaryFull
+summaryStats	summaryStats
+summaryStats.character	summaryStats
+summaryStats.data.frame	summaryStats
+summaryStats.default	summaryStats
+summaryStats.factor	summaryStats
+summaryStats.formula	summaryStats
+summaryStats.list	summaryStats
+summaryStats.logical	summaryStats
+summaryStats.matrix	summaryStats
+summaryStats.object	summaryStats.object
+T-test power	tTestPower
+t-test Power	tTestPower
+t-test power	tTestPower
+Three Parameter Lognormal	Lognormal3
+Tolerance Intervals	FcnsByCatTolInts
+tolIntGamma	tolIntGamma
+tolIntGammaAlt	tolIntGamma
+tolIntLnorm	tolIntLnorm
+tolIntLnormAlt	tolIntLnorm
+tolIntLnormCensored	tolIntLnormCensored
+tolIntNorm	tolIntNorm
+tolIntNormCensored	tolIntNormCensored
+tolIntNormHalfWidth	tolIntNormHalfWidth
+tolIntNormK	tolIntNormK
+tolIntNormN	tolIntNormN
+tolIntNpar	tolIntNpar
+tolIntNparConfLevel	tolIntNparConfLevel
+tolIntNparCoverage	tolIntNparCoverage
+tolIntNparN	tolIntNparN
+tolIntPois	tolIntPois
+Total.P.df	Total.P.df
+Trend Analysis	FcnsByCatTrend
+Triangular	Triangular
+tTestAlpha	tTestAlpha
+tTestLnormAltN	tTestLnormAltN
+tTestLnormAltPower	tTestLnormAltPower
+tTestLnormAltRatioOfMeans	tTestLnormAltRatioOfMeans
+tTestN	tTestN
+tTestPower	tTestPower
+tTestScaledMdd	tTestScaledMdd
+twoSampleLinearRankTest	twoSampleLinearRankTest
+twoSampleLinearRankTestCensored	twoSampleLinearRankTestCensored
+twoSamplePermutationTestLocation	twoSamplePermutationTestLocation
+twoSamplePermutationTestProportion	twoSamplePermutationTestProportion
+varGroupTest	varGroupTest
+varGroupTest.data.frame	varGroupTest
+varGroupTest.default	varGroupTest
+varGroupTest.formula	varGroupTest
+varGroupTest.list	varGroupTest
+varGroupTest.matrix	varGroupTest
+varTest	varTest
+Zero Modified Lognormal	ZeroModifiedLognormal
+Zero Modified Lognormal (Alternative Parameterization)	ZeroModifiedLognormalAlt
+Zero Modified Lognormal (Delta)	ZeroModifiedLognormal
+Zero Modified Normal	ZeroModifiedNormal
+Zero-Modified Lognormal	ZeroModifiedLognormal
+Zero-Modified Lognormal (Alternative Parameterization)	ZeroModifiedLognormalAlt
+Zero-Modified Lognormal (Delta)	ZeroModifiedLognormal
+Zero-Modified Normal	ZeroModifiedNormal
+ZeroModifiedLognormal	ZeroModifiedLognormal
+ZeroModifiedLognormalAlt	ZeroModifiedLognormalAlt
+ZeroModifiedNormal	ZeroModifiedNormal
+zTestGevdShape	zTestGevdShape

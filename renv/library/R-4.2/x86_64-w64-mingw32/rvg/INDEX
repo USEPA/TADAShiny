@@ -1,0 +1,10 @@
+dml                     Wrap plot instructions for DrawingML plotting
+                        in Powerpoint
+dml_pptx                DrawingML graphic device for Microsoft
+                        PowerPoint
+dml_xlsx                DrawingML graphic device for Microsoft Excel
+ph_with.dml             add a plot output as vector graphics into a
+                        PowerPoint object
+rvg-defunct             Defunct Functions in Package rvg
+xl_add_vg               add a plot output as vector graphics into an
+                        Excel object

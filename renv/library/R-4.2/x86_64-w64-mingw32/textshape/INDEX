@@ -1,0 +1,49 @@
+DATA                    Fictitious Classroom Dialogue
+bind_list               Row Bind a List of Named Dataframes or Vectors
+bind_table              Column Bind a Table's Values with Its Names
+bind_vector             Column Bind an Atomic Vector's Values with Its
+                        Names
+change_index            Indexing of Changes in Runs
+cluster_matrix          Reorder a Matrix Based on Hierarchical
+                        Clustering
+column_to_rownames      Add a Column as Rownames
+combine                 Combine Elements
+duration                Duration of Turns of Talk
+flatten                 Flatten a Nested List of Vectors Into a Single
+                        Tier List of Vectors
+from_to                 Prepare Discourse Data for Network Plotting
+golden_rules            Sentence Boundary Disambiguation Edge Cases
+grab_index              Get Elements Matching Between 2 Points
+grab_match              Get Elements Matching Between 2 Points
+hamlet                  Hamlet (Complete & Split by Sentence)
+mtabulate               Tabulate Frequency Counts for Multiple Vectors
+simple_dtm              Simple 'DocumentTermMatrix'
+split_index             Split Data Forms at Specified Indices
+split_match             Split a Vector By Split Points
+split_match_regex_to_transcript
+                        Split Text by Regex Into a Transcript
+split_portion           Break Text Into Ordered Word Chunks
+split_run               Split Runs
+split_sentence          Split Sentences
+split_sentence_token    Split Sentences & Tokens
+split_speaker           Break and Stretch if Multiple Persons per Cell
+split_token             Split Tokens
+split_transcript        Split a Transcript Style Vector on Delimiter &
+                        Coerce to Dataframe
+split_word              Split Words
+textshape               Tools for Reshaping Text
+tidy_colo_tdm           Convert a
+                        'DocumentTermMatrix'/'TermDocumentMatrix' into
+                        Collocating Words in Tidy Form
+tidy_dtm                Convert a
+                        'DocumentTermMatrix'/'TermDocumentMatrix' into
+                        Tidy Form
+tidy_list               Tidy a List of Named Dataframes or Named
+                        Vectors or Vectors
+tidy_matrix             Convert a Matrix into Tidy Form
+tidy_table              Tidy a Table: Bind Its Values with Its Names
+tidy_vector             Tidy a Named Atomic Vector: Bind Its Values
+                        with Its Names
+unique_pairs            Extract Only Unique Pairs of Collocating Words
+                        in 'tidy_colo_dtm'
+unnest_text             Un-nest Nested Text Columns

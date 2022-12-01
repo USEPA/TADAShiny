@@ -1,0 +1,145 @@
+# rvg 0.2.5
+
+## Changes
+
+* update for changes in the R graphics engine (thanks to Dr Paul Murrell)
+* function `body_add_vg` is defunct.
+* functions `ph_with_vg` and `ph_with_vg_at` have been removed.
+
+# rvg 0.2.4
+
+## Changes
+
+* functions `ph_with_vg` and `ph_with_vg_at` are defunct and will be removed in the next release.
+* rvg web site is now indicated in DESCRIPTION file.
+* functions `ph_with_vg` and `ph_with_vg_at` are defunct.
+
+
+# rvg 0.2.3
+
+## Deprecations
+
+* functions `ph_with_vg` and `ph_with_vg_at` are deprecated.
+
+# rvg 0.2.2
+
+## Fixes
+
+* fix issues with default font
+
+# rvg 0.2.1
+
+## Enhancement
+
+* New function `ph_with.dml` and `dml`, it will replace functions `ph_with_vg` and
+`ph_with_vg_at` (they will be deprecated in the next release).
+
+# rvg 0.2.0
+
+## Changes
+
+* dsvg is now living in ggiraph package
+
+# rvg 0.1.9
+
+## Enhancement
+
+* add path method to PowerPoint device. As an effect
+  `ggplot2::geom_sf` is now supported.
+* argument `type` of function `ph_with_vg`
+  now default to "body".
+
+## Changes
+
+* `dml_docx` is deprecated and will be removed in later versions. It
+  was maintained for compatibility reasons with package ReporteRs.
+  As ReporteRs will be removed from CRAN 2018-07-16, this function
+  has no more reason to exist.
+
+# rvg 0.1.8
+
+* fix encoding issues with Windows platforms.
+
+# rvg 0.1.7
+
+* add argument `ggobj` to `ph_with_vg()` and `ph_with_vg_at()`.
+It can be used as replacement to `code=print(gg)` when gg is
+a ggplot object.
+
+* new function `xl_add_vg()` to add vector graphics produced
+from R into Excel workbooks. This requires `officer >= 0.2.0`.
+
+# rvg 0.1.6
+
+* update with officer 1.8
+
+# rvg 0.1.5
+
+* update with gdtools 1.6
+* raster ids are now registered
+
+# rvg 0.1.4
+
+* raster images dpi has been increased
+* new 'ph_with_vg_at' methods for package officer
+
+# rvg 0.1.3
+
+* new 'body_add_vg' and 'ph_with_vg' methods for package officer
+* deletion of write_* functions, these are now available in officer (functions print)
+
+# rvg 0.1.2
+
+* add donttest tags in all examples to avoid long runs due to fontconfig initialisation
+* change textbox in Word graphics so that text auto-adjusts.
+
+# rvg 0.1.1
+
+* adapt code to gdtools 0.1.1
+
+# rvg 0.1.0
+
+* adapt code to xml2 1.0 (use xml_find_first instead of deprecated xml_find_one)
+
+# rvg 0.0.9
+
+## New features
+
+* new device driver for Microsoft Excel documents
+* add function write_xlsx
+
+## Bug fixes
+
+* make cliping region id unique in dsvg
+
+# rvg 0.0.8
+
+## Bug fixes
+
+* fix rectangle clipping
+* stop wrapping text in DrawingML devices
+
+# rvg 0.0.7
+
+## New features
+
+* implementation of clipping (algorithms by Francois Brunetti).
+* new function set_attr to set attributes to graphical elements
+  without dependency to jquery nor bootstrap (suggested by
+  Bob Rudis).
+
+# rvg 0.0.6
+
+## Bug fixes
+
+* plot size was truncated to integers
+
+* lines with opacity were not displayed
+
+## New features
+
+* grid support for interactive points,
+  polygons, polylines, rectangles,
+  segments and text
+
+

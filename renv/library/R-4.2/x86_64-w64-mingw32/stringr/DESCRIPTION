@@ -1,0 +1,34 @@
+Package: stringr
+Title: Simple, Consistent Wrappers for Common String Operations
+Version: 1.4.1
+Authors@R: 
+    c(person(given = "Hadley",
+             family = "Wickham",
+             role = c("aut", "cre", "cph"),
+             email = "hadley@rstudio.com"),
+      person(given = "RStudio",
+             role = c("cph", "fnd")))
+Description: A consistent, simple and easy to use set of
+    wrappers around the fantastic 'stringi' package. All function and
+    argument names (and positions) are consistent, all functions deal with
+    "NA"'s and zero length vectors in the same way, and the output from
+    one function is easy to feed into the input of another.
+License: GPL-2 | file LICENSE
+URL: https://stringr.tidyverse.org,
+        https://github.com/tidyverse/stringr
+BugReports: https://github.com/tidyverse/stringr/issues
+Depends: R (>= 3.1)
+Imports: glue (>= 1.2.0), magrittr, stringi (>= 1.1.7)
+Suggests: covr, htmltools, htmlwidgets, knitr, rmarkdown, testthat
+VignetteBuilder: knitr
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.2.1
+NeedsCompilation: no
+Packaged: 2022-08-20 14:07:06 UTC; hadleywickham
+Author: Hadley Wickham [aut, cre, cph],
+  RStudio [cph, fnd]
+Maintainer: Hadley Wickham <hadley@rstudio.com>
+Repository: CRAN
+Date/Publication: 2022-08-20 22:10:02 UTC
+Built: R 4.2.2; ; 2022-11-10 03:00:07 UTC; windows

@@ -1,0 +1,21 @@
+Package: MatrixModels
+Version: 0.5-1
+Date: 2022-09-03
+Title: Modelling with Sparse and Dense Matrices
+Author: Douglas Bates <bates@stat.wisc.edu> and Martin Maechler <maechler@stat.math.ethz.ch>
+Maintainer: Martin Maechler <mmaechler+Matrix@gmail.com>
+Contact: Doug and Martin <Matrix-authors@R-project.org>
+Description: Modelling with sparse and dense 'Matrix' matrices, using
+  modular prediction and response module classes.
+Depends: R (>= 3.6.0)
+Imports: stats, methods, Matrix (>= 1.4-2)
+ImportsNote: _not_yet_stats4
+Encoding: UTF-8
+LazyLoad: yes
+License: GPL (>= 2)
+URL: http://Matrix.R-forge.R-project.org/
+NeedsCompilation: no
+Packaged: 2022-09-03 21:13:52 UTC; maechler
+Repository: CRAN
+Date/Publication: 2022-09-11 06:02:55 UTC
+Built: R 4.2.2; ; 2022-11-10 03:26:06 UTC; windows

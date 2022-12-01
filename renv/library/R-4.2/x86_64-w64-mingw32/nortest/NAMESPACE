@@ -1,0 +1,2 @@
+importFrom("stats", "complete.cases", "cor", "pchisq", "pnorm", "ppoints", "qnorm", "sd")
+export(ad.test, cvm.test, lillie.test, pearson.test, sf.test)

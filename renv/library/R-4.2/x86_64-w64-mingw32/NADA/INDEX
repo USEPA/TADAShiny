@@ -1,0 +1,106 @@
+Ag                      Silver-standard concentrations
+Arsenic                 Dissolved arsenic concentrations in ground
+                        water of U.S.
+As                      Dissolved arsenic concentrations in ground
+                        water of U.S.
+AsExample               Example arsenic concentrations in drinking
+                        water
+Atra                    Atrazine concentrations in Nebraska ground
+                        water
+AtraAlt                 Atrazine concentrations in Nebraska ground
+                        water - Alternative
+Atrazine                Atrazine concentrations in Nebraska ground
+                        water - Another Format
+Bloodlead               Lead concentrations in the blood of herons in
+                        Virginia.
+Cadmium                 Cadmium concentrations in fish
+Cen                     Create a Censored Object
+ChlfmCA                 Chloroform concentrations in California
+                        groundwater.
+CuZn                    Copper and zinc concentrations in ground water
+CuZnAlt                 Zinc concentrations of the CuZn data set
+DFe                     Dissolved iron concentrations from the Brazos
+                        River, USA
+DOC                     DOC in ground water
+Golden                  Blood lead in organs of herons from Virginia
+Hatchery                Antibiotic concentrations in fish-hatchery
+                        drainage
+HgFish                  Mercury concentrations in fish across the
+                        United States.
+MDCu                    Copper in ground water from of San Joaquin
+                        Valley, USA
+NADAList-class          Class "NADAList"
+Oahu                    Arsenic concentrations in Manoa Stream, Oahu
+                        Hawaii
+Recon                   Atrazine in streams of the Midwestern U.S.
+Roach                   Lindane in fish from tributaries of the Thames
+                        River, UK
+SedPb                   Lead in stream sediments before and after
+                        wildfires
+ShePyrene               Pyrene concentrations in water from Puget
+                        Sound, WA USA
+Silver                  Dissolved silver concentrations from water
+                        analyses
+TCE                     TCE in ground waters of Long Island, New York
+TCEReg                  TCE ground waters of Long Island - with
+                        explanatory variables
+Tbl1one                 Contaminant concentrations in test and a
+                        control group
+Thames                  Dieldrin, lindane and PCB in fish of the Thames
+                        River, UK
+asSurv-methods          Methods for function asSurv in Package NADA
+boxplot-methods         Methods for function boxplot in Package NADA
+cenboxplot              Produces a censored boxplot
+cendiff                 Test Censored ECDF Differences
+cendiff-methods         Methods for function cendiff in Package NADA
+cenfit                  Compute an ECDF for Censored Data
+cenfit-class            Class "cenfit"
+cenfit-methods          Methods for function cenfit in Package NADA
+cenken                  Compute Kendall's tau correlation coefficient
+                        and associated line for censored data.
+                        Computes the Akritas-Theil-Sen nonparametric
+                        line, with the Turnbull estimate of intercept.
+cenken-class            Class "cenken"
+cenken-methods          Methods for function cenken in Package NADA
+cenmle                  Regression by Maximum Likelihood Estimation for
+                        Left-censored Data
+cenmle-class            Class "cenmle"
+cenmle-gaussian-class   Class "cenmle-gaussian"
+cenmle-lognormal-class
+                        Class "cenmle-lognormal"
+cenmle-methods          Methods for function cenmle in Package NADA
+cenreg                  Compute regression equations and likelihood
+                        correlation coefficient for censored data.
+cenreg-class            Class "cenreg"
+cenreg-gaussian-class   Class "cenreg-gaussian"
+cenreg-lognormal-class
+                        Class "cenreg-lognormal"
+cenreg-methods          Methods for function cenreg in Package NADA
+censtats                Produces summary statistics using ROS, MLE, and
+                        K-M methods.
+censummary              Produces basic summary statistics on censored
+                        data
+censummary-methods      Methods for function censummary in Package NADA
+cenxyplot               Produces a censored x-y scatter plot
+coef-methods            Methods for function coef in package NADA
+cor-methods             Methods for function cor in Package NADA
+flip-methods            Methods for function flip in Package NADA
+hc.ppoints              Helsel-Cohn style plotting positions
+lines-methods           Methods for function lines in Package NADA
+mean-methods            Methods for function mean in Package NADA
+median-methods          Methods for function median in Package NADA
+pctCen                  Calculate the percentage of values censored
+plot-methods            Methods for function plot in Package NADA
+predict-methods         Methods for function predict in package NADA
+print-methods           Methods for function print in Package NADA
+quantile-methods        Methods for function quantile in Package NADA
+residuals-methods       Methods for function residuals in package NADA
+ros                     Regression on Order Statistics
+ros-class               Class "ros"
+ros-methods             Methods for function ros in Package NADA
+sd-methods              Methods for function sd in Package NADA
+show-methods            Methods for function show in Package NADA
+splitQual               Split character qualifiers and numeric values
+                        from qualified data
+summary-methods         Methods for function summary in Package 'NADA'
+summary.cenreg-class    Class "summary.cenreg"

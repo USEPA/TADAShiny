@@ -1,0 +1,18 @@
+Package: nortest
+Title: Tests for Normality
+Version: 1.0-4
+Date: 2015-07-29
+Description: Five omnibus tests for testing the composite hypothesis of
+        normality.
+License: GPL (>= 2)
+Authors@R: c(person("Juergen", "Gross", role = "aut", email = "gross@statistik.tu-dortmund.de"),
+	person("Uwe", "Ligges", role = c("aut", "cre"), email = "ligges@statistik.tu-dortmund.de"))
+Imports: stats
+Packaged: 2015-07-29 21:51:34 UTC; ligges
+Author: Juergen Gross [aut],
+  Uwe Ligges [aut, cre]
+Maintainer: Uwe Ligges <ligges@statistik.tu-dortmund.de>
+NeedsCompilation: no
+Repository: CRAN
+Date/Publication: 2015-07-30 00:14:57
+Built: R 4.2.0; ; 2022-04-24 01:20:03 UTC; windows

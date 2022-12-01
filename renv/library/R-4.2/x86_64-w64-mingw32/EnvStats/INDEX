@@ -1,0 +1,740 @@
+ACE.13.TCE.df           Trichloroethylene Concentrations Before and
+                        After Remedation
+Benthic.df              Benthic Data from Monitoring Program in
+                        Chesapeake Bay
+CastilloAndHadi1994     Abstract: Castillo and Hadi (1994)
+Chi                     The Chi Distribution
+Distribution.df         Data Frame Summarizing Available Probability
+                        Distributions and Estimation Methods
+EPA.02d.Ex.2.ug.per.L.vec
+                        Concentrations in Exhibit 2 of 2002d USEPA
+                        Guidance Document
+EPA.02d.Ex.4.mg.per.kg.vec
+                        Concentrations in Exhibit 4 of 2002d USEPA
+                        Guidance Document
+EPA.02d.Ex.6.mg.per.kg.vec
+                        Concentrations in Exhibit 6 of 2002d USEPA
+                        Guidance Document
+EPA.02d.Ex.9.mg.per.L.vec
+                        Concentrations in Exhibit 9 of 2002d USEPA
+                        Guidance Document
+EPA.09.Ex.10.1.nickel.df
+                        Nickel Concentrations from Example 10-1 of 2009
+                        USEPA Guidance Document
+EPA.09.Ex.11.1.arsenic.df
+                        Arsenic Concentrations from Example 11-1 of
+                        2009 USEPA Guidance Document
+EPA.09.Ex.12.1.ccl4.df
+                        Carbon Tetrachloride Concentrations from
+                        Example 12-1 of 2009 USEPA Guidance Document
+EPA.09.Ex.12.4.naphthalene.df
+                        Naphthalene Concentrations from Example 12-4 of
+                        2009 USEPA Guidance Document
+EPA.09.Ex.13.1.iron.df
+                        Iron Concentrations from Example 13-1 of 2009
+                        USEPA Guidance Document
+EPA.09.Ex.14.1.manganese.df
+                        Manganese Concentrations from Example 14-1 of
+                        2009 USEPA Guidance Document
+EPA.09.Ex.14.3.alkalinity.df
+                        Alkalinity Measures from Example 14-3 of 2009
+                        USEPA Guidance Document
+EPA.09.Ex.14.4.arsenic.df
+                        Arsenic Concentrations from Example 14-4 of
+                        2009 USEPA Guidance Document
+EPA.09.Ex.14.8.df       Analyte Concentrations from Example 14-8 of
+                        2009 USEPA Guidance Document
+EPA.09.Ex.15.1.manganese.df
+                        Manganese Concentrations from Example 15-1 of
+                        2009 USEPA Guidance Document
+EPA.09.Ex.16.1.sulfate.df
+                        Sulfate Concentrations from Example 16-1 of
+                        2009 USEPA Guidance Document
+EPA.09.Ex.16.2.benzene.df
+                        Benzene Concentrations from Example 16-2 of
+                        2009 USEPA Guidance Document
+EPA.09.Ex.16.4.copper.df
+                        Copper Concentrations from Example 16-4 of 2009
+                        USEPA Guidance Document
+EPA.09.Ex.16.5.PCE.df   Tetrachloroethylene Concentrations from Example
+                        16-5 of 2009 USEPA Guidance Document
+EPA.09.Ex.17.1.loglead.df
+                        Log-transformed Lead Concentrations from
+                        Example 17-1 of 2009 USEPA Guidance Document
+EPA.09.Ex.17.2.toluene.df
+                        Toluene Concentrations from Example 17-2 of
+                        2009 USEPA Guidance Document
+EPA.09.Ex.17.3.chrysene.df
+                        Chrysene Concentrations from Example 17-3 of
+                        2009 USEPA Guidance Document
+EPA.09.Ex.17.3.log.chrysene.df
+                        Log-transformed Chrysene Concentrations from
+                        Example 17-3 of 2009 USEPA Guidance Document
+EPA.09.Ex.17.4.copper.df
+                        Copper Concentrations from Example 17-4 of 2009
+                        USEPA Guidance Document
+EPA.09.Ex.17.5.chloride.df
+                        Chloride Concentrations from Example 17-5 of
+                        2009 USEPA Guidance Document
+EPA.09.Ex.17.6.sulfate.df
+                        Sulfate Concentrations from Example 17-6 of
+                        2009 USEPA Guidance Document
+EPA.09.Ex.17.7.sodium.df
+                        Sodium Concentrations from Example 17-7 of 2009
+                        USEPA Guidance Document
+EPA.09.Ex.18.1.arsenic.df
+                        Arsenic Concentrations from Example 18-1 of
+                        2009 USEPA Guidance Document
+EPA.09.Ex.18.2.chrysene.df
+                        Chrysene Concentrations from Example 18-2 of
+                        2009 USEPA Guidance Document
+EPA.09.Ex.18.3.TCE.df   Trichloroethylene Concentrations from Example
+                        18-3 of 2009 USEPA Guidance Document
+EPA.09.Ex.18.4.xylene.df
+                        Xylene Concentrations from Example 18-4 of 2009
+                        USEPA Guidance Document
+EPA.09.Ex.19.1.sulfate.df
+                        Sulfate Concentrations from Example 19-1 of
+                        2009 USEPA Guidance Document
+EPA.09.Ex.19.2.chloride.df
+                        Chloride Concentrations from Example 19-2 of
+                        2009 USEPA Guidance Document
+EPA.09.Ex.19.5.mercury.df
+                        Mercury Concentrations from Example 19-5 of
+                        2009 USEPA Guidance Document
+EPA.09.Ex.20.1.nickel.df
+                        Nickel Concentrations from Example 20-1 of 2009
+                        USEPA Guidance Document
+EPA.09.Ex.21.1.aldicarb.df
+                        Aldicarb Concentrations from Example 21-1 of
+                        2009 USEPA Guidance Document
+EPA.09.Ex.21.2.benzene.df
+                        Benzene Concentrations from Example 21-2 of
+                        2009 USEPA Guidance Document
+EPA.09.Ex.21.5.beryllium.df
+                        Beryllium Concentrations from Example 21-5 of
+                        2009 USEPA Guidance Document
+EPA.09.Ex.21.6.nitrate.df
+                        Nitrate Concentrations from Example 21-6 of
+                        2009 USEPA Guidance Document
+EPA.09.Ex.21.7.TCE.df   Trichloroethylene Concentrations from Example
+                        21-7 of 2009 USEPA Guidance Document
+EPA.09.Ex.22.1.VC.df    Vinyl Chloride Concentrations from Example 22-1
+                        of 2009 USEPA Guidance Document
+EPA.09.Ex.22.2.Specific.Conductance.df
+                        Specific Conductance from Example 22-2 of 2009
+                        USEPA Guidance Document
+EPA.09.Ex.6.3.sulfate.df
+                        Sulfate Concentrations from Example 6-3 of 2009
+                        USEPA Guidance Document
+EPA.09.Ex.7.1.arsenic.df
+                        Arsenic concentrations from Example 7.1 of 2009
+                        USEPA Guidance Document
+EPA.09.Table.9.1.TCE.df
+                        Trichloroethene concentrations in Table 9.1 of
+                        2009 USEPA Guidance Document
+EPA.09.Table.9.3.df     Arsenic, Mercury and Strontium Concentrations
+                        in Table 9-3 of 2009 USEPA Guidance Document
+EPA.09.Table.9.4.nickel.vec
+                        Nickel Concentrations in Table 9-4 of 2009
+                        USEPA Guidance Document
+EPA.89b.aldicarb1.df    Aldicarb Concentrations from 1989 USEPA
+                        Guidance Document
+EPA.89b.aldicarb2.df    Aldicarb Concentrations from 1989 USEPA
+                        Guidance Document
+EPA.89b.benzene.df      Benzene Concentrations from 1989 USEPA Guidance
+                        Document
+EPA.89b.cadmium.df      Cadmium Concentrations from 1989 USEPA Guidance
+                        Document
+EPA.89b.chlordane1.df   Chlordane Concentrations from 1989 USEPA
+                        Guidance Document
+EPA.89b.chlordane2.df   Chlordane Concentrations from 1989 USEPA
+                        Guidance Document
+EPA.89b.edb.df          EDB Concentrations from 1989 USEPA Guidance
+                        Document
+EPA.89b.lead.df         Lead Concentrations from 1989 USEPA Guidance
+                        Document
+EPA.89b.loglead.df      Log-transformed Lead Concentrations from 1989
+                        USEPA Guidance Document
+EPA.89b.manganese.df    Manganese Concentrations from 1989 USEPA
+                        Guidance Document
+EPA.89b.sulfate.df      Sulfate Concentrations from 1989 USEPA Guidance
+                        Document
+EPA.89b.t29.df          T-29 Concentrations from 1989 USEPA Guidance
+                        Document
+EPA.89b.toc.vec         Total Organic Carbon Concentrations from 1989
+                        USEPA Guidance Document
+EPA.92c.arsenic1.df     Arsenic Concentrations from 1992 USEPA Guidance
+                        Document
+EPA.92c.arsenic2.df     Arsenic Concentrations from 1992 USEPA Guidance
+                        Document
+EPA.92c.arsenic3.df     Arsenic Concentrations from 1992 USEPA Guidance
+                        Document
+EPA.92c.benzene1.df     Benzene Concentrations from 1992 USEPA Guidance
+                        Document
+EPA.92c.benzene2.df     Benzene Concentrations from 1992 USEPA Guidance
+                        Document
+EPA.92c.ccl4.df         Carbon Tetrachloride Concentrations from 1992
+                        USEPA Guidance Document
+EPA.92c.chrysene.df     Chrysene Concentrations from 1992 USEPA
+                        Guidance Document
+EPA.92c.copper1.df      Copper Concentrations from 1992 USEPA Guidance
+                        Document
+EPA.92c.copper2.df      Copper Concentrations from 1992 USEPA Guidance
+                        Document
+EPA.92c.lognickel1.df   Log-transformed Nickel Concentrations from 1992
+                        USEPA Guidance Document
+EPA.92c.nickel1.df      Nickel Concentrations from 1992 USEPA Guidance
+                        Document
+EPA.92c.nickel2.df      Nickel Concentrations from 1992 USEPA Guidance
+                        Document
+EPA.92c.toluene.df      Toluene Concentrations from 1992 USEPA Guidance
+                        Document
+EPA.92c.zinc.df         Zinc Concentrations from 1992 USEPA Guidance
+                        Document
+EPA.92d.chromium.df     Chromium Concentrations from 1992 USEPA
+                        Guidance Document
+EPA.92d.chromium.vec    Chromium Concentrations from 1992 USEPA
+                        Guidance Document
+EPA.94b.lead.df         Lead Concentrations from 1994 USEPA Guidance
+                        Document
+EPA.94b.tccb.df         1,2,3,4-Tetrachlorobenzene Concentrations from
+                        1994 USEPA Guidance Document
+EPA.97.cadmium.111.df   Calibration Data for Cadmium at Mass 111
+EVD                     The Extreme Value (Gumbel) Distribution
+Empirical               The Empirical Distribution Based on a Set of
+                        Observations
+EnvStats-package        Package for Environmental Statistics, Including
+                        US EPA Guidance
+Environmental           Atmospheric Environmental Conditions in New
+                        York City
+EulersConstant          Euler's Constant
+FcnsByCat               EnvStats Functions Listed by Category
+FcnsByCatCalibration    EnvStats Functions for Calibration
+FcnsByCatCensoredData   EnvStats Functions for Censored Data
+FcnsByCatDataTrans      EnvStats Functions for Data Transformations
+FcnsByCatEstDistParams
+                        EnvStats Functions for Estimating Distribution
+                        Parameters
+FcnsByCatEstDistQuants
+                        EnvStats Functions for Estimating Distribution
+                        Quantiles
+FcnsByCatGOFTests       EnvStats Functions for Goodness-of-Fit Tests
+FcnsByCatHypothTests    EnvStats Functions for Hypothesis Tests
+FcnsByCatMCandRisk      EnvStats Functions for Monte Carlo Simulation
+                        and Risk Assessment
+FcnsByCatPlotProbDists
+                        EnvStats Functions for Plotting Probability
+                        Distributions
+FcnsByCatPlotUsingggplot2
+                        EnvStats Functions for Creating Plots Using the
+                        ggplot2 Package
+FcnsByCatPower          EnvStats Functions for Power and Sample Size
+                        Calculations
+FcnsByCatPredInts       EnvStats Functions for Prediction Intervals
+FcnsByCatPrintPlot      EnvStats Functions for Printing and Plotting
+                        Objects of Various S3 Classes
+FcnsByCatProbDists      EnvStats Probability Distributions and Random
+                        Numbers
+FcnsByCatSumStats       EnvStats Functions for Summary Statistics and
+                        Plots
+FcnsByCatTolInts        EnvStats Functions for Tolerance Intervals
+FcnsByCatTrend          EnvStats Functions for Trend Analysis
+GEVD                    The Generalized Extreme Value Distribution
+GammaAlt                The Gamma Distribution (Alternative
+                        Parameterization)
+Gibbons.et.al.09.Alkilinity.vec
+                        Alkilinity Data from Gibbons et al. (2009)
+Gibbons.et.al.09.Vinyl.Chloride.vec
+                        Vinyl Chloride Data from Gibbons et al. (2009)
+Graham.et.al.75.etu.df
+                        Ethylene Thiourea Dose-Response Data
+Grice.Bain.80.mat       Adjusted Alpha Levels to Compute Confidence
+                        Intervals for the Mean of a Gamma Distribution
+Helsel.Cohn.88.app.b.df
+                        Example of Multiply Left-censored Data from
+                        Literature
+Helsel.Cohn.88.silver.df
+                        Silver Concentrations From An Interlab
+                        Comparison
+Helsel.Hirsch.02.Mayfly.df
+                        Paired Counts of Mayfly Nymphs Above and Below
+                        Industrial Outfalls
+HoskingEtAl1985         Abstract: Hosking et al. (1985)
+Lin.Evans.80.df         Fecal Coliform Data from the Illinois River
+Lognormal3              The Three-Parameter Lognormal Distribution
+LognormalAlt            The Lognormal Distribution (Alternative
+                        Parameterization)
+LognormalMix            Mixture of Two Lognormal Distributions
+LognormalMixAlt         Mixture of Two Lognormal Distributions
+                        (Alternative Parameterization)
+LognormalTrunc          The Truncated Lognormal Distribution
+LognormalTruncAlt       The Truncated Lognormal Distribution
+                        (Alternative Parameterization)
+Millard.Deverel.88.df   Copper and Zinc Concentrations in Shallow
+                        Ground Water
+Modified.TcCB.df        Modified 1,2,3,4-Tetrachlorobenzene Data with
+                        Censored Values
+NIOSH.89.air.lead.vec   NIOSH Air Lead Levels Data
+NormalMix               Mixture of Two Normal Distributions
+NormalTrunc             The Truncated Normal Distribution
+Olympic.NH4.df          Ammonium Concentration in Precipitation
+                        Measured at Olympic National Park Hoh Ranger
+                        Station
+Ozone.NE.df             Ozone Concentrations in the Northeast U.S.
+Pareto                  The Pareto Distribution
+ProUCL.Crit.Vals.for.AD.Test.for.Gamma.array
+                        ProUCL Critical Values for Anderson-Darling
+                        Goodness-of-Fit Test for Gamma Distribution
+ProUCL.Crit.Vals.for.KS.Test.for.Gamma.array
+                        ProUCL Critical Values for Kolmogorov-Smirnov
+                        Goodness-of-Fit Test for Gamma Distribution
+Refinery.CO.df          Carbon Monoxide Emissions from Oil Refinery.
+Skagit.NH3_N.df         Ammonia Nitrogen Concentrations in the Skagit
+                        River, Marblemount, Washington
+Total.P.df              Total Phosphorus Data from Chesapeake Bay
+Triangular              The Triangular Distribution
+ZeroModifiedLognormal   The Zero-Modified Lognormal (Delta)
+                        Distribution
+ZeroModifiedLognormalAlt
+                        The Zero-Modified Lognormal (Delta)
+                        Distribution (Alternative Parameterization)
+ZeroModifiedNormal      The Zero-Modified Normal Distribution
+anovaPE                 Compute Lack-of-Fit and Pure Error Anova Table
+                        for a Linear Model
+aovN                    Compute Sample Size Necessary to Achieve
+                        Specified Power for One-Way Fixed-Effects
+                        Analysis of Variance
+aovPower                Compute the Power of a One-Way Fixed-Effects
+                        Analysis of Variance
+base                    Base b Representation of a Number
+boxcox                  Boxcox Power Transformation
+boxcox.object           S3 Class "boxcox"
+boxcoxCensored          Boxcox Power Transformation for Type I Censored
+                        Data
+boxcoxCensored.object   S3 Class "boxcoxCensored"
+boxcoxLm.object         S3 Class "boxcoxLm"
+boxcoxTransform         Apply a Box-Cox Power Transformation to a Set
+                        of Data
+calibrate               Fit a Calibration Line or Curve
+calibrate.object        S3 Class "calibrate"
+cdfCompare              Plot Two Cumulative Distribution Functions
+cdfCompareCensored      Plot Two Cumulative Distribution Functions
+                        Based on Censored Data
+cdfPlot                 Plot Cumulative Distribution Function
+chenTTest               Chen's Modified One-Sided t-test for Skewed
+                        Distributions
+ciBinomHalfWidth        Half-Width of Confidence Interval for Binomial
+                        Proportion or Difference Between Two
+                        Proportions
+ciBinomN                Sample Size for Specified Half-Width of
+                        Confidence Interval for Binomial Proportion or
+                        Difference Between Two Proportions
+ciNormHalfWidth         Half-Width of Confidence Interval for Normal
+                        Distribution Mean or Difference Between Two
+                        Means
+ciNormN                 Sample Size for Specified Half-Width of
+                        Confidence Interval for Normal Distribution
+                        Mean or Difference Between Two Means
+ciNparConfLevel         Compute Confidence Level Associated with a
+                        Nonparametric Confidence Interval for a
+                        Quantile
+ciNparN                 Sample Size for Nonparametric Confidence
+                        Interval for a Quantile
+ciTableMean             Table of Confidence Intervals for Mean or
+                        Difference Between Two Means
+ciTableProp             Table of Confidence Intervals for Proportion or
+                        Difference Between Two Proportions
+cv                      Sample Coefficient of Variation.
+detectionLimitCalibrate
+                        Determine Detection Limit
+distChoose              Choose Best Fitting Distribution Based on
+                        Goodness-of-Fit Tests
+distChoose.object       S3 Class "distChoose"
+distChooseCensored      Choose Best Fitting Distribution Based on
+                        Goodness-of-Fit Tests for Censored Data
+distChooseCensored.object
+                        S3 Class "distChooseCensored"
+ebeta                   Estimate Parameters of a Beta Distribution
+ebinom                  Estimate Parameter of a Binomial Distribution
+ecdfPlot                Empirical Cumulative Distribution Function Plot
+ecdfPlotCensored        Empirical Cumulative Distribution Function Plot
+                        Based on Type I Censored Data
+eevd                    Estimate Parameters of an Extreme Value
+                        (Gumbel) Distribution
+eexp                    Estimate Rate Parameter of an Exponential
+                        Distribution
+egamma                  Estimate Parameters of Gamma Distribution
+egammaAltCensored       Estimate Mean and Coefficient of Variation for
+                        a Gamma Distribution Based on Type I Censored
+                        Data
+egammaCensored          Estimate Shape and Scale Parameters for a Gamma
+                        Distribution Based on Type I Censored Data
+egeom                   Estimate Probability Parameter of a Geometric
+                        Distribution
+egevd                   Estimate Parameters of a Generalized Extreme
+                        Value Distribution
+ehyper                  Estimate Parameter of a Hypergeometric
+                        Distribution
+elnorm                  Estimate Parameters of a Lognormal Distribution
+                        (Log-Scale)
+elnorm3                 Estimate Parameters of a Three-Parameter
+                        Lognormal Distribution (Log-Scale)
+elnormAlt               Estimate Parameters of a Lognormal Distribution
+                        (Original Scale)
+elnormAltCensored       Estimate Parameters for a Lognormal
+                        Distribution (Original Scale) Based on Type I
+                        Censored Data
+elnormCensored          Estimate Parameters for a Lognormal
+                        Distribution (Log-Scale) Based on Type I
+                        Censored Data
+elogis                  Estimate Parameters of a Logistic Distribution
+enbinom                 Estimate Probability Parameter of a Negative
+                        Binomial Distribution
+enorm                   Estimate Parameters of a Normal (Gaussian)
+                        Distribution
+enormCensored           Estimate Parameters for a Normal Distribution
+                        Based on Type I Censored Data
+enparCensored           Estimate Mean, Standard Deviation, and Standard
+                        Error Nonparametrically Based on Censored Data
+epareto                 Estimate Parameters of a Pareto Distribution
+epdfPlot                Plot Empirical Probability Density Function
+epois                   Estimate Parameter of a Poisson Distribution
+epoisCensored           Estimate Mean of a Poisson Distribution Based
+                        on Type I Censored Data
+eqbeta                  Estimate Quantiles of a Beta Distribution
+eqbinom                 Estimate Quantiles of a Binomial Distribution
+eqevd                   Estimate Quantiles of an Extreme Value (Gumbel)
+                        Distribution
+eqexp                   Estimate Quantiles of an Exponential
+                        Distribution
+eqgamma                 Estimate Quantiles of a Gamma Distribution
+eqgeom                  Estimate Quantiles of a Geometric Distribution
+eqgevd                  Estimate Quantiles of a Generalized Extreme
+                        Value Distribution
+eqhyper                 Estimate Quantiles of a Hypergeometric
+                        Distribution
+eqlnorm                 Estimate Quantiles of a Lognormal Distribution
+eqlnorm3                Estimate Quantiles of a Three-Parameter
+                        Lognormal Distribution
+eqlnormCensored         Estimate Quantiles of a Lognormal Distribution
+                        Based on Type I Censored Data
+eqlogis                 Estimate Quantiles of a Logistic Distribution
+eqnbinom                Estimate Quantiles of a Negative Binomial
+                        Distribution
+eqnorm                  Estimate Quantiles of a Normal Distribution
+eqnormCensored          Estimate Quantiles of a Normal Distribution
+                        Based on Type I Censored Data
+eqnpar                  Estimate Quantiles of a Distribution
+                        Nonparametrically
+eqpareto                Estimate Quantiles of a Pareto Distribution
+eqpois                  Estimate Quantiles of a Poisson Distribution
+equnif                  Estimate Quantiles of a Uniform Distribution
+eqweibull               Estimate Quantiles of a Weibull Distribution
+eqzmlnorm               Estimate Quantiles of a Zero-Modified Lognormal
+                        (Delta) Distribution
+eqzmnorm                Estimate Quantiles of a Zero-Modified Normal
+                        Distribution
+errorBar                Plot Pointwise Error Bars
+estimate.object         S3 Class "estimate"
+estimateCensored.object
+                        S3 Class "estimateCensored"
+eunif                   Estimate Parameters of a Uniform Distribution
+evNormOrdStats          Expected Value of Order Statistics for Random
+                        Sample from Standard Normal Distribution
+eweibull                Estimate Parameters of a Weibull Distribution
+ezmlnorm                Estimate Parameters of a Zero-Modified
+                        Lognormal (Delta) Distribution
+ezmnorm                 Estimate Parameters of a Zero-Modified Normal
+                        Distribution
+geoMean                 Geometric Mean
+geoSD                   Geometric Standard Deviation.
+geom_stripchart         1-D Scatter Plots with Confidence Intervals
+                        Using ggplot2
+gof.object              S3 Class "gof"
+gofCensored.object      S3 Class "gofCensored"
+gofGroup.object         S3 Class "gofGroup"
+gofGroupTest            Goodness-of-Fit Test for a Specified
+                        Probability Distribution for Groups
+gofOutlier.object       S3 Class "gofOutlier"
+gofTest                 Goodness-of-Fit Test
+gofTestCensored         Goodness-of-Fit Test for Normal or Lognormal
+                        Distribution Based on Censored Data
+gofTwoSample.object     S3 Class "gofTwoSample"
+gpqCiNormCensored       Generalized Pivotal Quantity for Confidence
+                        Interval for the Mean of a Normal Distribution
+                        Based on Censored Data
+gpqTolIntNormCensored   Generalized Pivotal Quantity for Tolerance
+                        Interval for a Normal Distribution Based on
+                        Censored Data
+htest.object            S3 Class "htest"
+htestCensored.object    S3 Class "htestCensored"
+inversePredictCalibrate
+                        Predict Concentration Using Calibration
+iqr                     Interquartile Range
+kendallSeasonalTrendTest
+                        Nonparametric Test for Monotonic Trend Within
+                        Each Season Based on Kendall's Tau Statistic
+kendallTrendTest        Kendall's Nonparametric Test for Montonic Trend
+kurtosis                Coefficient of (Excess) Kurtosis
+lMoment                 Estimate L-Moments
+linearTrendTestN        Sample Size for a t-Test for Linear Trend
+linearTrendTestPower    Power of a t-Test for Linear Trend
+linearTrendTestScaledMds
+                        Scaled Minimal Detectable Slope for a t-Test
+                        for Linear Trend
+longToWide              Convert a Long Format Data Set into a Wide
+                        Format
+newsEnvStats            Show the EnvStats NEWS File
+oneSamplePermutationTest
+                        Fisher's One-Sample Randomization (Permutation)
+                        Test for Location
+pdfPlot                 Plot Probability Density Function
+permutationTest.object
+                        S3 Class "permutationTest"
+plot.boxcox             Plot Results of Box-Cox Transformations
+plot.boxcoxCensored     Plot Results of Box-Cox Transformations Based
+                        on Type I Censored Data
+plot.boxcoxLm           Plot Results of Box-Cox Transformations for a
+                        Linear Model
+plot.gof                Plot Results of Goodness-of-Fit Test
+plot.gofCensored        Plot Results of Goodness-of-Fit Test Based on
+                        Censored Data
+plot.gofGroup           Plot Results of Group Goodness-of-Fit Test
+plot.gofTwoSample       Plot Results of Goodness-of-Fit Test to Compare
+                        Two Samples
+plot.permutationTest    Plot Results of Permutation Test
+plotAovDesign           Create Plots for a Sampling Design Based on a
+                        One-Way Fixed-Effects Analysis of Variance
+plotCiBinomDesign       Plots for Sampling Design Based on Confidence
+                        Interval for Binomial Proportion or Difference
+                        Between Two Proportions
+plotCiNormDesign        Plots for Sampling Design Based on Confidence
+                        Interval for Mean of a Normal Distribution or
+                        Difference Between Two Means
+plotCiNparDesign        Plots for Sampling Design Based on
+                        Nonparametric Confidence Interval for a
+                        Quantile
+plotLinearTrendTestDesign
+                        Plots for a Sampling Design Based on a t-Test
+                        for Linear Trend
+plotPredIntLnormAltSimultaneousTestPowerCurve
+                        Power Curves for Sampling Design for Test Based
+                        on Simultaneous Prediction Interval for
+                        Lognormal Distribution
+plotPredIntLnormAltTestPowerCurve
+                        Power Curves for Sampling Design for Test Based
+                        on Prediction Interval for Lognormal
+                        Distribution
+plotPredIntNormDesign   Plots for a Sampling Design Based on a
+                        Prediction Interval for the Next k Observations
+                        from a Normal Distribution
+plotPredIntNormSimultaneousTestPowerCurve
+                        Power Curves for Sampling Design for Test Based
+                        on Simultaneous Prediction Interval for Normal
+                        Distribution
+plotPredIntNormTestPowerCurve
+                        Power Curves for Sampling Design for Test Based
+                        on Prediction Interval for Normal Distribution
+plotPredIntNparDesign   Plots for a Sampling Design Based on a
+                        Nonparametric Prediction Interval
+plotPredIntNparSimultaneousDesign
+                        Plots for a Sampling Design Based on a
+                        Simultaneous Nonparametric Prediction Interval
+plotPredIntNparSimultaneousTestPowerCurve
+                        Power Curves for Sampling Design for Test Based
+                        on Nonparametric Simultaneous Prediction
+                        Interval
+plotPropTestDesign      Plots for Sampling Design Based on One- or
+                        Two-Sample Proportion Test
+plotTTestDesign         Plots for a Sampling Design Based on a One- or
+                        Two-Sample t-Test
+plotTTestLnormAltDesign
+                        Plots for a Sampling Design Based on a One- or
+                        Two-Sample t-Test, Assuming Lognormal Data
+plotTolIntNormDesign    Plots for a Sampling Design Based on a
+                        Tolerance Interval for a Normal Distribution
+plotTolIntNparDesign    Plots for a Sampling Design Based on a
+                        Nonparametric Tolerance Interval
+pointwise               Pointwise Confidence Limits for Predictions
+ppointsCensored         Plotting Positions for Type I Censored Data
+predIntGamma            Prediction Interval for Gamma Distribution
+predIntGammaSimultaneous
+                        Simultaneous Prediction Interval for a Gamma
+                        Distribution
+predIntLnorm            Prediction Interval for a Lognormal
+                        Distribution
+predIntLnormAltSimultaneousTestPower
+                        Probability That at Least One Set of Future
+                        Observations Violates the Given Rule Based on a
+                        Simultaneous Prediction Interval for a
+                        Lognormal Distribution
+predIntLnormAltTestPower
+                        Probability That at Least One Future
+                        Observation Falls Outside a Prediction Interval
+                        for a Lognormal Distribution
+predIntLnormSimultaneous
+                        Simultaneous Prediction Interval for a
+                        Lognormal Distribution
+predIntNorm             Prediction Interval for a Normal Distribution
+predIntNormHalfWidth    Half-Width of a Prediction Interval for the
+                        next k Observations from a Normal Distribution
+predIntNormK            Compute the Value of K for a Prediction
+                        Interval for a Normal Distribution
+predIntNormN            Sample Size for a Specified Half-Width of a
+                        Prediction Interval for the next k Observations
+                        from a Normal Distribution
+predIntNormSimultaneous
+                        Simultaneous Prediction Interval for a Normal
+                        Distribution
+predIntNormSimultaneousK
+                        Compute the Value of K for a Simultaneous
+                        Prediction Interval for a Normal Distribution
+predIntNormSimultaneousTestPower
+                        Probability That at Least One Set of Future
+                        Observations Violates the Given Rule Based on a
+                        Simultaneous Prediction Interval for a Normal
+                        Distribution
+predIntNormTestPower    Probability That at Least One Future
+                        Observation Falls Outside a Prediction Interval
+                        for a Normal Distribution
+predIntNpar             Nonparametric Prediction Interval for a
+                        Continuous Distribution
+predIntNparConfLevel    Confidence Level for Nonparametric Prediction
+                        Interval for Continuous Distribution
+predIntNparN            Sample Size for a Nonparametric Prediction
+                        Interval for a Continuous Distribution
+predIntNparSimultaneous
+                        Nonparametric Simultaneous Prediction Interval
+                        for a Continuous Distribution
+predIntNparSimultaneousConfLevel
+                        Confidence Level of Simultaneous Nonparametric
+                        Prediction Interval for Continuous Distribution
+predIntNparSimultaneousN
+                        Sample Size for Simultaneous Nonparametric
+                        Prediction Interval for Continuous Distribution
+predIntNparSimultaneousTestPower
+                        Probability That at Least One Set of Future
+                        Observations Violates the Given Rule Based on a
+                        Nonparametric Simultaneous Prediction Interval
+predIntPois             Prediction Interval for a Poisson Distribution
+predict                 Model Predictions
+predict.lm              Predict Method for Linear Model Fits
+print                   Print Values
+print.boxcox            Print Output of Objective for Box-Cox Power
+                        Transformations
+print.boxcoxCensored    Print Output of Objective for Box-Cox Power
+                        Transformations Based on Type I Censored Data
+print.boxcoxLm          Print Output of Objective for Box-Cox Power
+                        Transformations for an "lm" Object
+print.distChoose        Print Output of Goodness-of-Fit Tests
+print.distChooseCensored
+                        Print Output of Goodness-of-Fit Tests
+print.estimate          Print Objects of Class "estimate"
+print.estimateCensored
+                        Print Objects of Class "estimateCensored"
+print.gof               Print Output of Goodness-of-Fit Tests
+print.gofCensored       Print Output of Goodness-of-Fit Tests Based on
+                        Censored Data
+print.gofGroup          Print Output of Group Goodness-of-Fit Tests
+print.gofOutlier        Print Output of Goodness-of-Fit Outlier Tests
+print.gofTwoSample      Print Output of Two-Sample Goodness-of-Fit
+                        Tests
+print.htestCensored     Print Output of Hypothesis Tests Based on
+                        Censored Data
+print.htestEnvStats     Print Output of Hypothesis Tests
+print.permutationTest   Print Output of Permutation Tests
+print.summaryStats      Print Summary Statistics
+propTestMdd             Minimal Detectable Difference Associated with a
+                        One- or Two-Sample Proportion Test
+propTestN               Compute Sample Size Necessary to Achieve a
+                        Specified Power for a One- or Two-Sample
+                        Proportion Test
+propTestPower           Compute the Power of a One- or Two-Sample
+                        Proportion Test
+pwMoment                Estimate Probability-Weighted Moments
+qqPlot                  Quantile-Quantile (Q-Q) Plot
+qqPlotCensored          Quantile-Quantile (Q-Q) Plot for Type I
+                        Censored Data
+qqPlotGestalt           Develop Gestalt of Q-Q Plots for Specific
+                        Distributions
+quantileTest            Two-Sample Rank Test to Detect a Shift in a
+                        Proportion of the "Treated" Population
+quantileTestPValue      Compute p-Value for the Quantile Test
+rosnerTest              Rosner's Test for Outliers
+serialCorrelationTest   Test for the Presence of Serial Correlation
+signTest                One-Sample or Paired-Sample Sign Test on a
+                        Median
+simulateMvMatrix        Simulate a Multivariate Matrix Based on a
+                        Specified Rank Correlation Mat
+simulateVector          Simulate a Vector of Random Numbers From a
+                        Specified Theoretical or Empirical Probability
+                        Distribution
+skewness                Coefficient of Skewness
+stat_mean_sd_text       Add Text Indicating the Mean and Standard
+                        Deviation to a ggplot2 Plot
+stat_median_iqr_text    Add Text Indicating the Median and
+                        Interquartile Range to a ggplot2 Plot
+stat_n_text             Add Text Indicating the Sample Size to a
+                        ggplot2 Plot
+stat_test_text          Add Text to a ggplot2 Plot Indicating the
+                        Results of a Hypothesis Test
+stripChart              1-D Scatter Plots with Confidence Intervals
+summaryFull             Full Complement of Summary Statistics
+summaryStats            Summary Statistics
+summaryStats.object     S3 Class "summaryStats"
+tTestAlpha              Type I Error Level for a One- or Two-Sample
+                        t-Test
+tTestLnormAltN          Sample Size for a One- or Two-Sample t-Test,
+                        Assuming Lognormal Data
+tTestLnormAltPower      Power of a One- or Two-Sample t-Test Assuming
+                        Lognormal Data
+tTestLnormAltRatioOfMeans
+                        Minimal or Maximal Detectable Ratio of Means
+                        for One- or Two-Sample t-Test, Assuming
+                        Lognormal Data
+tTestN                  Sample Size for a One- or Two-Sample t-Test
+tTestPower              Power of a One- or Two-Sample t-Test
+tTestScaledMdd          Scaled Minimal Detectable Difference for One-
+                        or Two-Sample t-Test
+tolIntGamma             Tolerance Interval for a Gamma Distribution
+tolIntLnorm             Tolerance Interval for a Lognormal Distribution
+tolIntLnormCensored     Tolerance Interval for a Lognormal Distribution
+                        Based on Censored Data
+tolIntNorm              Tolerance Interval for a Normal Distribution
+tolIntNormCensored      Tolerance Interval for a Normal Distribution
+                        Based on Censored Data
+tolIntNormHalfWidth     Half-Width of a Tolerance Interval for a Normal
+                        Distribution
+tolIntNormK             Compute the Value of K for a Tolerance Interval
+                        for a Normal Distribution
+tolIntNormN             Sample Size for a Specified Half-Width of a
+                        Tolerance Interval for a Normal Distribution
+tolIntNpar              Nonparametric Tolerance Interval for a
+                        Continuous Distribution
+tolIntNparConfLevel     Confidence Level for Nonparametric Tolerance
+                        Interval for Continuous Distribution
+tolIntNparCoverage      Coverage for Nonparametric Tolerance Interval
+                        for Continuous Distribution
+tolIntNparN             Sample Size for Nonparametric Tolerance
+                        Interval for Continuous Distribution
+tolIntPois              Tolerance Interval for a Poisson Distribution
+twoSampleLinearRankTest
+                        Two-Sample Linear Rank Test to Detect a
+                        Difference Between Two Distributions
+twoSampleLinearRankTestCensored
+                        Two-Sample Linear Rank Test to Detect a
+                        Difference Between Two Distributions Based on
+                        Censored Data
+twoSamplePermutationTestLocation
+                        Two-Sample or Paired-Sample Randomization
+                        (Permutation) Test for Location
+twoSamplePermutationTestProportion
+                        Randomization (Permutation) Test to Compare Two
+                        Proportions (Fisher's Exact Test)
+varGroupTest            Test for Homogeneity of Variance Among Two or
+                        More Groups
+varTest                 One-Sample Chi-Squared Test on Variance
+zTestGevdShape          Test Whether the Shape Parameter of a
+                        Generalized Extreme Value Distribution is Equal
+                        to 0

@@ -1,0 +1,122 @@
+add_sheet               Add a sheet
+add_slide               Add a slide
+annotate_base           Placeholder parameters annotation
+as.matrix.rpptx         PowerPoint table to matrix
+block_caption           Caption block
+block_list              List of blocks
+block_pour_docx         External Word document placeholder
+block_section           Section for 'Word'
+block_table             Table block
+block_toc               Table of content for 'Word'
+body_add_blocks         Add a list of blocks into a 'Word' document
+body_add_break          Add a page break in a 'Word' document
+body_add_caption        Add Word caption in a 'Word' document
+body_add_docx           Add an external docx in a 'Word' document
+body_add_fpar           Add fpar in a 'Word' document
+body_add_gg             Add a 'ggplot' in a 'Word' document
+body_add_img            Add an image in a 'Word' document
+body_add_par            Add paragraphs of text in a 'Word' document
+body_add_plot           Add plot in a 'Word' document
+body_add_table          Add table in a 'Word' document
+body_add_toc            Add table of content in a 'Word' document
+body_bookmark           Add bookmark in a 'Word' document
+body_end_block_section
+                        Add any section
+body_end_section_columns
+                        Add multi columns section
+body_end_section_columns_landscape
+                        Add a landscape multi columns section
+body_end_section_continuous
+                        Add continuous section
+body_end_section_landscape
+                        Add landscape section
+body_end_section_portrait
+                        Add portrait section
+body_remove             Remove an element in a 'Word' document
+body_replace_all_text   Replace text anywhere in the document
+body_replace_text_at_bkm
+                        Replace text at a bookmark location
+body_set_default_section
+                        Define Default Section
+change_styles           Replace styles in a 'Word' Document
+color_scheme            Color scheme of a PowerPoint file
+cursor_begin            Set cursor in a 'Word' document
+doc_properties          Read document properties
+docx_bookmarks          List Word bookmarks
+docx_dim                'Word' page layout
+docx_show_chunk         Show underlying text tag structure
+docx_summary            get Word content in a data.frame
+empty_content           Empty block for 'PowerPoint'
+external_img            External image
+fp_border               Border properties object
+fp_cell                 Cell formatting properties
+fp_par                  Paragraph formatting properties
+fp_text                 Text formatting properties
+fpar                    Formatted paragraph
+ftext                   Formatted chunk of text
+hyperlink_ftext         Formatted chunk of text with hyperlink
+layout_properties       Slide layout properties
+layout_summary          Presentation layouts summary
+length.rdocx            Number of blocks inside an rdocx object
+length.rpptx            Number of slides
+media_extract           Extract media from a document object
+move_slide              Move a slide
+notes_location_label    Location of a named placeholder for notes
+notes_location_type     Location of a placeholder for notes
+officer                 Manipulate Microsoft Word and PowerPoint
+                        Documents with 'officer'
+officer-defunct         Defunct Functions in Package officer
+on_slide                Change current slide
+page_mar                Page margins object
+page_size               Page size object
+ph_hyperlink            Hyperlink a placeholder
+ph_location             Location for a placeholder from scratch
+ph_location_fullsize    Location of a full size element
+ph_location_label       Location of a named placeholder
+ph_location_left        Location of a left body element
+ph_location_right       Location of a right body element
+ph_location_template    Location for a placeholder based on a template
+ph_location_type        Location of a placeholder based on a type
+ph_remove               Remove a shape
+ph_slidelink            Slide link to a placeholder
+ph_with                 Add objects on the current slide
+plot_instr              Wrap plot instructions for png plotting in
+                        Powerpoint or Word
+plot_layout_properties
+                        Slide layout properties plot
+pptx_summary            PowerPoint content in a data.frame
+print.rpptx             Write a 'PowerPoint' file.
+prop_section            Section properties
+prop_table              Table properties
+read_docx               Create a 'Word' document object
+read_pptx               Create a 'PowerPoint' document object
+read_xlsx               Create an 'Excel' document object
+remove_slide            Remove a slide
+run_autonum             Auto number
+run_bookmark            Bookmark for 'Word'
+run_columnbreak         Column break for 'Word'
+run_footnote            Footnote for 'Word'
+run_footnoteref         Word footnote reference
+run_linebreak           Page break for 'Word'
+run_pagebreak           Page break for 'Word'
+run_reference           Cross reference
+run_word_field          'Word' computed field
+section_columns         Section columns
+set_autonum_bookmark    Update bookmark of an autonumber run
+set_doc_properties      Set document properties
+set_notes               Set notes for current slide
+sheet_select            Select sheet
+shortcuts               shortcuts for formatting properties
+slide_size              Slides width and height
+slide_summary           Slide content in a data.frame
+slip_in_footnote        append a footnote
+sp_line                 Line properties
+sp_lineend              Line end properties
+styles_info             Read 'Word' styles
+table_colwidths         Column widths of a table
+table_conditional_formatting
+                        Table conditional formatting
+table_layout            Algorithm for table layout
+table_stylenames        Paragraph styles for columns
+table_width             Preferred width for a table
+unordered_list          Unordered list

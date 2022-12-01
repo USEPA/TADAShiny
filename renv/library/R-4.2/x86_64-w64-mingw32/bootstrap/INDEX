@@ -1,0 +1,23 @@
+Rainfall                Rainfall Data
+abcnon                  Nonparametric ABC Confidence Limits
+abcpar                  Parametric ABC Confidence Limits
+bcanon                  Nonparametric BCa Confidence Limits
+bootpred                Bootstrap Estimates of Prediction Error
+bootstrap               Non-Parametric Bootstrapping
+boott                   Bootstrap-t Confidence Limits
+cell                    Cell Survival data
+cholost                 The Cholostyramine Data
+crossval                K-fold Cross-Validation
+diabetes                Blood Measurements on 43 Diabetic Children
+hormone                 Hormone Data from page 107
+jackknife               Jackknife Estimation
+law                     Law school data from Efron and Tibshirani
+law82                   Data for Universe of USA Law Schools
+lutenhorm               Luteinizing Hormone
+mouse.c                 Experiments with mouse
+mouse.t                 Experiment with mouse
+patch                   The Patch Data
+scor                    Open/Closed Book Examination Data
+spatial                 Spatial Test Data
+stamp                   Data on Thickness of Stamps
+tooth                   Tooth Strength Data

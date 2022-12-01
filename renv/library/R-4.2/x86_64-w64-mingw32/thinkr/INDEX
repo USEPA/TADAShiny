@@ -1,0 +1,26 @@
+%ni%                    not in
+.efface_test            delete .test file in testthat folder
+all_ggplot_to_pptx      Save all ggplot in a pptx
+as_mon_numeric          Transform a vector into numeric if meaningful,
+                        even with bad decimal, space or %
+clean_levels            Clean levels label
+clean_names             clean_names
+clean_vec               Clean character vector
+dput_levels             return R instruction to create levels
+excel_names             Get position or excel name of column
+find_name               find pattern in name's dataset
+from_excel_to_posixt    transform the excel numeric date format into
+                        POSIXct
+gsub2                   like gsub but keep a factor as factor
+is.01                   does this vector only contains 0 and 1
+is.12                   does this vector only contains 1 and 2
+is_full_figures         Predicate for charater vector full of figures
+is_full_na              Predicate for full NA vector
+is_likert               is a factor a likert scale
+look_like_a_number      return TRUE if this look like a number
+make_unique             make.unique improvement
+peep                    peep the pipeline
+replace_pattern         Replace pattern everywhere in a data.frame
+save_as_csv             export a data.frame to csv
+set_col_type            set a given coltype to each column in a
+                        data.frame

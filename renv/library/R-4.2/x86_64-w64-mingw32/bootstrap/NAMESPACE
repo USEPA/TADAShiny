@@ -1,0 +1,17 @@
+# Remove the previous line if you edit this file
+# The following is edited from the automatically generated file.
+
+# Export all names
+export(abcnon, abcpar, bcanon, bootpred, bootstrap, boott, crossval,
+       ctsub, jackknife, xinter, yinter)
+
+# Import all packages listed as Imports or Depends
+import(
+  stats
+)
+
+useDynLib(bootstrap, .registration=TRUE)
+
+
+
+

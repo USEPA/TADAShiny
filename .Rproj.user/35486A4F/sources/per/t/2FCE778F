@@ -1,0 +1,25 @@
+{
+    "id": "2FCE778F",
+    "path": "C:/Users/cmulli01/TADARPackage/TADA/vignettes/WQPDataHarmonization.Rmd",
+    "project_path": null,
+    "type": "r_markdown",
+    "hash": "1787364720",
+    "contents": "",
+    "dirty": false,
+    "created": 1668789786597.0,
+    "source_on_save": false,
+    "relative_order": 4,
+    "properties": {
+        "chunk_output_type": "console",
+        "cursorPosition": "7,27",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1668627274,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1668627274,
+    "read_only": false,
+    "read_only_alternatives": []
+}
