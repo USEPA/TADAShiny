@@ -32,7 +32,7 @@ library(gifski)
 library(maps)
 library(TADA)
 
-#sample_data_1 = utils::read.csv(file = "TADAShiny/sample_data/TADAProfile_UT_Nutrients.csv")
+TADAProfile_UT_Nutrients = utils::read.csv(file = "sample_data/TADAProfile_UT_Nutrients.csv")
 
 mod_Cristinas_first_module_ui <- function(id){
   ns <- NS(id)
