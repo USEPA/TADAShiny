@@ -6,8 +6,8 @@
 #' @noRd
 app_server <- function( input, output, session ) {
   # Your application server logic 
-  epc_data <- reactiveVal(NULL)
+  TADA_Profile <- reactiveVal(NULL)
   
-
+  modImportTADAProfile <- mod_upload_TADAprofile_server("upload_TADAprofile_1", TADA_Profile)
   
 }
