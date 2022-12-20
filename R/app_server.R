@@ -16,4 +16,6 @@ app_server <- function( input, output, session ) {
   
   modImportTADAProfile <- mod_upload_TADAprofile_server("upload_TADAprofile_1", TADA_Profile)
   
+  mod_WQP_data_summary_server("WQP_data_summary_1", modImportTADAProfile)
+  
 }

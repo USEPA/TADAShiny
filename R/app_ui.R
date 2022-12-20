@@ -12,8 +12,8 @@ app_ui <- function(request) {
     htmlTemplate(
       # Tab 1
       app_sys("app/www/index.html"),
-      # TADA Profile Upload
-      tab1_data_import = mod_upload_TADAprofile_ui("upload_TADAprofile_1")
+      tab1_data_import = mod_upload_TADAprofile_ui("upload_TADAprofile_1"),
+      tab1_data_summary = mod_WQP_data_summary_ui("WQP_data_summary_1")
      
   )
   )

@@ -9,13 +9,11 @@
 #' @importFrom shiny NS tagList
 
 
-#Nutrients_Utah = data("Nutrients_Utah")
-
 mod_upload_TADAprofile_ui <- function(id){
   ns <- NS(id)
   tagList(
     
-    # widget to upload csv
+    # widget to upload WQP profile or WQX formatted spreadsheet
     fileInput(
       ns("file"), "",
       multiple = TRUE,
@@ -36,7 +34,7 @@ mod_upload_TADAprofile_server <- function(id, TADA_Profile){
     input_filepath_set <- reactive({
       
       TADA_Profile(NULL) # reset user input
-      req(input$file$datapath) # require a datapath has been uploaded to run
+      req(input$file$datapath) # require data uploaded to run
       
       # user uploaded data
       uploaded_data <- readxl::read_excel(input$file$datapath, sheet = 1) 
