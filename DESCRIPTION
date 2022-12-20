@@ -14,7 +14,8 @@ Imports:
     golem,
     magrittr,
     shiny, 
-    remotes, 
+    readxl, 
+    shinyjs,
     TADA
 Remotes: USEPA/TADA
 Copyright: This software is in the public domain because it contains
