@@ -6,6 +6,3 @@
 dev_history.R
 ^dev$
 $run_dev.*
-^app\.R$
-^rsconnect$
-^LICENSE\.md$
