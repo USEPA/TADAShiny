@@ -8,10 +8,23 @@ Imports:
     config,
     golem,
     magrittr,
-    shiny, 
-    readxl, 
+    shiny,
+    readxl,
     shinyjs,
-    TADA
+    TADA,
+    attempt,
+    DT,
+    glue,
+    htmltools,
+    thinkr,
+    shinycssloaders,
+    dplyr,
+    xlsx,
+    readr,
+    bootstrap,
+    stringr,
+    NADA,
+    EnvStats
 Remotes: USEPA/TADA
 Copyright: This software is in the public domain because it contains
     materials that originally came from the U.S. Environmental Protection
@@ -23,3 +36,12 @@ Depends:
     R (>= 2.10)
 URL: https://github.com/USEPA/TADAShiny
 BugReports: https://github.com/USEPA/TADAShiny/issues
+Suggests: 
+    covr,
+    knitr,
+    rmarkdown,
+    spelling,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Language: en-US
+VignetteBuilder: knitr
