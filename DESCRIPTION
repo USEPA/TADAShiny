@@ -11,20 +11,7 @@ Imports:
     shiny,
     readxl,
     shinyjs,
-    TADA,
-    attempt,
-    DT,
-    glue,
-    htmltools,
-    thinkr,
-    shinycssloaders,
-    dplyr,
-    xlsx,
-    readr,
-    bootstrap,
-    stringr,
-    NADA,
-    EnvStats
+    TADA
 Remotes: USEPA/TADA
 Copyright: This software is in the public domain because it contains
     materials that originally came from the U.S. Environmental Protection
@@ -41,7 +28,7 @@ Suggests:
     knitr,
     rmarkdown,
     spelling,
-    testthat (>= 3.0.0)
+    testthat (>= 4.2.2)
 Config/testthat/edition: 3
 Language: en-US
 VignetteBuilder: knitr
