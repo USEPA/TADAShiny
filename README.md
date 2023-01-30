@@ -9,6 +9,7 @@
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![Codecov test
 coverage](https://codecov.io/gh/USEPA/TADAShiny/branch/develop/graph/badge.svg)](https://app.codecov.io/gh/USEPA/TADAShiny?branch=develop)
+[![R-CMD-check](https://github.com/USEPA/TADAShiny/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/USEPA/TADAShiny/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The goal of TADAShiny is to …
