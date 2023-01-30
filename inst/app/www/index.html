@@ -239,19 +239,19 @@
 
       <div class="usa-step-indicator" aria-label="progress">
         <ol class="usa-step-indicator__segments">
-          <li class="usa-step-indicator__segment usa-step-indicator__segment--complete">
-            <span class="usa-step-indicator__segment-label">Data Import <span class="usa-sr-only">completed</span></span>
+          <li class="usa-step-indicator__segment usa-step-indicator__segment--current">
+            <span class="usa-step-indicator__segment-label">Data Import 
           </li>
           <li
-            class="usa-step-indicator__segment usa-step-indicator__segment--complete">
-            <span class="usa-step-indicator__segment-label">Overview <span class="usa-sr-only">completed</span></span>
+            class="usa-step-indicator__segment usa-step-indicator__segment" aria-current="true">
+            <span class="usa-step-indicator__segment-label">Overview <span class="usa-sr-only">not completed</span></span>
           </li>
           <li
-            class="usa-step-indicator__segment usa-step-indicator__segment--current">
+            class="usa-step-indicator__segment">
             <span class="usa-step-indicator__segment-label">Flagged Sites and Results <span class="usa-sr-only">not completed</span></span>
           </li>
-          <li class="usa-step-indicator__segment usa-step-indicator__segment" aria-current="true" >
-            <span class="usa-step-indicator__segment-label">Dynamic Filtering
+          <li class="usa-step-indicator__segment">
+            <span class="usa-step-indicator__segment-label">Dynamic Filtering <span class="usa-sr-only">not completed</span></span>
             </span>
           </li>
           <li class="usa-step-indicator__segment">
@@ -280,15 +280,37 @@
           <h4 class="usa-step-indicator__heading">
             <span class="usa-step-indicator__heading-counter">
               <span class="usa-sr-only">Step</span>
-              <span class="usa-step-indicator__current-step">3</span>
+              <span class="usa-step-indicator__current-step">1</span>
               <span class="usa-step-indicator__total-steps">of 11</span>
             </span>
-            <span class="usa-step-indicator__heading-text">Flagged Sites and Results</span>
+            <span class="usa-step-indicator__heading-text">Data Import</span>
           </h4>
         </div>
       </div>
 
+			 <h1>Import your data!</h1>
+								<p class="intro">
+TADA accepts spreadsheets in the .csv format from the <i>Water Quality Portal</i> or any .csv formatted in the Water Quality eXchange (WQX) format (i.e., WQX required column headers). Use the features on this screen to upload your data. For questions or assistance using TADA, please contact the TADA team at <i>mullin.cristina@epa.gov</i> and include the phrase "TADA Data Discovery and Cleaning" in the subject line.
 
+            <div class="form-group shiny-input-container-inline">
+              <div class="upload">
+        <h2>Review WQX 3.0 Physical/Chemical Data Import Template</h2>
+                <a href="www/wqxweb3_physical_chemical_package_0_12192022.zip" class="download-link">Download WQX 3.0 Data Import Template</a>
+                
+        <h2>Data Import</h2>
+                <div class="float-left"><button class="usa-button">{{tab1_data_import}} </button></div>
+              </div>
+            </div>
+            </div>
+      <h2>Data Import Summary</h2>
+        <div class="content">
+          {{tab1_data_summary}}
+    </div>
+   </div>
+                
+  </div>
+
+      
       <h2>Flagged Sites and Results</h2>
       <div class="content">
         <p>We reviewed and appended columns to your dataset to flag results that may be inacurate, uncommon, or not relevant. You can remove data from your dataset that you do not need using the toggles below. If you decide not to remove flagged data, the flag columns we added to perform this check will still be available in the spreadsheet that you can download. </p>

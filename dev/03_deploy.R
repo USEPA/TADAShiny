@@ -40,3 +40,7 @@ golem::add_dockerfile_shinyproxy()
 
 ## If you want to deploy to Heroku
 golem::add_dockerfile_heroku()
+
+## If you want to build github pages
+usethis::use_pkgdown() # run once to configure your package
+pkgdown::build_site() 

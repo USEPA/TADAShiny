@@ -66,13 +66,16 @@ devtools::build_vignettes()
 usethis::use_coverage()
 
 # Create a summary readme for the testthat subdirectory
-covrpage::covrpage()
+# Not available on CRAN
+# remotes::install_github('yonicd/covrpage')
+# covrpage::covrpage()
 
 ## CI ----
 ## Use this part of the script if you need to set up a CI
 ## service for your application
 ## 
 ## (You'll need GitHub there)
+
 usethis::use_github()
 
 # GitHub Actions
