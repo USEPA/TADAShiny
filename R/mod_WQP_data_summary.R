@@ -13,18 +13,18 @@ mod_WQP_data_summary_ui <- function(id){
     
     # Table title
     
-      tags$div(id = 'table_class',
+    tags$div(id = 'table_class',
              
-              h3(textOutput(ns("table_title"))),
+             h3(textOutput(ns("table_title"))),
              
-              tableOutput(ns("table"))
+             tableOutput(ns("table"))
              
- 
+             
     ),
-  
+    
   )
 }
-    
+
 #' WQP_data_summary Server Functions
 #'
 #' @noRd 
@@ -69,9 +69,9 @@ mod_WQP_data_summary_server <- function(id, input_filepath){
     
   })
 }
-    
+
 ## To be copied in the UI
 # mod_WQP_data_summary_ui("WQP_data_summary_1")
-    
+
 ## To be copied in the server
 # mod_WQP_data_summary_server("WQP_data_summary_1")
