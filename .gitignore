@@ -2,13 +2,3 @@
 .Rhistory
 .RData
 .Ruserdata
-.vscode/
-.Rbuildignore
-.Rproj
-.Rdata
-.httr-oauth
-.DS_Store
-inst/doc
-/doc/
-/Meta/
-docs

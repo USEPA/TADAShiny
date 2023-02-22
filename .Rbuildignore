@@ -6,16 +6,3 @@
 dev_history.R
 ^dev$
 $run_dev.*
-^app\.R$
-^rsconnect$
-^LICENSE\.md$
-^LICENSE\.md$
-^CONTRIBUTING\.md$
-^README\.Rmd$
-^CODE_OF_CONDUCT\.md$
-^doc$
-^Meta$
-^_pkgdown\.yml$
-^docs$
-^pkgdown$
-^codecov\.yml$
