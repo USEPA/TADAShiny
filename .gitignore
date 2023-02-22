@@ -1,4 +1,21 @@
+# RStudio files
+TADAShiny.Rproj
 .Rproj.user
+
+# History files
 .Rhistory
+.Rapp.history
+
+# Temporary files created by R markdown
+*.utf8.md
+*.knit.md
+
+# Session Data files
 .RData
+.Rdata
+.httr-oauth
+.DS_Store
+
+# Other
+_snaps
 .Ruserdata

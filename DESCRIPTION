@@ -1,31 +1,52 @@
 Package: TADAShiny
-Title: EPA TADA Amazing Shiny App
+Type: Package
+Title: WQP Data Discovery and Cleaning: First R Shiny App in the TADA (Tools for Automated Data Analysis) Series
 Version: 0.0.0.9000
+Organization: U.S. Environmental Protection Agency
 Authors@R: 
-    person(given = "firstname",
-           family = "lastname",
+  c(person(given = "Cristina",
+           family = "Mullin",
            role = c("aut", "cre"),
-           email = "zhou.hui@epa.gov")
-Description: What the package does (one paragraph).
-License: What license is it under?
+           email = "mullin.cristina@epa.gov",
+           comment = c(ORCID = "0000-0002-0615-6087")),
+    person(given = "Trip",
+           family = "Hook",
+           role = "aut"),
+    person(given = "Hui",
+           family = "Zhou",
+           role = c("aut"),
+           email = "zhou.hui@epa.gov"),
+    person(given = "Shelly",
+           family = "Thawley",
+           role = "aut"))
+Description: Assists data partners in retrieving, wrangling, quality checking, and preparing data from the Water Quality Portal for subsequent analyses.
+License: CC0
+Copyright: This software is in the public domain because it contains materials
+    that originally came from the U.S. Environmental Protection Agency.
 Imports: 
-    bootstrap,
+    shinyalert,
+    tibble,
     config,
     dplyr,
     DT,
-    EnvStats,
     golem,
     magrittr,
-    NADA,
-    pkgload,
-    readr,
     readxl,
     shiny,
     shinycssloaders,
     shinyjs,
     stringr,
-    thinkr,
-    xlsx
+    attempt,
+    glue,
+    htmltools
+Depends: 
+    R (>= 3.5.0)
 Encoding: UTF-8
+Language: en-US
+Config/testthat/edition: 3
+Config/testthat/load-all: list(export_all = FALSE, helpers = FALSE)
 LazyData: true
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.3
+Suggests: 
+    spelling,
+    testthat (>= 3.0.0)
