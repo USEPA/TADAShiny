@@ -6,3 +6,8 @@
 dev_history.R
 ^dev$
 $run_dev.*
+^docs$
+^\.github$
+LICENSE.md
+readme.md
+.gitignore
