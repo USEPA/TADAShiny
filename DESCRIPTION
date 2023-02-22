@@ -29,7 +29,8 @@ Imports:
     magrittr,
     readxl,
     shiny,
-    shinyjs, 
+    shinyjs,
+    remotes,
     TADA
 Remotes: USEPA/TADA
 Suggests: 
