@@ -36,15 +36,13 @@ test_that(
     expect_true(
       get_golem_config(
         "app_prod",
-        config = "production",
-        file = config_file
+        config = "production"
       )
     )
     expect_false(
       get_golem_config(
         "app_prod",
-        config = "dev",
-        file = config_file
+        config = "dev"
       )
     )
   }
