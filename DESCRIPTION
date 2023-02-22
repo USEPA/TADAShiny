@@ -35,10 +35,7 @@ Imports:
     shiny,
     shinycssloaders,
     shinyjs,
-    stringr,
-    attempt,
-    glue,
-    htmltools
+    stringr
 Depends: 
     R (>= 3.5.0)
 Encoding: UTF-8
