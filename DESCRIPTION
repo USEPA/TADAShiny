@@ -35,9 +35,8 @@ Remotes: USEPA/TADA
 Suggests: 
     covr,
     knitr,
-    rmarkdown,
     spelling,
-    testthat (>= 4.2.2)
+    testthat
 Depends: 
     R (>= 3.5.0)
 Encoding: UTF-8
