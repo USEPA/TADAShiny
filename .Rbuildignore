@@ -10,7 +10,7 @@ $run_dev.*
 ^\.github$
 LICENSE.md
 CONTRIBUTING.md
-readme.md
+README.Rmd
 .gitignore
 ^app\.R$
 ^rsconnect$
