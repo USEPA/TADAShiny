@@ -10,7 +10,7 @@
 ###################################
 #### CURRENT FILE: DEV SCRIPT #####
 ###################################
-usethis::use_cc0_license()
+
 # Engineering
 
 ## Dependencies ----
@@ -33,13 +33,20 @@ usethis::use_package("shinyjs")
 ## Add modules ----
 ## Create a module infrastructure in R/
 ##golem::add_module( name = "name_of_module1" ) # Name of the module
-## golem::add_module( name = "import" ) # Name of the import module
+golem::add_module( name = "import" ) # Name of the import module
+golem::add_module( name = "tables" ) # Name of the tables module
+golem::add_module( name = "import_summary" ) 
+golem::add_module( name = "import_check")
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*
 ##golem::add_fct( "helpers" ) 
 ##golem::add_utils( "helpers" )
 
+##hui added a function - check import errors
+golem::add_fct("import_error_checking")
+## hui added the utils function to check summary info
+golem::add_utils("summarize_import")
 
 ## External resources
 ## Creates .js and .css files at inst/app/www
@@ -66,25 +73,22 @@ devtools::build_vignettes()
 usethis::use_coverage()
 
 # Create a summary readme for the testthat subdirectory
-# Not available on CRAN
-# remotes::install_github('yonicd/covrpage')
-# covrpage::covrpage()
+covrpage::covrpage()
 
 ## CI ----
 ## Use this part of the script if you need to set up a CI
 ## service for your application
 ## 
 ## (You'll need GitHub there)
-
 usethis::use_github()
 
 # GitHub Actions
 usethis::use_github_action() 
-# Chose one of the two
+# Chose one of the three
 # See https://usethis.r-lib.org/reference/use_github_action.html
 usethis::use_github_action_check_release() 
 usethis::use_github_action_check_standard() 
-# usethis::use_github_action_check_full() 
+usethis::use_github_action_check_full() 
 # Add action for PR
 usethis::use_github_action_pr_commands()
 

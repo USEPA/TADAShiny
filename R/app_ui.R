@@ -12,9 +12,10 @@ app_ui <- function(request) {
     htmlTemplate(
       # Tab 1
       app_sys("app/www/index.html"),
-      tab1_data_import = mod_upload_TADAprofile_ui("upload_TADAprofile_1"),
-      tab1_data_summary = mod_WQP_data_summary_ui("WQP_data_summary_1")
-     
+      # Hui - example
+      tab1_data_import = mod_import_ui("import_ui_1"),
+      tab1_data_check = mod_import_check_ui("import_check"),
+      tab1_data_summary = mod_import_summary_ui("import_summary_ui_1")
   )
   )
 }

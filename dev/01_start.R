@@ -21,11 +21,11 @@
 golem::fill_desc(
   pkg_name = "TADAShiny", # The Name of the package containing the App 
   pkg_title = "TADAShiny", # The Title of the package containing the App 
-  pkg_description = "This Shiny application is the first of the Water Quality Portal TADA (Tools for Automated Data Analysis) series.", # The Description of the package containing the App 
-  author_first_name = "TADA Team", # Your First Name
+  pkg_description = "PKG_DESC.", # The Description of the package containing the App 
+  author_first_name = "TADA_Team", # Your First Name
   author_last_name = "EPA", # Your Last Name
-  author_email = "mullin.cristina@epa.gov", # Your Email
-  repo_url = "https://github.com/USEPA/TADAShiny" # The URL of the GitHub Repo (optional) 
+  author_email = "tada@epa.gov", # Your Email
+  repo_url = NULL # The URL of the GitHub Repo (optional) 
 )     
 
 ## Set {golem} options ----
@@ -33,9 +33,9 @@ golem::set_golem_options()
 
 ## Create Common Files ----
 ## See ?usethis for more information
-usethis::use_cc0_license()  # You can set another license here
+usethis::use_mit_license( "Golem User" )  # You can set another license here
 usethis::use_readme_rmd( open = FALSE )
-usethis::use_code_of_conduct("mullin.cristina@epa.gov")
+usethis::use_code_of_conduct()
 usethis::use_lifecycle_badge( "Experimental" )
 usethis::use_news_md( open = FALSE )
 
