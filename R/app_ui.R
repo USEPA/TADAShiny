@@ -12,10 +12,7 @@ app_ui <- function(request) {
     htmlTemplate(
       # Tab 1
       app_sys("app/www/index.html"),
-      # Hui - example
-      tab1_data_import = mod_import_ui("import_ui_1"),
-      tab1_data_check = mod_import_check_ui("import_check"),
-      tab1_data_summary = mod_import_summary_ui("import_summary_ui_1")
+     
   )
   )
 }

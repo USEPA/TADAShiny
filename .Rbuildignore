@@ -12,3 +12,6 @@ LICENSE.md
 CONTRIBUTING.md
 readme.md
 .gitignore
+^app\.R$
+^rsconnect$
+^LICENSE\.md$

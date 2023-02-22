@@ -19,3 +19,5 @@ TADAShiny.Rproj
 # Other
 _snaps
 .Ruserdata
+.vscode/
+.Rbuildignore
