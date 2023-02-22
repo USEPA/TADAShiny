@@ -5,4 +5,4 @@ default:
 production:
   app_prod: yes
 dev:
-  golem_wd: !expr here::here()
+  golem_wd: C:/Users/cmulli01/TADARShiny/TADAShiny

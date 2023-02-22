@@ -4,15 +4,18 @@
 #'     DO NOT REMOVE.
 #' @import shiny
 #' @noRd
+
+# Below increases the max data upload size from the Shiny default of 5MB per file
+# to 30MB for file
+options(shiny.maxRequestSize=30*1024^2)
+
 app_server <- function( input, output, session ) {
   # Your application server logic 
-  epc_data <- reactiveVal(NULL)
   
-  # Get the reactive value from the import server
-  modImportReactiveVals <- mod_import_server("import_ui_1", epc_data)
-  upload_error <- mod_import_check_server("import_check", modImportReactiveVals)
+  TADA_Profile <- reactiveVal(NULL)
   
-  # summary table when user uploads data
-  mod_import_summary_server("import_summary_ui_1", modImportReactiveVals, upload_error)
+  modImportTADAProfile <- mod_upload_TADAprofile_server("upload_TADAprofile_1", TADA_Profile)
+  
+  mod_WQP_data_summary_server("WQP_data_summary_1", modImportTADAProfile)
   
 }
