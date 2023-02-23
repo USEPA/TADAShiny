@@ -8,6 +8,9 @@
 #'
 #' @importFrom shiny NS tagList 
 
+# remotes::install_github("USEPA/TADA")
+# library("TADA")
+
 mod_WQP_data_summary_ui <- function(id){
   ns <- NS(id)
   tagList(

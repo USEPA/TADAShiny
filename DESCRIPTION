@@ -32,7 +32,7 @@ Imports:
     shinyjs,
     remotes,
     TADA
-Remotes: USEPA/TADA
+Remotes: remotes::install_github("USEPA/TADA")
 Suggests: 
     covr,
     knitr,
