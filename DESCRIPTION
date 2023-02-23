@@ -30,9 +30,8 @@ Imports:
     readxl,
     shiny,
     shinyjs,
-    remotes,
     TADA
-Remotes: remotes::install_github("USEPA/TADA")
+Remotes: USEPA/TADA
 Suggests: 
     covr,
     knitr,
