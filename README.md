@@ -1,3 +1,4 @@
+
 <!-- README.md is generated from README.Rmd. Please edit that file. 
 You’ll still need to render `README.Rmd` regularly, to keep `README.md`
 up-to-date. `devtools::build_readme()` is handy for this. You could also
@@ -6,11 +7,6 @@ example workflow can be found here:
 <https://github.com/r-lib/actions/tree/v1/examples>.-->
 
 # TADAShiny
-Provides a user interface on top of the TADA R Package (https://github.com/USEPA/TADA)
-- TADA Shiny base template and structure with geolem framework  (https://github.com/ThinkR-open/golem) 
-- IDE Requirements: R Studio 1.4.X, R 4.1.x, and golem 0.3.2 - install.packages("golem")
-- HTML Template - EPA Standalone Template/USWDS (https://designsystem.digital.gov/)
-- Run the base template with sample code: R Studio -->Open TADAShiny.Rproj-->dev-->run_dev.R
 
 <!-- badges: start -->
 
