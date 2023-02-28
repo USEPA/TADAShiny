@@ -11,7 +11,7 @@ app_ui <- function(request) {
     # Your application UI logic 
     htmlTemplate(
       # Tab 1
-     # app_sys("app/www/index.html"),
+     # app_sys("app/www/index-stepwise-archive.html"),
       # hz - changed it to a temp page
       app_sys("app/www/index-showhide.html"),
       tab1_data_import = mod_upload_TADAprofile_ui("upload_TADAprofile_1"),
