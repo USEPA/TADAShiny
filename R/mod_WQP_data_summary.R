@@ -63,7 +63,7 @@ mod_WQP_data_summary_server <- function(id, input_filepath){
         
         # Apply the instance specific processing to the dataframe and render
         #use TADA R package for table contents
-        import_summary_table <- TADA::SummarizeCharacteristics(input_filepath()) 
+        import_summary_table <- TADA::SummarizeColumn(input_filepath()) 
         
         return(import_summary_table)
       }
