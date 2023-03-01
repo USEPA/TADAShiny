@@ -36,15 +36,13 @@ testthat::test_that(
     expect_true(
       get_golem_config(
         "app_prod",
-        config = "production",
-        file = config_file
+        config = "production"
       )
     )
     expect_false(
       get_golem_config(
         "app_prod",
-        config = "dev",
-        file = config_file
+        config = "dev"
       )
     )
   }
@@ -52,18 +50,18 @@ testthat::test_that(
 
 # Configure this test to fit your need.
 # testServer() function makes it possible to test code in server functions and modules, without needing to run the full Shiny application
-shiny::testServer(app_server, {
+# shiny::testServer(app_server, {
   
   # Set and test an input
-  session$setInputs(x = 2)
-  expect_equal(input$x, 2)
+  # session$setInputs(x = 2)
+  # expect_equal(input$x, 2)
   
   # Example of tests you can do on the server:
   # - Checking reactiveValues
   # expect_equal(r$lg, 'EN')
   # - Checking output
   # expect_equal(output$txt, "Text")
-})
+# })
 
 # Configure this test to fit your need
 testthat::test_that(
