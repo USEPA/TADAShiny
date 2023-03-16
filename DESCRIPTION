@@ -12,6 +12,10 @@ Authors@R:
     person(given = "Trip",
            family = "Hook",
            role = "aut"),
+    person(given = "Elise",
+           family = "Hinman",
+           role = c("aut"),
+           email = "hinman.elise@epa.gov"),
     person(given = "Hui",
            family = "Zhou",
            role = c("aut"),
@@ -31,9 +35,12 @@ Imports:
     shiny,
     shinyjs,
     TADA
-Remotes: USEPA/TADA
+Remotes: 
+    github::USEPA/TADA   
 Suggests: 
+    remotes,
     covr,
+    rmarkdown, 
     knitr,
     spelling,
     testthat
@@ -47,3 +54,6 @@ LazyData: true
 URL: https://github.com/USEPA/TADAShiny
 BugReports: https://github.com/USEPA/TADAShiny/issues
 RoxygenNote: 7.2.3
+Roxygen: list(markdown = TRUE)
+VignetteBuilder: knitr, rmarkdown
+
