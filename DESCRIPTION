@@ -35,7 +35,8 @@ Imports:
     shiny,
     shinyjs,
     TADA,
-    rmarkdown
+    rmarkdown, 
+    remotes
 Remotes: USEPA/TADA
 Suggests: 
     covr,
