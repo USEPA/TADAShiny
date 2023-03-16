@@ -34,7 +34,8 @@ Imports:
     readxl,
     shiny,
     shinyjs,
-    TADA
+    TADA,
+    rmarkdown
 Remotes: USEPA/TADA
 Suggests: 
     covr,
@@ -51,3 +52,6 @@ LazyData: true
 URL: https://github.com/USEPA/TADAShiny
 BugReports: https://github.com/USEPA/TADAShiny/issues
 RoxygenNote: 7.2.3
+Roxygen: list(markdown = TRUE)
+VignetteBuilder: knitr, rmarkdown
+
