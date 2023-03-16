@@ -34,12 +34,14 @@ Imports:
     readxl,
     shiny,
     shinyjs,
-    TADA,
-    rmarkdown, 
-    remotes
-Remotes: USEPA/TADA
+    TADA
+Remotes: 
+    github::USEPA/TADA, 
+    r-lib/remotes     
 Suggests: 
+    remotes,
     covr,
+    rmarkdown, 
     knitr,
     spelling,
     testthat
