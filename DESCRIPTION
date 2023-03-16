@@ -36,7 +36,10 @@ Imports:
     shinyjs,
     TADA
 Remotes: 
-    r-lib/github::USEPA/TADA   
+    r-lib/covr, 
+    r-lib/testthat,
+    r-lib/remotes,
+    github::USEPA/TADA   
 Suggests: 
     remotes,
     covr,
