@@ -10,12 +10,14 @@
 options(shiny.maxRequestSize=30*1024^2)
 
 app_server <- function( input, output, session ) {
+  
   # Your application server logic 
   
-  TADA_Profile <- reactiveVal(NULL)
+  .data <- reactiveVal(NULL)
   
-  modImportTADAProfile <- mod_upload_TADAprofile_server("upload_TADAprofile_1", TADA_Profile)
+  modImportReactiveVals <- mod_uploadData_server("uploadData_1", .data)
   
-  mod_WQP_data_summary_server("WQP_data_summary_1", modImportTADAProfile)
+  # summarize imported data  
+  mod_summarizeData_server("summarizeData_1", modImportReactiveVals)
   
 }

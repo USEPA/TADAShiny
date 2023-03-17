@@ -4,6 +4,8 @@
 #'     DO NOT REMOVE.
 #' @import shiny
 #' @noRd
+
+
 app_ui <- function(request) {
   tagList(
     # Leave this function for adding external resources
@@ -11,11 +13,9 @@ app_ui <- function(request) {
     # Your application UI logic 
     htmlTemplate(
       # Tab 1
-     # app_sys("app/www/index-stepwise-archive.html"),
-      # hz - changed it to a temp page
-      app_sys("app/www/index-showhide.html"),
-      tab1_data_import = mod_upload_TADAprofile_ui("upload_TADAprofile_1"),
-      tab1_data_summary = mod_WQP_data_summary_ui("WQP_data_summary_1")
+      app_sys("app/www/index.html"),
+      tab1_data_import = mod_uploadData_ui("uploadData_1"),
+      tab1_data_summary = mod_summarizeData_ui("summarizeData_1")
       
     )
   )
