@@ -17,7 +17,7 @@ mod_upload_TADAprofile_ui <- function(id){
     fileInput(
       ns("file"), "",
       multiple = TRUE,
-      accept = c(".xlsx", ".xls", ".csv"),
+      accept = c(".xlsx", ".xls"),
       width = "100%"
     )
     
