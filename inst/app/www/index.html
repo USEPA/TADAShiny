@@ -297,7 +297,7 @@
       <div class="screen" id="data-import">
         <h2>Data Import</h2>
         <div class="content">
-            <p>TADA accepts spreadsheets in the .csv format from the <i>Water Quality Portal</i> or any .csv formatted in the Water Quality eXchange (WQX) format (i.e., WQX required column headers). Use the features on this screen to upload your data. For questions or assistance using TADA, please contact the TADA team at <i>mullin.cristina@epa.gov</i> and include the phrase "TADA Data Discovery and Cleaning" in the subject line.</p>
+            <p>TADA accepts spreadsheets in the .xlsx format from the <i>Water Quality Portal</i> or any .xlsx formatted in the Water Quality eXchange (WQX) format (i.e., WQX required column headers). Use the features on this screen to upload your data. For questions or assistance using TADA, please contact the TADA team at <i>mullin.cristina@epa.gov</i> and include the phrase "TADA Data Discovery and Cleaning" in the subject line.</p>
         </div>
 
         <hr />
@@ -311,23 +311,17 @@
                <div>
 				   	  <h3>Data Import & Summary</h3>
 				   	  <div class="upload">
-				   	    {{tab1_data_import}}
-				   	    </div>
-				   	    
-				   	    </div>
-				   	      {{tab1_data_summary}}
-				   	    </div>
-			  	  </div>
-			  	</div>
+				   	    <button class="usa-button">{{tab1_data_import}}{{tab1_data_summary}}</button>
+				   	  </div>
 			  </div>
 		  <hr />
         <p class="float-left"><button class="usa-button">Apply Changes &amp; Continue</button></p>
         <p class="float-right"><button class="usa-button">Skip &amp; Continue</button></p>
 
 		 
-      </div><!--/#data-import ends-->
-
-
+      </div>
+      
+    <!--/#data-import ends-->
 
       <div class="screen" id="overview">
         <h2>Overview</h2>

@@ -16,7 +16,7 @@ mod_uploadData_ui <- function(id){
     fileInput(
       ns("file"), "",
       multiple = TRUE,
-      accept = c(".xlsx", ".xls"),
+      accept = ".xlsx",
       width = "100%"
     )
  
