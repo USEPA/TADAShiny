@@ -4,7 +4,7 @@ if (!require("pacman")) install.packages("pacman")
 pacman::p_load("golem", "thinkr", "shiny", "shinycssloaders", "dplyr", "xlsx", 
                "readr", "magrittr", "bootstrap", "stringr", "readxl", "DT", 
                "plotly", "ggplot2", "tidyr", "ggpubr", 
-               "cowplot", "textshape",  "boot", "remotes")
+               "cowplot", "textshape",  "boot", "remotes", "TADA")
 
 
 # Set options here
