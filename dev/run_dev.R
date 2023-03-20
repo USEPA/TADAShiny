@@ -6,6 +6,7 @@ pacman::p_load("golem", "thinkr", "shiny", "shinycssloaders", "dplyr", "xlsx",
                "plotly", "ggplot2", "tidyr", "ggpubr", 
                "cowplot", "textshape",  "boot", "remotes")
 
+remotes::install_github("USEPA/TADA", ref = "develop", dependencies = TRUE)
 
 # Set options here
 options(golem.app.prod = FALSE) # TRUE = production mode, FALSE = development mode
