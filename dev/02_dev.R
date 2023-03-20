@@ -42,6 +42,7 @@ usethis::use_package("shinybusy")
 # golem::add_module(name = "overview", with_test = TRUE) # Name of the module
 # golem::add_module(name = "upload_data", with_test = TRUE) # Name of the module
 # golem::add_module(name = "summary", with_test = TRUE) # Name of the module
+# golem::add_module(name = "TADA_summary") # Name of the module
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*

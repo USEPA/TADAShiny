@@ -3,6 +3,7 @@
 export("%>%")
 export(run_app)
 import(shiny)
+import(shinybusy)
 importFrom(golem,activate_js)
 importFrom(golem,add_resource_path)
 importFrom(golem,bundle_resources)

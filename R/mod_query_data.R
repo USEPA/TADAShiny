@@ -7,6 +7,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
+#' @import shinybusy
 
 load("inst/extdata/statecodes_df.Rdata")
 orgs = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/Organization.CSV"))$ID)
@@ -21,6 +22,9 @@ projects = unique(data.table::fread("https://www.waterqualitydata.us/data/Projec
 mod_query_data_ui <- function(id){
   ns <- NS(id)
   tagList(
+    h3("Query the WQP from the app"),
+    "Use the fields below to download a dataset directly from WQP. To search by monitoring location ID, please type in monitoring location ID's as documented in the WQP. You may include multiple monitoring locations in your search using a comma between entries.",
+    br(),
     fluidRow(column(4,selectizeInput(ns("state"),"State", choices = NULL)),
              column(4,selectizeInput(ns("county"), "County", choices = NULL)),
              column(4, selectizeInput(ns("org"),"Organization(s)", choices = NULL, multiple = TRUE))),
