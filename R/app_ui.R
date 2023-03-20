@@ -4,6 +4,8 @@
 #'     DO NOT REMOVE.
 #' @import shiny
 #' @noRd
+
+# THE BUSINESS STARTS ON line 223 or thereabouts.
 app_ui <- function(request) {
   tagList(
     # Leave this function for adding external resources
@@ -228,7 +230,10 @@ app_ui <- function(request) {
                  tags$a(href="https://www.epa.gov/waterdata/water-quality-exchange-web-template-files", "here."),
                  mod_upload_data_ui("upload_data_1"),
                  h3("Query the WQP from the app"),
+                 "Use the fields below to download a dataset directly from WQP. To search by monitoring location ID, please type in monitoring location ID's as documented in the WQP. You may include multiple monitoring locations in your search using a comma between entries.",
+                 br(),
                  mod_query_data_ui("query_data_1"),
+                 br(),
                  mod_summary_ui("summary_1")),
         tabPanel("Overview"),
         tabPanel("Flag"),

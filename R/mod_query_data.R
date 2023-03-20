@@ -21,16 +21,16 @@ projects = unique(data.table::fread("https://www.waterqualitydata.us/data/Projec
 mod_query_data_ui <- function(id){
   ns <- NS(id)
   tagList(
-    fluidRow(column(4,selectizeInput(ns("state"),"Select State", choices = NULL)),
-             column(4,selectizeInput(ns("county"), "Select County", choices = NULL)),
-             column(4, selectizeInput(ns("org"),"Select Organization(s)", choices = NULL, multiple = TRUE))),
-    fluidRow(column(4, selectizeInput(ns("proj"),"Select Project(s)", choices = NULL, multiple = TRUE)),
-             column(4, selectizeInput(ns("characteristic"),"Select Characteristic(s)", choices = NULL, multiple = TRUE)),
-             column(4, selectizeInput(ns("media"), "Select Sample Media", choices = c("",media), selected = "Water", multiple = TRUE))),
-    fluidRow(column(4, selectizeInput(ns("type"), "Select Site Type(s)", choices = c("",sitetype), multiple = TRUE)),
-             column(8, textInput(ns("siteids"), "Type in Monitoring Location ID(s), separated by commas", value = ""))),
-    fluidRow(column(3, dateInput(ns("startdate"),"Select Start Date", format = "yyyy-mm-dd", startview = "year")),
-             column(3, dateInput(ns("enddate"),"Select End Date", format = "yyyy-mm-dd", startview = "year"))),
+    fluidRow(column(4,selectizeInput(ns("state"),"State", choices = NULL)),
+             column(4,selectizeInput(ns("county"), "County", choices = NULL)),
+             column(4, selectizeInput(ns("org"),"Organization(s)", choices = NULL, multiple = TRUE))),
+    fluidRow(column(4, selectizeInput(ns("proj"),"Project(s)", choices = NULL, multiple = TRUE)),
+             column(4, selectizeInput(ns("characteristic"),"Characteristic(s)", choices = NULL, multiple = TRUE)),
+             column(4, selectizeInput(ns("media"), "Sample Media", choices = c("",media), selected = "Water", multiple = TRUE))),
+    fluidRow(column(4, selectizeInput(ns("type"), "Site Type(s)", choices = c("",sitetype), multiple = TRUE)),
+             column(8, textInput(ns("siteids"), "Monitoring Location ID(s), separated by commas", value = ""))),
+    fluidRow(column(3, dateInput(ns("startdate"),"Start Date", format = "yyyy-mm-dd", startview = "year")),
+             column(3, dateInput(ns("enddate"),"End Date", format = "yyyy-mm-dd", startview = "year"))),
     # textInput(ns("hucs"), "Type in HUC(s), separated by commas", value = ""),
     fluidRow(column(3, actionButton(ns("querynow"),"Run Query"))),
     fluidRow(column(3, textOutput(ns("success"))))

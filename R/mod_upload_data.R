@@ -29,7 +29,7 @@ mod_upload_data_server <- function(id, tadat){
     observe({
       req(input$file)
       # user uploaded data
-      tadat$raw <- readxl::read_excel(input$file$datapath, sheet = 1)
+      tadat$raw <- suppressWarnings(readxl::read_excel(input$file$datapath, sheet = 1))
     })
 
   })
