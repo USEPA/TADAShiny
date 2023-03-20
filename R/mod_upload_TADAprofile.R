@@ -20,7 +20,7 @@ mod_upload_TADAprofile_ui <- function(id){
       accept = c(".xlsx", ".xls"),
       width = "100%"
     )
-    
+ 
   )
 }
 
@@ -49,9 +49,9 @@ mod_upload_TADAprofile_server <- function(id, TADA_Profile){
   )
 }
 
-
+    
 ## To be copied in the UI
 # mod_upload_TADAprofile_ui("Cristinas_first_module_1")
-
+    
 ## To be copied in the server
 # mod_upload_TADAprofile_server("Cristinas_first_module_1")

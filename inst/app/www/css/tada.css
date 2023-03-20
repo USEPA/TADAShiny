@@ -1,7 +1,6 @@
 .TADA .l-constrain {
     max-width: auto !important;
 }
-
 .TADA .full-width{
     padding-left: 2rem;
     padding-right: 2rem;
@@ -11,10 +10,6 @@ table,
 .usa-table,
 .usa-prose>table{
     width: 100%;
-}
-
-h1.page-title{
-    float: left;
 }
 
 .switch label input[type="checkbox"] {
@@ -82,36 +77,10 @@ label {
     max-width: 64rem;
 }
 
-.usa-step-indicator {
-    clear: both;
-}
-
 .usa-step-indicator__heading {
     margin-top: 0 !important;
 }
-.usa-step-indicator__segment--current a{
-    text-decoration: none;
-}
+
 .summary-list{
     width: 50%;
-}
-
-.resources{
-    float: right;
-}
-
-.resources li{
-    display: inline-block;
-}
-
-.clear-both{
-    clear: both;
-}
-
-.screen {
-    clear: both;
-    display: none;
-}
-.screen.is-visible{
-    display: block;
 }

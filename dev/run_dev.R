@@ -2,9 +2,10 @@
 # hz updated the following line to check and install the golem and used packages 1/4/2022
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load("golem", "thinkr", "shiny", "shinycssloaders", "dplyr", "xlsx", 
-               "readr", "magrittr", "bootstrap", "stringr", 
-               "readxl", "DT", "plotly", "ggplot2", "tidyr", "ggpubr", 
+               "readr", "magrittr", "bootstrap", "stringr", "readxl", "DT", 
+               "plotly", "ggplot2", "tidyr", "ggpubr", 
                "cowplot", "textshape",  "boot", "remotes")
+
 
 # Set options here
 options(golem.app.prod = FALSE) # TRUE = production mode, FALSE = development mode
