@@ -9,13 +9,10 @@
 # to 30MB for file
 options(shiny.maxRequestSize=30*1024^2)
 
-app_server <- function( input, output, session ) {
-  # Your application server logic 
-  
-  TADA_Profile <- reactiveVal(NULL)
-  
-  modImportTADAProfile <- mod_upload_TADAprofile_server("upload_TADAprofile_1", TADA_Profile)
-  
-  mod_WQP_data_summary_server("WQP_data_summary_1", modImportTADAProfile)
-  
+app_server <- function(input, output, session) {
+  # Your application server logic
+  tadat = reactiveValues()
+  mod_query_data_server("query_data_1", tadat)
+  mod_upload_data_server("upload_data_1", tadat)
+  mod_summary_server("summary_1", tadat)
 }

@@ -29,11 +29,18 @@ usethis::use_package("readxl")
 usethis::use_package("DT")
 usethis::use_package("EnvStats")
 usethis::use_package("shinyjs")
+usethis::use_package("ggplot2")
+usethis::use_package("leaflet")
+usethis::use_package("sf")
 
 ## Add modules ----
 ## Create a module infrastructure in R/
 ##golem::add_module( name = "name_of_module1" ) # Name of the module
 ## golem::add_module( name = "import" ) # Name of the import module
+# golem::add_module(name = "query_data", with_test = TRUE) # Name of the module
+# golem::add_module(name = "overview", with_test = TRUE) # Name of the module
+# golem::add_module(name = "upload_data", with_test = TRUE) # Name of the module
+# golem::add_module(name = "summary", with_test = TRUE) # Name of the module
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*

@@ -38,6 +38,13 @@ Imports:
 Remotes: 
     r-lib/testthat,
     github::USEPA/TADA
+    data.table,
+    ggplot2,
+    leaflet,
+    sf,
+    stringr,
+    TADA,
+    utils
 Suggests: 
     remotes,
     covr,
