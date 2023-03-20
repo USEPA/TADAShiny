@@ -241,7 +241,7 @@ app_ui <- function(request) {
         tabPanel("Harmonize"),
         tabPanel("Censored Data"),
         tabPanel("Explore"),
-        tabPanel("Download")
+        tabPanel("Download"),
 
       )
       ,

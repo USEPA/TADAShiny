@@ -32,8 +32,7 @@ mod_query_data_ui <- function(id){
     fluidRow(column(3, dateInput(ns("startdate"),"Start Date", format = "yyyy-mm-dd", startview = "year")),
              column(3, dateInput(ns("enddate"),"End Date", format = "yyyy-mm-dd", startview = "year"))),
     # textInput(ns("hucs"), "Type in HUC(s), separated by commas", value = ""),
-    fluidRow(column(3, actionButton(ns("querynow"),"Run Query"))),
-    fluidRow(column(3, textOutput(ns("success"))))
+    fluidRow(column(3, actionButton(ns("querynow"),"Run Query")))
   )
 }
 
@@ -78,6 +77,13 @@ mod_query_data_server <- function(id, tadat){
       }else{
         siteid = stringr::str_trim(unlist(strsplit(input$siteids,",")))}
 
+      shinybusy::show_modal_spinner(
+        spin = "double-bounce",
+        color = "#0071bc",
+        text = "Querying WQP database...",
+        session = shiny::getDefaultReactiveDomain()
+      )
+
       tadat$raw = TADA::TADAdataRetrieval(statecode = statecode,
                                         startDate = as.character(input$startdate),
                                         countycode = countycode,
@@ -91,13 +97,8 @@ mod_query_data_server <- function(id, tadat){
                                         applyautoclean = TRUE
       )
 
-      output$success <- renderText({
-        if(is.null(tadat$raw)){
-          "Working on it..."
-        }else{
-          "I did it!"
-        }
-      })
+      shinybusy::remove_modal_spinner(session = getDefaultReactiveDomain())
+
     })
 
   })
