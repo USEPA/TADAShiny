@@ -57,4 +57,3 @@ BugReports: https://github.com/USEPA/TADAShiny/issues
 RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr, rmarkdown
-
