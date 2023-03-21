@@ -36,7 +36,8 @@ mod_query_data_ui <- function(id){
     fluidRow(column(3, dateInput(ns("startdate"),"Start Date", format = "yyyy-mm-dd", startview = "year")),
              column(3, dateInput(ns("enddate"),"End Date", format = "yyyy-mm-dd", startview = "year"))),
     # textInput(ns("hucs"), "Type in HUC(s), separated by commas", value = ""),
-    fluidRow(column(3, actionButton(ns("querynow"),"Run Query")))
+    fluidRow(column(3, actionButton(ns("querynow"),"Run Query",icon("cloud"), 
+                                    style="color: #fff; background-color: #337ab7; border-color: #2e6da4")))
   )
 }
 
