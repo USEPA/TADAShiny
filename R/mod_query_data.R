@@ -10,14 +10,16 @@
 #' @import shinybusy
 
 load("inst/extdata/statecodes_df.Rdata")
-orgs = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/Organization.CSV"))$ID)
-chars = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/Characteristic.CSV"))$Name)
-media = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/ActivityMedia.CSV"))$Name)
-county = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/County.CSV"))$County.Name)
-# sitetype = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/MonitoringLocationType.CSV"))$Name)
-sitetype = c("Aggregate groundwater use","Aggregate surface-water-use","Aggregate water-use establishment","Atmosphere","Estuary","Facility","Glacier","Lake, Reservoir, Impoundment","Land","Not Assigned","Ocean","Spring","Stream","Subsurface","Well","Wetland")
-projects = unique(data.table::fread("https://www.waterqualitydata.us/data/Project/search?mimeType=csv&zip=no&providers=NWIS&providers=STEWARDS&providers=STORET")$ProjectIdentifier)
-
+load("inst/extdata/query_choices.Rdata")
+# orgs = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/Organization.CSV"))$ID)
+# chars = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/Characteristic.CSV"))$Name)
+# media = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/ActivityMedia.CSV"))$Name)
+# county = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/County.CSV"))$County.Name)
+# # sitetype = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/MonitoringLocationType.CSV"))$Name)
+# sitetype = c("Aggregate groundwater use","Aggregate surface-water-use","Aggregate water-use establishment","Atmosphere","Estuary","Facility","Glacier","Lake, Reservoir, Impoundment","Land","Not Assigned","Ocean","Spring","Stream","Subsurface","Well","Wetland")
+# projects = unique(data.table::fread("https://www.waterqualitydata.us/data/Project/search?mimeType=csv&zip=no&providers=NWIS&providers=STEWARDS&providers=STORET")$ProjectIdentifier)
+# mlids = unique(data.table::fread("https://www.waterqualitydata.us/data/Station/search?mimeType=csv&zip=no&providers=NWIS&providers=STEWARDS&providers=STORET")$MonitoringLocationIdentifier)
+# save(orgs, chars, media, county, sitetype, projects, mlids, file = "query_choices.Rdata")
 
 mod_query_data_ui <- function(id){
   ns <- NS(id)
@@ -32,7 +34,7 @@ mod_query_data_ui <- function(id){
              column(4, selectizeInput(ns("characteristic"),"Characteristic(s)", choices = NULL, multiple = TRUE)),
              column(4, selectizeInput(ns("media"), "Sample Media", choices = c("",media), selected = "Water", multiple = TRUE))),
     fluidRow(column(4, selectizeInput(ns("type"), "Site Type(s)", choices = c("",sitetype), multiple = TRUE)),
-             column(8, textInput(ns("siteids"), "Monitoring Location ID(s), separated by commas", value = ""))),
+             column(8, selectizeInput(ns("siteid"), "Monitoring Location ID(s)", choices = NULL,multiple = TRUE))),
     fluidRow(column(3, dateInput(ns("startdate"),"Start Date", format = "yyyy-mm-dd", startview = "year")),
              column(3, dateInput(ns("enddate"),"End Date", format = "yyyy-mm-dd", startview = "year"))),
     # textInput(ns("hucs"), "Type in HUC(s), separated by commas", value = ""),
@@ -53,6 +55,7 @@ mod_query_data_server <- function(id, tadat){
     updateSelectizeInput(session,"org",choices = c("",orgs), server = TRUE)
     updateSelectizeInput(session,"characteristic",choices = c("",chars), server = TRUE)
     updateSelectizeInput(session,"proj", choices = c("",projects), server = TRUE)
+    updateSelectizeInput(session,"siteid", choices = c("",mlids), server = TRUE)
 
     observeEvent(input$querynow,{
       # convert to null when needed
@@ -77,10 +80,12 @@ mod_query_data_server <- function(id, tadat){
       if(is.null(input$org)){
         organization = "null"
       }else{organization = input$org}
-      if(input$siteids == ""){
+      if(is.null(input$siteid)){
         siteid = "null"
       }else{
-        siteid = stringr::str_trim(unlist(strsplit(input$siteids,",")))}
+        siteid = input$siteid
+        # siteid = stringr::str_trim(unlist(strsplit(input$siteids,",")))
+        }
 
       shinybusy::show_modal_spinner(
         spin = "double-bounce",
