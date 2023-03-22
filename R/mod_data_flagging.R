@@ -1,9 +1,9 @@
 library(shiny)
 library(shinyWidgets)
 library(DT)
-
+print(getwd())
 # Read in the tables
-prompt_table = read.csv("C:\\Users\\jhook\\ow\\tadashiny\\R\\flag_prompts.csv")
+prompt_table = read.csv("inst\\flag_prompts.csv")
 prompt_table <- prompt_table[order(prompt_table$Order), ]
 prompts <- prompt_table$Prompt
 n_switches <- length(prompts)
