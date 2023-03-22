@@ -1,0 +1,50 @@
+﻿flagType,columnName,flagValue,rFunction
+Above National Threshold,TADA.ResultValueAboveUpperThreshold.Flag,Y,AboveNationalWQXUpperThreshold 
+Above National Threshold,TADA.ResultValueAboveUpperThreshold.Flag,N,Unknown
+Above National Threshold,TADA.ResultValueBelowLowerThreshold.Flag,N,Unknown
+Analytical Method,TADA.AnalyticalMethod.Flag,Valid,Unknown
+Analytical Method,TADA.AnalyticalMethod.Flag,Nonstandardized,Unknown
+Analytical Method,TADA.AnalyticalMethod.Flag,Invalid,InvalidMethod
+Below National Threshold,TADA.ResultValueBelowLowerThreshold.Flag,Y,BelowNationalWQXLowerThreshold
+Below National Threshold,TADA.ResultValueBelowLowerThreshold.Flag,No threshold avilable,Unknown
+Below National Threshold,TADA.ResultValueAboveUpperThreshold.Flag,No threshold avilable,Unknown
+Censored Data,TADA.CensoredData.Flag,Censored but not Categorized,Unknown
+Censored Data,TADA.CensoredData.Flag,Conflict between Condition and Limit,Unknown
+Censored Data,TADA.CensoredData.Flag,Non-Detect,Unknown
+Censored Data,TADA.CensoredData.Flag,Over-Detect,Unknown
+Censored Data,TADA.CensoredData.Flag,Other Condition/Limit Populated,Unknown
+Continuous Data,TADA.AggregatedContinuousData.Flag,Unknown,AggregatedContinuousData
+Continuous Data,TADA.AggregatedContinuousData.Flag,Y,AggregatedContinuousData
+Convert Depth Units,ConvertDepthUnits,m or ft or feet or meters: depends on user decision,Unknown
+Convert Time Zone,Unknown,Unknown,Unknown
+Duplicates,Unknown,Unknown,Unknown
+Media Type,TADA.ActivityMediaName,"Anything that isn't WATER (TISSUE, AIR, SEDIMENT)",Unknown
+Method Speciation,TADA.MethodSpeciation.Flag,Valid,Unknown
+Method Speciation,TADA.MethodSpeciation.Flag,Nonstandardized,Unknown
+Method Speciation,TADA.MethodSpeciation.Flag,Invalid,InvalidSpeciation
+QAPP Approved,QAPPApprovedIndicator,NA,QAPPapproved
+QAPP Approved,QAPPApprovedIndicator,Y,QAPPapproved
+QAPP Approved,QAPPApprovedIndicator,N,QAPPapproved
+QAPP Documentation,TADA.QAPPDocAvailable,Y_ProjectFileUrlProvided,QAPPDocAvailable
+QAPP Documentation,TADA.QAPPDocAvailable,N,QAPPDocAvailable
+Sample Fraction,TADA.SampleFraction.Flag,Valid,Unknown
+Sample Fraction,TADA.SampleFraction.Flag,Nonstandardized,Unknown
+Sample Fraction,TADA.SampleFraction.Flag,Invalid,InvalidFraction
+Spatial Flags,TADA.InvalidCoordinates.Flag,LAT_OutsideUSA,InvalidCoordinates
+Spatial Flags,TADA.InvalidCoordinates.Flag,LONG_OutsideUSA,InvalidCoordinates
+Spatial Flags,TADA.InvalidCoordinates.Flag,Imprecise_Latincludes999,InvalidCoordinates
+Spatial Flags,TADA.InvalidCoordinates.Flag,Imprecise_Longincludes999,InvalidCoordinates
+Spatial Flags,TADA.InvalidCoordinates.Flag,Imprecise_lessthan3decimaldigits,InvalidCoordinates
+Spatial Flags,TADA.InvalidCoordinates.Flag,OK,InvalidCoordinates
+Special Characters,TADA.ResultMeasureValueDataTypes.Flag,ND or NA,Unknown
+Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Coerced to NA,Unknown
+Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Numeric,Unknown
+Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Less Than,Unknown
+Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Greater Than,Unknown
+Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Approximate Value,Unknown
+Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Percentage,Unknown
+Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Comma-Separated Numeric,Unknown
+Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Text,Unknown
+Units,TADA.ResultUnit.Flag,Valid,Unknown
+Units,TADA.ResultUnit.Flag,Nonstandardized,Unknown
+Units,TADA.ResultUnit.Flag,Invalid,InvalidResultUnit
