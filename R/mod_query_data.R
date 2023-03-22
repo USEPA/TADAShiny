@@ -25,23 +25,24 @@ load("inst/extdata/query_choices.Rdata")
 mod_query_data_ui <- function(id){
   ns <- NS(id)
   tagList(
-    h3("Query the WQP from the app"),
-    "Use the fields below to download a dataset directly from WQP. To search by monitoring location ID, please type in monitoring location ID's as documented in the WQP. You may include multiple monitoring locations in your search using a comma between entries.",
-    br(),
-    fluidRow(column(4,selectizeInput(ns("state"),"State", choices = NULL)),
-             column(4,selectizeInput(ns("county"), "County (pick state first)", choices = NULL)),
-             column(4, selectizeInput(ns("org"),"Organization(s)", choices = NULL, multiple = TRUE))),
-    fluidRow(column(4, selectizeInput(ns("proj"),"Project(s)", choices = NULL, multiple = TRUE)),
-             column(4, selectizeInput(ns("characteristic"),"Characteristic(s)", choices = NULL, multiple = TRUE)),
-             column(4, selectizeInput(ns("media"), "Sample Media", choices = c("",media), selected = "Water", multiple = TRUE))),
-    fluidRow(column(4, selectizeInput(ns("type"), "Site Type(s)", choices = c("",sitetype), multiple = TRUE)),
-             column(8, selectizeInput(ns("siteid"), "Monitoring Location ID(s)", choices = NULL,multiple = TRUE))),
-    fluidRow(column(3, dateInput(ns("startdate"),"Start Date", format = "yyyy-mm-dd", startview = "year")),
-             column(3, dateInput(ns("enddate"),"End Date", format = "yyyy-mm-dd", startview = "year"))),
-    # textInput(ns("hucs"), "Type in HUC(s), separated by commas", value = ""),
-    fluidRow(column(3, actionButton(ns("querynow"),"Run Query",icon("cloud"), 
-                                    style="color: #fff; background-color: #337ab7; border-color: #2e6da4")))
-  )
+    shinyBS::bsCollapsePanel("Query the WQP",
+                             "Use the fields below to download a dataset directly from WQP. To search by monitoring location ID, please type in monitoring location ID's as documented in the WQP. You may include multiple monitoring locations in your search using a comma between entries.",
+                             br(),
+                             fluidRow(column(4,selectizeInput(ns("state"),"State", choices = NULL)),
+                                      column(4,selectizeInput(ns("county"), "County (pick state first)", choices = NULL)),
+                                      column(4, selectizeInput(ns("org"),"Organization(s)", choices = NULL, multiple = TRUE))),
+                             fluidRow(column(4, selectizeInput(ns("proj"),"Project(s)", choices = NULL, multiple = TRUE)),
+                                      column(4, selectizeInput(ns("characteristic"),"Characteristic(s)", choices = NULL, multiple = TRUE)),
+                                      column(4, selectizeInput(ns("media"), "Sample Media", choices = c("",media), selected = "Water", multiple = TRUE))),
+                             fluidRow(column(4, selectizeInput(ns("type"), "Site Type(s)", choices = c("",sitetype), multiple = TRUE)),
+                                      column(8, selectizeInput(ns("siteid"), "Monitoring Location ID(s)", choices = NULL,multiple = TRUE))),
+                             fluidRow(column(3, dateInput(ns("startdate"),"Start Date", format = "yyyy-mm-dd", startview = "year")),
+                                      column(3, dateInput(ns("enddate"),"End Date", format = "yyyy-mm-dd", startview = "year"))),
+                             # textInput(ns("hucs"), "Type in HUC(s), separated by commas", value = ""),
+                             fluidRow(column(3, actionButton(ns("querynow"),"Run Query",icon("cloud"), 
+                                                             style="color: #fff; background-color: #337ab7; border-color: #2e6da4")))
+    )
+      )
 }
 
 #' query_data Server Functions

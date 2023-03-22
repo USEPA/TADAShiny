@@ -15,4 +15,5 @@ app_server <- function(input, output, session) {
   mod_query_data_server("query_data_1", tadat)
   mod_upload_data_server("upload_data_1", tadat)
   mod_summary_server("summary_1", tadat)
+  mod_overview_server("overview_1", tadat)
 }

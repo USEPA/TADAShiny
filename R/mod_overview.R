@@ -10,16 +10,29 @@
 mod_overview_ui <- function(id){
   ns <- NS(id)
   tagList(
- 
+    shinyBS::bsCollapsePanel("Data Overview",
+                             "The map, tables, and plots below are built using the uploaded/queried data.",
+                             leaflet::leafletOutput("overview_map")
+                             )
   )
 }
     
 #' overview Server Functions
 #'
 #' @noRd 
-mod_overview_server <- function(id){
+mod_overview_server <- function(id, tadat){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
+    
+    observe({
+      req(tadat$raw)
+      test <<- tadat$raw
+    })
+    
+    output$overview_map = leaflet::renderLeaflet({
+      req(tadat$raw)
+      
+    })
  
   })
 }
