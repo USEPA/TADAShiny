@@ -11,8 +11,9 @@ mod_overview_ui <- function(id){
   ns <- NS(id)
   tagList(
     shinyBS::bsCollapsePanel("Data Overview",
-                             "The map, tables, and plots below are built using the uploaded/queried data.",
-                             leaflet::leafletOutput("overview_map")
+                             "The map, tables, and plots below are built using the uploaded/queried data. Use the drop down menu below to select one parameter of interest or use choice 'All' to see a summary for all parameters together.",
+                             fluidRow(column(6, uiOutput(ns("overview_select")))),
+                             fluidRow(leaflet::leafletOutput(ns("overview_map")))
                              )
   )
 }
@@ -26,7 +27,12 @@ mod_overview_server <- function(id, tadat){
     
     observe({
       req(tadat$raw)
-      test <<- tadat$raw
+      tadat$o_char <- unique(tadat$raw$TADA.CharacteristicName)
+    })
+    
+    output$overview_select = renderUI({
+      req(tadat$o_char)
+      selectInput("overview_select","Select Parameter", choices = c("All", tadat$o_char), selected = "All")
     })
     
     output$overview_map = leaflet::renderLeaflet({
