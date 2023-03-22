@@ -14,7 +14,7 @@ load("inst/extdata/query_choices.Rdata")
 # orgs = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/Organization.CSV"))$ID)
 # chars = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/Characteristic.CSV"))$Name)
 # media = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/ActivityMedia.CSV"))$Name)
-# county = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/County.CSV"))$County.Name)
+# county = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/County.CSV")))
 # # sitetype = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/MonitoringLocationType.CSV"))$Name)
 # sitetype = c("Aggregate groundwater use","Aggregate surface-water-use","Aggregate water-use establishment","Atmosphere","Estuary","Facility","Glacier","Lake, Reservoir, Impoundment","Land","Not Assigned","Ocean","Spring","Stream","Subsurface","Well","Wetland")
 # projects = unique(data.table::fread("https://www.waterqualitydata.us/data/Project/search?mimeType=csv&zip=no&providers=NWIS&providers=STEWARDS&providers=STORET")$ProjectIdentifier)
@@ -28,7 +28,7 @@ mod_query_data_ui <- function(id){
     "Use the fields below to download a dataset directly from WQP. To search by monitoring location ID, please type in monitoring location ID's as documented in the WQP. You may include multiple monitoring locations in your search using a comma between entries.",
     br(),
     fluidRow(column(4,selectizeInput(ns("state"),"State", choices = NULL)),
-             column(4,selectizeInput(ns("county"), "County", choices = NULL)),
+             column(4,selectizeInput(ns("county"), "County (pick state first)", choices = NULL)),
              column(4, selectizeInput(ns("org"),"Organization(s)", choices = NULL, multiple = TRUE))),
     fluidRow(column(4, selectizeInput(ns("proj"),"Project(s)", choices = NULL, multiple = TRUE)),
              column(4, selectizeInput(ns("characteristic"),"Characteristic(s)", choices = NULL, multiple = TRUE)),
@@ -51,11 +51,21 @@ mod_query_data_server <- function(id, tadat){
     ns <- session$ns
 
     updateSelectizeInput(session,"state",choices = c("",unique(statecodes_df$STUSAB)),  server = TRUE)
-    updateSelectizeInput(session,"county",choices = c("",county), server = TRUE)
+    updateSelectizeInput(session,"county",choices = c("",unique(county$County.Name)), server = TRUE)
     updateSelectizeInput(session,"org",choices = c("",orgs), server = TRUE)
     updateSelectizeInput(session,"characteristic",choices = c("",chars), server = TRUE)
     updateSelectizeInput(session,"proj", choices = c("",projects), server = TRUE)
     updateSelectizeInput(session,"siteid", choices = c("",mlids), server = TRUE)
+    
+    observeEvent(input$state,{
+      state_counties = subset(county, county$State.Code==input$state)
+      updateSelectizeInput(session,"county",choices = c("",unique(state_counties$County.Name)), server = TRUE) 
+    })
+    
+    # observeEvent(input$county,{
+    #   state = county$State.Code[county$County.Name%in%c(input$county)]
+    #   updateSelectizeInput(session,"state",choices = c("",unique(statecodes_df$STUSAB)), selected = state, server = TRUE) 
+    # })
 
     observeEvent(input$querynow,{
       # convert to null when needed
