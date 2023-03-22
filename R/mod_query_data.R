@@ -11,10 +11,11 @@
 
 load("inst/extdata/statecodes_df.Rdata")
 load("inst/extdata/query_choices.Rdata")
+# county = readr::read_tsv(url("https://www2.census.gov/geo/docs/reference/codes/files/national_county.txt"), col_names = FALSE)
+# county = county%>%tidyr::separate(X1,into = c("STUSAB","STATE","COUNTY","COUNTY_NAME","COUNTY_ID"), sep=",")
 # orgs = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/Organization.CSV"))$ID)
 # chars = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/Characteristic.CSV"))$Name)
 # media = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/ActivityMedia.CSV"))$Name)
-# county = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/County.CSV")))
 # # sitetype = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/MonitoringLocationType.CSV"))$Name)
 # sitetype = c("Aggregate groundwater use","Aggregate surface-water-use","Aggregate water-use establishment","Atmosphere","Estuary","Facility","Glacier","Lake, Reservoir, Impoundment","Land","Not Assigned","Ocean","Spring","Stream","Subsurface","Well","Wetland")
 # projects = unique(data.table::fread("https://www.waterqualitydata.us/data/Project/search?mimeType=csv&zip=no&providers=NWIS&providers=STEWARDS&providers=STORET")$ProjectIdentifier)
@@ -51,15 +52,15 @@ mod_query_data_server <- function(id, tadat){
     ns <- session$ns
 
     updateSelectizeInput(session,"state",choices = c("",unique(statecodes_df$STUSAB)),  server = TRUE)
-    updateSelectizeInput(session,"county",choices = c("",unique(county$County.Name)), server = TRUE)
+    # updateSelectizeInput(session,"county",choices = c("",unique(county$COUNTY_NAME)), server = TRUE)
     updateSelectizeInput(session,"org",choices = c("",orgs), server = TRUE)
     updateSelectizeInput(session,"characteristic",choices = c("",chars), server = TRUE)
     updateSelectizeInput(session,"proj", choices = c("",projects), server = TRUE)
     updateSelectizeInput(session,"siteid", choices = c("",mlids), server = TRUE)
     
     observeEvent(input$state,{
-      state_counties = subset(county, county$State.Code==input$state)
-      updateSelectizeInput(session,"county",choices = c("",unique(state_counties$County.Name)), server = TRUE) 
+      state_counties = subset(county, county$STUSAB==input$state)
+      updateSelectizeInput(session,"county",choices = c("",unique(state_counties$COUNTY_NAME)), server = TRUE) 
     })
     
     # observeEvent(input$county,{
@@ -118,6 +119,13 @@ mod_query_data_server <- function(id, tadat){
       )
 
       shinybusy::remove_modal_spinner(session = getDefaultReactiveDomain())
+      
+      if(dim(tadat$raw)[1]<1){
+        showModal(modalDialog(
+          title = "Empty Query",
+          "Your query returned zero results. Please adjust your search inputs and try again."
+        ))
+      }
 
     })
 
