@@ -28,7 +28,9 @@ mod_overview_server <- function(id, tadat){
     # an observer that creates a new reactive object vector called "o_char" that has only the characteristics contained within the tadat$raw dataset
     observe({
       req(tadat$raw)
-      tadat$o_char <- unique(tadat$raw$TADA.CharacteristicName)
+      if(dim(tadat$raw)[1]>0){
+        tadat$o_char <- unique(tadat$raw$TADA.CharacteristicName)
+      }
     })
     
     # o_char is used to parameterize this drop down select input that allows the user to map/plot one parameter at a time or all of them.

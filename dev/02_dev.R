@@ -33,6 +33,7 @@ usethis::use_package("ggplot2")
 usethis::use_package("leaflet")
 usethis::use_package("sf")
 usethis::use_package("shinybusy")
+usethis::use_package("TADA")
 
 ## Add modules ----
 ## Create a module infrastructure in R/

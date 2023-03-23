@@ -33,7 +33,7 @@ mod_summary_server <- function(id, tadat){
 
     output$table_title <- renderText({
 
-      if (is.null(tadat$raw)){
+      if (is.null(tadat$raw)||dim(tadat$raw)[1]<1){
         return(NULL)
 
       } else {
@@ -45,7 +45,7 @@ mod_summary_server <- function(id, tadat){
 
     output$table <- renderTable({
 
-      if (is.null(tadat$raw)) {
+      if (is.null(tadat$raw)||dim(tadat$raw)[1]<1) {
         # Just render nothing, because no file is uploaded.
 
         return(NULL)
