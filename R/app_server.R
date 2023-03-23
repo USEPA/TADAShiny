@@ -11,8 +11,8 @@ options(shiny.maxRequestSize=30*1024^2)
 
 app_server <- function(input, output, session) {
   # Your application server logic
-  tadat = reactiveValues()
-  mod_query_data_server("query_data_1", tadat)
+  tadat = reactiveValues() # create a list object that holds reactive values passed between modules
+  mod_query_data_server("query_data_1", tadat) # server call to the module servers with the name of the module and any dependecies (this one uses the tadat reactive values object)
   mod_upload_data_server("upload_data_1", tadat)
   mod_summary_server("summary_1", tadat)
   mod_overview_server("overview_1", tadat)

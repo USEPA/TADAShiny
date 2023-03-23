@@ -27,8 +27,8 @@ mod_query_data_ui <- function(id){
   tagList(
     shinyBS::bsCollapsePanel("Query the WQP",
                              "Use the fields below to download a dataset directly from WQP. To search by monitoring location ID, please type in monitoring location ID's as documented in the WQP. You may include multiple monitoring locations in your search using a comma between entries.",
-                             br(),
-                             fluidRow(column(4,selectizeInput(ns("state"),"State", choices = NULL)),
+                             br(), # styling several fluid rows with columns to hold the input drop down widgets
+                             fluidRow(column(4,selectizeInput(ns("state"),"State", choices = NULL)), # widgets shown when app opens
                                       column(4,selectizeInput(ns("county"), "County (pick state first)", choices = NULL)),
                                       column(4, selectizeInput(ns("org"),"Organization(s)", choices = NULL, multiple = TRUE))),
                              fluidRow(column(4, selectizeInput(ns("proj"),"Project(s)", choices = NULL, multiple = TRUE)),
@@ -51,7 +51,8 @@ mod_query_data_ui <- function(id){
 mod_query_data_server <- function(id, tadat){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
-
+    
+    # this section has widget update commands for the selectizeinputs that have a lot of possible selections - shiny suggested hosting the choices server-side rather than ui-side
     updateSelectizeInput(session,"state",choices = c("",unique(statecodes_df$STUSAB)),  server = TRUE)
     # updateSelectizeInput(session,"county",choices = c("",unique(county$COUNTY_NAME)), server = TRUE)
     updateSelectizeInput(session,"org",choices = c("",orgs), server = TRUE)
@@ -59,6 +60,7 @@ mod_query_data_server <- function(id, tadat){
     updateSelectizeInput(session,"proj", choices = c("",projects), server = TRUE)
     updateSelectizeInput(session,"siteid", choices = c("",mlids), server = TRUE)
     
+    # this observes when the user inputs a state into the drop down and subsets the choices for counties to only those counties within that state.
     observeEvent(input$state,{
       state_counties = subset(county, county$STUSAB==input$state)
       updateSelectizeInput(session,"county",choices = c("",unique(state_counties$COUNTY_NAME)), server = TRUE) 
@@ -68,10 +70,10 @@ mod_query_data_server <- function(id, tadat){
     #   state = county$State.Code[county$County.Name%in%c(input$county)]
     #   updateSelectizeInput(session,"state",choices = c("",unique(statecodes_df$STUSAB)), selected = state, server = TRUE) 
     # })
-
+    # this event observer is triggered when the user hits the "Query Now" button, and then runs the TADAdataRetrieval function
     observeEvent(input$querynow,{
       # convert to null when needed
-      if(input$state==""){
+      if(input$state==""){ # changing inputs of "" or NULL to "null"
         statecode = "null"
       }else{statecode = input$state}
       if(input$county==""){
@@ -98,14 +100,14 @@ mod_query_data_server <- function(id, tadat){
         siteid = input$siteid
         # siteid = stringr::str_trim(unlist(strsplit(input$siteids,",")))
         }
-
+      # a modal that pops up showing it's working on querying the portal
       shinybusy::show_modal_spinner(
         spin = "double-bounce",
         color = "#0071bc",
         text = "Querying WQP database...",
         session = shiny::getDefaultReactiveDomain()
       )
-
+      # storing the output of TADAdataRetrieval with the user's input choices as a reactive object named "raw" in the tadat list. 
       tadat$raw = TADA::TADAdataRetrieval(statecode = statecode,
                                         startDate = as.character(input$startdate),
                                         countycode = countycode,
@@ -118,9 +120,10 @@ mod_query_data_server <- function(id, tadat){
                                         endDate = as.character(input$enddate),
                                         applyautoclean = TRUE
       )
-
+      # remove the modal once the dataset has been pulled
       shinybusy::remove_modal_spinner(session = getDefaultReactiveDomain())
       
+      # show a modal dialog box when tadat$raw is empty and the query didn't return any records.
       if(dim(tadat$raw)[1]<1){
         showModal(modalDialog(
           title = "Empty Query",
