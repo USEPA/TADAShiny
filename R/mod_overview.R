@@ -63,22 +63,25 @@ mod_overview_server <- function(id, tadat){
       req(input$overview_dates)
       mapdat$alldat2 = subset(mapdat$alldat, mapdat$alldat$ActivityStartDate>=input$overview_dates[1]&mapdat$alldat$ActivityStartDate<=input$overview_dates[2])
       mapdat$sumdat = mapdat$alldat2%>%dplyr::group_by(MonitoringLocationIdentifier,MonitoringLocationName,TADA.LatitudeMeasure, TADA.LongitudeMeasure)%>%dplyr::summarise(Sample_Count = length(unique(ResultIdentifier)), Visit_Count = length(unique(ActivityStartDate)), Parameter_Count = length(unique(TADA.CharacteristicName)), Organization_Count = length(unique(OrganizationIdentifier)))
-    })
+    
+      alldat2 <<- mapdat$alldat
+      sumdat <<- mapdat$sumdat
+      })
     
     # the leaflet map
     output$overview_map = leaflet::renderLeaflet({
       req(input$overview_dates)
-      pal <- colorNumeric(
+      pal <- leaflet::colorNumeric(
         palette = "Blues",
         domain = mapdat$sumdat$Parameter_Count)
-      leaflet()%>%
-        addProviderTiles("Esri.WorldImagery", group = "Satellite", options = providerTileOptions(updateWhenZooming = FALSE,updateWhenIdle = TRUE)) %>%
-        addProviderTiles("Esri.WorldTopoMap", group = "World topo", options = providerTileOptions(updateWhenZooming = FALSE,updateWhenIdle = TRUE))%>%
-        addLayersControl(position ="topright",
+      leaflet::leaflet()%>%
+        leaflet::addProviderTiles("Esri.WorldImagery", group = "Satellite", options = leaflet::providerTileOptions(updateWhenZooming = FALSE,updateWhenIdle = TRUE)) %>%
+        leaflet::addProviderTiles("Esri.WorldTopoMap", group = "World topo", options = leaflet::providerTileOptions(updateWhenZooming = FALSE,updateWhenIdle = TRUE))%>%
+        leaflet::addLayersControl(position ="topright",
                          baseGroups = c("World topo", "Satellite"))%>%
-        clearShapes()%>%
-        fitBounds(lng1 = min(mapdat$sumdat$TADA.LongitudeMeasure), lat1 = min(mapdat$sumdat$TADA.LatitudeMeasure), lng2 = max(mapdat$sumdat$TADA.LongitudeMeasure), lat2 = max(mapdat$sumdat$TADA.LatitudeMeasure))%>%
-        addCircleMarkers(data = mapdat$sumdat, lng=~TADA.LongitudeMeasure, lat=~TADA.LatitudeMeasure, color="black",fillColor=~pal(Parameter_Count), fillOpacity = 0.7, stroke = TRUE, weight = 1.5, radius=~scales::rescale(mapdat$sumdat$Sample_Count, c(2,15)),
+        leaflet::clearShapes()%>%
+        leaflet::fitBounds(lng1 = min(mapdat$sumdat$TADA.LongitudeMeasure), lat1 = min(mapdat$sumdat$TADA.LatitudeMeasure), lng2 = max(mapdat$sumdat$TADA.LongitudeMeasure), lat2 = max(mapdat$sumdat$TADA.LatitudeMeasure))%>%
+        leaflet::addCircleMarkers(data = mapdat$sumdat, lng=~TADA.LongitudeMeasure, lat=~TADA.LatitudeMeasure, color="black",fillColor=~pal(Parameter_Count), fillOpacity = 0.7, stroke = TRUE, weight = 1.5, radius=~scales::rescale(mapdat$sumdat$Sample_Count, c(2,15)),
                          popup = paste0("Site ID: ", mapdat$sumdat$MonitoringLocationIdentifier,
                                         "<br> Site Name: ", mapdat$sumdat$MonitoringLocationName,
                                         "<br> Sample Count: ", mapdat$sumdat$Sample_Count,
@@ -89,9 +92,8 @@ mod_overview_server <- function(id, tadat){
     # histogram
     output$overview_hist = renderPlot({
       req(input$overview_dates)
-      ggplot2::ggplot(data = mapdat$alldat2, aes(x = ActivityStartDate))+geom_histogram(color = "black", fill = "#005ea2")+labs(title=input$overview_select,x="Dates", y = "Sample Count")+theme_classic(base_size = 14)
+      ggplot2::ggplot(data = mapdat$alldat2, ggplot2::aes(x = ActivityStartDate))+ggplot2::geom_histogram(color = "black", fill = "#005ea2")+ggplot2::labs(title=input$overview_select,x="Dates", y = "Sample Count")+ggplot2::theme_classic(base_size = 14)
     })
-    
     
     # om%>%
     #   clearShapes()%>%
