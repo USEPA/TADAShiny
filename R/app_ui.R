@@ -225,10 +225,11 @@ app_ui <- function(request) {
         title = tagList(span("TADAShiny", style = "padding: 10px; font-weight: bold; font-size: 35px")),
         id = "navbar",
         tabPanel("Load", id="load", # each tabPanel represents a tab page at the top of the navbar
-                 mod_upload_data_ui("upload_data_1"), # these are ui calls to the different module uis
-                 mod_query_data_ui("query_data_1"),
-                 mod_summary_ui("summary_1"),
-                 mod_overview_ui("overview_1"),
+                 shinyBS::bsCollapse(id = "loadcollapse",
+                                     shinyBS::bsCollapsePanel("Upload dataset...",mod_upload_data_ui("upload_data_1")), # these are ui calls to the different module uis
+                                     shinyBS::bsCollapsePanel("...or Query the WQP",mod_query_data_ui("query_data_1")),
+                                     shinyBS::bsCollapsePanel("Data Overview",mod_overview_ui("overview_1"),
+                                                              mod_summary_ui("summary_1"))),
                  hr(),
                  mod_TADA_summary_ui("TADA_summary_1")),
         # tabPanel("Overview", id="over",

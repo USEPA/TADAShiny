@@ -27,7 +27,7 @@ load("inst/extdata/query_choices.Rdata")
 mod_query_data_ui <- function(id){
   ns <- NS(id)
   tagList(
-    shinyBS::bsCollapsePanel("Query the WQP",
+    # shinyBS::bsCollapsePanel("Query the WQP",
                              "Use the fields below to download a dataset directly from WQP. Fields with '(s)' in the label allow multiple selections. Hydrologic Units may be at any scale, from subwatershed to region. However, be mindful that large queries may time out.",
                              br(),
                              br(), # styling several fluid rows with columns to hold the input drop down widgets
@@ -46,7 +46,7 @@ mod_query_data_ui <- function(id){
                              # textInput(ns("hucs"), "Type in HUC(s), separated by commas", value = ""),
                              fluidRow(column(4, actionButton(ns("querynow"),"Run Query",icon("cloud"), 
                                                              style="color: #fff; background-color: #337ab7; border-color: #2e6da4")))
-    )
+    # )
       )
 }
 
@@ -56,10 +56,6 @@ mod_query_data_ui <- function(id){
 mod_query_data_server <- function(id, tadat){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
-    
-    observe({
-      print(input$huc)
-    })
     
     # this section has widget update commands for the selectizeinputs that have a lot of possible selections - shiny suggested hosting the choices server-side rather than ui-side
     updateSelectizeInput(session,"state",choices = c("",unique(statecodes_df$STUSAB)),  server = TRUE)
