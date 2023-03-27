@@ -7,15 +7,13 @@
 #' @noRd 
 #'
 #' @importFrom shiny NS tagList 
-#' @importFrom scales rescale
+
 mod_overview_ui <- function(id){
   ns <- NS(id)
   tagList(
-    "The map, tables, and plots below are built using the uploaded/queried data. Use the drop down menu below to select one parameter of interest or use choice 'All' to see a summary for all parameters together.",
-     fluidRow(column(6, uiOutput(ns("overview_select"))),
-              column(6, uiOutput(ns("overview_dates")))), # note that this uiOutput is a widget that needs something from the server-side before rendering. It is a drop down menu.
-     fluidRow(column(6, leaflet::leafletOutput(ns("overview_map"))),
-              column(6, plotOutput(ns("overview_hist"))))
+    fluidRow(column(6, leaflet::leafletOutput(ns("overview_map"))),
+             column(6, fluidRow(column(11, plotOutput(ns("overview_hist"), height = "200px"))),
+                    fluidRow(column(11, dataTableOutput(ns("overview_orgtable"))))))
   )
 }
     
@@ -28,60 +26,34 @@ mod_overview_server <- function(id, tadat){
     
     mapdat = reactiveValues()
     
-    o_char = reactive({
-      req(tadat$raw)
-      if(dim(tadat$raw)[1]>0){
-        unique(tadat$raw$TADA.CharacteristicName)
-      }
-    })
-
-    # o_char is used to parameterize this drop down select input that allows the user to map/plot one parameter at a time or all of them.
-    output$overview_select = renderUI({
-      req(o_char()) # this is the drop down menu widget that you might be familiar seeing in the ui, but because it needs something from tadat$raw to create tadat$o_char before rendering, it goes in the server-side.
-      selectInput(ns("overview_select"),"Select Characteristic", choices = c("All", o_char()))
-    })
-    
-    observeEvent(input$overview_select,{
-      if(!input$overview_select=="All"){
-        alldat = subset(tadat$raw, tadat$raw$TADA.CharacteristicName==input$overview_select)
-      }else{
-        alldat = tadat$raw
-      }
-      alldat$ActivityStartDate = as.Date(alldat$ActivityStartDate, "%Y-%m-%d")
-      mapdat$alldat = alldat
-    })
-    
-    output$overview_dates = renderUI({
-      req(mapdat$alldat) 
-      start = min(mapdat$alldat$ActivityStartDate)
-      end = max(mapdat$alldat$ActivityStartDate)
-      sliderInput(ns("overview_dates"),"Select Date Range", min = start, max = end, value = c(start,end), timeFormat = "%Y-%m-%d")
-    })
-    
-    # create dataset for map and histogram using characteristic and dates selected
-    observe({
-      req(input$overview_dates)
-      mapdat$alldat2 = subset(mapdat$alldat, mapdat$alldat$ActivityStartDate>=input$overview_dates[1]&mapdat$alldat$ActivityStartDate<=input$overview_dates[2])
-      mapdat$sumdat = mapdat$alldat2%>%dplyr::group_by(MonitoringLocationIdentifier,MonitoringLocationName,TADA.LatitudeMeasure, TADA.LongitudeMeasure)%>%dplyr::summarise(Sample_Count = length(unique(ResultIdentifier)), Visit_Count = length(unique(ActivityStartDate)), Parameter_Count = length(unique(TADA.CharacteristicName)), Organization_Count = length(unique(OrganizationIdentifier)))
-    
-      alldat2 <<- mapdat$alldat
-      sumdat <<- mapdat$sumdat
+    # create dataset for map and histogram using raw data
+    observeEvent(tadat$raw, {
+      mapdat$sumdat = tadat$raw%>%dplyr::group_by(MonitoringLocationIdentifier,MonitoringLocationName,TADA.LatitudeMeasure, TADA.LongitudeMeasure)%>%dplyr::summarise(Sample_Count = length(unique(ResultIdentifier)), Visit_Count = length(unique(ActivityStartDate)), Parameter_Count = length(unique(TADA.CharacteristicName)), Organization_Count = length(unique(OrganizationIdentifier)))
+      mapdat$sumdat$radius = 3
+      mapdat$sumdat$radius = ifelse(mapdat$sumdat$Sample_Count>10,5,mapdat$sumdat$radius)
+      mapdat$sumdat$radius = ifelse(mapdat$sumdat$Sample_Count>50,8,mapdat$sumdat$radius)
+      mapdat$sumdat$radius = ifelse(mapdat$sumdat$Sample_Count>100,10,mapdat$sumdat$radius)
+      mapdat$sumdat$radius = ifelse(mapdat$sumdat$Sample_Count>200,15,mapdat$sumdat$radius)
+      mapdat$sumdat$radius = ifelse(mapdat$sumdat$Sample_Count>500,20,mapdat$sumdat$radius)
+      mapdat$sumdat$radius = ifelse(mapdat$sumdat$Sample_Count>1500,30,mapdat$sumdat$radius)
+      mapdat$orgs = tadat$raw%>%dplyr::group_by(OrganizationFormalName)%>%dplyr::summarise('Sample Count' = length(unique(ResultIdentifier)))%>%dplyr::arrange(desc("Sample Count"))
+      mapdat$chars = tadat$raw%>%dplyr::group_by(TADA.CharacteristicName)%>%dplyr::summarise(Sample_Count = length(unique(ResultIdentifier)))
       })
     
     # the leaflet map
     output$overview_map = leaflet::renderLeaflet({
-      req(input$overview_dates)
+      req(mapdat$sumdat)
       pal <- leaflet::colorNumeric(
         palette = "Blues",
         domain = mapdat$sumdat$Parameter_Count)
       leaflet::leaflet()%>%
-        leaflet::addProviderTiles("Esri.WorldImagery", group = "Satellite", options = leaflet::providerTileOptions(updateWhenZooming = FALSE,updateWhenIdle = TRUE)) %>%
+        # leaflet::addProviderTiles("Esri.WorldImagery", group = "Satellite", options = leaflet::providerTileOptions(updateWhenZooming = FALSE,updateWhenIdle = TRUE)) %>%
         leaflet::addProviderTiles("Esri.WorldTopoMap", group = "World topo", options = leaflet::providerTileOptions(updateWhenZooming = FALSE,updateWhenIdle = TRUE))%>%
         leaflet::addLayersControl(position ="topright",
                          baseGroups = c("World topo", "Satellite"))%>%
         leaflet::clearShapes()%>%
         leaflet::fitBounds(lng1 = min(mapdat$sumdat$TADA.LongitudeMeasure), lat1 = min(mapdat$sumdat$TADA.LatitudeMeasure), lng2 = max(mapdat$sumdat$TADA.LongitudeMeasure), lat2 = max(mapdat$sumdat$TADA.LatitudeMeasure))%>%
-        leaflet::addCircleMarkers(data = mapdat$sumdat, lng=~TADA.LongitudeMeasure, lat=~TADA.LatitudeMeasure, color="black",fillColor=~pal(Parameter_Count), fillOpacity = 0.7, stroke = TRUE, weight = 1.5, radius=~scales::rescale(mapdat$sumdat$Sample_Count, c(2,15)),
+        leaflet::addCircleMarkers(data = mapdat$sumdat, lng=~TADA.LongitudeMeasure, lat=~TADA.LatitudeMeasure, color="black",fillColor=~pal(Parameter_Count), fillOpacity = 0.7, stroke = TRUE, weight = 1.5, radius=mapdat$sumdat$radius,
                          popup = paste0("Site ID: ", mapdat$sumdat$MonitoringLocationIdentifier,
                                         "<br> Site Name: ", mapdat$sumdat$MonitoringLocationName,
                                         "<br> Sample Count: ", mapdat$sumdat$Sample_Count,
@@ -91,9 +63,14 @@ mod_overview_server <- function(id, tadat){
     
     # histogram
     output$overview_hist = renderPlot({
-      req(input$overview_dates)
-      ggplot2::ggplot(data = mapdat$alldat2, ggplot2::aes(x = ActivityStartDate))+ggplot2::geom_histogram(color = "black", fill = "#005ea2")+ggplot2::labs(title=input$overview_select,x="Dates", y = "Sample Count")+ggplot2::theme_classic(base_size = 14)
+      req(tadat$raw)
+      ggplot2::ggplot(data = tadat$raw, ggplot2::aes(x = ActivityStartDate))+ggplot2::geom_histogram(color = "black", fill = "#005ea2", binwidth = 7)+ggplot2::labs(title=input$overview_select,x="Dates", y = "Sample Count")+ggplot2::theme_classic(base_size = 14)
     })
+    
+    output$overview_orgtable = renderDataTable(
+      mapdat$orgs,
+      options = list(scrollY = TRUE,dom = 't')
+    )
     
     # om%>%
     #   clearShapes()%>%
