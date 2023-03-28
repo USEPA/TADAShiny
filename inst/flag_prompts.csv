@@ -8,7 +8,7 @@
 7,Remove data if QAPP doc is missing,QAPP Documentation
 8,"Would you like to remove aggregate, high frequency, continuous, sensor data?",Continuous Data
 10,Would you like to remove true duplicates?,Duplicates
-11,"Data are potential duplicates, but our confidence is not 100%. Would you like to remove potential duplicates? (maybe include link to read more?)",Duplicates
+11,"Data are potential duplicates, but our confidence is not 100%. Would you like to remove potential duplicates? (maybe include link to read more?)",Potential Duplicates
 12,"Remove all sample data that is not for the media ""water""",Media Type
 13,Result value is outside of the national lower range for a given parameter. Remove?,Above National Threshold
 14,Result value is outside of the national upper range for a given parameter. Remove?,Below National Threshold
