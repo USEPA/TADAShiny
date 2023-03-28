@@ -3,6 +3,7 @@
 export("%>%")
 export(run_app)
 import(TADA)
+import(plotly)
 import(shiny)
 import(shinybusy)
 importFrom(golem,activate_js)
