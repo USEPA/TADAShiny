@@ -1,47 +1,80 @@
 #' The application User-Interface
-#' 
-#' @param request Internal parameter for `{shiny}`. 
+#'
+#' @param request Internal parameter for `{shiny}`.
 #'     DO NOT REMOVE.
 #' @import shiny
 #' @noRd
 
-
+# THE BUSINESS STARTS ON line 223 or thereabouts.
 app_ui <- function(request) {
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
-    # Your application UI logic 
-    htmlTemplate(
-      # Tab 1
-      app_sys("app/www/index.html"),
-      tab1_data_import = mod_uploadData_ui("uploadData_1"),
-      tab1_data_summary = mod_summarizeData_ui("summarizeData_1")
-      
+    # Your application UI logic
+    fluidPage(
+      tags$html(class = "no-js", lang="en"),
+      epa_header,
+      shinyjs::useShinyjs(),
+      navbarPage( # create a navbar page with tabs at the top
+        title = tagList(span("TADAShiny", style = "padding: 10px; font-weight: bold; font-size: 35px")),
+        id = "navbar",
+        tabPanel("Load", id="load", # each tabPanel represents a tab page at the top of the navbar
+                 shinyBS::bsCollapse(id = "loadcollapse",
+                                     shinyBS::bsCollapsePanel("Upload dataset...",mod_upload_data_ui("upload_data_1")), # these are ui calls to the different module uis
+                                     shinyBS::bsCollapsePanel("...or Query the WQP",mod_query_data_ui("query_data_1")),
+                                     shinyBS::bsCollapsePanel("Data Overview",mod_overview_ui("overview_1"),
+                                                              mod_summary_ui("summary_1"))),
+                 hr(),
+                 mod_TADA_summary_ui("TADA_summary_1")),
+        # tabPanel("Overview", id="over",
+        #          
+        #          hr(),
+        #          mod_TADA_summary_ui("TADA_summary_1")),
+        tabPanel("Flag", id="flag",
+                 hr(),
+                 mod_data_flagging_ui("data_flagging_1")),
+        tabPanel("Filter", id="filter",
+                 hr(),
+                 mod_TADA_summary_ui("TADA_summary_1")),
+        tabPanel("Harmonize", id="harmonize",
+                 hr(),
+                 mod_TADA_summary_ui("TADA_summary_1")),
+        tabPanel("Censored Data", id="censored",
+                 hr(),
+                 mod_TADA_summary_ui("TADA_summary_1")),
+        tabPanel("Explore", id="explore",
+                 hr(),
+                 mod_TADA_summary_ui("TADA_summary_1")),
+        tabPanel("Download", id="dwn",
+                 hr(),
+                 mod_TADA_summary_ui("TADA_summary_1")),
+      ),
+      epa_footer
     )
   )
 }
 
 #' Add external Resources to the Application
-#' 
-#' This function is internally used to add external 
-#' resources inside the Shiny application. 
-#' 
+#'
+#' This function is internally used to add external
+#' resources inside the Shiny application.
+#'
 #' @import shiny
 #' @importFrom golem add_resource_path activate_js favicon bundle_resources
 #' @noRd
-golem_add_external_resources <- function(){
-  
+golem_add_external_resources <- function() {
   add_resource_path(
-    'www', app_sys('app/www')
+    "www",
+    app_sys("app/www")
   )
-  
+
   tags$head(
     favicon(),
     bundle_resources(
-      path = app_sys('app/www'),
-      app_title = 'TADAShiny'
+      path = app_sys("app/www"),
+      app_title = "ehTADAShiny"
     )
     # Add here other external resources
-    # for example, you can add shinyalert::useShinyalert() 
+    # for example, you can add shinyalert::useShinyalert()
   )
 }
