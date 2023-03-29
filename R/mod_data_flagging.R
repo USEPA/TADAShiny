@@ -1,12 +1,20 @@
-library(shiny)
-library(shinyWidgets)
-library(DT)
+#' overview UI Function
+#'
+#' @description A shiny Module.
+#'
+#' @param id,input,output,session Internal parameters for {shiny}.
+#'
+#' @noRd 
+#'
+#' @importFrom shiny NS tagList
+#' @import shinyWidgets 
+#' @import DT
 
 mod_data_flagging_ui <- function(id) {
   ns <- NS(id)
   tagList(
     tags$div(style = "display: none;",
-             prettySwitch("dummy", label = NULL)),
+             shinyWidgets::prettySwitch("dummy", label = NULL)),
     htmlOutput(ns('step_1')),
     "Here",
     fluidRow(column(
