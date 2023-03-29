@@ -21,10 +21,13 @@ mod_data_flagging_ui <- function(id) {
       3, actionButton(ns("runFlags"), "Run Data Flagging")
     )),
     htmlOutput(ns('step_2')),
-    DT::dataTableOutput(ns('flagTable')),
+    # recommended to use DTOutput() and renderDT() to avoid possible
+    # collisions with functions of the same names in shiny 
+    # (shiny::dataTableOutput() and shiny::renderDataTable() 
+    DT::DTOutput(ns('flagTable')),
     br(),
     htmlOutput(ns('step_3')),
-    DT::dataTableOutput(ns('summaryTable'))
+    DT::DTOutput(ns('summaryTable'))
   )
 }
 
@@ -101,7 +104,7 @@ mod_data_flagging_server <- function(id, tadat) {
         )
       })
       
-      output$flagTable = DT::renderDataTable(
+      output$flagTable = DT::renderDT(
         isolate(switchTable()),
         escape = FALSE,
         selection = 'none',
@@ -119,7 +122,7 @@ mod_data_flagging_server <- function(id, tadat) {
         )
       )
       
-      output$summaryTable = DT::renderDataTable(
+      output$summaryTable = DT::renderDT(
         values$summaryTable,
         escape = FALSE,
         selection = 'none',
