@@ -8,7 +8,7 @@
 #'
 #' @importFrom shiny NS tagList
 #' @import shinybusy
-#' @import TADA
+#' 
 
 load("inst/extdata/statecodes_df.Rdata")
 load("inst/extdata/query_choices.Rdata")

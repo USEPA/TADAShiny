@@ -33,7 +33,6 @@ Imports:
     magrittr,
     readxl,
     shiny,
-    shinyBS,
     leaflet,
     plotly,
     shinyWidgets,
@@ -42,16 +41,17 @@ Imports:
     TADA, 
     shinybusy, 
     dplyr, 
-    plyr
+    plyr,
+    testthat
 Remotes: 
-    github::USEPA/TADA
+    github::USEPA/TADA,
+    r-lib/testthat
 Suggests: 
     remotes,
     covr,
     rmarkdown, 
     knitr,
     spelling,
-    testthat,
     sf,
     shinyjs,
     stringr,

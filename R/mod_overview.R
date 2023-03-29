@@ -7,9 +7,7 @@
 #' @noRd 
 #'
 #' @importFrom shiny NS tagList
-#' @import plotly 
-#' @import DT
-#' @import shinyBS
+#' 
 
 mod_overview_ui <- function(id){
   ns <- NS(id)
@@ -30,7 +28,7 @@ mod_overview_server <- function(id, tadat){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
-    mapdat = reactiveValues()
+    mapdat = shiny::reactiveValues()
     
     # create dataset for map and histogram using raw data
     observeEvent(tadat$raw, {

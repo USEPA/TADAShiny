@@ -7,8 +7,7 @@
 #' @noRd 
 #'
 #' @importFrom shiny NS tagList
-#' @import shinyWidgets 
-#' @import DT
+#' 
 
 mod_data_flagging_ui <- function(id) {
   ns <- NS(id)
@@ -64,7 +63,7 @@ mod_data_flagging_server <- function(id, tadat) {
           value
       }))
     }
-    values = reactiveValues()
+    values = shiny::reactiveValues()
     values$census = integer(length(n_switches))
 
     # 

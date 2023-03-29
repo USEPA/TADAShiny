@@ -2,8 +2,8 @@
 #' 
 #' @param input,output,session Internal parameters for {shiny}. 
 #'     DO NOT REMOVE.
-#' @import shiny
 #' @noRd
+#' 
 
 # Below increases the max data upload size from the Shiny default of 5MB per file
 # to 30MB for file
@@ -11,7 +11,7 @@ options(shiny.maxRequestSize=30*1024^2)
 
 app_server <- function(input, output, session) {
   # Your application server logic
-  tadat = reactiveValues() # create a list object that holds reactive values passed between modules
+  tadat = shiny::reactiveValues() # create a list object that holds reactive values passed between modules
   mod_query_data_server("query_data_1", tadat) # server call to the module servers with the name of the module and any dependecies (this one uses the tadat reactive values object)
   mod_upload_data_server("upload_data_1", tadat)
   mod_data_flagging_server("data_flagging_1", tadat)
