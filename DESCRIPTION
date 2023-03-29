@@ -34,17 +34,20 @@ Imports:
     readxl,
     shiny,
     shinyjs,
+    shinyBS,
+    leaflet,
+    plotly,
+    shinyWidgets,
+    DT,
+    ggplot2,
+    sf,
+    stringr,
+    utils,
     TADA
 Remotes: 
     r-lib/testthat,
     github::USEPA/TADA
-    data.table,
-    ggplot2,
-    leaflet,
-    sf,
-    stringr,
-    TADA,
-    utils
+    TADA
 Suggests: 
     remotes,
     covr,
