@@ -19,7 +19,7 @@ mod_overview_ui <- function(id){
              column(5,plotly::plotlyOutput(ns("overview_piechar")))),#"Hover over a piece of the pie chart to see the characteristic name, count, and its percentage of the dataset. The pie shows the top ten characteristics as their own slices; all other characteristics fit into the 'ALL OTHERS' group.",
     br(),
     fluidRow(column(7,plotOutput(ns("overview_hist"), height="400px")),#"This histogram shows sample collection frequency for all sites over the time period queried.",
-             column(5, DT::dataTableOutput(ns("overview_orgtable"), height="400px")))
+             column(5, DT::DTOutput(ns("overview_orgtable"), height="400px")))
   )
 }
     
@@ -81,7 +81,7 @@ mod_overview_server <- function(id, tadat){
       ggplot2::ggplot(data = tadat$raw, ggplot2::aes(x = ActivityStartDate))+ggplot2::geom_histogram(color = "black", fill = "#005ea2", binwidth = 7)+ggplot2::labs(title="Samples collected over date range queried",x="Time", y = "Sample Count")+ggplot2::theme_classic(base_size = 14)
     })
     
-    output$overview_orgtable = DT::renderDataTable(
+    output$overview_orgtable = DT::renderDT(
       mapdat$orgs,
       options = list(dom="t", scrollY=TRUE, pageLength=5),
       rownames= FALSE,

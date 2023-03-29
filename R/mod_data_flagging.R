@@ -21,10 +21,10 @@ mod_data_flagging_ui <- function(id) {
       3, actionButton(ns("runFlags"), "Run Data Flagging")
     )),
     htmlOutput(ns('step_2')),
-    DT::dataTableOutput(ns('flagTable')),
+    DT::DTOutput(ns('flagTable')),
     br(),
     htmlOutput(ns('step_3')),
-    DT::dataTableOutput(ns('summaryTable'))
+    DT::DTOutput(ns('summaryTable'))
   )
 }
 
@@ -101,7 +101,7 @@ mod_data_flagging_server <- function(id, tadat) {
         )
       })
       
-      output$flagTable = DT::renderDataTable(
+      output$flagTable = DT::renderDT(
         isolate(switchTable()),
         escape = FALSE,
         selection = 'none',
@@ -119,7 +119,7 @@ mod_data_flagging_server <- function(id, tadat) {
         )
       )
       
-      output$summaryTable = DT::renderDataTable(
+      output$summaryTable = DT::renderDT(
         values$summaryTable,
         escape = FALSE,
         selection = 'none',
