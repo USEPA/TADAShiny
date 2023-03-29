@@ -26,26 +26,33 @@ load("inst/extdata/query_choices.Rdata")
 
 mod_query_data_ui <- function(id){
   ns <- NS(id)
-  tagList(h3("...or Query the WQP"),
-                             "Use the fields below to download a dataset directly from WQP. Fields with '(s)' in the label allow multiple selections. Hydrologic Units may be at any scale, from subwatershed to region. However, be mindful that large queries may time out.",
-                             br(),
-                             br(), # styling several fluid rows with columns to hold the input drop down widgets
-                             fluidRow(column(4,selectizeInput(ns("state"),"State", choices = NULL)), # widgets shown when app opens
-                                      column(4,selectizeInput(ns("county"), "County (pick state first)", choices = NULL)),
-                                      column(4,textInput(ns("huc"),"Hydrologic Unit", placeholder = "e.g. 020700100103"))),
-                             fluidRow(column(4, selectizeInput(ns("siteid"), "Monitoring Location ID(s)", choices = NULL,multiple = TRUE)),
-                                      column(4, selectizeInput(ns("org"),"Organization(s)", choices = NULL, multiple = TRUE)),
-                                      column(4, selectizeInput(ns("proj"),"Project(s)", choices = NULL, multiple = TRUE))),
-                             fluidRow(column(4, selectizeInput(ns("chargroup"),"Characteristic Group", choices = NULL)),
-                                      column(4, selectizeInput(ns("characteristic"),"Characteristic(s)", choices = NULL, multiple = TRUE)),
-                                      column(4, selectizeInput(ns("media"), "Sample Media", choices = c("",media), selected = "Water", multiple = TRUE))),
-                             fluidRow(column(4, selectizeInput(ns("type"), "Site Type(s)", choices = c("",sitetype), multiple = TRUE)),
-                                      column(4, dateInput(ns("startdate"),"Start Date", format = "yyyy-mm-dd", startview = "year")),
-                                      column(4, dateInput(ns("enddate"),"End Date", format = "yyyy-mm-dd", startview = "year"))),
-                             # textInput(ns("hucs"), "Type in HUC(s), separated by commas", value = ""),
-                             fluidRow(column(4, actionButton(ns("querynow"),"Run Query",icon("cloud"), 
-                                                             style="color: #fff; background-color: #337ab7; border-color: #2e6da4")))
-    # )
+  tagList(fluidRow(h3("Upload dataset..."),
+                   "Select a pre-existing file from your computer. Currently supports .xls and .xlsx only. You can find the WQX profile templates ",
+                   tags$a(href="https://www.epa.gov/waterdata/water-quality-exchange-web-template-files", "here."),
+                   # widget to upload WQP profile or WQX formatted spreadsheet
+                   column(9,fileInput(ns("file"), "",
+                             multiple = TRUE,
+                             accept = c(".xlsx", ".xls"),
+                             width = "100%"))),
+          fluidRow(column(3,actionButton(ns("example_data"),"Use example data",icon("gift"),style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))),
+          hr(),
+          fluidRow(h3("...or Query the WQP"),
+                   "Use the fields below to download a dataset directly from WQP. Fields with '(s)' in the label allow multiple selections. Hydrologic Units may be at any scale, from subwatershed to region. However, be mindful that large queries may time out."),
+          br(), # styling several fluid rows with columns to hold the input drop down widgets
+          fluidRow(column(4,selectizeInput(ns("state"),"State", choices = NULL)), # widgets shown when app opens
+                    column(4,selectizeInput(ns("county"), "County (pick state first)", choices = NULL)),
+                    column(4,textInput(ns("huc"),"Hydrologic Unit", placeholder = "e.g. 020700100103"))),
+         fluidRow(column(4, selectizeInput(ns("siteid"), "Monitoring Location ID(s)", choices = NULL,multiple = TRUE)),
+                    column(4, selectizeInput(ns("org"),"Organization(s)", choices = NULL, multiple = TRUE)),
+                    column(4, selectizeInput(ns("proj"),"Project(s)", choices = NULL, multiple = TRUE))),
+         fluidRow(column(4, selectizeInput(ns("chargroup"),"Characteristic Group", choices = NULL)),
+                    column(4, selectizeInput(ns("characteristic"),"Characteristic(s)", choices = NULL, multiple = TRUE)),
+                    column(4, selectizeInput(ns("media"), "Sample Media", choices = c("",media), selected = "Water", multiple = TRUE))),
+         fluidRow(column(4, selectizeInput(ns("type"), "Site Type(s)", choices = c("",sitetype), multiple = TRUE)),
+                    column(4, dateInput(ns("startdate"),"Start Date", format = "yyyy-mm-dd", startview = "year")),
+                    column(4, dateInput(ns("enddate"),"End Date", format = "yyyy-mm-dd", startview = "year"))),
+         fluidRow(column(4, actionButton(ns("querynow"),"Run Query",icon("cloud"), 
+                                          style="color: #fff; background-color: #337ab7; border-color: #2e6da4")))
       )
 }
 
@@ -55,6 +62,16 @@ mod_query_data_ui <- function(id){
 mod_query_data_server <- function(id, tadat){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
+    
+    observe({
+      req(input$file)
+      # user uploaded data
+      tadat$raw <- suppressWarnings(readxl::read_excel(input$file$datapath, sheet = 1))
+    })
+    
+    observeEvent(input$example_data,{
+      tadat$raw = TADA::Nutrients_Utah
+    })
     
     # this section has widget update commands for the selectizeinputs that have a lot of possible selections - shiny suggested hosting the choices server-side rather than ui-side
     updateSelectizeInput(session,"state",choices = c("",unique(statecodes_df$STUSAB)),  server = TRUE)
@@ -138,14 +155,11 @@ mod_query_data_server <- function(id, tadat){
           "Your query returned zero results. Please adjust your search inputs and try again."
         ))
       }
-      tadat$tab = 1
+      tadat$overview = 1
 
     })
     
-    observe({
-      print(tadat$tab)
-      print(input$tabbar)
-    })
+
 
   })
 }
