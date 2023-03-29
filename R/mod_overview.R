@@ -14,18 +14,11 @@
 mod_overview_ui <- function(id){
   ns <- NS(id)
   tagList(
-    tags$head(
-      tags$style(type="text/css", "tfoot {display:none;}")
-    ),
-    fluidRow(column(7,leaflet::leafletOutput(ns("overview_map")),
-                    shinyBS::bsTooltip(ns("overview_map"), "Larger point sizes represent more samples collected at a site; darker points represent more characteristics collected at a site. Click on a point to see the site ID, name, and sample/visit/parameter counts.",
-                              "top")),
-             column(5,plotly::plotlyOutput(ns("overview_piechar")),
-                    shinyBS::bsTooltip(ns("overview_piechar"), "Hover over a piece of the pie chart to see the characteristic name, count, and its percentage of the dataset. The pie shows the top ten characteristics as their own slices; all other characteristics fit into the 'ALL OTHERS' group.",
-                              "top"))),
-    fluidRow(column(7,plotOutput(ns("overview_hist"), height="400px"),
-                    shinyBS::bsTooltip(ns("overview_hist"), "This histogram shows sample collection frequency for all sites over the time period queried.",
-                              "top")),
+    h3("Data Overview"),
+    fluidRow(column(7,leaflet::leafletOutput(ns("overview_map"))),# "Larger point sizes represent more samples collected at a site; darker points represent more characteristics collected at a site. Click on a point to see the site ID, name, and sample/visit/parameter counts.",
+             column(5,plotly::plotlyOutput(ns("overview_piechar")))),#"Hover over a piece of the pie chart to see the characteristic name, count, and its percentage of the dataset. The pie shows the top ten characteristics as their own slices; all other characteristics fit into the 'ALL OTHERS' group.",
+    br(),
+    fluidRow(column(7,plotOutput(ns("overview_hist"), height="400px")),#"This histogram shows sample collection frequency for all sites over the time period queried.",
              column(5, DT::dataTableOutput(ns("overview_orgtable"), height="400px")))
   )
 }
@@ -96,23 +89,10 @@ mod_overview_server <- function(id, tadat){
     )
     
     output$overview_piechar = plotly::renderPlotly({
+      req(mapdat$chars)
       fig = plotly::plot_ly(data = mapdat$chars, labels =~TADA.CharacteristicName, values =~Sample_Count, textinfo = "text", text =~Sample_Count, marker = list(colorscale="Viridis"))%>%plotly::add_pie(hole = 0.3)%>%
         plotly::layout(title = "Characteristics in Dataset", showlegend = FALSE, font = list(family = "Arial", size = 12))
     })
-    
-    # om%>%
-    #   clearShapes()%>%
-    #   fitBounds(lng1 = min(mapdat$sumdat$TADA.LongitudeMeasure), lat1 = min(mapdat$sumdat$TADA.LatitudeMeasure), lng2 = max(mapdat$sumdat$TADA.LongitudeMeasure), lat2 = max(mapdat$sumdat$TADA.LatitudeMeasure))%>%
-    #   addCircleMarkers(data = mapdat$sumdat, lng=~TADA.LongitudeMeasure, lat=~TADA.LatitudeMeasure, color="black",fillColor=~pal(Parameter_Count), fillOpacity = 0.7, stroke = TRUE, weight = 1.5, radius=~scales::rescale(mapdat$sumdat$Sample_Count, c(2,15)),
-    #                    popup = paste0("Site ID: ", mapdat$sumdat$MonitoringLocationIdentifier,
-    #                                   "<br> Site Name: ", mapdat$sumdat$MonitoringLocationName,
-    #                                   "<br> Sample Count: ", mapdat$sumdat$Sample_Count,
-    #                                   "<br> Visit Count: ", mapdat$sumdat$Visit_Count,
-    #                                   "<br> Parameter Count: ", mapdat$sumdat$Parameter_Count)) #%>%
-    # addLegend("bottomright", pal = pal, values = ~mapdat$mdat$Parameter_Count,
-    #           title = "Number of characteristics sampled",
-    #           opacity = 1
-    # )
  
   })
 }

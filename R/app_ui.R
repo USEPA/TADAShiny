@@ -14,38 +14,44 @@ app_ui <- function(request) {
     fluidPage(
       tags$html(class = "no-js", lang="en"),
       epa_header,
-      shinyjs::useShinyjs(),
-      navbarPage( # create a navbar page with tabs at the top
-        title = tagList(span("TADAShiny", style = "padding: 10px; font-weight: bold; font-size: 35px")),
-        id = "navbar",
-        tabPanel("Load", id="load", # each tabPanel represents a tab page at the top of the navbar
-                 shinyBS::bsCollapse(id = "loadcollapse",
-                                     shinyBS::bsCollapsePanel("Upload dataset...",mod_upload_data_ui("upload_data_1")), # these are ui calls to the different module uis
-                                     shinyBS::bsCollapsePanel("...or Query the WQP",mod_query_data_ui("query_data_1")),
-                                     shinyBS::bsCollapsePanel("Data Overview",mod_overview_ui("overview_1"),
-                                                              mod_summary_ui("summary_1"))),
+      # shinyjs::useShinyjs(),
+      title = "TADAShiny",
+      tabsetPanel( # create a navbar page with tabs at the top
+        id = "tabbar", selected = "Overview",
+        tabPanel("Load", # each tabPanel represents a tab page at the top of the navbar
+                 br(),
+                 mod_upload_data_ui("upload_data_1"), # these are ui calls to the different module uis
+                 mod_query_data_ui("query_data_1"),
                  hr(),
                  mod_TADA_summary_ui("TADA_summary_1")),
-        # tabPanel("Overview", id="over",
-        #          
-        #          hr(),
-        #          mod_TADA_summary_ui("TADA_summary_1")),
-        tabPanel("Flag", id="flag",
+        tabPanel("Overview",
+                 br(),
+                 mod_overview_ui("overview_1"),
                  hr(),
+                 mod_summary_ui("summary_1"),
+                 hr(),
+                 mod_TADA_summary_ui("TADA_summary_1")),
+        tabPanel("Flag",
+                 br(),
                  mod_data_flagging_ui("data_flagging_1")),
         tabPanel("Filter", id="filter",
+                 br(),
                  hr(),
                  mod_TADA_summary_ui("TADA_summary_1")),
-        tabPanel("Harmonize", id="harmonize",
+        tabPanel("Harmonize",
+                 br(),
                  hr(),
                  mod_TADA_summary_ui("TADA_summary_1")),
-        tabPanel("Censored Data", id="censored",
+        tabPanel("Censored Data",
+                 br(),
                  hr(),
                  mod_TADA_summary_ui("TADA_summary_1")),
-        tabPanel("Explore", id="explore",
+        tabPanel("Explore",
+                 br(),
                  hr(),
                  mod_TADA_summary_ui("TADA_summary_1")),
-        tabPanel("Download", id="dwn",
+        tabPanel("Download",
+                 br(),
                  hr(),
                  mod_TADA_summary_ui("TADA_summary_1")),
       ),
@@ -72,7 +78,7 @@ golem_add_external_resources <- function() {
     favicon(),
     bundle_resources(
       path = app_sys("app/www"),
-      app_title = "ehTADAShiny"
+      app_title = "TADAShiny"
     )
     # Add here other external resources
     # for example, you can add shinyalert::useShinyalert()
