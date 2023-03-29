@@ -2,9 +2,11 @@
 
 export("%>%")
 export(run_app)
+import(DT)
 import(TADA)
 import(plotly)
 import(shiny)
+import(shinyBS)
 import(shinybusy)
 importFrom(golem,activate_js)
 importFrom(golem,add_resource_path)
