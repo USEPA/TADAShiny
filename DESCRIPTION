@@ -47,7 +47,6 @@ Imports:
 Remotes: 
     r-lib/testthat,
     github::USEPA/TADA
-    TADA
 Suggests: 
     remotes,
     covr,
