@@ -26,8 +26,7 @@ load("inst/extdata/query_choices.Rdata")
 
 mod_query_data_ui <- function(id){
   ns <- NS(id)
-  tagList(
-    # shinyBS::bsCollapsePanel("Query the WQP",
+  tagList(h3("...or Query the WQP"),
                              "Use the fields below to download a dataset directly from WQP. Fields with '(s)' in the label allow multiple selections. Hydrologic Units may be at any scale, from subwatershed to region. However, be mindful that large queries may time out.",
                              br(),
                              br(), # styling several fluid rows with columns to hold the input drop down widgets
@@ -139,7 +138,13 @@ mod_query_data_server <- function(id, tadat){
           "Your query returned zero results. Please adjust your search inputs and try again."
         ))
       }
+      tadat$tab = 1
 
+    })
+    
+    observe({
+      print(tadat$tab)
+      print(input$tabbar)
     })
 
   })

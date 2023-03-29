@@ -10,16 +10,16 @@
 mod_upload_data_ui <- function(id){
   ns <- NS(id)
   tagList(
-                             "Select a pre-existing file from your computer. Currently supports .xls and .xlsx only. You can find the WQX profile templates ",
-                             tags$a(href="https://www.epa.gov/waterdata/water-quality-exchange-web-template-files", "here."),
+    fluidRow(h3("Upload dataset..."),
+             "Select a pre-existing file from your computer. Currently supports .xls and .xlsx only. You can find the WQX profile templates ",
+             tags$a(href="https://www.epa.gov/waterdata/water-quality-exchange-web-template-files", "here."),
                              # widget to upload WQP profile or WQX formatted spreadsheet
-                             fileInput(
-                               ns("file"), "",
-                               multiple = TRUE,
-                               accept = c(".xlsx", ".xls"),
-                               width = "100%"
+             fileInput(ns("file"), "",
+                       multiple = TRUE,
+                       accept = c(".xlsx", ".xls"),
+                       width = "100%"
                              )
-  )
+  ))
 }
 
 #' upload_data Server Functions
