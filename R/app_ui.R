@@ -14,6 +14,7 @@ app_ui <- function(request) {
     shiny::fluidPage(
       tags$html(class = "no-js", lang="en"),
       epa_header,
+      shiny::includeHTML(app_sys("app/www/header.html")),
       # shinyjs::useShinyjs(),
       title = "TADAShiny",
       shiny::tabsetPanel( # create a navbar page with tabs at the top
@@ -37,7 +38,7 @@ app_ui <- function(request) {
       ),
       htmltools::hr(),
       mod_TADA_summary_ui("TADA_summary_1"),
-      epa_footer
+      shiny::includeHTML(app_sys("app/www/footer.html"))
     )
   )
 }
