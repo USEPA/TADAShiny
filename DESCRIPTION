@@ -41,12 +41,11 @@ Imports:
     TADA, 
     shinybusy, 
     dplyr, 
-    plyr,
-    testthat
+    plyr
 Remotes: 
-    github::USEPA/TADA,
-    r-lib/testthat
+    github::USEPA/TADA
 Suggests: 
+    testthat,
     remotes,
     covr,
     rmarkdown, 
