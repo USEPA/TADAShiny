@@ -1,6 +1,6 @@
 # Read in the tables
-prompt_table = read.csv("inst\\flag_prompts.csv")
-test_table = read.csv("inst\\flag_tests.csv")
+prompt_table = read.csv(app_sys("flag_prompts.csv"))
+test_table = read.csv(app_sys("flag_tests.csv"))
 prompt_table <- prompt_table[order(prompt_table$Order),]
 prompts <- prompt_table$Prompt
 n_switches <- length(prompts)
