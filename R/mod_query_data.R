@@ -26,32 +26,32 @@ load("inst/extdata/query_choices.Rdata")
 
 mod_query_data_ui <- function(id){
   ns <- NS(id)
-  tagList(fluidRow(h3("Upload dataset..."),
+  tagList(shiny::fluidRow(htmltools::h3("Upload dataset..."),
                    "Select a pre-existing file from your computer. Currently supports .xls and .xlsx only. You can find the WQX profile templates ",
                    tags$a(href="https://www.epa.gov/waterdata/water-quality-exchange-web-template-files", "here."),
                    # widget to upload WQP profile or WQX formatted spreadsheet
-                   column(9,fileInput(ns("file"), "",
+                   column(9,shiny::fileInput(ns("file"), "",
                              multiple = TRUE,
                              accept = c(".xlsx", ".xls"),
                              width = "100%"))),
-          fluidRow(column(3,actionButton(ns("example_data"),"Use example data",icon("gift"),style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))),
-          hr(),
-          fluidRow(h3("...or Query the WQP"),
+          shiny::fluidRow(column(3,shiny::actionButton(ns("example_data"),"Use example data",shiny::icon("gift"),style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))),
+          htmltools::hr(),
+          shiny::fluidRow(htmltools::h3("...or Query the WQP"),
                    "Use the fields below to download a dataset directly from WQP. Fields with '(s)' in the label allow multiple selections. Hydrologic Units may be at any scale, from subwatershed to region. However, be mindful that large queries may time out."),
-          br(), # styling several fluid rows with columns to hold the input drop down widgets
-          fluidRow(column(4,selectizeInput(ns("state"),"State", choices = NULL)), # widgets shown when app opens
-                    column(4,selectizeInput(ns("county"), "County (pick state first)", choices = NULL)),
-                    column(4,textInput(ns("huc"),"Hydrologic Unit", placeholder = "e.g. 020700100103"))),
-         fluidRow(column(4, selectizeInput(ns("siteid"), "Monitoring Location ID(s)", choices = NULL,multiple = TRUE)),
-                    column(4, selectizeInput(ns("org"),"Organization(s)", choices = NULL, multiple = TRUE)),
-                    column(4, selectizeInput(ns("proj"),"Project(s)", choices = NULL, multiple = TRUE))),
-         fluidRow(column(4, selectizeInput(ns("chargroup"),"Characteristic Group", choices = NULL)),
-                    column(4, selectizeInput(ns("characteristic"),"Characteristic(s)", choices = NULL, multiple = TRUE)),
-                    column(4, selectizeInput(ns("media"), "Sample Media", choices = c("",media), selected = "Water", multiple = TRUE))),
-         fluidRow(column(4, selectizeInput(ns("type"), "Site Type(s)", choices = c("",sitetype), multiple = TRUE)),
-                    column(4, dateInput(ns("startdate"),"Start Date", format = "yyyy-mm-dd", startview = "year")),
-                    column(4, dateInput(ns("enddate"),"End Date", format = "yyyy-mm-dd", startview = "year"))),
-         fluidRow(column(4, actionButton(ns("querynow"),"Run Query",icon("cloud"), 
+          htmltools::br(), # styling several fluid rows with columns to hold the input drop down widgets
+          shiny::fluidRow(column(4,shiny::selectizeInput(ns("state"),"State", choices = NULL)), # widgets shown when app opens
+                    column(4,shiny::selectizeInput(ns("county"), "County (pick state first)", choices = NULL)),
+                    column(4,shiny::textInput(ns("huc"),"Hydrologic Unit", placeholder = "e.g. 020700100103"))),
+         shiny::fluidRow(column(4, shiny::selectizeInput(ns("siteid"), "Monitoring Location ID(s)", choices = NULL,multiple = TRUE)),
+                    column(4, shiny::selectizeInput(ns("org"),"Organization(s)", choices = NULL, multiple = TRUE)),
+                    column(4, shiny::selectizeInput(ns("proj"),"Project(s)", choices = NULL, multiple = TRUE))),
+         shiny::fluidRow(column(4, shiny::selectizeInput(ns("chargroup"),"Characteristic Group", choices = NULL)),
+                    column(4, shiny::selectizeInput(ns("characteristic"),"Characteristic(s)", choices = NULL, multiple = TRUE)),
+                    column(4, shiny::selectizeInput(ns("media"), "Sample Media", choices = c("",media), selected = "Water", multiple = TRUE))),
+         shiny::fluidRow(column(4, shiny::selectizeInput(ns("type"), "Site Type(s)", choices = c("",sitetype), multiple = TRUE)),
+                    column(4, shiny::dateInput(ns("startdate"),"Start Date", format = "yyyy-mm-dd", startview = "year")),
+                    column(4, shiny::dateInput(ns("enddate"),"End Date", format = "yyyy-mm-dd", startview = "year"))),
+         shiny::fluidRow(column(4, shiny::actionButton(ns("querynow"),"Run Query",shiny::icon("cloud"), 
                                           style="color: #fff; background-color: #337ab7; border-color: #2e6da4")))
       )
 }
@@ -60,35 +60,35 @@ mod_query_data_ui <- function(id){
 #'
 #' @noRd
 mod_query_data_server <- function(id, tadat){
-  moduleServer( id, function(input, output, session){
+  shiny::moduleServer( id, function(input, output, session){
     ns <- session$ns
     
-    observe({
-      req(input$file)
+    shiny::observe({
+      shiny::req(input$file)
       # user uploaded data
       tadat$raw <- suppressWarnings(readxl::read_excel(input$file$datapath, sheet = 1))
     })
     
-    observeEvent(input$example_data,{
+    shiny::observeEvent(input$example_data,{
       tadat$raw = TADA::Nutrients_Utah
     })
     
     # this section has widget update commands for the selectizeinputs that have a lot of possible selections - shiny suggested hosting the choices server-side rather than ui-side
-    updateSelectizeInput(session,"state",choices = c("",unique(statecodes_df$STUSAB)),  server = TRUE)
-    updateSelectizeInput(session,"org",choices = c("",orgs), server = TRUE)
-    updateSelectizeInput(session,"chargroup",choices = c("",chargroup), server = TRUE)
-    updateSelectizeInput(session,"characteristic",choices = c("",chars), server = TRUE)
-    updateSelectizeInput(session,"proj", choices = c("",projects), server = TRUE)
-    updateSelectizeInput(session,"siteid", choices = c("",mlids), server = TRUE)
+    shiny::updateSelectizeInput(session,"state",choices = c("",unique(statecodes_df$STUSAB)),  server = TRUE)
+    shiny::updateSelectizeInput(session,"org",choices = c("",orgs), server = TRUE)
+    shiny::updateSelectizeInput(session,"chargroup",choices = c("",chargroup), server = TRUE)
+    shiny::updateSelectizeInput(session,"characteristic",choices = c("",chars), server = TRUE)
+    shiny::updateSelectizeInput(session,"proj", choices = c("",projects), server = TRUE)
+    shiny::updateSelectizeInput(session,"siteid", choices = c("",mlids), server = TRUE)
     
     # this observes when the user inputs a state into the drop down and subsets the choices for counties to only those counties within that state.
-    observeEvent(input$state,{
+    shiny::observeEvent(input$state,{
       state_counties = subset(county, county$STUSAB==input$state)
-      updateSelectizeInput(session,"county",choices = c("",unique(state_counties$COUNTY_NAME)), server = TRUE) 
+      shiny::updateSelectizeInput(session,"county",choices = c("",unique(state_counties$COUNTY_NAME)), server = TRUE) 
     })
     
     # this event observer is triggered when the user hits the "Query Now" button, and then runs the TADAdataRetrieval function
-    observeEvent(input$querynow,{
+    shiny::observeEvent(input$querynow,{
       # convert to null when needed
       if(input$state==""){ # changing inputs of "" or NULL to "null"
         statecode = "null"
@@ -146,11 +146,11 @@ mod_query_data_server <- function(id, tadat){
                                         applyautoclean = TRUE
       )
       # remove the modal once the dataset has been pulled
-      shinybusy::remove_modal_spinner(session = getDefaultReactiveDomain())
+      shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
       
       # show a modal dialog box when tadat$raw is empty and the query didn't return any records.
       if(dim(tadat$raw)[1]<1){
-        showModal(modalDialog(
+        shiny::showModal(shiny::modalDialog(
           title = "Empty Query",
           "Your query returned zero results. Please adjust your search inputs and try again."
         ))

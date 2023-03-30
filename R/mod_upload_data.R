@@ -10,11 +10,11 @@
 mod_upload_data_ui <- function(id){
   ns <- NS(id)
   tagList(
-    fluidRow(h3("Upload dataset..."),
+    shiny::fluidRow(htmltools::h3("Upload dataset..."),
              "Select a pre-existing file from your computer. Currently supports .xls and .xlsx only. You can find the WQX profile templates ",
              tags$a(href="https://www.epa.gov/waterdata/water-quality-exchange-web-template-files", "here."),
                              # widget to upload WQP profile or WQX formatted spreadsheet
-             fileInput(ns("file"), "",
+             shiny::fileInput(ns("file"), "",
                        multiple = TRUE,
                        accept = c(".xlsx", ".xls"),
                        width = "100%"
@@ -26,10 +26,10 @@ mod_upload_data_ui <- function(id){
 #'
 #' @noRd
 mod_upload_data_server <- function(id, tadat){
-  moduleServer( id, function(input, output, session){
+  shiny::moduleServer( id, function(input, output, session){
     ns <- session$ns
-    observe({
-      req(input$file)
+    shiny::observe({
+      shiny::req(input$file)
       # user uploaded data
       tadat$raw <- suppressWarnings(readxl::read_excel(input$file$datapath, sheet = 1))
     })

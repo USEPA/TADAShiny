@@ -31,6 +31,7 @@ Imports:
     config,
     golem,
     magrittr,
+    htmltools,
     readxl,
     shiny,
     leaflet,

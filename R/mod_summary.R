@@ -16,9 +16,9 @@ mod_summary_ui <- function(id){
 
     tags$div(id = 'table_class',
 
-             h3(textOutput(ns("table_title"))),
+             htmltools::h3(shiny::textOutput(ns("table_title"))),
 
-             tableOutput(ns("table"))
+             shiny::tableOutput(ns("table"))
 
 
     ),
@@ -30,10 +30,10 @@ mod_summary_ui <- function(id){
 #'
 #' @noRd
 mod_summary_server <- function(id, tadat){
-  moduleServer( id, function(input, output, session){
+  shiny::moduleServer( id, function(input, output, session){
     ns <- session$ns
 
-    output$table_title <- renderText({
+    output$table_title <- shiny::renderText({
 
       if (is.null(tadat$raw)||dim(tadat$raw)[1]<1){
         return(NULL)
@@ -45,7 +45,7 @@ mod_summary_server <- function(id, tadat){
 
     })
 
-    output$table <- renderTable({
+    output$table <- shiny::renderTable({
 
       if (is.null(tadat$raw)||dim(tadat$raw)[1]<1) {
         # Just render nothing, because no file is uploaded.

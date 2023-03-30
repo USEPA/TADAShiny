@@ -10,7 +10,7 @@
 mod_TADA_summary_ui <- function(id){
   ns <- NS(id)
   tagList(
-    h3("TADA Working Summary:")
+    htmltools::h3("TADA Working Summary:")
 
   )
 }
@@ -19,7 +19,7 @@ mod_TADA_summary_ui <- function(id){
 #'
 #' @noRd
 mod_TADA_summary_server <- function(id){
-  moduleServer( id, function(input, output, session){
+  shiny::moduleServer( id, function(input, output, session){
     ns <- session$ns
 
   })

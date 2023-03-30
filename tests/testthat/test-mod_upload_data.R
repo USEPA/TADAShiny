@@ -1,4 +1,4 @@
-testServer(
+shiny::testServer(
   mod_upload_data_server,
   # Add here your module params
   args = list()
@@ -26,7 +26,7 @@ testServer(
     # expect_true(inherits(output$tbl$html, "html"))
 })
  
-test_that("module ui works", {
+testthat::test_that("module ui works", {
   ui <- mod_upload_data_ui(id = "test")
   golem::expect_shinytaglist(ui)
   # Check that formals have not been removed

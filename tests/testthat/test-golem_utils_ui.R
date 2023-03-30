@@ -1,4 +1,4 @@
-test_that("Test with_red_star works", {
+testthat::test_that("Test with_red_star works", {
   expect_s3_class(with_red_star("golem"), "shiny.tag")
   expect_equal(
     as.character(with_red_star("Enter your name here")),
@@ -6,7 +6,7 @@ test_that("Test with_red_star works", {
   )
 })
 
-test_that("Test list_to_li works", {
+testthat::test_that("Test list_to_li works", {
   expect_s3_class(list_to_li(c("a", "b")), "shiny.tag.list")
   expect_equal(
     as.character(list_to_li(c("a", "b"))),
@@ -18,7 +18,7 @@ test_that("Test list_to_li works", {
   )
 })
 
-test_that("Test list_to_p works", {
+testthat::test_that("Test list_to_p works", {
   expect_s3_class(
     list_to_p(c(
       "This is the first paragraph",
@@ -49,7 +49,7 @@ test_that("Test list_to_p works", {
   )
 })
 
-test_that("Test named_to_li works", {
+testthat::test_that("Test named_to_li works", {
   expect_s3_class(named_to_li(list(a = "a", b = "b")), "shiny.tag.list")
   expect_equal(
     as.character(named_to_li(list(a = "a", b = "b"))),
@@ -61,7 +61,7 @@ test_that("Test named_to_li works", {
   )
 })
 
-test_that("Test tagRemoveAttributes works", {
+testthat::test_that("Test tagRemoveAttributes works", {
   a_with_tag <- shiny::tags$p(src = "plop", "pouet")
   expect_s3_class(a_with_tag, "shiny.tag")
   expect_equal(
@@ -77,7 +77,7 @@ test_that("Test tagRemoveAttributes works", {
   )
 })
 
-test_that("Test undisplay works", {
+testthat::test_that("Test undisplay works", {
   a <- shiny::tags$p(src = "plop", "pouet")
   expect_s3_class(a, "shiny.tag")
   expect_equal(
@@ -105,7 +105,7 @@ test_that("Test undisplay works", {
   )
 })
 
-test_that("Test display works", {
+testthat::test_that("Test display works", {
   a_undisplay <- shiny::tags$p(src = "plop", "pouet", style = "display: none;")
   expect_s3_class(a_undisplay, "shiny.tag")
   expect_equal(
@@ -120,7 +120,7 @@ test_that("Test display works", {
   )
 })
 
-test_that("Test jq_hide works", {
+testthat::test_that("Test jq_hide works", {
   expect_s3_class(jq_hide("golem"), "shiny.tag")
   expect_equal(
     as.character(jq_hide("golem")),
@@ -128,7 +128,7 @@ test_that("Test jq_hide works", {
   )
 })
 
-test_that("Test rep_br works", {
+testthat::test_that("Test rep_br works", {
   expect_s3_class(rep_br(5), "html")
   expect_equal(
     as.character(rep_br(5)),
@@ -136,7 +136,7 @@ test_that("Test rep_br works", {
   )
 })
 
-test_that("Test enurl works", {
+testthat::test_that("Test enurl works", {
   expect_s3_class(enurl("https://www.thinkr.fr", "ThinkR"), "shiny.tag")
   expect_equal(
     as.character(enurl("https://www.thinkr.fr", "ThinkR")),
@@ -144,7 +144,7 @@ test_that("Test enurl works", {
   )
 })
 
-test_that("Test columns wrappers works", {
+testthat::test_that("Test columns wrappers works", {
   expect_s3_class(col_12(), "shiny.tag")
   expect_s3_class(col_10(), "shiny.tag")
   expect_s3_class(col_8(), "shiny.tag")
@@ -164,9 +164,9 @@ test_that("Test columns wrappers works", {
   expect_equal(as.character(col_1()), '<div class="col-sm-1"></div>')
 })
 
-test_that("Test make_action_button works", {
+testthat::test_that("Test make_action_button works", {
   button <- make_action_button(
-    a(href = "#", "My super link", style = "color: lightblue;"),
+    htmltools::a(href = "#", "My super link", style = "color: lightblue;"),
     inputId = "mylink"
   )
   expect_s3_class(button, "shiny.tag")

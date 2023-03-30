@@ -11,31 +11,31 @@ app_ui <- function(request) {
     # Leave this function for adding external resources
     golem_add_external_resources(),
     # Your application UI logic
-    fluidPage(
+    shiny::fluidPage(
       tags$html(class = "no-js", lang="en"),
       epa_header,
       # shinyjs::useShinyjs(),
       title = "TADAShiny",
-      tabsetPanel( # create a navbar page with tabs at the top
+      shiny::tabsetPanel( # create a navbar page with tabs at the top
         id = "tabbar", selected = "Load",
-        tabPanel("Load", # each tabPanel represents a tab page at the top of the navbar
-                 br(),
+        shiny::tabPanel("Load", # each tabPanel represents a tab page at the top of the navbar
+                 htmltools::br(),
                  mod_query_data_ui("query_data_1")), #,
-        tabPanel("Overview",
-                 br(),
+        shiny::tabPanel("Overview",
+                 htmltools::br(),
                  mod_overview_ui("overview_1"),
-                 hr(),
+                 htmltools::hr(),
                  mod_summary_ui("summary_1")),
-        tabPanel("Flag",
-                 br(),
+        shiny::tabPanel("Flag",
+                        htmltools::br(),
                  mod_data_flagging_ui("data_flagging_1")),
-        tabPanel("Filter", id="filter"),
-        tabPanel("Harmonize"),
-        tabPanel("Censored Data"),
-        tabPanel("Explore"),
-        tabPanel("Download")
+        shiny::tabPanel("Filter", id="filter"),
+        shiny::tabPanel("Harmonize"),
+        shiny::tabPanel("Censored Data"),
+        shiny::tabPanel("Explore"),
+        shiny::tabPanel("Download")
       ),
-      hr(),
+      htmltools::hr(),
       mod_TADA_summary_ui("TADA_summary_1"),
       epa_footer
     )

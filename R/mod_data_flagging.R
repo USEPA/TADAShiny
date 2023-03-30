@@ -14,24 +14,24 @@ mod_data_flagging_ui <- function(id) {
   tagList(
     tags$div(style = "display: none;",
              shinyWidgets::prettySwitch("dummy", label = NULL)),
-    htmlOutput(ns('step_1')),
+    shiny::htmlOutput(ns('step_1')),
     "Here",
-    fluidRow(column(
-      3, actionButton(ns("runFlags"), "Run Data Flagging")
+    shiny::fluidRow(column(
+      3, shiny::actionButton(ns("runFlags"), "Run Data Flagging")
     )),
-    htmlOutput(ns('step_2')),
+    shiny::htmlOutput(ns('step_2')),
     DT::DTOutput(ns('flagTable')),
-    br(),
-    htmlOutput(ns('step_3')),
+    htmltools::br(),
+    shiny::htmlOutput(ns('step_3')),
     DT::DTOutput(ns('summaryTable'))
   )
 }
 
 mod_data_flagging_server <- function(id, tadat) {
-  moduleServer(id, function(input, output, session) {
+  shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
-    output$step_1 = renderUI(
+    output$step_1 = shiny::renderUI(
       HTML(
         "<h3>Step 1</h3> Click the button below to scan the dataset for
         potential missing or out-of-range data"
@@ -44,7 +44,7 @@ mod_data_flagging_server <- function(id, tadat) {
       }
       inputs = character(len)
       for (i in seq_len(len)) {
-        inputs[i] = as.character(prettySwitch(
+        inputs[i] = as.character(shinyWidgets::prettySwitch(
           ns(paste0(id, i)),
           label = NULL,
           value = value[i],
@@ -67,7 +67,7 @@ mod_data_flagging_server <- function(id, tadat) {
     values$census = integer(length(n_switches))
 
     # 
-    observeEvent(input$runFlags, {
+    shiny::observeEvent(input$runFlags, {
       shinybusy::show_modal_spinner(
         spin = "double-bounce",
         color = "#0071bc",
@@ -78,21 +78,21 @@ mod_data_flagging_server <- function(id, tadat) {
       values$censusTable <- flagCensus(flagged)
       values$census <- colSums(values$censusTable)
       values$sites = flagged$MonitoringLocationIdentifier
-      shinybusy::remove_modal_spinner(session = getDefaultReactiveDomain())
-      output$step_2 = renderUI(HTML(
+      shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+      output$step_2 = shiny::renderUI(HTML(
         "<h3>Step 2</h3>Select the types of flagged data to be removed"
       ))
-      output$step_3 = renderUI(HTML(
+      output$step_3 = shiny::renderUI(HTML(
         "<h3>Summary of data to be removed"
       ))
       
-      observe({
+      shiny::observe({
         values$summaryTable = getCounts(
           values$sites, 
           values$censusTable[flag_types[shinyValue('switch_', n_switches)]])
       })
       
-      switchTable = reactive({
+      switchTable = shiny::reactive({
         df = data.frame(
           Prompt = prompts,
           Count = values$census,
@@ -101,7 +101,7 @@ mod_data_flagging_server <- function(id, tadat) {
       })
       
       output$flagTable = DT::renderDT(
-        isolate(switchTable()),
+        shiny::isolate(switchTable()),
         escape = FALSE,
         selection = 'none',
         rownames = FALSE,
@@ -109,10 +109,10 @@ mod_data_flagging_server <- function(id, tadat) {
           dom = 't',
           paging = TRUE,
           ordering = FALSE,
-          preDrawCallback = JS(
+          preDrawCallback = DT::JS(
             'function() { Shiny.unbindAll(this.api().table().node()); }'
           ),
-          drawCallback = JS(
+          drawCallback = DT::JS(
             'function() { Shiny.bindAll(this.api().table().node()); } '
           )
         )
@@ -127,10 +127,10 @@ mod_data_flagging_server <- function(id, tadat) {
           dom = 't',
           paging = FALSE,
           ordering = FALSE,
-          preDrawCallback = JS(
+          preDrawCallback = DT::JS(
             'function() { Shiny.unbindAll(this.api().table().node()); }'
           ),
-          drawCallback = JS(
+          drawCallback = DT::JS(
             'function() { Shiny.bindAll(this.api().table().node()); } '
           )
         )
