@@ -31,20 +31,31 @@ Imports:
     config,
     golem,
     magrittr,
+    htmltools,
     readxl,
     shiny,
-    shinyjs,
-    TADA
+    leaflet,
+    plotly,
+    shinyWidgets,
+    DT,
+    ggplot2,
+    TADA, 
+    shinybusy, 
+    dplyr, 
+    plyr
 Remotes: 
-    r-lib/testthat,
     github::USEPA/TADA
 Suggests: 
+    testthat,
     remotes,
     covr,
     rmarkdown, 
     knitr,
     spelling,
-    testthat
+    sf,
+    shinyjs,
+    stringr,
+    utils
 Depends: 
     R (>= 3.5.0)
 Encoding: UTF-8
@@ -57,4 +68,3 @@ BugReports: https://github.com/USEPA/TADAShiny/issues
 RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr, rmarkdown
-

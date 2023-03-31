@@ -1,4 +1,3 @@
-#' Access files in the current app
 #' 
 #' NOTE: If you manually change your package name in the DESCRIPTION, 
 #' don't forget to change it here too, and in the config file. 
@@ -34,4 +33,3 @@ get_golem_config <- function(
     use_parent = use_parent
   )
 }
-
