@@ -131,7 +131,7 @@ mod_query_data_server <- function(id, tadat){
         session = shiny::getDefaultReactiveDomain()
       )
       # storing the output of TADAdataRetrieval with the user's input choices as a reactive object named "raw" in the tadat list. 
-      tadat$raw = TADA::TADAdataRetrieval(statecode = statecode,
+      raw = TADA::TADAdataRetrieval(statecode = statecode,
                                         countycode = countycode,
                                         huc = huc,
                                         siteid = siteid,
@@ -149,14 +149,22 @@ mod_query_data_server <- function(id, tadat){
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
       
       # show a modal dialog box when tadat$raw is empty and the query didn't return any records.
-      if(dim(tadat$raw)[1]<1){
+      if(dim(raw)[1]<1){
         shiny::showModal(shiny::modalDialog(
           title = "Empty Query",
           "Your query returned zero results. Please adjust your search inputs and try again."
         ))
+      }else{
+        tadat$raw = raw
       }
-      tadat$overview = 1
 
+    })
+    
+    shiny::observeEvent(tadat$raw,{
+      shiny::showModal(shiny::modalDialog(
+        title = "Data Loaded",
+        "Your data were successfully loaded into the app. Move to the Overview tab to visualize your dataset."
+      ))
     })
     
 

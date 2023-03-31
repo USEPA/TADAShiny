@@ -15,8 +15,10 @@ app_ui <- function(request) {
       tags$html(class = "no-js", lang="en"),
       epa_header,
       shiny::includeHTML(app_sys("app/www/header.html")),
-      # shinyjs::useShinyjs(),
-      title = "TADAShiny",
+      shinyjs::useShinyjs(),
+      htmltools::br(),
+      shiny::headerPanel(title = "TADAShiny"),
+      htmltools::br(),
       shiny::tabsetPanel( # create a navbar page with tabs at the top
         id = "tabbar", selected = "Load",
         shiny::tabPanel("Load", # each tabPanel represents a tab page at the top of the navbar

@@ -13,7 +13,7 @@ mod_overview_ui <- function(id){
   ns <- NS(id)
   tagList(
     htmltools::h3("Data Overview"),
-    shiny::fluidRow(column(7,leaflet::leafletOutput(ns("overview_map"))),# "Larger point sizes represent more samples collected at a site; darker points represent more characteristics collected at a site. Click on a point to see the site ID, name, and sample/visit/parameter counts.",
+    shiny::fluidRow(column(7,shinycssloaders::withSpinner(leaflet::leafletOutput(ns("overview_map")))),# "Larger point sizes represent more samples collected at a site; darker points represent more characteristics collected at a site. Click on a point to see the site ID, name, and sample/visit/parameter counts.",
              column(5,plotly::plotlyOutput(ns("overview_piechar")))),#"Hover over a piece of the pie chart to see the characteristic name, count, and its percentage of the dataset. The pie shows the top ten characteristics as their own slices; all other characteristics fit into the 'ALL OTHERS' group.",
     htmltools::br(),
     shiny::fluidRow(column(7,shiny::plotOutput(ns("overview_hist"), height="400px")),#"This histogram shows sample collection frequency for all sites over the time period queried.",
@@ -51,7 +51,7 @@ mod_overview_server <- function(id, tadat){
     # the leaflet map
     output$overview_map = leaflet::renderLeaflet({
       shiny::req(mapdat$sumdat)
-      pal <- leaflet::colorNumeric(
+      pal <- leaflet::colorBin(
         palette = "Blues",
         domain = mapdat$sumdat$Parameter_Count)
       leaflet::leaflet()%>%

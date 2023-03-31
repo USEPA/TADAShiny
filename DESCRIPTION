@@ -37,6 +37,7 @@ Imports:
     leaflet,
     plotly,
     shinyWidgets,
+    shinycssloaders,
     DT,
     ggplot2,
     TADA, 
