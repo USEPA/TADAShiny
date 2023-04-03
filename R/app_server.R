@@ -16,6 +16,7 @@ app_server <- function(input, output, session) {
   mod_data_flagging_server("data_flagging_1", tadat)
   mod_summary_server("summary_1", tadat)
   mod_overview_server("overview_1", tadat)
+  mod_TADA_summary_server("TADA_summary_1", tadat)
 
   shiny::observeEvent(tadat$raw,{
     shiny::showModal(shiny::modalDialog(
@@ -24,4 +25,5 @@ app_server <- function(input, output, session) {
     ))
     shiny::updateTabsetPanel(session=session, inputId="tabbar", selected="Overview")
   })
+
 }

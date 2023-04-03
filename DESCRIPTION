@@ -43,7 +43,8 @@ Imports:
     TADA, 
     shinybusy, 
     dplyr, 
-    plyr
+    plyr,
+    scales
 Remotes: 
     github::USEPA/TADA
 Suggests: 

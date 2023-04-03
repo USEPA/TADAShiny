@@ -155,7 +155,13 @@ mod_query_data_server <- function(id, tadat){
           "Your query returned zero results. Please adjust your search inputs and try again."
         ))
       }else{
+        raw$Removed = FALSE
+        raw$Removed = ifelse(!raw$TADA.ActivityMediaName%in%c("WATER"),TRUE,raw$Removed)
+        raw$Removed = ifelse(raw$TADA.ResultMeasureValueDataTypes.Flag%in%c("ND or NA","Text","Coerced to NA"),TRUE,raw$Removed)
         tadat$raw = raw
+        tadat$init_rem = unique(raw[,c("ResultIdentifier","Removed")])
+
+        dat <<- raw
       }
 
     })
