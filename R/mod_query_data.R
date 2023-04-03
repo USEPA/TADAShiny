@@ -8,7 +8,7 @@
 #'
 #' @importFrom shiny NS tagList
 #' @import shinybusy
-#' 
+#'
 
 load("inst/extdata/statecodes_df.Rdata")
 load("inst/extdata/query_choices.Rdata")
@@ -51,7 +51,7 @@ mod_query_data_ui <- function(id){
          shiny::fluidRow(column(4, shiny::selectizeInput(ns("type"), "Site Type(s)", choices = c("",sitetype), multiple = TRUE)),
                     column(4, shiny::dateInput(ns("startdate"),"Start Date", format = "yyyy-mm-dd", startview = "year")),
                     column(4, shiny::dateInput(ns("enddate"),"End Date", format = "yyyy-mm-dd", startview = "year"))),
-         shiny::fluidRow(column(4, shiny::actionButton(ns("querynow"),"Run Query",shiny::icon("cloud"), 
+         shiny::fluidRow(column(4, shiny::actionButton(ns("querynow"),"Run Query",shiny::icon("cloud"),
                                           style="color: #fff; background-color: #337ab7; border-color: #2e6da4")))
       )
 }
@@ -62,17 +62,17 @@ mod_query_data_ui <- function(id){
 mod_query_data_server <- function(id, tadat){
   shiny::moduleServer( id, function(input, output, session){
     ns <- session$ns
-    
+
     shiny::observe({
       shiny::req(input$file)
       # user uploaded data
       tadat$raw <- suppressWarnings(readxl::read_excel(input$file$datapath, sheet = 1))
     })
-    
+
     shiny::observeEvent(input$example_data,{
       tadat$raw = TADA::Nutrients_Utah
     })
-    
+
     # this section has widget update commands for the selectizeinputs that have a lot of possible selections - shiny suggested hosting the choices server-side rather than ui-side
     shiny::updateSelectizeInput(session,"state",choices = c("",unique(statecodes_df$STUSAB)),  server = TRUE)
     shiny::updateSelectizeInput(session,"org",choices = c("",orgs), server = TRUE)
@@ -80,13 +80,13 @@ mod_query_data_server <- function(id, tadat){
     shiny::updateSelectizeInput(session,"characteristic",choices = c("",chars), server = TRUE)
     shiny::updateSelectizeInput(session,"proj", choices = c("",projects), server = TRUE)
     shiny::updateSelectizeInput(session,"siteid", choices = c("",mlids), server = TRUE)
-    
+
     # this observes when the user inputs a state into the drop down and subsets the choices for counties to only those counties within that state.
     shiny::observeEvent(input$state,{
       state_counties = subset(county, county$STUSAB==input$state)
-      shiny::updateSelectizeInput(session,"county",choices = c("",unique(state_counties$COUNTY_NAME)), server = TRUE) 
+      shiny::updateSelectizeInput(session,"county",choices = c("",unique(state_counties$COUNTY_NAME)), server = TRUE)
     })
-    
+
     # this event observer is triggered when the user hits the "Query Now" button, and then runs the TADAdataRetrieval function
     shiny::observeEvent(input$querynow,{
       # convert to null when needed
@@ -130,7 +130,7 @@ mod_query_data_server <- function(id, tadat){
         text = "Querying WQP database...",
         session = shiny::getDefaultReactiveDomain()
       )
-      # storing the output of TADAdataRetrieval with the user's input choices as a reactive object named "raw" in the tadat list. 
+      # storing the output of TADAdataRetrieval with the user's input choices as a reactive object named "raw" in the tadat list.
       raw = TADA::TADAdataRetrieval(statecode = statecode,
                                         countycode = countycode,
                                         huc = huc,
@@ -147,7 +147,7 @@ mod_query_data_server <- function(id, tadat){
       )
       # remove the modal once the dataset has been pulled
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
-      
+
       # show a modal dialog box when tadat$raw is empty and the query didn't return any records.
       if(dim(raw)[1]<1){
         shiny::showModal(shiny::modalDialog(
@@ -159,15 +159,6 @@ mod_query_data_server <- function(id, tadat){
       }
 
     })
-    
-    shiny::observeEvent(tadat$raw,{
-      shiny::showModal(shiny::modalDialog(
-        title = "Data Loaded",
-        "Your data were successfully loaded into the app. Move to the Overview tab to visualize your dataset."
-      ))
-    })
-    
-
 
   })
 }

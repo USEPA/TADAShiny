@@ -4,15 +4,17 @@
 #'
 #' @param id,input,output,session Internal parameters for {shiny}.
 #'
-#' @noRd 
+#' @noRd
 #'
 #' @importFrom shiny NS tagList
-#' 
+#'
 
 mod_overview_ui <- function(id){
   ns <- NS(id)
   tagList(
     htmltools::h3("Data Overview"),
+    shiny::fluidRow(column(12, shiny::htmlOutput(ns("overview_totals")))),
+    htmltools::br(),
     shiny::fluidRow(column(7,shinycssloaders::withSpinner(leaflet::leafletOutput(ns("overview_map")))),# "Larger point sizes represent more samples collected at a site; darker points represent more characteristics collected at a site. Click on a point to see the site ID, name, and sample/visit/parameter counts.",
              column(5,plotly::plotlyOutput(ns("overview_piechar")))),#"Hover over a piece of the pie chart to see the characteristic name, count, and its percentage of the dataset. The pie shows the top ten characteristics as their own slices; all other characteristics fit into the 'ALL OTHERS' group.",
     htmltools::br(),
@@ -20,16 +22,25 @@ mod_overview_ui <- function(id){
              column(5, DT::DTOutput(ns("overview_orgtable"), height="400px")))
   )
 }
-    
+
 #' overview Server Functions
 #'
-#' @noRd 
+#' @noRd
 mod_overview_server <- function(id, tadat){
   shiny::moduleServer( id, function(input, output, session){
     ns <- session$ns
-    
+
+    output$overview_mtitle = shiny::renderText({
+      "Map"
+    })
+
+    output$overview_totals = shiny::renderText({
+      req(tadat$raw)
+      paste0("Your dataset contains <B>",scales::comma(length(unique(tadat$raw$ResultIdentifier))),"</B> unique records from <B>",scales::comma(length(unique(tadat$raw$MonitoringLocationIdentifier))),"</B> monitoring locations and <B>", scales::comma(length(unique(tadat$raw$OrganizationFormalName))),"</B> unique organizations.")
+    })
+
     mapdat = shiny::reactiveValues()
-    
+
     # create dataset for map and histogram using raw data
     shiny::observeEvent(tadat$raw, {
       mapdat$sumdat = tadat$raw%>%dplyr::group_by(MonitoringLocationIdentifier,MonitoringLocationName,TADA.LatitudeMeasure, TADA.LongitudeMeasure)%>%dplyr::summarise("Sample_Count" = length(unique(ResultIdentifier)), "Visit_Count" = length(unique(ActivityStartDate)), "Parameter_Count" = length(unique(TADA.CharacteristicName)), "Organization_Count" = length(unique(OrganizationIdentifier)))
@@ -47,7 +58,7 @@ mod_overview_server <- function(id, tadat){
       bottomslice = chars%>%dplyr::ungroup()%>%dplyr::filter(!TADA.CharacteristicName%in%topslice$TADA.CharacteristicName)%>%dplyr::select("Sample_Count")%>%dplyr::summarise("Sample_Count" = sum(Sample_Count))%>%dplyr::mutate("TADA.CharacteristicName" = "ALL OTHERS")
       mapdat$chars = plyr::rbind.fill(topslice, bottomslice)
       })
-    
+
     # the leaflet map
     output$overview_map = leaflet::renderLeaflet({
       shiny::req(mapdat$sumdat)
@@ -72,31 +83,31 @@ mod_overview_server <- function(id, tadat){
                   opacity = 0.5
         )
     })
-    
+
     # histogram
     output$overview_hist = shiny::renderPlot({
       shiny::req(tadat$raw)
       ggplot2::ggplot(data = tadat$raw, ggplot2::aes(x = ActivityStartDate))+ggplot2::geom_histogram(color = "black", fill = "#005ea2", binwidth = 7)+ggplot2::labs(title="Samples collected over date range queried",x="Time", y = "Sample Count")+ggplot2::theme_classic(base_size = 14)
     })
-    
+
     output$overview_orgtable = DT::renderDT(
       mapdat$orgs,
       options = list(dom="t", scrollY=TRUE, pageLength=5),
       rownames= FALSE,
       selection = 'none'
     )
-    
+
     output$overview_piechar = plotly::renderPlotly({
       shiny::req(mapdat$chars)
       fig = plotly::plot_ly(data = mapdat$chars, labels =~TADA.CharacteristicName, values =~Sample_Count, textinfo = "text", text =~Sample_Count, marker = list(colorscale="Viridis"))%>%plotly::add_pie(hole = 0.3)%>%
         plotly::layout(title = "Characteristics in Dataset", showlegend = FALSE, font = list(family = "Arial", size = 12))
     })
- 
+
   })
 }
-    
+
 ## To be copied in the UI
 # mod_overview_ui("overview_1")
-    
+
 ## To be copied in the server
 # mod_overview_server("overview_1")

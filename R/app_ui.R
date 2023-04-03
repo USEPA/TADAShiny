@@ -3,7 +3,7 @@
 #' @param request Internal parameter for `{shiny}`.
 #'     DO NOT REMOVE.
 #' @noRd
-#' 
+#'
 
 # THE BUSINESS STARTS ON line 223 or thereabouts.
 app_ui <- function(request) {
@@ -20,7 +20,7 @@ app_ui <- function(request) {
       shiny::headerPanel(title = "TADAShiny"),
       htmltools::br(),
       shiny::tabsetPanel( # create a navbar page with tabs at the top
-        id = "tabbar", selected = "Load",
+        id = "tabbar",
         shiny::tabPanel("Load", # each tabPanel represents a tab page at the top of the navbar
                  htmltools::br(),
                  mod_query_data_ui("query_data_1")), #,
@@ -52,7 +52,7 @@ app_ui <- function(request) {
 #'
 #' @importFrom golem add_resource_path activate_js favicon bundle_resources
 #' @noRd
-#' 
+#'
 
 golem_add_external_resources <- function() {
   add_resource_path(

@@ -10,8 +10,7 @@
 mod_TADA_summary_ui <- function(id){
   ns <- NS(id)
   tagList(
-    htmltools::h3("TADA Working Summary:")
-
+    shiny::fluidRow(column(6, htmltools::h3("TADA Working Summary:")))
   )
 }
 
