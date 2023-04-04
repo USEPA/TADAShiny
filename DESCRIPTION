@@ -33,9 +33,9 @@ Imports:
     magrittr,
     htmltools,
     readxl,
+    writexl,
     shiny,
     leaflet,
-    plotly,
     shinyWidgets,
     shinycssloaders,
     DT,
@@ -44,7 +44,8 @@ Imports:
     shinybusy, 
     dplyr, 
     plyr,
-    scales
+    scales,
+    forcats
 Remotes: 
     github::USEPA/TADA
 Suggests: 

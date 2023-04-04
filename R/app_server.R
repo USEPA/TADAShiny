@@ -21,7 +21,7 @@ app_server <- function(input, output, session) {
   shiny::observeEvent(tadat$raw,{
     shiny::showModal(shiny::modalDialog(
       title = "Data Loaded",
-      "Your data were successfully loaded into the app. On the Overview page, explore site information using the map, hover over the pieces of the pie chart for more information on characteristics, and review the summary tables below."
+      "Your data were successfully loaded into the app and are displayed on the Overview tab."
     ))
     shiny::updateTabsetPanel(session=session, inputId="tabbar", selected="Overview")
   })

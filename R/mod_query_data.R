@@ -27,7 +27,7 @@ load("inst/extdata/query_choices.Rdata")
 mod_query_data_ui <- function(id){
   ns <- NS(id)
   tagList(shiny::fluidRow(htmltools::h3("Upload dataset..."),
-                   "Select a pre-existing file from your computer. Currently supports .xls and .xlsx only. You can find the WQX profile templates ",
+                   htmltools::HTML("Select a file from your computer. The file can be a <B>fresh</B> TADA dataset or a <B>working</B> TADA dataset that you are return to the app to work on. Currently supports .xls and .xlsx only. If you'd like to format a non-WQP dataset to work in the tool, you can find the WQX profile templates "),
                    tags$a(href="https://www.epa.gov/waterdata/water-quality-exchange-web-template-files", "here."),
                    # widget to upload WQP profile or WQX formatted spreadsheet
                    column(9,shiny::fileInput(ns("file"), "",
@@ -62,15 +62,30 @@ mod_query_data_ui <- function(id){
 mod_query_data_server <- function(id, tadat){
   shiny::moduleServer( id, function(input, output, session){
     ns <- session$ns
-
+    
+    # read in the excel spreadsheet dataset if this input reactive object is populated via fileInput and define as tadat$raw
     shiny::observe({
       shiny::req(input$file)
       # user uploaded data
-      tadat$raw <- suppressWarnings(readxl::read_excel(input$file$datapath, sheet = 1))
+      raw <- suppressWarnings(readxl::read_excel(input$file$datapath, sheet = 1))
+      if(!"Removed"%in%names(raw)){
+        raw$Removed = FALSE
+        raw$Removed = ifelse(!raw$TADA.ActivityMediaName%in%c("WATER"),TRUE,raw$Removed)
+        raw$Removed = ifelse(raw$TADA.ResultMeasureValueDataTypes.Flag%in%c("ND or NA","Text","Coerced to NA"),TRUE,raw$Removed)
+      }
+      tadat$raw = raw
+      tadat$init_rem = unique(raw[,c("ResultIdentifier","Removed")]) # this is a reactive object that saves the initial records removed in anticipation of a "Reset" button that allows users to go back to the initial conditions. May not be used.
+      
     })
-
+  # if user presses example data button, make tadat$raw the nutrients dataset contained within the TADA package.
     shiny::observeEvent(input$example_data,{
-      tadat$raw = TADA::Nutrients_Utah
+      raw = TADA::Nutrients_Utah
+      raw$Removed = FALSE
+      raw$Removed = ifelse(!raw$TADA.ActivityMediaName%in%c("WATER"),TRUE,raw$Removed)
+      raw$Removed = ifelse(raw$TADA.ResultMeasureValueDataTypes.Flag%in%c("ND or NA","Text","Coerced to NA"),TRUE,raw$Removed)
+      tadat$raw = raw
+      tadat$init_rem = unique(raw[,c("ResultIdentifier","Removed")]) # this is a reactive object that saves the initial records removed in anticipation of a "Reset" button that allows users to go back to the initial conditions. May not be used.
+      
     })
 
     # this section has widget update commands for the selectizeinputs that have a lot of possible selections - shiny suggested hosting the choices server-side rather than ui-side
@@ -149,20 +164,20 @@ mod_query_data_server <- function(id, tadat){
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
 
       # show a modal dialog box when tadat$raw is empty and the query didn't return any records.
+      # but if tadat$raw isn't empty, perform some initial QC of data that aren't media type water or have NA Resultvalue and no detection limit data
       if(dim(raw)[1]<1){
         shiny::showModal(shiny::modalDialog(
           title = "Empty Query",
           "Your query returned zero results. Please adjust your search inputs and try again."
         ))
       }else{
-        raw$Removed = FALSE
-        raw$Removed = ifelse(!raw$TADA.ActivityMediaName%in%c("WATER"),TRUE,raw$Removed)
-        raw$Removed = ifelse(raw$TADA.ResultMeasureValueDataTypes.Flag%in%c("ND or NA","Text","Coerced to NA"),TRUE,raw$Removed)
+          raw$Removed = FALSE
+          raw$Removed = ifelse(!raw$TADA.ActivityMediaName%in%c("WATER"),TRUE,raw$Removed)
+          raw$Removed = ifelse(raw$TADA.ResultMeasureValueDataTypes.Flag%in%c("ND or NA","Text","Coerced to NA"),TRUE,raw$Removed)
+        }
+        
         tadat$raw = raw
-        tadat$init_rem = unique(raw[,c("ResultIdentifier","Removed")])
-
-        dat <<- raw
-      }
+        tadat$init_rem = unique(raw[,c("ResultIdentifier","Removed")]) # this is a reactive object that saves the initial records removed in anticipation of a "Reset" button that allows users to go back to the initial conditions. May not be used.
 
     })
 
