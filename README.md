@@ -22,6 +22,28 @@ TADAShiny provides a user interface on top of the TADAPackage
 compile and evaluate Water Quality Portal (WQP) data for samples
 collected from surface water monitoring sites on streams and lakes.
 
+In 2012, the WQP was deployed by the U.S. Geological Survey (USGS), 
+the U.S. Environmental Protection Agency (USEPA), and the National 
+Water Quality Monitoring Council to combine and serve water-quality 
+data from numerous sources in a standardized format. The WQP holds 
+over 420 million water quality sample results from over 1000 federal,
+state, tribal and other partners, and is the nation's largest source
+for single point of access for water-quality data. Participating 
+organizations submit their data to the WQP using the EPA's Water 
+Quality Exchange (WQX), a framework designed to map their data 
+holdings to a common data structure.
+
+TADAShiny (Module 1: Data Discovery and Cleaning) retrieves data from
+the WQP, and runs it through a series of data wrangling, cleaning, and
+quality control checks. Features include flagging invalid results and
+metadata using validation reference tables, harmonization of synonyms,
+result and depth unit conversions, censored data substitutions, dataset
+filtering, and data visualizations. Users will be able to review and 
+download summary information about their dataset, along with a data file
+and that is ready for additional manual review and use in subsequent 
+analyses. Users make all decisions using the app to flag data for removal
+or keep data depending on its quality and relevance for their analysis.
+
 ## Installation
 
 You can install the development version of TADAShiny from
