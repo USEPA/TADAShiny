@@ -32,15 +32,13 @@ mod_overview_server <- function(id, tadat){
     # this widget produces the text at the top of the page describing record, site, and org numbers in dataset
     output$overview_totals = shiny::renderText({
       shiny::req(tadat$raw)
-      paste0("Your dataset contains <B>",scales::comma(length(unique(tadat$raw$ResultIdentifier))),"</B> unique records from <B>",scales::comma(length(unique(tadat$raw$MonitoringLocationIdentifier))),"</B> monitoring locations and <B>", scales::comma(length(unique(tadat$raw$OrganizationFormalName))),"</B> unique organizations.")
+      paste0("Your dataset contains <B>",scales::comma(length(unique(tadat$raw$ResultIdentifier))),"</B> unique results from <B>",scales::comma(length(unique(tadat$raw$MonitoringLocationIdentifier))),"</B> monitoring location(s) and <B>", scales::comma(length(unique(tadat$raw$OrganizationFormalName))),"</B> unique organization(s).")
     })
     # this a reactive list created to hold all the reactive objects specific to this module.
     mapdat = shiny::reactiveValues()
 
     # create dataset for map and histogram using raw data
     shiny::observeEvent(tadat$raw, {
-      tadat$tab = "overview"
-      tadat$raw$tab = "Overview"
       mapdat$sumdat = tadat$raw%>%dplyr::group_by(MonitoringLocationIdentifier,MonitoringLocationName,TADA.LatitudeMeasure, TADA.LongitudeMeasure)%>%dplyr::summarise("Sample_Count" = length(unique(ResultIdentifier)), "Visit_Count" = length(unique(ActivityStartDate)), "Parameter_Count" = length(unique(TADA.CharacteristicName)), "Organization_Count" = length(unique(OrganizationIdentifier)))
       mapdat$sumdat$radius = 3
       mapdat$sumdat$radius = ifelse(mapdat$sumdat$Sample_Count>10,5,mapdat$sumdat$radius)

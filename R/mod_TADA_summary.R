@@ -43,56 +43,56 @@ mod_TADA_summary_server <- function(id, tadat){
     # summary text = total records
     output$rec_tot = shiny::renderText({
       if(is.null(tadat$raw)){
-        "Total Records in Raw File: 0"
+        "Total Results in Dataset: 0"
       }else{
-        paste0("Total Records in Raw File: ",scales::comma(length(tadat$raw$ResultIdentifier)))
+        paste0("Total Results in Dataset: ",scales::comma(length(tadat$raw$ResultIdentifier)))
       }
     })
     # summary text = total records removed
     output$rec_rem = shiny::renderText({
       if(is.null(tadat$raw)){
-        "Total Records Removed: 0"
+        "Total Results Flagged for Removal: 0"
       }else{
-        paste0("Total Records Removed: ",scales::comma(summary_things$rem_rec))
+        paste0("Total Results Flagged for Removal: ",scales::comma(summary_things$rem_rec))
       }
     })
     # summary text = total records in clean
     output$rec_clean = shiny::renderText({
       if(is.null(tadat$raw)){
-        "Total Records in Clean File: 0"
+        "Total Results Retained: 0"
       }else{
-        paste0("Total Records in Clean File: ",scales::comma(summary_things$clean_rec))
+        paste0("Total Results Retained: ",scales::comma(summary_things$clean_rec))
       }
     })
     # summary text = total sites
     output$site_tot = shiny::renderText({
       if(is.null(tadat$raw)){
-        "Total Sites in Raw File: 0"
+        "Total Sites in Dataset: 0"
       }else{
-        paste0("Total Sites in Raw File: ",scales::comma(length(unique(tadat$raw$MonitoringLocationIdentifier))))
+        paste0("Total Sites in Dataset: ",scales::comma(length(unique(tadat$raw$MonitoringLocationIdentifier))))
       }
     })
     # summary text = total sites removed - sites with NO records in the clean file
     output$site_rem = shiny::renderText({
       if(is.null(tadat$raw)){
-        "Total Sites Removed: 0"
+        "Total Sites Flagged for Removal: 0"
       }else{
-        paste0("Total Sites Removed: ",scales::comma(summary_things$rem_site))
+        paste0("Total Sites Flagged for Removal: ",scales::comma(summary_things$rem_site))
       }
     })
     # summary text = total sites in clean file
     output$site_clean = shiny::renderText({
       if(is.null(tadat$raw)){
-        "Total Sites in Clean File: 0"
+        "Total Sites Retained: 0"
       }else{
-        paste0("Total Sites in Clean File: ",scales::comma(summary_things$clean_site))
+        paste0("Total Sites Retained: ",scales::comma(summary_things$clean_site))
       }
     })
     
     # download dataset button - only appears if there exists data in the app already
     output$dwn_all = shiny::renderUI({
       shiny::req(tadat$raw)
-      shiny::downloadButton(ns("download_all"),"Download Working Dataset", style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
+      shiny::downloadButton(ns("download_all"),"Download Working Dataset (.xlsx)", style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
     })
     
     output$download_all = shiny::downloadHandler(

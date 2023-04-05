@@ -17,13 +17,21 @@ app_server <- function(input, output, session) {
   mod_summary_server("summary_1", tadat)
   mod_overview_server("overview_1", tadat)
   mod_TADA_summary_server("TADA_summary_1", tadat)
-
-  shiny::observeEvent(tadat$raw,{
-    shiny::showModal(shiny::modalDialog(
-      title = "Data Loaded",
-      "Your data were successfully loaded into the app and are displayed on the Overview tab."
-    ))
-    shiny::updateTabsetPanel(session=session, inputId="tabbar", selected="Overview")
+  
+  # switch to overview tab when tadat$new changes
+  shiny::observeEvent(tadat$new,{
+      shiny::showModal(shiny::modalDialog(
+        title = "Data Loaded",
+        "Your data were successfully loaded into the app and are displayed on the Overview tab."
+      ))
+      shiny::updateTabsetPanel(session=session, inputId="tabbar", selected="Overview")
+      tadat$new = NULL
+  })
+  
+  observe({
+    req(tadat$raw)
+    tadat$raw$tab = input$tabbar
+    tadat$tab = input$tabbar
   })
 
 }

@@ -72,6 +72,7 @@ mod_query_data_server <- function(id, tadat){
         raw$Removed = FALSE
         raw$Removed = ifelse(!raw$TADA.ActivityMediaName%in%c("WATER"),TRUE,raw$Removed)
         raw$Removed = ifelse(raw$TADA.ResultMeasureValueDataTypes.Flag%in%c("ND or NA","Text","Coerced to NA"),TRUE,raw$Removed)
+        tadat$new = 1
       }
       tadat$raw = raw
       tadat$init_rem = unique(raw[,c("ResultIdentifier","Removed")]) # this is a reactive object that saves the initial records removed in anticipation of a "Reset" button that allows users to go back to the initial conditions. May not be used.
@@ -85,7 +86,7 @@ mod_query_data_server <- function(id, tadat){
       raw$Removed = ifelse(raw$TADA.ResultMeasureValueDataTypes.Flag%in%c("ND or NA","Text","Coerced to NA"),TRUE,raw$Removed)
       tadat$raw = raw
       tadat$init_rem = unique(raw[,c("ResultIdentifier","Removed")]) # this is a reactive object that saves the initial records removed in anticipation of a "Reset" button that allows users to go back to the initial conditions. May not be used.
-      
+      tadat$new = 1
     })
 
     # this section has widget update commands for the selectizeinputs that have a lot of possible selections - shiny suggested hosting the choices server-side rather than ui-side
@@ -178,7 +179,7 @@ mod_query_data_server <- function(id, tadat){
         
         tadat$raw = raw
         tadat$init_rem = unique(raw[,c("ResultIdentifier","Removed")]) # this is a reactive object that saves the initial records removed in anticipation of a "Reset" button that allows users to go back to the initial conditions. May not be used.
-
+        tadat$new = 1
     })
 
   })
