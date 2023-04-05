@@ -8,7 +8,7 @@
 #'
 #' @importFrom shiny NS tagList
 #' @import shinybusy
-#' 
+#'
 
 load("inst/extdata/statecodes_df.Rdata")
 load("inst/extdata/query_choices.Rdata")
@@ -27,7 +27,7 @@ load("inst/extdata/query_choices.Rdata")
 mod_query_data_ui <- function(id){
   ns <- NS(id)
   tagList(shiny::fluidRow(htmltools::h3("Upload dataset..."),
-                   "Select a pre-existing file from your computer. Currently supports .xls and .xlsx only. You can find the WQX profile templates ",
+                   htmltools::HTML("Select a file from your computer. The file can be a <B>fresh</B> TADA dataset or a <B>working</B> TADA dataset that you are return to the app to work on. Currently supports .xls and .xlsx only. If you'd like to format a non-WQP dataset to work in the tool, you can find the WQX profile templates "),
                    tags$a(href="https://www.epa.gov/waterdata/water-quality-exchange-web-template-files", "here."),
                    # widget to upload WQP profile or WQX formatted spreadsheet
                    column(9,shiny::fileInput(ns("file"), "",
@@ -51,7 +51,7 @@ mod_query_data_ui <- function(id){
          shiny::fluidRow(column(4, shiny::selectizeInput(ns("type"), "Site Type(s)", choices = c("",sitetype), multiple = TRUE)),
                     column(4, shiny::dateInput(ns("startdate"),"Start Date", format = "yyyy-mm-dd", startview = "year")),
                     column(4, shiny::dateInput(ns("enddate"),"End Date", format = "yyyy-mm-dd", startview = "year"))),
-         shiny::fluidRow(column(4, shiny::actionButton(ns("querynow"),"Run Query",shiny::icon("cloud"), 
+         shiny::fluidRow(column(4, shiny::actionButton(ns("querynow"),"Run Query",shiny::icon("cloud"),
                                           style="color: #fff; background-color: #337ab7; border-color: #2e6da4")))
       )
 }
@@ -63,16 +63,31 @@ mod_query_data_server <- function(id, tadat){
   shiny::moduleServer( id, function(input, output, session){
     ns <- session$ns
     
+    # read in the excel spreadsheet dataset if this input reactive object is populated via fileInput and define as tadat$raw
     shiny::observe({
       shiny::req(input$file)
       # user uploaded data
-      tadat$raw <- suppressWarnings(readxl::read_excel(input$file$datapath, sheet = 1))
+      raw <- suppressWarnings(readxl::read_excel(input$file$datapath, sheet = 1))
+      if(!"Removed"%in%names(raw)){
+        raw$Removed = FALSE
+        raw$Removed = ifelse(!raw$TADA.ActivityMediaName%in%c("WATER"),TRUE,raw$Removed)
+        raw$Removed = ifelse(raw$TADA.ResultMeasureValueDataTypes.Flag%in%c("ND or NA","Text","Coerced to NA"),TRUE,raw$Removed)
+      }
+      tadat$raw = raw
+      tadat$init_rem = unique(raw[,c("ResultIdentifier","Removed")]) # this is a reactive object that saves the initial records removed in anticipation of a "Reset" button that allows users to go back to the initial conditions. May not be used.
+      
     })
-    
+  # if user presses example data button, make tadat$raw the nutrients dataset contained within the TADA package.
     shiny::observeEvent(input$example_data,{
-      tadat$raw = TADA::Nutrients_Utah
+      raw = TADA::Nutrients_Utah
+      raw$Removed = FALSE
+      raw$Removed = ifelse(!raw$TADA.ActivityMediaName%in%c("WATER"),TRUE,raw$Removed)
+      raw$Removed = ifelse(raw$TADA.ResultMeasureValueDataTypes.Flag%in%c("ND or NA","Text","Coerced to NA"),TRUE,raw$Removed)
+      tadat$raw = raw
+      tadat$init_rem = unique(raw[,c("ResultIdentifier","Removed")]) # this is a reactive object that saves the initial records removed in anticipation of a "Reset" button that allows users to go back to the initial conditions. May not be used.
+      
     })
-    
+
     # this section has widget update commands for the selectizeinputs that have a lot of possible selections - shiny suggested hosting the choices server-side rather than ui-side
     shiny::updateSelectizeInput(session,"state",choices = c("",unique(statecodes_df$STUSAB)),  server = TRUE)
     shiny::updateSelectizeInput(session,"org",choices = c("",orgs), server = TRUE)
@@ -80,13 +95,13 @@ mod_query_data_server <- function(id, tadat){
     shiny::updateSelectizeInput(session,"characteristic",choices = c("",chars), server = TRUE)
     shiny::updateSelectizeInput(session,"proj", choices = c("",projects), server = TRUE)
     shiny::updateSelectizeInput(session,"siteid", choices = c("",mlids), server = TRUE)
-    
+
     # this observes when the user inputs a state into the drop down and subsets the choices for counties to only those counties within that state.
     shiny::observeEvent(input$state,{
       state_counties = subset(county, county$STUSAB==input$state)
-      shiny::updateSelectizeInput(session,"county",choices = c("",unique(state_counties$COUNTY_NAME)), server = TRUE) 
+      shiny::updateSelectizeInput(session,"county",choices = c("",unique(state_counties$COUNTY_NAME)), server = TRUE)
     })
-    
+
     # this event observer is triggered when the user hits the "Query Now" button, and then runs the TADAdataRetrieval function
     shiny::observeEvent(input$querynow,{
       # convert to null when needed
@@ -130,8 +145,8 @@ mod_query_data_server <- function(id, tadat){
         text = "Querying WQP database...",
         session = shiny::getDefaultReactiveDomain()
       )
-      # storing the output of TADAdataRetrieval with the user's input choices as a reactive object named "raw" in the tadat list. 
-      tadat$raw = TADA::TADAdataRetrieval(statecode = statecode,
+      # storing the output of TADAdataRetrieval with the user's input choices as a reactive object named "raw" in the tadat list.
+      raw = TADA::TADAdataRetrieval(statecode = statecode,
                                         countycode = countycode,
                                         huc = huc,
                                         siteid = siteid,
@@ -147,19 +162,24 @@ mod_query_data_server <- function(id, tadat){
       )
       # remove the modal once the dataset has been pulled
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
-      
+
       # show a modal dialog box when tadat$raw is empty and the query didn't return any records.
-      if(dim(tadat$raw)[1]<1){
+      # but if tadat$raw isn't empty, perform some initial QC of data that aren't media type water or have NA Resultvalue and no detection limit data
+      if(dim(raw)[1]<1){
         shiny::showModal(shiny::modalDialog(
           title = "Empty Query",
           "Your query returned zero results. Please adjust your search inputs and try again."
         ))
-      }
-      tadat$overview = 1
+      }else{
+          raw$Removed = FALSE
+          raw$Removed = ifelse(!raw$TADA.ActivityMediaName%in%c("WATER"),TRUE,raw$Removed)
+          raw$Removed = ifelse(raw$TADA.ResultMeasureValueDataTypes.Flag%in%c("ND or NA","Text","Coerced to NA"),TRUE,raw$Removed)
+        }
+        
+        tadat$raw = raw
+        tadat$init_rem = unique(raw[,c("ResultIdentifier","Removed")]) # this is a reactive object that saves the initial records removed in anticipation of a "Reset" button that allows users to go back to the initial conditions. May not be used.
 
     })
-    
-
 
   })
 }

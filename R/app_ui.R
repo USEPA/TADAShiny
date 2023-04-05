@@ -3,7 +3,7 @@
 #' @param request Internal parameter for `{shiny}`.
 #'     DO NOT REMOVE.
 #' @noRd
-#' 
+#'
 
 # THE BUSINESS STARTS ON line 223 or thereabouts.
 app_ui <- function(request) {
@@ -15,18 +15,20 @@ app_ui <- function(request) {
       tags$html(class = "no-js", lang="en"),
       epa_header,
       shiny::includeHTML(app_sys("app/www/header.html")),
-      # shinyjs::useShinyjs(),
-      title = "TADAShiny",
+      shinyjs::useShinyjs(),
+      htmltools::br(),
+      shiny::headerPanel(title = "TADAShiny"),
+      htmltools::br(),
       shiny::tabsetPanel( # create a navbar page with tabs at the top
-        id = "tabbar", selected = "Load",
+        id = "tabbar",
         shiny::tabPanel("Load", # each tabPanel represents a tab page at the top of the navbar
                  htmltools::br(),
                  mod_query_data_ui("query_data_1")), #,
         shiny::tabPanel("Overview",
                  htmltools::br(),
                  mod_overview_ui("overview_1"),
-                 htmltools::hr(),
-                 mod_summary_ui("summary_1")),
+                 htmltools::hr()),
+                 # mod_summary_ui("summary_1")),
         shiny::tabPanel("Flag",
                         htmltools::br(),
                  mod_data_flagging_ui("data_flagging_1")),
@@ -50,7 +52,7 @@ app_ui <- function(request) {
 #'
 #' @importFrom golem add_resource_path activate_js favicon bundle_resources
 #' @noRd
-#' 
+#'
 
 golem_add_external_resources <- function() {
   add_resource_path(

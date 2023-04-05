@@ -33,16 +33,19 @@ Imports:
     magrittr,
     htmltools,
     readxl,
+    writexl,
     shiny,
     leaflet,
-    plotly,
     shinyWidgets,
+    shinycssloaders,
     DT,
     ggplot2,
     TADA, 
     shinybusy, 
     dplyr, 
-    plyr
+    plyr,
+    scales,
+    forcats
 Remotes: 
     github::USEPA/TADA
 Suggests: 

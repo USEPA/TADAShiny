@@ -1,9 +1,9 @@
 #' The application server-side
-#' 
-#' @param input,output,session Internal parameters for {shiny}. 
+#'
+#' @param input,output,session Internal parameters for {shiny}.
 #'     DO NOT REMOVE.
 #' @noRd
-#' 
+#'
 
 # Below increases the max data upload size from the Shiny default of 5MB per file
 # to 30MB for file
@@ -16,14 +16,14 @@ app_server <- function(input, output, session) {
   mod_data_flagging_server("data_flagging_1", tadat)
   mod_summary_server("summary_1", tadat)
   mod_overview_server("overview_1", tadat)
-  
-  # observeEvent(tadat$overview==1, {
-  #   appendTab(inputId="tabbar",tab=tabPanel("Overview",
-  #                                                    br(),
-  #                                                    mod_overview_ui("overview_1"),
-  #                                                    hr(),
-  #                                                    mod_summary_ui("summary_1"),
-  #                                                    hr(),
-  #                                                    mod_TADA_summary_ui("TADA_summary_1")))
-  # })
+  mod_TADA_summary_server("TADA_summary_1", tadat)
+
+  shiny::observeEvent(tadat$raw,{
+    shiny::showModal(shiny::modalDialog(
+      title = "Data Loaded",
+      "Your data were successfully loaded into the app and are displayed on the Overview tab."
+    ))
+    shiny::updateTabsetPanel(session=session, inputId="tabbar", selected="Overview")
+  })
+
 }
