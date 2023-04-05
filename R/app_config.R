@@ -1,4 +1,3 @@
-#' Access files in the current app
 #' 
 #' NOTE: If you manually change your package name in the DESCRIPTION, 
 #' don't forget to change it here too, and in the config file. 
@@ -22,15 +21,15 @@ app_sys <- function(...){
 #' 
 #' @noRd
 get_golem_config <- function(
-  value, 
-  config = Sys.getenv(
-    "GOLEM_CONFIG_ACTIVE", 
-    Sys.getenv(
-      "R_CONFIG_ACTIVE", 
-      "default"
-    )
-  ), 
-  use_parent = TRUE
+    value, 
+    config = Sys.getenv(
+      "GOLEM_CONFIG_ACTIVE",
+      Sys.getenv(
+        "R_CONFIG_ACTIVE",
+        "default"
+      )
+    ), 
+    use_parent = TRUE
 ){
   config::get(
     value = value, 
@@ -40,4 +39,3 @@ get_golem_config <- function(
     use_parent = use_parent
   )
 }
-
