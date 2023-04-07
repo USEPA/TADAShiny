@@ -76,7 +76,6 @@ download_and_build_github_package <- function(pack) {
         devtools::install_github(pack[2], dependencies = FALSE,
                 build = TRUE, build_opts = c("--binary"))
         setwd(orig_wd)
-
 }
 
 packages_needing_to_be_built <- c("sf")
