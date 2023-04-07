@@ -70,16 +70,6 @@ download_and_build_cran_package <- function(pack) {
         unlink("junktemp", recursive = TRUE)
 }
 
-download_and_build_github_package <- function(pack) {
-        dir.create("junktemp")
-        pak::pkg_download(pack[2], dest_dir = "junktemp",
-                dependencies = FALSE, platforms = "source")
-        pkg <- list.files("junktemp")[1]
-        devtools::build(pkg = paste("junktemp", pkg, sep = "/"),
-                        path = args[1], binary = TRUE)
-        unlink("junktemp", recursive = TRUE)
-}
-
 packages_needing_to_be_built <- c("sf")
 
 # Download the packages from the repository
@@ -92,11 +82,6 @@ for (p in intersect(packages, packages_needing_to_be_built)) {
         message(paste("Package", p, "requires special handling", sep = " "))
         download_and_build_cran_package(p)
         cat(p, file = "r-build-deps.txt", sep = "\n", append = TRUE)
-}
-
-for (p in github_packages_to_build) {
-        message(paste("Package", p[1], "must be built from GitHub", sep = " "))
-        download_and_build_github_package(p)
 }
 
 # i <- 1
@@ -120,3 +105,13 @@ tools::write_PACKAGES(dir = args[1], fields = NULL,
   validate = FALSE)
 
 message("Wrote package description files")
+
+download_github_package <- function(pack) {
+        pak::pkg_download(pack[2], dest_dir = args[1],
+                dependencies = FALSE, platforms = "source")
+}
+
+for (p in github_packages_to_build) {
+        message(paste("Package", p[1], "must be built from GitHub", sep = " "))
+        download_and_build_github_package(p)
+}
