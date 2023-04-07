@@ -69,7 +69,7 @@ jobs:
 
     - name: Add minimal dependency
       run: |
-        install2.r pak devtools rlist
+        install2.r pak devtools rlist pkgdepends
 
     - name: Setup Git and remove problematic packages
       run: |
