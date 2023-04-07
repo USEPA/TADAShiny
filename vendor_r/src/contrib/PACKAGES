@@ -1067,7 +1067,7 @@ Suggests: blob, covr, dplyr (>= 0.8-3), ggplot2, knitr, lwgeom (>=
         tibble (>= 1.4.1), tidyr (>= 1.2.0), tidyselect (>= 1.0.0),
         tmap (>= 2.0), vctrs, wk
 License: GPL-2 | MIT + file LICENSE
-MD5sum: 708d234c4a682ab1dca10e03999d0745
+MD5sum: 9d9141a4d715133c4fdc40b82d9d913a
 NeedsCompilation: yes
 
 Package: shiny
