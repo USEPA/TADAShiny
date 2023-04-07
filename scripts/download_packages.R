@@ -20,9 +20,10 @@ input_packs <- unlist(str_split(args[2], ","))
 
 message(paste(input_packs), sep = " ")
 
-options(HTTPUserAgent = sprintf("R/%s R (%s)", getRversion(),
-        paste(getRversion(), R.version["platform"],
-        R.version["arch"], R.version["os"])))
+plfrm <- paste(getRversion(), R.version["platform"],
+        R.version["arch"], R.version["os"])
+
+options(HTTPUserAgent = sprintf("R/%s R (%s)", getRversion(), ptfrm))
 
 # Get packages function to get the packages and dependencies
 get_packages <- function(packs) {
@@ -100,7 +101,8 @@ message("Wrote package description files")
 
 download_github_package <- function(pack) {
         pak::pkg_download(pack[2], dest_dir = args[1],
-                dependencies = FALSE, platforms = "source")
+                dependencies = FALSE,
+                platforms = pkgdepends::current_r_platform())
 }
 
 for (p in github_packages_to_build) {
