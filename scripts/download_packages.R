@@ -18,7 +18,7 @@ if (!dir.exists(args[1])) {
 # Split the packages into a character list
 input_packs <- unlist(str_split(args[2], ","))
 
-message(input_packs)
+message(paste(input_packs), sep = " ")
 
 options(HTTPUserAgent = sprintf("R/%s R (%s)", getRversion(),
         paste(getRversion(), R.version["platform"],
@@ -38,7 +38,7 @@ get_packages <- function(packs) {
 
 # Install any GitHub packages which are not available in Posit Public Package Manager but some of their dependencies may be
 github_packages_known_list <- list(c("TADA", "USEPA/TADA"))
-gh_pkg_names <- sapply(github_packages, "[[", 1)
+gh_pkg_names <- sapply(github_packages_known_list, "[[", 1)
 github_packages_to_build <- list()
 for (p in intersect(input_packs, gh_pkg_names)) {
         gh_pkg <- github_packages_known_list[gh_pkg_names == p]

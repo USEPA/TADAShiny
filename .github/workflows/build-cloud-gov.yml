@@ -1,7 +1,10 @@
 on:
-  push:
-    branches:
-      cloud-gov
+  workflow_dispatch:
+    inputs:
+      build_deps:
+        description: 'Also build R dependencies?'
+        required: true
+        type: boolean
 
 permissions:
   contents: write
