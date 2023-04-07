@@ -71,15 +71,12 @@ download_and_build_cran_package <- function(pack) {
 }
 
 download_and_build_github_package <- function(pack) {
-        dir.create("junktemp")
-        setwd("junktemp")
-        system2(command = paste("git clone https://github.com/",
-                pack[2], sep = ""))
-        setwd("..")
-        pkg <- list.files("junktemp")[1]
-        devtools::build(pkg = paste("junktemp", pkg, sep = "/"),
-                        path = args[1], binary = TRUE)
-        unlink("junktemp", recursive = TRUE)
+        orig_wd <- getwd()
+        setwd(args[1])
+        devtools::install_github(pack[2], dependencies = FALSE,
+                build = TRUE, build_opts = c("--binary"))
+        setwd(orig_wd)
+
 }
 
 packages_needing_to_be_built <- c("sf")
@@ -100,6 +97,14 @@ for (p in github_packages_to_build) {
         message(paste("Package", p[1], "must be built from GitHub", sep = " "))
         download_and_build_github_package(p)
 }
+
+# i <- 1
+# while (i < length(github_packages_to_build)) {
+#         message(paste("Package", github_packages_to_build[i],
+#                 "must be built from GitHub", sep = " "))
+#         download_and_build_github_package(github_packages_to_build[i + 1])
+#         i <- i + 2
+# }
 
 if ("rmarkdown" %in% packages) {
         cat("pandoc", file = "r-build-deps.txt", sep = "\n", append = TRUE)
