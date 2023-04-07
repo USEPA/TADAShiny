@@ -100,7 +100,7 @@ tools::write_PACKAGES(dir = args[1], fields = NULL,
 message("Wrote package description files")
 
 download_github_package <- function(pack) {
-        pak::pkg_download(pack[2], dest_dir = args[1],
+        pak::pkg_download(pack[2], dest_dir = "vendor_r",
                 dependencies = FALSE,
                 platforms = pkgdepends::current_r_platform())
 }
