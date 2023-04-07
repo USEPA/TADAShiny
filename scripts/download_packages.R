@@ -52,7 +52,7 @@ for (p in intersect(input_packs, gh_pkg_names)) {
 }
 
 # Get the package dependencies from Posit Public Package Manager
-packages <- get_packages(setdiff(input_packs), gh_pkg_names)
+packages <- get_packages(setdiff(input_packs, gh_pkg_names))
 
 download_and_build_cran_package <- function(pack) {
         dir.create("junktemp")
