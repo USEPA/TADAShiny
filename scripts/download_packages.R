@@ -43,14 +43,20 @@ github_packages_to_build <- list()
 for (p in intersect(input_packs, gh_pkg_names)) {
         gh_pkg <- github_packages_known_list[gh_pkg_names == p]
         message(paste("Github package", p, "found", sep = " "))
-        rlist::list.append(github_packages_to_build, gh_pkg)
         deps <- pak::pkg_deps(gh_pkg[[1]][2])
         in_cran <- deps["ref"][deps["type"] == "standard"]
-        for (g in deps[deps["type"] == "github", c("package", "ref")]) {
-                rlist::list.append(github_packages_to_build, array(unlist(g)))
+        gpk <- unlist(deps[deps["type"] == "github", c("package", "ref")])
+        i <- 1
+        while (i < length(gpk)) {
+                github_packages_to_build <- rlist::list.append(
+                        github_packages_to_build, c(gpk[i], gpk[i + 1]))
+                i <- i + 2
         }
-        input_packs <- intersect(input_packs, in_cran)
+        input_packs <- union(input_packs, in_cran)
 }
+
+message(paste("Github packages needed are:",
+        github_packages_to_build, sep = " "))
 
 # Get the package dependencies from Posit Public Package Manager
 packages <- get_packages(setdiff(input_packs, gh_pkg_names))
