@@ -56,7 +56,7 @@ jobs:
       run:
         working-directory: /workspace
     container:
-      image: rocker/geospatial
+      image: ghcr.io/rocker-org/geospatial:latest
       volumes: 
        - ${{ github.workspace }}:/workspace
 
@@ -68,11 +68,8 @@ jobs:
         ref: cloud-gov
 
     - name: Add minimal dependency
-      uses: r-lib/actions/setup-r-dependencies@v2
-      with:
-        packages: |
-          pak
-          devtools
+      run: |
+        install2.r pak devtools
 
     - name: Setup Git and remove problematic packages
       run: |
@@ -92,7 +89,6 @@ jobs:
         more r-build-deps.txt
         if [ `grep sf r-build-deps.txt | wc -c` -gt 0 ]; then echo needs_geo=true; else echo needs_geo=false; fi >> $GITHUB_ENV
         if [ `grep pandoc r-build-deps.txt | wc -c` -gt 0 ]; then echo needs_pandoc=true; else echo needs_pandoc=false; fi >> $GITHUB_ENV
-        # if [ -f "r-build-deps.txt" ]; then echo needs_libraries=true; else echo needs_libraries=false; fi >> $GITHUB_ENV
 
     - name: Run lib_tar.sh to extract each of the libraries needed by sf
       if: ${{ env.needs_geo == 'true' }}
