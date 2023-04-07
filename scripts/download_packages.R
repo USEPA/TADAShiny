@@ -71,11 +71,8 @@ download_and_build_cran_package <- function(pack) {
 }
 
 download_and_build_github_package <- function(pack) {
-        orig_wd <- getwd()
-        setwd(args[1])
-        devtools::install_github(pack[2], dependencies = FALSE,
-                build = TRUE, build_opts = c("--binary"))
-        setwd(orig_wd)
+        pak::pkg_install(pack[2], lib = args[1],
+                dependencies = FALSE, upgrade = FALSE)
 }
 
 packages_needing_to_be_built <- c("sf")
