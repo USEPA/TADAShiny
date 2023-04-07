@@ -23,7 +23,7 @@ message(paste(input_packs), sep = " ")
 plfrm <- paste(getRversion(), R.version["platform"],
         R.version["arch"], R.version["os"])
 
-options(HTTPUserAgent = sprintf("R/%s R (%s)", getRversion(), ptfrm))
+options(HTTPUserAgent = sprintf("R/%s R (%s)", getRversion(), plfrm))
 
 # Get packages function to get the packages and dependencies
 get_packages <- function(packs) {
