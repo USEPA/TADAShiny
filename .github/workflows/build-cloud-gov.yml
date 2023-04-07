@@ -67,6 +67,12 @@ jobs:
         fetch-depth: 1
         ref: cloud-gov
 
+    - name: Add minimal dependency
+      uses: r-lib/actions/setup-r-dependencies@v2
+      with:
+        packages: |
+          pak
+
     - name: Setup Git and remove problematic packages
       run: |
         git config --global --add safe.directory $(realpath .)
