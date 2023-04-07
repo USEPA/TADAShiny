@@ -91,18 +91,15 @@ if ("rmarkdown" %in% packages) {
 
 message("Completed downloading packages")
 
-tools::write_PACKAGES(dir = args[1], fields = NULL,
-  type = c("source"),
-  verbose = FALSE, unpacked = FALSE, subdirs = FALSE,
-  latestOnly = TRUE, addFiles = FALSE, rds_compress = "xz",
-  validate = FALSE)
-
-message("Wrote package description files")
-
 download_github_package <- function(pack) {
-        pak::pkg_download(pack[2], dest_dir = "vendor_r",
+        dir.create("junktemp")
+        dl <- pak::pkg_download(pack[2], dest_dir = "vendor_r",
                 dependencies = FALSE,
                 platforms = pkgdepends::current_r_platform())
+        print(dl$fulltarget_tree)
+        devtools::build(pkg = dl$fulltarget_tree,
+                path = args[1], binary = TRUE)
+        unlink("junktemp", recursive = TRUE)
 }
 
 for (p in github_packages_to_build) {
