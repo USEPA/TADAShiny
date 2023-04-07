@@ -71,8 +71,13 @@ download_and_build_cran_package <- function(pack) {
 }
 
 download_and_build_github_package <- function(pack) {
-        pak::pkg_install(pack[2], lib = args[1],
-                dependencies = FALSE, upgrade = FALSE)
+        dir.create("junktemp")
+        pak::pkg_download(pack[2], destdir = "junktemp",
+                dependencies = FALSE, platforms = "source")
+        pkg <- list.files("junktemp")[1]
+        devtools::build(pkg = paste("junktemp", pkg, sep = "/"),
+                        path = args[1], binary = TRUE)
+        unlink("junktemp", recursive = TRUE)
 }
 
 packages_needing_to_be_built <- c("sf")

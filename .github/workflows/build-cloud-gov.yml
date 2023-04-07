@@ -89,6 +89,8 @@ jobs:
         more r-build-deps.txt
         if [ `grep sf r-build-deps.txt | wc -c` -gt 0 ]; then echo needs_geo=true; else echo needs_geo=false; fi >> $GITHUB_ENV
         if [ `grep pandoc r-build-deps.txt | wc -c` -gt 0 ]; then echo needs_pandoc=true; else echo needs_pandoc=false; fi >> $GITHUB_ENV
+      env: 
+        GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Run lib_tar.sh to extract each of the libraries needed by sf
       if: ${{ env.needs_geo == 'true' }}
