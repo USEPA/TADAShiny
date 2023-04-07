@@ -16,6 +16,7 @@ app_server <- function(input, output, session) {
   mod_data_flagging_server("data_flagging_1", tadat)
   mod_summary_server("summary_1", tadat)
   mod_overview_server("overview_1", tadat)
+  mod_censored_data_server("censored_data_1", tadat)
   mod_TADA_summary_server("TADA_summary_1", tadat)
   
   # switch to overview tab when tadat$new changes
