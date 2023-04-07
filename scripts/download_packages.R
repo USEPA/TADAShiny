@@ -1,5 +1,7 @@
 library(stringr)
 
+# Sys.setenv(GITHUB_PAT="${TOKEN}")
+
 args <- commandArgs(trailingOnly = TRUE)
 
 options(repos = "https://packagemanager.rstudio.com/cran/__linux__/jammy/latest")
