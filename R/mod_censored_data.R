@@ -19,6 +19,14 @@ mod_censored_data_ui <- function(id){
           shiny::fluidRow(htmltools::h3("Step 2: Handle Censored Data Using Simple Methods")),
           shiny::fluidRow("Use the drop down menus below to pick a single simple method for handling non-detects and over-detects in the dataset."),
           htmltools::br(),
+          shiny::fluidRow(column(3, selectInput(ns("nd_method"),"Non-Detect Handling Method",choices = c("Multiply detection limit by X","Random number between 0 and detection limit","No change"), multiple = FALSE)),
+                          column(3, shiny::uiOutput(ns("nd_mult"))),
+                          column(3, selectInput(ns("od_method"),"Over-Detect Handling Method",choices = c("Multiply detection limit by X","No change"), selected = "No change", multiple = FALSE)),
+                          column(3, shiny::uiOutput(ns("od_mult")))),
+          shiny::fluidRow(column(4, shiny::actionButton(ns("apply_methods"),"Apply Methods to Dataset",style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))),
+          shiny::fluidRow(htmltools::h3("Optional Step 3: Consider More Complex Censored Data Handling Methods")),
+          shiny::fluidRow("Use the picker list below to select grouping columns to create summary table. The summary table shows the number of non- and over-detects in each group, the total number of results in each group, and the percentage of the dataset that is censored. These numbers are then used to suggest a potential statistical censored data method to use. Currently, the user must perform more complex analyses outside of TADAShiny."),
+          htmltools::br(),
     shiny::fluidRow(shiny::wellPanel(shiny::fluidRow(column(12,shiny::uiOutput(ns("cens_groups")))),
                                      shiny::fluidRow(column(12,shiny::actionButton(ns("cens_sumbutton"),"ID and Summarize Censored Data", style="color: #fff; background-color: #337ab7; border-color: #2e6da4")))),
                     DT::DTOutput(ns("cens_sumtable"), height="400px"))
@@ -75,6 +83,23 @@ mod_censored_data_server <- function(id, tadat){
     
     shiny::observeEvent(input$rem_probcens,{
       tadat$raw$Removed = ifelse(tadat$raw$ResultIdentifier%in%censdat$issues$ResultIdentifier,TRUE,tadat$raw$Removed)
+    })
+    
+    output$nd_mult = shiny::renderUI({
+      if(input$nd_method=="Multiply detection limit by X"){
+        shiny::numericInput(ns("nd_mult"),"Multiplier",value = 0.5, min=0)
+      }
+    })
+    
+    output$od_mult = shiny::renderUI({
+      if(input$od_method=="Multiply detection limit by X"){
+        shiny::numericInput(ns("od_mult"),"Multiplier",value = 1, min=0)
+      }
+    })
+    
+    shiny::observeEvent(input$apply_methods,{
+      
+      
     })
     
     output$cens_groups = shiny::renderUI({
