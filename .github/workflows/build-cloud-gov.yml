@@ -69,7 +69,7 @@ jobs:
 
     - name: Add minimal dependency
       run: |
-        install2.r pak devtools
+        install2.r pak devtools rlist
 
     - name: Setup Git and remove problematic packages
       run: |
@@ -107,14 +107,6 @@ jobs:
         git add r-lib
       env:
         LIBS: libudunits2.so.0 libgeos_c.so libproj.so.22 proj.db libgdal.so.30
-
-    - name: Copy pandoc executable
-      if: ${{ env.needs_pandoc == 'true' }}
-      run: |
-        if [ -d "r-bin" ]; then rm -fr r-bin; fi
-        mkdir r-bin
-        cp /usr/bin/pandoc r-bin
-        git add r-bin
         
     - name: Add additional files to repo if not already there
       run: |
