@@ -65,11 +65,15 @@ download_and_build_cran_package <- function(pack) {
 }
 
 download_and_build_github_package <- function(pack) {
-        orig_wd <- getwd()
-        setwd(args[1])
-        devtools::install_github(pack[2], dependencies = FALSE,
-                build = TRUE, build_opts = c("--binary"))
-        setwd(orig_wd)
+        dir.create("junktemp")
+        setwd("junktemp")
+        system2(command = paste("git clone https://github.com/",
+                pack[2], sep = ""))
+        setwd("..")
+        pkg <- list.files("junktemp")[1]
+        devtools::build(pkg = paste("junktemp", pkg, sep = "/"),
+                        path = args[1], binary = TRUE)
+        unlink("junktemp", recursive = TRUE)
 }
 
 packages_needing_to_be_built <- c("sf")
