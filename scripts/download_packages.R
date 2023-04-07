@@ -43,7 +43,7 @@ github_packages_to_build <- list()
 for (p in intersect(input_packs, gh_pkg_names)) {
         gh_pkg <- github_packages_known_list[gh_pkg_names == p]
         append(github_packages_to_build, gh_pkg)
-        deps <- pak::pkg_deps(gh_pkg[2])
+        deps <- pak::pkg_deps(gh_pkg[[1]][2])
         in_cran <- deps["ref"][deps["type"] == "standard"]
         for (g in deps[deps["type"] == "github", c("package", "ref")]) {
                 append(github_packages_to_build, array(unlist(g)))
