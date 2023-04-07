@@ -1,0 +1,31 @@
+---
+packages:
+  - packages:
+    - name: TADA
+    - name: config
+    - name: golem
+    - name: magrittr
+    - name: htmltools
+    - name: readxl
+    - name: writexl
+    - name: shiny
+    - name: leaflet
+    - name: shinyWidgets
+    - name: shinycssloaders
+    - name: DT
+    - name: ggplot2
+    - name: shinybusy
+    - name: dplyr
+    - name: plyr
+    - name: scales
+    - name: forcats
+    - name: testthat
+    - name: remotes
+    - name: covr
+    - name: rmarkdown
+    - name: knitr
+    - name: spelling
+    - name: sf
+    - name: shinyjs
+    - name: stringr
+    - name: utils
