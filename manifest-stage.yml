@@ -1,0 +1,10 @@
+---
+applications:
+- name: tada-stage
+  memory: 256M
+  disk quota: 1024M
+  routes:
+    - route: tada-stage.app.cloud.gov
+  buildpacks:
+    - r_buildpack
+  command: R -f shiny.R
