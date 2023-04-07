@@ -72,7 +72,7 @@ download_and_build_cran_package <- function(pack) {
 
 download_and_build_github_package <- function(pack) {
         dir.create("junktemp")
-        pak::pkg_download(pack[2], destdir = "junktemp",
+        pak::pkg_download(pack[2], dest_dir = "junktemp",
                 dependencies = FALSE, platforms = "source")
         pkg <- list.files("junktemp")[1]
         devtools::build(pkg = paste("junktemp", pkg, sep = "/"),
