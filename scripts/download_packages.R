@@ -109,3 +109,11 @@ for (p in github_packages_to_build) {
         message(paste("Package", p[1], "must be built from GitHub", sep = " "))
         download_github_package(p)
 }
+
+tools::write_PACKAGES(dir = args[1], fields = NULL,
+  type = c("source"),
+  verbose = FALSE, unpacked = FALSE, subdirs = FALSE,
+  latestOnly = TRUE, addFiles = FALSE, rds_compress = "xz",
+  validate = FALSE)
+
+message("Wrote package description files")
