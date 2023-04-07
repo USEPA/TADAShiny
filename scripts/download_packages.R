@@ -84,14 +84,6 @@ for (p in intersect(packages, packages_needing_to_be_built)) {
         cat(p, file = "r-build-deps.txt", sep = "\n", append = TRUE)
 }
 
-# i <- 1
-# while (i < length(github_packages_to_build)) {
-#         message(paste("Package", github_packages_to_build[i],
-#                 "must be built from GitHub", sep = " "))
-#         download_and_build_github_package(github_packages_to_build[i + 1])
-#         i <- i + 2
-# }
-
 if ("rmarkdown" %in% packages) {
         cat("pandoc", file = "r-build-deps.txt", sep = "\n", append = TRUE)
 }
@@ -113,5 +105,5 @@ download_github_package <- function(pack) {
 
 for (p in github_packages_to_build) {
         message(paste("Package", p[1], "must be built from GitHub", sep = " "))
-        download_and_build_github_package(p)
+        download_github_package(p)
 }
