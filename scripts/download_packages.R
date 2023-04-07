@@ -66,7 +66,7 @@ download_and_build_cran_package <- function(pack) {
 download_and_build_github_package <- function(pack) {
         orig_wd <- getwd()
         setwd(args[1])
-        devtools::install_github("USEPA/TADA", dependencies = FALSE,
+        devtools::install_github(pack[2], dependencies = FALSE,
                 build = TRUE, build_opts = c("--binary"))
         setwd(orig_wd)
 }
@@ -86,7 +86,7 @@ for (p in intersect(packages, packages_needing_to_be_built)) {
 }
 
 for (p in github_packages_to_build) {
-        message(paste("Package", p, "must be built from GitHub", sep = " "))
+        message(paste("Package", p[1], "must be built from GitHub", sep = " "))
         download_and_build_github_package(p)
 }
 
