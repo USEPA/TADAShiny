@@ -1,6 +1,6 @@
 library(stringr)
 
-Sys.setenv(GITHUB_PAT="${TOKEN}")
+Sys.setenv(GITHUB_PAT=Sys.getenv("TOKEN"))
 
 args <- commandArgs(trailingOnly = TRUE)
 
