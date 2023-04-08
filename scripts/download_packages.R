@@ -103,10 +103,10 @@ download_github_package <- function(pack) {
                 print(dl$fulltarget_tree)
                 dir.create("junktemp2")
                 # fulltarget_tree has extension ".tar.gz-t"; removing the "-t"
-                # no_dash_t <- str_sub(dl$fulltarget_tree, start = 1, end = -3)
-                # file.copy(dl$fulltarget_tree, no_dash_t)
+                no_dash_t <- str_sub(dl$fulltarget_tree, start = 1, end = -3)
+                file.copy(dl$fulltarget_tree, no_dash_t)
                 print(Sys.getenv("TAR"))
-                untar(dl$fulltarget_tree, exdir = "junktemp2", list = TRUE)
+                untar(no_dash_t, exdir = "junktemp2", list = TRUE)
                 devtools::build(pkg = "junktemp2",
                         path = args[1], binary = TRUE)
                 unlink("junktemp2", recursive = TRUE)
