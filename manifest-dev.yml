@@ -2,7 +2,7 @@
 applications:
 - name: tada-dev
   memory: 512M
-  disk quota: 1024M
+  disk_quota: 2G
   routes:
     - route: tada-dev.app.cloud.gov
   buildpacks:

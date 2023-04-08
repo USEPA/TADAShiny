@@ -1,10 +1,10 @@
 ---
 applications:
-- name: tada
+- name: tada-sandbox
   memory: 512M
   disk_quota: 2G
   routes:
-    - route: tada.app.cloud.gov
+    - route: tada-sandbox.app.cloud.gov
   buildpacks:
     - r_buildpack
   command: R -f shiny.R

@@ -2,7 +2,7 @@
 applications:
 - name: tada-stage
   memory: 256M
-  disk quota: 1024M
+  disk_quota: 2G
   routes:
     - route: tada-stage.app.cloud.gov
   buildpacks:

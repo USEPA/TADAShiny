@@ -1,6 +1,6 @@
 library(stringr)
 pak::pkg_install("rlist")
-pak::pkg_install("USEPA/TADA")
+
 args <- commandArgs(trailingOnly = TRUE)
 
 options(repos = 
@@ -48,6 +48,8 @@ github_packages_to_build <- list()
 for (p in intersect(input_packs, gh_pkg_names)) {
         gh_pkg <- github_packages_known_list[gh_pkg_names == p]
         message(paste("Github package", p, "found", sep = " "))
+        # Install package to also install dependencies:
+        pak::pkg_install(gh_pkg[[1]][2])
         deps <- pak::pkg_deps(gh_pkg[[1]][2])
         in_cran <- deps["ref"][deps["type"] == "standard"]
         gpk <- unlist(deps[deps["type"] == "github", c("package", "ref")])
