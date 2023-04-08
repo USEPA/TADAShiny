@@ -98,7 +98,7 @@ download_github_package <- function(pack) {
         dir.create("junktemp")
         dl <- pak::pkg_download(pack[2], dest_dir = "vendor_r",
                 dependencies = FALSE,
-                platforms = pkgdepends::current_r_platform())
+                platforms = "source")
         if ("fulltarget_tree" %in% names(dl)) {
                 print(dl$fulltarget_tree)
                 dir.create("junktemp2")
