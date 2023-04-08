@@ -96,9 +96,16 @@ download_github_package <- function(pack) {
         dl <- pak::pkg_download(pack[2], dest_dir = "vendor_r",
                 dependencies = FALSE,
                 platforms = pkgdepends::current_r_platform())
-        print(dl$fulltarget_tree)
-        devtools::build(pkg = str_sub(dl$fulltarget_tree, 1, -2),
-                path = args[1], binary = TRUE)
+        if ("fulltarget_tree" %in% names(dl)) {
+                print(dl$fulltarget_tree)
+                dir.create("junktemp2")
+                untar(dl$fulltarget_tree, exdir = "junktemp2", list = TRUE)
+                devtools::build(pkg = "junktemp2",
+                        path = args[1], binary = TRUE)
+                unlink("junktemp2", recursive = TRUE)
+        } else {
+           file.copy(dl$fulltarget, args[1])
+        }
         unlink("junktemp", recursive = TRUE)
 }
 
