@@ -99,7 +99,8 @@ download_github_package <- function(pack) {
         if ("fulltarget_tree" %in% names(dl)) {
                 print(dl$fulltarget_tree)
                 dir.create("junktemp2")
-                no_dash_t <- str_sub(dl$fulltarget_tree, 1, -2)
+                # fulltarget_tree has extension ".tar.gz-t"; the "-t" needs to be removed
+                no_dash_t <- str_sub(dl$fulltarget_tree, start = 1, end = -3)
                 file.copy(dl$fulltarget_tree, no_dash_t)
                 untar(no_dash_t, exdir = "junktemp2", list = TRUE)
                 devtools::build(pkg = "junktemp2",
