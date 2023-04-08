@@ -101,19 +101,19 @@ download_github_package <- function(pack) {
                 platforms = "source")
         if ("fulltarget_tree" %in% names(dl)) {
                 print(dl$fulltarget_tree)
-                dir.create("junktemp2")
+                # dir.create("junktemp2")
                 # fulltarget_tree has extension ".tar.gz-t"; switch to ".zip"
                 no_exten <- str_sub(dl$fulltarget_tree, start = 1, end = -10)
                 print(no_exten)
-                as_zip <- paste(no_exten, ".zip", sep = "")
-                print(as_zip)
-                file.rename(dl$fulltarget_tree, as_zip)
-                unzip(as_zip, exdir = "junktemp/src/contrib")
-                list.files(path = "junktemp/src/contrib")
-                # untar(tarfile = no_dash_t, exdir = "junktemp2", list = TRUE)
+                # as_zip <- paste(no_exten, ".zip", sep = "")
+                # print(as_zip)
+                # file.rename(dl$fulltarget_tree, as_zip)
+                # unzip(as_zip, exdir = "junktemp/src/contrib")
+                # list.files(path = "junktemp/src/contrib")
+                untar(dl$fulltarget_tree, exdir = "junktemp/src/contrib")
                 devtools::build(pkg = no_exten,
                         path = args[1], binary = TRUE)
-                unlink("junktemp2", recursive = TRUE)
+                # unlink("junktemp2", recursive = TRUE)
         } else {
                 file.copy(dl$fulltarget, args[1])
         }
