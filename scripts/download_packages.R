@@ -96,7 +96,7 @@ message("Completed downloading packages")
 
 download_github_package <- function(pack) {
         dir.create("junktemp")
-        dl <- pak::pkg_download(pack[2], dest_dir = "vendor_r",
+        dl <- pak::pkg_download(pack[2], dest_dir = "junktemp",
                 dependencies = FALSE,
                 platforms = "source")
         if ("fulltarget_tree" %in% names(dl)) {
