@@ -1,5 +1,5 @@
 library(stringr)
-
+install.packages("rlist")
 args <- commandArgs(trailingOnly = TRUE)
 
 options(repos = 
@@ -106,8 +106,7 @@ download_github_package <- function(pack) {
                 # no_dash_t <- str_sub(dl$fulltarget_tree, start = 1, end = -3)
                 # file.copy(dl$fulltarget_tree, no_dash_t)
                 print(Sys.getenv("TAR"))
-                untar(dl$fulltarget_tree, exdir = "junktemp2", list = TRUE,
-                        tar = "/usr/bin/tar")
+                untar(dl$fulltarget_tree, exdir = "junktemp2", list = TRUE)
                 devtools::build(pkg = "junktemp2",
                         path = args[1], binary = TRUE)
                 unlink("junktemp2", recursive = TRUE)
