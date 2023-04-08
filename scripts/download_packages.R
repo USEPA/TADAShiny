@@ -97,7 +97,7 @@ download_github_package <- function(pack) {
                 dependencies = FALSE,
                 platforms = pkgdepends::current_r_platform())
         print(dl$fulltarget_tree)
-        devtools::build(pkg = dl$fulltarget_tree,
+        devtools::build(pkg = str_sub(dl$fulltarget_tree, 1, -2),
                 path = args[1], binary = TRUE)
         unlink("junktemp", recursive = TRUE)
 }
