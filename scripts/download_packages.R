@@ -108,7 +108,7 @@ download_github_package <- function(pack) {
                 as_zip <- paste(no_exten, ".zip", sep = "")
                 print(as_zip)
                 file.rename(dl$fulltarget_tree, as_zip)
-                unzip(as_zip)
+                unzip(as_zip, exdir = "junktemp/src/contrib")
                 list.files(path = "junktemp/src/contrib")
                 # untar(tarfile = no_dash_t, exdir = "junktemp2", list = TRUE)
                 devtools::build(pkg = no_exten,
