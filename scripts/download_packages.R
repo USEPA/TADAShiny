@@ -2,11 +2,13 @@ library(stringr)
 
 args <- commandArgs(trailingOnly = TRUE)
 
-options(repos = "https://packagemanager.rstudio.com/cran/__linux__/jammy/latest")
+options(repos = 
+        "https://packagemanager.rstudio.com/cran/__linux__/jammy/latest")
 
 # Test if a package destination directory was passed as an argument
 if (length(args) == 0) {
-  stop("Usage: R -f download_packages.R destination_directory package1,package2,package3", call. = FALSE)
+        stop("Usage: R -f download_packages.R destination_directory 
+        package1,package2,package3", call. = FALSE)
 }
 
 # Create the directory
@@ -37,7 +39,8 @@ get_packages <- function(packs) {
         packages
 }
 
-# Install any GitHub packages which are not available in Posit Public Package Manager but some of their dependencies may be
+# Install any GitHub packages which are not available in
+# Posit Public Package Manager but some of their dependencies may be
 github_packages_known_list <- list(c("TADA", "USEPA/TADA"))
 gh_pkg_names <- sapply(github_packages_known_list, "[[", 1)
 github_packages_to_build <- list()
@@ -99,11 +102,11 @@ download_github_package <- function(pack) {
         if ("fulltarget_tree" %in% names(dl)) {
                 print(dl$fulltarget_tree)
                 dir.create("junktemp2")
-                # fulltarget_tree has extension ".tar.gz-t"; the "-t" needs to be removed
+                # fulltarget_tree has extension ".tar.gz-t"; removing the "-t"
                 no_dash_t <- str_sub(dl$fulltarget_tree, start = 1, end = -3)
                 file.copy(dl$fulltarget_tree, no_dash_t)
-                untar(no_dash_t, exdir = "junktemp2", list = TRUE)
-                devtools::build(pkg = "junktemp2",
+                # untar(no_dash_t, exdir = "junktemp2", list = TRUE)
+                devtools::build(pkg = no_dash_t,
                         path = args[1], binary = TRUE)
                 unlink("junktemp2", recursive = TRUE)
         } else {
