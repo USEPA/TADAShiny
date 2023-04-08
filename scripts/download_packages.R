@@ -99,12 +99,14 @@ download_github_package <- function(pack) {
         if ("fulltarget_tree" %in% names(dl)) {
                 print(dl$fulltarget_tree)
                 dir.create("junktemp2")
-                untar(dl$fulltarget_tree, exdir = "junktemp2", list = TRUE)
+                no_dash_t <- str_sub(dl$fulltarget_tree, 1, -2)
+                file.copy(dl$fulltarget_tree, no_dash_t)
+                untar(no_dash_t, exdir = "junktemp2", list = TRUE)
                 devtools::build(pkg = "junktemp2",
                         path = args[1], binary = TRUE)
                 unlink("junktemp2", recursive = TRUE)
         } else {
-           file.copy(dl$fulltarget, args[1])
+                file.copy(dl$fulltarget, args[1])
         }
         unlink("junktemp", recursive = TRUE)
 }
@@ -115,9 +117,9 @@ for (p in github_packages_to_build) {
 }
 
 tools::write_PACKAGES(dir = args[1], fields = NULL,
-  type = c("source"),
-  verbose = FALSE, unpacked = FALSE, subdirs = FALSE,
-  latestOnly = TRUE, addFiles = FALSE, rds_compress = "xz",
-  validate = FALSE)
+        type = c("source"),
+        verbose = FALSE, unpacked = FALSE, subdirs = FALSE,
+        latestOnly = TRUE, addFiles = FALSE, rds_compress = "xz",
+        validate = FALSE)
 
 message("Wrote package description files")
