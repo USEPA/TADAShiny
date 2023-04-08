@@ -1,5 +1,6 @@
 library(stringr)
-install.packages("rlist")
+pak::pkg_install("rlist")
+pak::pkg_install("USEPA/TADA")
 args <- commandArgs(trailingOnly = TRUE)
 
 options(repos = 
@@ -102,13 +103,6 @@ download_github_package <- function(pack) {
         if ("fulltarget_tree" %in% names(dl)) {
                 print(dl$fulltarget_tree)
                 dir.create("junktemp2")
-                # fulltarget_tree has extension ".tar.gz-t"; switch to ".zip"
-                # no_exten <- str_sub(dl$fulltarget_tree, start = 1, end = -10)
-                # print(no_exten)
-                # as_zip <- paste(no_exten, ".zip", sep = "")
-                # print(as_zip)
-                # file.rename(dl$fulltarget_tree, as_zip)
-                # unzip(as_zip, exdir = "junktemp/src/contrib")
                 unzip(dl$fulltarget_tree, exdir = "junktemp2")
                 f <- list.files(path = "junktemp2")
                 print(f)
