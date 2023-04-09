@@ -139,10 +139,10 @@ jobs:
         if ls manifest*.yml >/dev/null 2>&1; then
           echo "Already has a manifest!!!"
         fi
-        if [ ! ls hello*.yml >/dev/null 2>&1 ]; then
+        if ! ls hello*.yml >/dev/null 2>&1; then
           echo "This should print!!!"
         fi
-        if [ ! ls manifest*.yml >/dev/null 2>&1 ]; then
+        if ! ls manifest*.yml >/dev/null 2>&1; then
           mv scripts/include/manifest.yml .
           git add manifest.yml
         fi
