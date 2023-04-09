@@ -76,7 +76,7 @@ download_and_build_package <- function(pack) {
     print(paste("Fulltarget is", dl$fulltarget, sep = " "))
     print(paste("Fulltarget_tree is", dl$fulltarget_tree, sep = " "))
     if (file.exists(dl$fulltarget)) {
-        file.copy(dl$fulltarget, args[1])
+        devtools::build(dl$fulltarget, path = args[1], binary = TRUE)
     } else {
         print(dl$fulltarget_tree)
         dir.create("junktemp2")
