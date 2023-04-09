@@ -67,22 +67,17 @@ message(paste("Github packages needed are:",
     packages["ref"][packages["type"] == "github"], sep = " "))
 
 download_and_build_package <- function(pack) {
+    print(paste("Pack is", pack, sep = " "))
     dir.create("junktemp")
     dl <- pak::pkg_download(pack, dest_dir = "junktemp",
         dependencies = FALSE,
         platforms = "source")
     if ("fulltarget_tree" %in% names(dl)) {
         print(dl$fulltarget_tree)
+        print(list.files("junktemp/src/contrib"))
         dir.create("junktemp2")
-        untar(dl$fulltarget_tree, exdir = "junktemp2")
-        # tryCatch(
-        #     {
-        #         untar(dl$fulltarget_tree, exdir = "junktemp2")
-        #     },
-        #     error = {
-        #         unzip(dl$fulltarget_tree, exdir = "junktemp2")
-        #     }
-        # )
+        try(untar(dl$fulltarget_tree, exdir = "junktemp2"))
+        try(unzip(dl$fulltarget_tree, exdir = "junktemp2"))
         f <- list.files(path = "junktemp2")
         print(f)
         devtools::build(pkg = paste("junktemp2", f[1], sep = "/"),
