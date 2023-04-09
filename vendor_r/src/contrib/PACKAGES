@@ -1,3 +1,9 @@
+Package: BH
+Version: 1.81.0-1
+License: BSL-1.0
+MD5sum: 2bd842a58f4a2260cc9b1131d54d4903
+NeedsCompilation: no
+
 Package: DBI
 Version: 1.1.3
 Depends: methods, R (>= 3.0.0)
@@ -17,15 +23,6 @@ Suggests: knitr (>= 1.8), rmarkdown, shiny (>= 1.6), bslib, future,
 License: GPL-3 | file LICENSE
 MD5sum: 2708b681c02afc7c277187839605fcfe
 NeedsCompilation: no
-
-Package: KernSmooth
-Version: 2.23-20
-Priority: recommended
-Depends: R (>= 2.5.0), stats
-Suggests: MASS, carData
-License: Unlimited
-MD5sum: fe3e73b6f37591d7e704a468beba8b6a
-NeedsCompilation: yes
 
 Package: MASS
 Version: 7.3-58.3
@@ -81,7 +78,7 @@ Imports: plyr, data.table, dplyr, grDevices, magrittr, stringr, utils,
 Suggests: readr, tidyverse, knitr, testthat, testthis, usethis,
         devtools, pkgdown, Rcpp, spelling
 License: CC0
-MD5sum: 24a6eb82a63d53ae897c56b50c4425da
+MD5sum: 97bcafbbf89fbba8b9609dc3e505de84
 NeedsCompilation: no
 
 Package: anytime
@@ -1062,25 +1059,6 @@ Suggests: bit64, covr, dichromat, ggplot2, hms (>= 0.5.0), stringi,
 License: MIT + file LICENSE
 MD5sum: 651702b055ef6479ebf4676f7124b285
 NeedsCompilation: no
-
-Package: sf
-Version: 1.0-12
-Depends: methods, R (>= 3.3.0)
-Imports: classInt (>= 0.4-1), DBI (>= 0.8), graphics, grDevices, grid,
-        magrittr, Rcpp (>= 0.12.18), s2 (>= 1.1.0), stats, tools, units
-        (>= 0.7-0), utils
-LinkingTo: Rcpp
-Suggests: blob, covr, dplyr (>= 0.8-3), ggplot2, knitr, lwgeom (>=
-        0.2-1), maps, mapview, Matrix, microbenchmark, odbc, pbapply,
-        pillar, pool, raster, rlang, rmarkdown, RPostgres (>= 1.1.0),
-        RPostgreSQL, RSQLite, sp (>= 1.2-4), spatstat (>= 2.0-1),
-        spatstat.geom, spatstat.random, spatstat.linnet,
-        spatstat.utils, stars (>= 0.2-0), terra, testthat (>= 3.0.0),
-        tibble (>= 1.4.1), tidyr (>= 1.2.0), tidyselect (>= 1.0.0),
-        tmap (>= 2.0), vctrs, wk
-License: GPL-2 | MIT + file LICENSE
-MD5sum: ccf2bc6e5bcd9f4366d5a1235d9d36ca
-NeedsCompilation: yes
 
 Package: shinyWidgets
 Version: 0.7.6
