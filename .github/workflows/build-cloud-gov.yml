@@ -89,6 +89,7 @@ jobs:
       with:
         packages: |
           stringr
+          devtools
           rlist
           sf
 
@@ -100,19 +101,19 @@ jobs:
       run: |
         if [ -d "vendor_r" ]; then rm -fr vendor_r; fi
         Rscript scripts/download_packages.R vendor_r/src/contrib ${{ env.packs }}
-        if [ ls "vendor_r/src/contrib/sf_*.tar.gz" 1> /dev/null 2>&1 ]; then echo needs_geo=true; else echo needs_geo=false; fi >> $GITHUB_ENV
-        if [ ls "vendor_r/src/contrib/rmarkdown_*.tar.gz" 1> /dev/null 2>&1 ]; then echo needs_pandoc=true; else echo needs_pandoc=false; fi >> $GITHUB_ENV
-        if [ ls "vendor_r/src/contrib/*_R_x86_64-pc-linux-gnu.tar.gz" 1> /dev/null 2>&1 ]; then
+        cd vendor_r/src/contrib
+        if [ ls "sf_*" 1> /dev/null 2>&1 ]; then echo needs_geo=true; else echo needs_geo=false; fi >> $GITHUB_ENV
+        if [ ls "rmarkdown_*" 1> /dev/null 2>&1 ]; then echo needs_pandoc=true; else echo needs_pandoc=false; fi >> $GITHUB_ENV
+        if [ ls "*_R_x86_64-pc-linux-gnu.tar.gz" 1> /dev/null 2>&1 ]; then
           find -name '*_R_x86_64-pc-linux-gnu.tar.gz' -print0 | sed -ze "p;s/\_R_x86_64-pc-linux-gnu//" | xargs -0 -n2 mv;
         fi
+        cd ../../..
       env: 
         GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Run lib_tar.sh to extract each of the libraries needed by sf
       if: ${{ env.needs_geo == 'true' }}
       run: |
-        cd vendor_r/src/contrib
-        cd ../../..
         if [ -d "r-lib" ]; then rm -fr r-lib; fi
         mkdir r-lib
         chmod +x scripts/lib_tar.sh

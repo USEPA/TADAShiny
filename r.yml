@@ -1,7 +1,7 @@
 ---
 packages:
   - packages:
-    - name: USEPA/TADA
+    - name: TADA
     - name: config
     - name: golem
     - name: magrittr
