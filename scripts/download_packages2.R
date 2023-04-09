@@ -72,9 +72,10 @@ download_and_build_package <- function(pack) {
     dl <- pak::pkg_download(pack, dest_dir = "junktemp",
         dependencies = FALSE,
         platforms = "source")
-    if ("fulltarget_tree" %in% names(dl)) {
+    if (file.exists(dl$fulltarget)) {
+        file.copy(dl$fulltarget, args[1])
+    } else {
         print(dl$fulltarget_tree)
-        print(list.files("junktemp/src/contrib"))
         dir.create("junktemp2")
         try(untar(dl$fulltarget_tree, exdir = "junktemp2"))
         try(unzip(dl$fulltarget_tree, exdir = "junktemp2"))
@@ -83,8 +84,6 @@ download_and_build_package <- function(pack) {
         devtools::build(pkg = paste("junktemp2", f[1], sep = "/"),
             path = args[1], binary = TRUE)
         unlink("junktemp2", recursive = TRUE)
-    } else {
-        file.copy(dl$fulltarget, args[1])
     }
     unlink("junktemp", recursive = TRUE)
 }
