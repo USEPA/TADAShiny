@@ -2,19 +2,19 @@ library(stringr)
 
 args <- commandArgs(trailingOnly = TRUE)
 
-options(repos = 
-        "https://packagemanager.rstudio.com/cran/__linux__/jammy/latest")
+options(repos =
+    "https://packagemanager.rstudio.com/cran/__linux__/jammy/latest")
 
 # Test if a package destination directory was passed as an argument
 if (length(args) == 0) {
-        stop("Usage: R -f download_packages.R destination_directory 
-        package1,package2,package3", call. = FALSE)
+    stop("Usage: R -f download_packages.R destination_directory 
+    package1,package2,package3", call. = FALSE)
 }
 
 # Create the directory
 if (!dir.exists(args[1])) {
-        message("Creating the directory")
-        dir.create(args[1], recursive = TRUE)
+    message("Creating the directory")
+    dir.create(args[1], recursive = TRUE)
 }
 
 # Split the packages into a character list
@@ -23,7 +23,7 @@ input_packs <- unlist(str_split(args[2], ","))
 message(paste(input_packs), sep = " ")
 
 plfrm <- paste(getRversion(), R.version["platform"],
-        R.version["arch"], R.version["os"])
+    R.version["arch"], R.version["os"])
 
 options(HTTPUserAgent = sprintf("R/%s R (%s)", getRversion(), plfrm))
 
@@ -35,20 +35,22 @@ packages_needing_to_be_built <- c("sf")
 
 # Get packages deps function to get the packages and dependencies
 get_package_deps <- function(packs, github, to_build_cran) {
-        refs <- packs
-        message("Replacing names for items that should be pulled from GitHub")
-        for (p in github) {
-                if (p[1] %in% refs){
-                        refs[match(p[1], refs)] <- p[2]
-                }
+    refs <- packs
+    message("Replacing names for items that should be pulled from GitHub")
+    for (p in github) {
+        if (p[1] %in% refs){
+            full_ref <- p[2]
+            refs[match(p[1], refs)] <- full_ref
+            pak::pkg_install(full_ref)
         }
-        message("Getting the package dependencies")
-        deps <- pak::pkg_deps(refs)
-        deps["cran_build"] <- c(FALSE, TRUE)[mapply(`%in%`, deps["package"],
-            to_build_cran) + 1]
-        deps["require_build"] <- deps["type"] == "github" |
-            deps["cran_build"] == TRUE
-        deps
+    }
+    message("Getting the package dependencies")
+    deps <- pak::pkg_deps(refs)
+    deps["cran_build"] <- c(FALSE, TRUE)[mapply(`%in%`, deps["package"],
+        to_build_cran) + 1]
+    deps["require_build"] <- deps["type"] == "github" |
+        deps["cran_build"] == TRUE
+    deps
 }
 
 # Get the package dependencies
@@ -57,51 +59,51 @@ packages <- get_package_deps(input_packs, github_packages_list,
 
 # Download the packages from the Posit repository
 message(paste("Downloading the packages and dependencies to",
-        args[1], sep = " "))
+    args[1], sep = " "))
 download.packages(packages["ref"][packages["require_build"] == FALSE],
-        destdir = args[1])
+    destdir = args[1])
 
 message(paste("Github packages needed are:",
-        packages["ref"][packages["type"] == "github"], sep = " "))
+    packages["ref"][packages["type"] == "github"], sep = " "))
 
 download_and_build_package <- function(pack) {
-        dir.create("junktemp")
-        dl <- pak::pkg_download(pack[2], dest_dir = "junktemp",
-                dependencies = FALSE,
-                platforms = "source")
-        if ("fulltarget_tree" %in% names(dl)) {
-                print(dl$fulltarget_tree)
-                dir.create("junktemp2")
-                tryCatch(
-                        {
-                                untar(dl$fulltarget_tree, exdir = "junktemp2")
-                        },
-                        error = {
-                                unzip(dl$fulltarget_tree, exdir = "junktemp2")
-                        }
-                )
-                f <- list.files(path = "junktemp2")
-                print(f)
-                devtools::build(pkg = paste("junktemp2", f[1], sep = "/"),
-                        path = args[1], binary = TRUE)
-                unlink("junktemp2", recursive = TRUE)
-        } else {
-                file.copy(dl$fulltarget, args[1])
-        }
-        unlink("junktemp", recursive = TRUE)
+    dir.create("junktemp")
+    dl <- pak::pkg_download(pack, dest_dir = "junktemp",
+        dependencies = FALSE,
+        platforms = "source")
+    if ("fulltarget_tree" %in% names(dl)) {
+        print(dl$fulltarget_tree)
+        dir.create("junktemp2")
+        tryCatch(
+            {
+                untar(dl$fulltarget_tree, exdir = "junktemp2")
+            },
+            error = {
+                unzip(dl$fulltarget_tree, exdir = "junktemp2")
+            }
+        )
+        f <- list.files(path = "junktemp2")
+        print(f)
+        devtools::build(pkg = paste("junktemp2", f[1], sep = "/"),
+            path = args[1], binary = TRUE)
+        unlink("junktemp2", recursive = TRUE)
+    } else {
+        file.copy(dl$fulltarget, args[1])
+    }
+    unlink("junktemp", recursive = TRUE)
 }
 
 for (p in packages["ref"][packages["require_build"] == TRUE]) {
-        message(paste("Package", p, "must be built", sep = " "))
-        download_and_build_package(p)
+    message(paste("Package", p, "must be built", sep = " "))
+    download_and_build_package(p)
 }
 
 message("Completed downloading packages")
 
 tools::write_PACKAGES(dir = args[1], fields = NULL,
-        type = c("source"),
-        verbose = FALSE, unpacked = FALSE, subdirs = FALSE,
-        latestOnly = TRUE, addFiles = FALSE, rds_compress = "xz",
-        validate = FALSE)
+    type = c("source"),
+    verbose = FALSE, unpacked = FALSE, subdirs = FALSE,
+    latestOnly = TRUE, addFiles = FALSE, rds_compress = "xz",
+    validate = FALSE)
 
 message("Wrote package description files")
