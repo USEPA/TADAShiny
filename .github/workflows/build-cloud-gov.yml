@@ -100,7 +100,7 @@ jobs:
     - name: Download R packages
       run: |
         if [ -d "vendor_r" ]; then rm -fr vendor_r; fi
-        Rscript scripts/download_packages.R vendor_r/src/contrib ${{ env.packs }}
+        Rscript scripts/download_packages2.R vendor_r/src/contrib ${{ env.packs }}
         cd vendor_r/src/contrib
         if ls sf_* >/dev/null 2>&1; then echo needs_geo=true; else echo needs_geo=false; fi >> $GITHUB_ENV
         if ls rmarkdown_* >/dev/null 2>&1; then echo needs_pandoc=true; else echo needs_pandoc=false; fi >> $GITHUB_ENV
