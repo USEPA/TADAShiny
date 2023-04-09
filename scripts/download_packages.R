@@ -42,6 +42,7 @@ get_packages <- function(packs) {
 # Install any GitHub packages which are not available in
 # Posit Public Package Manager but some of their dependencies may be
 github_packages_known_list <- list(c("TADA", "USEPA/TADA"))
+
 gh_pkg_names <- sapply(github_packages_known_list, "[[", 1)
 github_packages_to_build <- list()
 for (p in intersect(input_packs, gh_pkg_names)) {
