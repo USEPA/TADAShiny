@@ -72,6 +72,11 @@ download_and_build_package <- function(pack) {
     dl <- pak::pkg_download(pack, dest_dir = "junktemp",
         dependencies = FALSE,
         platforms = "source")
+    print(paste("Fulltarget is", dl$fulltarget, sep = " "))
+    print(paste("Fulltarget_tree is", dl$fulltarget_tree, sep = " "))
+    if (length(dl$fulltarget) > 1) {
+        dl$fulltarget <- dl$fulltarget[1]
+    }
     if (file.exists(dl$fulltarget)) {
         file.copy(dl$fulltarget, args[1])
     } else {
