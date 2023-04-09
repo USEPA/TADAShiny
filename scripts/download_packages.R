@@ -13,4 +13,21 @@ input_packs <- unlist(str_split(args[2], ","))
 
 message(paste(input_packs), sep = " ")
 
-pak::pkg_install(input_packs, lib = args[1])
+deps <- pak::pkg_deps(input_packs)
+
+for (row in 1:nrow(deps)) {
+        dl <- pak::pkg_download(deps[row, "ref"], dest_dir = args[1],
+                dependencies = FALSE)
+        if ("fulltarget_tree" %in% names(dl)) {
+                # Indicates package needs to be built
+                print(dl$fulltarget_tree)
+                dir.create("junktemp")
+                unzip(dl$fulltarget_tree, exdir = "junktemp")
+                f <- list.files(path = "junktemp")
+                print(f)
+                devtools::build(pkg = paste("junktemp", f[1], sep = "/"),
+                        path = args[1], binary = TRUE)
+                unlink("junktemp", recursive = TRUE)
+                file.remove(dl$fulltarget_tree)
+        }
+}
