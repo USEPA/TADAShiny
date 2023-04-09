@@ -1,0 +1,23 @@
+Package: labeling
+Type: Package
+Title: Axis Labeling
+Version: 0.4.2
+Date: 2020-10-15
+Author: Justin Talbot,
+Maintainer: Nuno Sempere <nuno.semperelh@gmail.com>
+Description: Functions which provide a range of axis labeling algorithms. 
+License: MIT + file LICENSE | Unlimited
+Collate: 'labeling.R'
+NeedsCompilation: no
+Imports: stats, graphics
+Packaged: 2020-10-18 12:56:46 UTC; nuno
+Repository: RSPM
+Date/Publication: 2020-10-20 07:00:09 UTC
+Encoding: UTF-8
+Built: R 4.2.0; ; 2022-05-06 22:43:40 UTC; unix
+RemoteType: standard
+RemotePkgRef: labeling
+RemoteRef: labeling
+RemoteRepos: https://packagemanager.posit.co/cran/__linux__/jammy/latest
+RemotePkgPlatform: source
+RemoteSha: 0.4.2

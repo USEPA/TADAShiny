@@ -1,0 +1,59 @@
+Package: golem
+Title: A Framework for Robust Shiny Applications
+Version: 0.4.0
+Authors@R: c(
+    person("Colin", "Fay", , "contact@colinfay.me", role = c("cre", "aut"),
+           comment = c(ORCID = "0000-0001-7343-1846")),
+    person("Vincent", "Guyader", , "vincent@thinkr.fr", role = "aut",
+           comment = c(ORCID = "0000-0003-0671-9270", "previous maintainer")),
+    person("Sébastien", "Rochette", , "sebastien@thinkr.fr", role = "aut",
+           comment = c(ORCID = "0000-0002-1565-9313")),
+    person("Cervan", "Girard", , "cervan@thinkr.fr", role = "aut",
+           comment = c(ORCID = "0000-0002-4816-4624")),
+    person("Novica", "Nakov", , "nnovica@gmail.com", role = "ctb"),
+    person("David", "Granjon", , "dgranjon@ymail.com", role = "ctb"),
+    person("Arthur", "Bréant", , "arthur@thinkr.fr", role = "ctb"),
+    person("Antoine", "Languillaume", , "antoine@thinkr.fr", role = "ctb"),
+    person("ThinkR", role = "cph")
+  )
+Description: An opinionated framework for building a production-ready
+    'Shiny' application. This package contains a series of tools for
+    building a robust 'Shiny' application from start to finish.
+License: MIT + file LICENSE
+URL: https://github.com/ThinkR-open/golem
+BugReports: https://github.com/ThinkR-open/golem/issues
+Depends: R (>= 3.0)
+Imports: attempt (>= 0.3.0), config, here, htmltools, rlang (>= 1.0.0),
+        shiny (>= 1.5.0), utils, yaml
+Suggests: covr, cli (>= 2.0.0), crayon, devtools, dockerfiler (>=
+        0.2.0), knitr, pkgload, pkgbuild, pkgdown, processx, purrr,
+        rcmdcheck, roxygen2, rmarkdown, rsconnect, spelling, stringr,
+        testthat, tools, withr, attachment (>= 0.2.5), renv, usethis
+        (>= 1.6.0), fs, rstudioapi, desc
+VignetteBuilder: knitr
+Config/testthat/edition: 3
+Encoding: UTF-8
+Language: en-US
+RoxygenNote: 7.2.3
+NeedsCompilation: no
+Packaged: 2023-03-10 13:02:12 UTC; colinfay
+Author: Colin Fay [cre, aut] (<https://orcid.org/0000-0001-7343-1846>),
+  Vincent Guyader [aut] (<https://orcid.org/0000-0003-0671-9270>,
+    previous maintainer),
+  Sébastien Rochette [aut] (<https://orcid.org/0000-0002-1565-9313>),
+  Cervan Girard [aut] (<https://orcid.org/0000-0002-4816-4624>),
+  Novica Nakov [ctb],
+  David Granjon [ctb],
+  Arthur Bréant [ctb],
+  Antoine Languillaume [ctb],
+  ThinkR [cph]
+Maintainer: Colin Fay <contact@colinfay.me>
+Repository: RSPM
+Date/Publication: 2023-03-12 10:20:18 UTC
+Built: R 4.2.0; ; 2023-03-13 11:28:53 UTC; unix
+RemoteType: standard
+RemotePkgRef: golem
+RemoteRef: golem
+RemoteRepos: https://packagemanager.posit.co/cran/__linux__/jammy/latest
+RemotePkgPlatform: source
+RemoteSha: 0.4.0

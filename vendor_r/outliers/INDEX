@@ -1,0 +1,16 @@
+chisq.out.test          Chi-squared test for outlier
+cochran.test            Test for outlying or inlying variance
+dixon.test              Dixon tests for outlier
+grubbs.test             Grubbs tests for one or two outliers in data
+                        sample
+outlier                 Find value with largest difference from the
+                        mean
+qcochran                Critical values and p-values for Cochran
+                        outlying variance test
+qdixon                  critical values and p-values for Dixon tests
+qgrubbs                 Calculate critical values and p-values for
+                        Grubbs tests
+qtable                  Interpolate tabularized distribution
+rm.outlier              Remove the value(s) most differing from the
+                        mean
+scores                  Calculate scores of the sample

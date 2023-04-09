@@ -1,0 +1,32 @@
+Package: shinybusy
+Title: Busy Indicators and Notifications for 'Shiny' Applications
+Version: 0.3.1
+Authors@R: c(person("Fanny", "Meyer", role = "aut"),
+  person("Victor", "Perrier", email = "victor.perrier@dreamrs.fr", role = c("aut", "cre")),
+  person("Silex Technologies", comment = "https://www.silex-ip.com", role = "fnd"))
+Description: Add indicators (spinner, progress bar, gif) in your 'shiny'
+  applications to show the user that the server is busy. And other tools to let
+  your users know something is happening (send notifications, reports, ...).
+License: GPL-3
+Encoding: UTF-8
+Imports: htmltools, shiny, jsonlite, htmlwidgets
+RoxygenNote: 7.1.2
+URL: https://github.com/dreamRs/shinybusy
+BugReports: https://github.com/dreamRs/shinybusy/issues
+Suggests: testthat, covr, knitr, rmarkdown
+VignetteBuilder: knitr
+NeedsCompilation: no
+Packaged: 2022-05-10 15:15:17 UTC; perri
+Author: Fanny Meyer [aut],
+  Victor Perrier [aut, cre],
+  Silex Technologies [fnd] (https://www.silex-ip.com)
+Maintainer: Victor Perrier <victor.perrier@dreamrs.fr>
+Repository: RSPM
+Date/Publication: 2022-05-10 16:00:02 UTC
+Built: R 4.2.0; ; 2022-06-06 21:02:55 UTC; unix
+RemoteType: standard
+RemotePkgRef: shinybusy
+RemoteRef: shinybusy
+RemoteRepos: https://packagemanager.posit.co/cran/__linux__/jammy/latest
+RemotePkgPlatform: source
+RemoteSha: 0.3.1

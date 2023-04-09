@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<title>Demos of <code>knit_expand()</code></title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.6.0/build/styles/github.min.css">
+<script src="https://cdn.jsdelivr.net/combine/gh/highlightjs/cdn-release@11.6.0/build/highlight.min.js,npm/@xiee/utils/js/load-highlight.js" async></script>
+
+
+
+<style type="text/css">
+body, td {
+  font-family: sans-serif;
+  background-color: white;
+  font-size: 13px;
+}
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+tt, code, pre {
+  font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+a:visited { color: #80007f; }
+pre, img { max-width: 100%; }
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+code[class] { background-color: #F8F8F8; }
+code.language-undefined { background-color: inherit; }
+table {
+  margin: auto;
+  border-top: 1px solid #666;
+  border-bottom: 1px solid #666;
+}
+table thead th { border-bottom: 1px solid #ddd; }
+th, td { padding: 5px; }
+thead, tfoot, tr:nth-child(even) { background: #eee; }
+blockquote {
+  color:#666;
+  margin:0;
+  padding-left: 1em;
+  border-left: 0.5em #eee solid;
+}
+hr { border: 1px #ddd dashed; }
+.frontmatter { text-align: center; }
+
+@media print {
+  * {
+    background: transparent !important;
+    color: black !important;
+    filter:none !important;
+  }
+  body {
+    font-size: 12pt;
+    max-width: 100%;
+  }
+  a, a:visited { text-decoration: underline; }
+  hr {
+    visibility: hidden;
+    page-break-before: always;
+  }
+  pre, blockquote {
+    padding-right: 1em;
+    page-break-inside: avoid;
+  }
+  tr, img { page-break-inside: avoid; }
+  img { max-width: 100% !important; }
+  @page :left { margin: 15mm 20mm 15mm 10mm; }
+  @page :right { margin: 15mm 10mm 15mm 20mm; }
+  p, h2, h3 { orphans: 3; widows: 3; }
+  h2, h3 { page-break-after: avoid; }
+}
+</style>
+
+
+</head>
+
+<body>
+<div class="include-before">
+
+</div>
+
+<div class="frontmatter">
+<div class="title"><h1>Demos of <code>knit_expand()</code></h1></div>
+<div class="author"><h2></h2></div>
+<div class="date"><h3></h3></div>
+</div>
+
+<div class="body">
+<!--
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{Templating with knit_expand()}
+-->
+<h1>Demos of <code>knit_expand()</code></h1>
+<p>A few simple examples:</p>
+<pre><code class="language-r">library(knitr)
+knit_expand(text = 'The value of pi is {{pi}}.')
+</code></pre>
+<pre><code>## [1] &quot;The value of pi is 3.14159265358979.&quot;
+</code></pre>
+<pre><code class="language-r">knit_expand(text = 'The value of a is {{a}}, so a + 1 is {{a+1}}.', a = rnorm(1))
+</code></pre>
+<pre><code>## [1] &quot;The value of a is -0.0285346304466519, so a + 1 is 0.971465369553348.&quot;
+</code></pre>
+<pre><code class="language-r">knit_expand(text = 'The area of a circle with radius {{r}} is {{pi*r^2}}', r = 5)
+</code></pre>
+<pre><code>## [1] &quot;The area of a circle with radius 5 is 78.5398163397448&quot;
+</code></pre>
+<p>Any number of variables:</p>
+<pre><code class="language-r">knit_expand(text = 'a is {{a}} and b is {{b}}, with my own pi being {{pi}} instead of {{base::pi}}', a=1, b=2, pi=3)
+</code></pre>
+<pre><code>## [1] &quot;a is 1 and b is 2, with my own pi being 3 instead of 3.14159265358979&quot;
+</code></pre>
+<p>Custom delimiter <code>&lt;% %&gt;</code>:</p>
+<pre><code class="language-r">knit_expand(text = 'I do not like curly braces, so use % with &lt;&gt; instead: a is &lt;% a %&gt;.', a = 8, delim = c(&quot;&lt;%&quot;, &quot;%&gt;&quot;))
+</code></pre>
+<pre><code>## [1] &quot;I do not like curly braces, so use % with &lt;&gt; instead: a is 8.&quot;
+</code></pre>
+<p>The pyexpander delimiter:</p>
+<pre><code class="language-r">knit_expand(text = 'hello $(LETTERS[24]) and $(pi)!', delim = c(&quot;$(&quot;, &quot;)&quot;))
+</code></pre>
+<pre><code>## [1] &quot;hello X and 3.14159265358979!&quot;
+</code></pre>
+<p>Arbitrary R code:</p>
+<pre><code class="language-r">knit_expand(text = 'you cannot see the value of x {{x=rnorm(1)}}but it is indeed created: x = {{x}}')
+</code></pre>
+<pre><code>## [1] &quot;you cannot see the value of x but it is indeed created: x = -0.0747822117264385&quot;
+</code></pre>
+<pre><code class="language-r">res = knit_expand(text = c(' x | x^2', '{{x=1:5;paste(sprintf(&quot;%2d | %3d&quot;, x, x^2), collapse = &quot;\n&quot;)}}'))
+cat(res)
+</code></pre>
+<pre><code>##  x | x^2
+##  1 |   1
+##  2 |   4
+##  3 |   9
+##  4 |  16
+##  5 |  25
+</code></pre>
+<p>The m4 example: <a href="https://en.wikipedia.org/wiki/M4_(computer_language)">https://en.wikipedia.org/wiki/M4_(computer_language)</a></p>
+<pre><code class="language-r">res = knit_expand(text = c('{{i=0;h2=function(x){i&lt;&lt;-i+1;sprintf(&quot;&lt;h2&gt;%d. %s&lt;/h2&gt;&quot;, i, x)} }}&lt;html&gt;',
+'{{h2(&quot;First Section&quot;)}}', '{{h2(&quot;Second Section&quot;)}}', '{{h2(&quot;Conclusion&quot;)}}', '&lt;/html&gt;'))
+cat(res)
+</code></pre>
+<pre><code>## &lt;html&gt;
+## &lt;h2&gt;1. First Section&lt;/h2&gt;
+## &lt;h2&gt;2. Second Section&lt;/h2&gt;
+## &lt;h2&gt;3. Conclusion&lt;/h2&gt;
+## &lt;/html&gt;
+</code></pre>
+<p>Build regression models based on a template; loop through all variables in <code>mtcars</code>:</p>
+<pre><code class="language-r">src = lapply(names(mtcars)[-1], function(i) {
+knit_expand(text=c(&quot;# Regression on {{i}}&quot;, '```{r lm-{{i}}}', 'lm(mpg~{{i}}, data=mtcars)', '```'))
+})
+# knit the source
+res = knit_child(text = unlist(src))
+res = paste('&lt;pre&gt;&lt;code&gt;', gsub('^\\s*|\\s*$', '', res), '&lt;/code&gt;&lt;/pre&gt;', sep = '')
+</code></pre>
+<pre><code># Regression on cyl
+
+```r
+lm(mpg~cyl, data=mtcars)
+```
+
+```
+## 
+## Call:
+## lm(formula = mpg ~ cyl, data = mtcars)
+## 
+## Coefficients:
+## (Intercept)          cyl  
+##       37.88        -2.88
+```
+# Regression on disp
+
+```r
+lm(mpg~disp, data=mtcars)
+```
+
+```
+## 
+## Call:
+## lm(formula = mpg ~ disp, data = mtcars)
+## 
+## Coefficients:
+## (Intercept)         disp  
+##     29.5999      -0.0412
+```
+# Regression on hp
+
+```r
+lm(mpg~hp, data=mtcars)
+```
+
+```
+## 
+## Call:
+## lm(formula = mpg ~ hp, data = mtcars)
+## 
+## Coefficients:
+## (Intercept)           hp  
+##     30.0989      -0.0682
+```
+# Regression on drat
+
+```r
+lm(mpg~drat, data=mtcars)
+```
+
+```
+## 
+## Call:
+## lm(formula = mpg ~ drat, data = mtcars)
+## 
+## Coefficients:
+## (Intercept)         drat  
+##       -7.52         7.68
+```
+# Regression on wt
+
+```r
+lm(mpg~wt, data=mtcars)
+```
+
+```
+## 
+## Call:
+## lm(formula = mpg ~ wt, data = mtcars)
+## 
+## Coefficients:
+## (Intercept)           wt  
+##       37.29        -5.34
+```
+# Regression on qsec
+
+```r
+lm(mpg~qsec, data=mtcars)
+```
+
+```
+## 
+## Call:
+## lm(formula = mpg ~ qsec, data = mtcars)
+## 
+## Coefficients:
+## (Intercept)         qsec  
+##       -5.11         1.41
+```
+# Regression on vs
+
+```r
+lm(mpg~vs, data=mtcars)
+```
+
+```
+## 
+## Call:
+## lm(formula = mpg ~ vs, data = mtcars)
+## 
+## Coefficients:
+## (Intercept)           vs  
+##       16.62         7.94
+```
+# Regression on am
+
+```r
+lm(mpg~am, data=mtcars)
+```
+
+```
+## 
+## Call:
+## lm(formula = mpg ~ am, data = mtcars)
+## 
+## Coefficients:
+## (Intercept)           am  
+##       17.15         7.24
+```
+# Regression on gear
+
+```r
+lm(mpg~gear, data=mtcars)
+```
+
+```
+## 
+## Call:
+## lm(formula = mpg ~ gear, data = mtcars)
+## 
+## Coefficients:
+## (Intercept)         gear  
+##        5.62         3.92
+```
+# Regression on carb
+
+```r
+lm(mpg~carb, data=mtcars)
+```
+
+```
+## 
+## Call:
+## lm(formula = mpg ~ carb, data = mtcars)
+## 
+## Coefficients:
+## (Intercept)         carb  
+##       25.87        -2.06
+```</code></pre>
+
+</div>
+
+<div class="include-after">
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/combine/npm/@xiee/utils/js/center-img.min.js" async></script>
+<script>
+
+</script>
+</body>
+
+</html>

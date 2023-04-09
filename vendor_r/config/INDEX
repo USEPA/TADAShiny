@@ -1,0 +1,5 @@
+config                  Manage Environment Specific Configuration
+                        Values.
+get                     Read configuration values.
+is_active               Test active configuration
+merge                   Merge two configurations.

@@ -1,0 +1,58 @@
+
+/* CSS radio buttons for icons */
+
+.btn.radiobtn:focus {
+  outline: none !important;
+}
+
+.btn.radiobtn.disabled > .radio-btn-icon-yes {
+	pointer-events: none;
+}
+.btn.radiobtn.disabled > .radio-btn-icon-no {
+	pointer-events: none;
+}
+
+/*** BS3 ***/
+/* show "yes" icon if active */
+.btn.radiobtn .radio-btn-icon-yes {
+	opacity: 0;
+	display: none;
+}
+.btn.radiobtn.active .radio-btn-icon-yes {
+	opacity: 1;
+	display: inline-block;
+}
+
+/* show "no" icon if not active */
+.btn.radiobtn.active .radio-btn-icon-no {
+	opacity: 0;
+	display: none;
+}
+.btn.radiobtn .radio-btn-icon-no {
+	opacity: 1;
+	display: inline-block;
+}
+
+
+/*** BS5 ***/
+/* show "yes" icon if radio checked */
+.btn.radiobtn>.radio-btn-icon-yes {
+	opacity: 0;
+	display: none;
+}
+.btn-check:checked+.btn.radiobtn>.radio-btn-icon-yes,
+  .btn-check:active+.btn.radiobtn>.radio-btn-icon-yes{
+	opacity: 1 !important;
+	display: inline-block !important;
+}
+
+/* show "no" icon if radio not checked */
+.btn-check:checked+.btn.radiobtn>.radio-btn-icon-no {
+	opacity: 0;
+	display: none;
+}
+.btn.radiobtn>.radio-btn-icon-no {
+	opacity: 1;
+	display: inline-block;
+}
+

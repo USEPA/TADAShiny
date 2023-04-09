@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>Including shinyjs in different types of apps</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h1>Including shinyjs in different types of apps</h1>
+
+<h2>Table of contents</h2>
+
+<ul>
+<li><a href="#usage-basic">Basic use of shinyjs</a></li>
+<li><a href="#usage-dashboard">Using shinyjs in Shiny Dashboards</a></li>
+<li><a href="#usage-navbarpage">Using shinyjs with navbarPage layout</a></li>
+<li><a href="#usage-rmd">Using shinyjs in R Markdown documents</a>
+
+<ul>
+<li><a href="#usage-tabbed">Rmd documents with Tabbed Sections</a></li>
+<li><a href="#usage-prerendered">Rmd documents using <code>shiny_prerendered</code> engine</a></li>
+</ul></li>
+<li><a href="#usage-html">Using shinyjs when the user interface is built using an HTML file</a></li>
+</ul>
+
+<h2 id="usage-basic">Basic use of shinyjs</h2>
+
+<p>A typical Shiny app has a UI portion and a server portion. Before using most shinyjs functions, you need to call <code>useShinyjs()</code> in the app&#39;s UI. It&#39;s best to include it near the top as a convention.</p>
+
+<p>Here is a minimal Shiny app that uses <code>shinyjs</code>:</p>
+
+<pre><code>library(shiny)
+library(shinyjs)
+
+ui &lt;- fluidPage(
+  useShinyjs(),  # Include shinyjs
+
+  actionButton(&quot;button&quot;, &quot;Click me&quot;),
+  textInput(&quot;text&quot;, &quot;Text&quot;)
+)
+
+server &lt;- function(input, output) {
+  observeEvent(input$button, {
+    toggle(&quot;text&quot;)  # toggle is a shinyjs function
+  })
+}
+
+shinyApp(ui, server)
+</code></pre>
+
+<p>This is how most Shiny apps should initialize <code>shinyjs</code> - by calling <code>useShinyjs()</code> near the top of the UI.</p>
+
+<p>However, if you use shinyjs in any of the following cases:</p>
+
+<ul>
+<li>In Shiny dashboards (built using the <code>shinydashboard</code> package)</li>
+<li>In Shiny apps that use a <code>navbarPage</code> layout</li>
+<li>In Rmd documents</li>
+<li>In Shiny apps that manually build the user interface with an HTML file or template (instead of using Shiny&#39;s UI functions)</li>
+</ul>
+
+<p>Then the following sections will show you how you to include shinyjs.</p>
+
+<h2 id="usage-dashboard">Using shinyjs in Shiny Dashboards</h2>
+
+<p><code>shinydashboard</code> is an R package that lets you create nice dashboards with Shiny. Since it has a different structure than typical Shiny apps, it can be unclear where to include the call to <code>useShinyjs()</code> in these apps. It is recommended to place the call to <code>useShinyjs()</code> in the beginning of <code>dashboardBody()</code>. For example, here is a minimal Shiny dashboard that uses <code>shinyjs</code>:</p>
+
+<pre><code>library(shiny)
+library(shinydashboard)
+library(shinyjs)
+
+ui &lt;- dashboardPage(
+  dashboardHeader(),
+  dashboardSidebar(),
+  dashboardBody(
+    useShinyjs(),
+    actionButton(&quot;button&quot;, &quot;Click me&quot;),
+    div(id = &quot;hello&quot;, &quot;Hello!&quot;)
+  )
+)
+
+server &lt;- function(input, output) {
+  observeEvent(input$button, {
+    toggle(&quot;hello&quot;)
+  })
+}
+
+shinyApp(ui, server)
+</code></pre>
+
+<h2 id="usage-navbarpage">Using shinyjs with navbarPage layout</h2>
+
+<p>When creating a Shiny app that uses a <code>navbarPage</code> layout, the call to <code>useShinyjs()</code> can be placed inside any of the tabs (since the only real requirement is that it will be present <em>somewhere</em> in the UI). While having <code>useShinyjs()</code> inside the contents of any tab will work, there is another method that is preferred. You can wrap the <code>navbarPage</code> in a <code>tagList</code>, and call <code>useShinyjs()</code> within the <code>tagList</code>. This way, <code>shinyjs</code> gets set up in a way that is independent of each of the tabs. For example, here is a minimal Shiny app that uses <code>shinyjs</code> inside a <code>navbarPage</code> layout:</p>
+
+<pre><code>library(shiny)
+library(shinyjs)
+
+ui &lt;- tagList(
+  useShinyjs(),
+  navbarPage(
+    &quot;shinyjs with navbarPage&quot;,
+    tabPanel(&quot;tab1&quot;,
+             actionButton(&quot;button&quot;, &quot;Click me&quot;),
+             div(id = &quot;hello&quot;, &quot;Hello!&quot;)),
+    tabPanel(&quot;tab2&quot;)
+  )
+)
+
+server &lt;- function(input, output, session) {
+  observeEvent(input$button, {
+    toggle(&quot;hello&quot;)
+  })
+}
+
+shinyApp(ui, server)
+</code></pre>
+
+<h2 id="usage-rmd">Using shinyjs in R Markdown documents</h2>
+
+<p>It is possible to embed Shiny components in an R Markdown document, resulting in interactive R Markdown documents. More information on how to use these documents is available <a href="https://bookdown.org/yihui/rmarkdown/shiny-documents.html">on the R Markdown website</a>. Even though interactive documents don&#39;t explicitly specify a UI and a server, using <code>shinyjs</code> is still easy: simply call <code>useShinyjs(rmd = TRUE)</code> (note the <code>rmd = TRUE</code> argument). For example, the following code can be used inside an R Markdown code chunk (assuming the Rmd document is set up with <code>runtime: shiny</code> as the link above describes):</p>
+
+<pre><code>library(shinyjs)
+
+useShinyjs(rmd = TRUE)
+actionButton(&quot;button&quot;, &quot;Click me&quot;)
+div(id = &quot;hello&quot;, &quot;Hello!&quot;)
+
+observeEvent(input$button, {
+ toggle(&quot;hello&quot;)
+})
+</code></pre>
+
+<h3 id="usage-tabbed">Rmd documents with Tabbed Sections</h3>
+
+<p>If the Rmd file makes use of <a href="https://bookdown.org/yihui/rmarkdown/html-document.html#tabbed_sections">Tabbed Sections</a> (using <code>{.tabset}</code>), then you should include the call to <code>useShinyjs(rmd = TRUE)</code> before the tabset definition, near the beginning of the file.</p>
+
+<h3 id="usage-prerendered">Rmd documents using shiny_prerendered engine</h3>
+
+<p>If you&#39;re using the <a href="https://bookdown.org/yihui/rmarkdown/shiny-documents.html"><code>shiny_prerendered</code> Rmd format</a>, you need to include the following code in the beginning of your Rmd file, just after the YAML header (you need to remove the spaces between the backticks to make this code work):</p>
+
+<pre><code>```{r, echo=FALSE}
+shiny::addResourcePath(&quot;shinyjs&quot;, system.file(&quot;srcjs&quot;, package = &quot;shinyjs&quot;))
+</code></pre>
+
+<pre><code class="r, context=&quot;server&quot;">shinyjs::useShinyjs(html = TRUE)
+</code></pre>
+
+<script src="shinyjs/inject.js"></script>
+
+<pre><code>
+&lt;h2 id=&quot;usage-html&quot;&gt;Using shinyjs when the user interface is built using an HTML file/template&lt;/h2&gt;
+
+While most Shiny apps use Shiny&#39;s functions to build a user interface to the app, it is possible to build the UI with an HTML template, [as RStudio shows in this article](https://shiny.rstudio.com/articles/templates.html). In this case, you simply need to add `{{ useShinyjs() }}` somewhere in the template, preferably inside the `&lt;head&gt;...&lt;/head&gt;` tags.
+
+A similar way to create your app&#39;s UI with HTML is to write it entirely in HTML (without templates), [as RStudio shows in this article](https://shiny.rstudio.com/articles/html-ui.html). Building Shiny apps like this is much more complicated and should only be used if you&#39;re very comfortable with HTML. Using `shinyjs` in these apps is possible but it works a little differently since there is no `ui.R` to call `useShinyjs()` from.  There are three simple steps to take in order to use `shinyjs` in these apps:
+
+- Create a `global.R` file in the same directory as your `server.R`, and add the following line to the file:
+
+        shiny::addResourcePath(&quot;shinyjs&quot;, system.file(&quot;srcjs&quot;, package = &quot;shinyjs&quot;))
+
+- In the `index.html` file you need to load a special JavaScript file named `shinyjs/inject.js`. You do this by adding the following line to the HTML&#39;s `&lt;head&gt;` tag:
+
+        `&lt;script src=&quot;shinyjs/inject.js&quot;&gt;&lt;/script&gt;`
+
+- In your server function (the `shinyServer` function) you need to call `useShinyjs(html = TRUE)`
+
+After adding these three lines to your code, you can use all `shinyjs` functions as usual.
+</code></pre>
+
+</body>
+
+</html>

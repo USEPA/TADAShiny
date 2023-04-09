@@ -1,0 +1,27 @@
+Package: maps
+Title: Draw Geographical Maps
+Version: 3.4.1
+Date: 2022-10-29
+Author: Original S code by Richard A. Becker and Allan R. Wilks.
+	R version by Ray Brownrigg.
+        Enhancements by Thomas P Minka and Alex Deckmyn.
+Description: Display of maps.  Projection code and larger maps are in
+             separate packages ('mapproj' and 'mapdata').
+Depends: R (>= 3.5.0)
+Imports: graphics, utils
+LazyData: yes
+Suggests: mapproj (>= 1.2-0), mapdata (>= 2.3.0), sp, rnaturalearth
+License: GPL-2
+Maintainer: Alex Deckmyn <alex.deckmyn@meteo.be>
+NeedsCompilation: yes
+Repository: RSPM
+Packaged: 2022-10-29 22:58:49 UTC; alex
+Date/Publication: 2022-10-30 23:27:38 UTC
+Encoding: UTF-8
+Built: R 4.2.0; x86_64-pc-linux-gnu; 2022-10-31 13:40:43 UTC; unix
+RemoteType: standard
+RemotePkgRef: maps
+RemoteRef: maps
+RemoteRepos: https://packagemanager.posit.co/cran/__linux__/jammy/latest
+RemotePkgPlatform: source
+RemoteSha: 3.4.1

@@ -1,0 +1,69 @@
+Package: TADA
+Type: Package
+Title: TADA (Tools for Automated Data Analysis) R Package
+Version: 0.0.1
+Organization: U.S. Environmental Protection Agency
+Authors@R: 
+  c(person(given = "Cristina",
+           family = "Mullin",
+           role = c("aut", "cre"),
+           email = "mullin.cristina@epa.gov",
+           comment = c(ORCID = "0000-0002-0615-6087")),
+    person(given = "Michelle",
+           family = "Thawley",
+           role = "aut"),
+    person(given = "Jacob",
+           family = "Greif",
+           role = "aut"),
+    person(given = "Laura",
+           family = "Shumway",
+           role = "aut"),
+    person(given = "Elise",
+           family = "Hinman",
+           role = "aut"), 
+    person(given = "Kathleen",
+           family = "Healy",
+           role = "aut")
+    )
+Description: Assists data partners in performing water quality analyses with
+    data from the Water Quality Portal.
+License: CC0
+Copyright: This software is in the public domain because it contains
+        materials that originally came from the U.S. Environmental
+        Protection Agency.
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Imports: plyr, data.table, dplyr, grDevices, magrittr, stringr, utils,
+        RColorBrewer, stats, lubridate, dataRetrieval, ggplot2, sf,
+        maps, plotly, rmarkdown, outliers, remotes
+Depends: R (>= 3.5.0)
+Suggests: readr, tidyverse, knitr, testthat, testthis, usethis,
+        devtools, pkgdown, Rcpp, spelling
+VignetteBuilder: knitr, rmarkdown
+Language: en-US
+Config/testthat/edition: 3
+Config/testthat/load-all: list(export_all = FALSE, helpers = FALSE)
+URL: https://usepa.github.io/TADA/, https://github.com/USEPA/TADA
+LazyData: true
+NeedsCompilation: no
+Packaged: 2023-04-09 13:05:48 UTC; root
+Author: Cristina Mullin [aut, cre] (<https://orcid.org/0000-0002-0615-6087>),
+  Michelle Thawley [aut],
+  Jacob Greif [aut],
+  Laura Shumway [aut],
+  Elise Hinman [aut],
+  Kathleen Healy [aut]
+Maintainer: Cristina Mullin <mullin.cristina@epa.gov>
+Built: R 4.2.2; ; 2023-04-09 13:05:51 UTC; unix
+RemoteType: github
+RemoteHost: api.github.com
+RemoteRepo: TADA
+RemoteUsername: USEPA
+RemotePkgRef: USEPA/TADA
+RemoteRef: HEAD
+RemoteSha: 3da4bc2d644280be0e1b9a12fb41ab3f107224e5
+GithubRepo: TADA
+GithubUsername: USEPA
+GithubRef: HEAD
+GithubSHA1: 3da4bc2d644280be0e1b9a12fb41ab3f107224e5

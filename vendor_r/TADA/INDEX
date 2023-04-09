@@ -1,0 +1,93 @@
+AboveNationalWQXUpperThreshold
+                        Check Result Value Against WQX Upper Threshold
+AggregatedContinuousData
+                        Check for Aggregated Continuous Data
+AutoFilter              AutoFilter
+BelowNationalWQXLowerThreshold
+                        Check Result Value Against WQX Lower Threshold
+ConvertDepthUnits       Convert Depth Units
+ConvertResultUnits      Transform Units to WQX Target Units
+ConvertSpecialChars     ConvertSpecialChars
+FilterFieldReview       Generate list of unique values in a given field
+FilterFields            Generate list of field names
+FilterParFieldReview    Generate list of unique values in a given field
+                        subset by parameter
+FilterParFields         Generate list of field names subset by
+                        parameter
+FilterParList           Generate list of parameters
+GetDetCondRef           Update Result Detection Condition Reference
+                        Table
+GetDetLimitRef          Update Detection Quantitation Limit Type
+                        Reference Table
+GetMeasureUnitRef       Update Measure Unit Reference Table
+GetWQXCharValRef        WQX QAQC Characteristic Validation Reference
+                        Table
+HarmonizationRefTable   Generate Unique Harmonization Reference Table
+HarmonizeData           Transform CharacteristicName,
+                        ResultSampleFractionText,
+                        MethodSpecificationName, and
+                        ResultMeasure.MeasureUnitCode values to TADA
+                        standards.
+InvalidCoordinates      Invalid coordinates
+InvalidFraction         Check Sample Fraction Validity
+InvalidMethod           Check for Invalid Analytical Methods
+InvalidResultUnit       Check Result Unit Validity
+InvalidSpeciation       Check Method Speciation Validity
+JoinWQPProfiles         Join WQP Profiles
+MeasureValueSpecialCharacters
+                        Check for Special Characters in Measure Value
+                        Fields - Deprecated
+Nutrients_Utah          Utah Nutrient Data
+OrderTADACols           Order TADA Columns
+PotentialDuplicateRowID
+                        Check for Potential Duplicates
+QAPPDocAvailable        Check if an approved QAPP document URL is
+                        provided
+QAPPapproved            Check data for an approved QAPP
+QualityControlActivity
+                        Check for Quality Control Samples
+RemoveEmptyColumns      RemoveEmptyColumns
+TADA.env                Used with multiple filter functions in this .R
+                        file
+TADABigdataRetrieval    Large WQP data pulls using dataRetrieval
+TADAProfileClean18_TNonly
+                        TADAProfileClean18_TNonly
+TADAReadWQPWebServices
+                        Read in WQP data using the Water Quality Portal
+                        (WQP) web services
+TADA_boxplot            Create Boxplot
+TADA_stats              Generate Statistics Table
+TADA_summarizeColumn    Summarize data downloaded by specified column
+TADAdataRetrieval       Generate TADA-compatible dataframe from WQP
+                        Data
+TADAprofileCheck        TADA Profile Check
+UpdateDetCondRef        Update Measure Unit Reference Table internal
+                        file (for internal use only)
+UpdateDetLimitRef       Update Measure Unit Reference Table internal
+                        file (for internal use only)
+UpdateMeasureUnitRef    Update Measure Unit Reference Table internal
+                        file (for internal use only)
+UpdateWQXCharValRef     Update Characteristic Validation Reference
+                        Table internal file (for internal use only)
+WQXCharValRef_Cached    Used to store cached WQX QAQC Characteristic
+                        Validation Reference Table
+WQXDetCondRef_Cached    Used to store cached Result Detection Condition
+                        Reference Table
+WQXDetLimitRef_Cached   Used to store cached Result Detection Condition
+                        Reference Table
+WQXunitRef_Cached       Used to store cached Measure Unit Reference
+                        Table
+WaterTemp_US            Lake Water Temperature
+autoclean               autoclean
+checkColumns            Check Columns
+checkType               Check Type
+decimalnumcount         decimalnumcount
+decimalplaces           decimalplaces
+idCensoredData          Prepare Censored Data
+identifyPotentialDuplicates
+                        Identify Potential Duplicate Data Uploads
+narrow                  narrow
+resultphyschem          resultphyschem
+simpleCensoredMethods   Simple Tools for Censored Data Handling
+station                 station
+summarizeCensoredData   Summarize Censored Data

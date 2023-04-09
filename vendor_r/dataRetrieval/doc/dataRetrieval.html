@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Laura A. DeCicco and Robert M. Hirsch" />
+
+
+<title>Introduction to the dataRetrieval package</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Introduction to the dataRetrieval
+package</h1>
+<h4 class="author">Laura A. DeCicco and Robert M. Hirsch</h4>
+<h4 class="date">21 November, 2022</h4>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#usgs-web-retrievals" id="toc-usgs-web-retrievals"><span class="toc-section-number">1</span> USGS Web Retrievals</a>
+<ul>
+<li><a href="#site-information" id="toc-site-information"><span class="toc-section-number">1.1</span> Site Information</a>
+<ul>
+<li><a href="#readnwissite" id="toc-readnwissite"><span class="toc-section-number">1.1.1</span> readNWISsite</a></li>
+<li><a href="#whatnwisdata" id="toc-whatnwisdata"><span class="toc-section-number">1.1.2</span> whatNWISdata</a></li>
+</ul></li>
+<li><a href="#parameter-information" id="toc-parameter-information"><span class="toc-section-number">1.2</span> Parameter Information</a></li>
+<li><a href="#daily-data" id="toc-daily-data"><span class="toc-section-number">1.3</span> Daily Data</a></li>
+<li><a href="#unit-data" id="toc-unit-data"><span class="toc-section-number">1.4</span> Unit Data</a></li>
+<li><a href="#groundwater-level-data" id="toc-groundwater-level-data"><span class="toc-section-number">1.5</span> Groundwater Level Data</a></li>
+<li><a href="#peak-flow-data" id="toc-peak-flow-data"><span class="toc-section-number">1.6</span> Peak Flow Data</a></li>
+<li><a href="#rating-curve-data" id="toc-rating-curve-data"><span class="toc-section-number">1.7</span> Rating Curve Data</a></li>
+<li><a href="#surface-water-measurement-data" id="toc-surface-water-measurement-data"><span class="toc-section-number">1.8</span> Surface-Water Measurement
+Data</a></li>
+<li><a href="#water-use-data" id="toc-water-use-data"><span class="toc-section-number">1.9</span> Water Use Data</a></li>
+<li><a href="#statistics-data" id="toc-statistics-data"><span class="toc-section-number">1.10</span> Statistics Data</a></li>
+</ul></li>
+<li><a href="#water-quality-portal-web-retrievals" id="toc-water-quality-portal-web-retrievals"><span class="toc-section-number">2</span> Water Quality Portal Web
+Retrievals</a></li>
+<li><a href="#generalized-retrievals" id="toc-generalized-retrievals"><span class="toc-section-number">3</span> Generalized Retrievals</a>
+<ul>
+<li><a href="#nwis" id="toc-nwis"><span class="toc-section-number">3.1</span> NWIS</a>
+<ul>
+<li><a href="#sites-whatnwissites" id="toc-sites-whatnwissites"><span class="toc-section-number">3.1.1</span> Sites: whatNWISsites</a></li>
+<li><a href="#data-readnwisdata" id="toc-data-readnwisdata"><span class="toc-section-number">3.1.2</span> Data: readNWISdata</a></li>
+</ul></li>
+<li><a href="#wqp" id="toc-wqp"><span class="toc-section-number">3.2</span> WQP</a>
+<ul>
+<li><a href="#sites-whatwqpsites" id="toc-sites-whatwqpsites"><span class="toc-section-number">3.2.1</span> Sites: whatWQPsites</a></li>
+<li><a href="#data-readwqpdata" id="toc-data-readwqpdata"><span class="toc-section-number">3.2.2</span> Data: readWQPdata</a></li>
+<li><a href="#availability-whatwqpdata" id="toc-availability-whatwqpdata"><span class="toc-section-number">3.2.3</span> Availability:
+whatWQPdata</a></li>
+<li><a href="#samples-whatwqpsamples" id="toc-samples-whatwqpsamples"><span class="toc-section-number">3.2.4</span> Samples: whatWQPsamples</a></li>
+<li><a href="#metrics-whatwqpmetrics" id="toc-metrics-whatwqpmetrics"><span class="toc-section-number">3.2.5</span> Metrics: whatWQPmetrics</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#embedded-metadata" id="toc-embedded-metadata"><span class="toc-section-number">4</span> Embedded Metadata</a></li>
+<li><a href="#getting-started-in-r" id="toc-getting-started-in-r"><span class="toc-section-number">5</span> Getting Started in R</a>
+<ul>
+<li><a href="#new-to-r" id="toc-new-to-r"><span class="toc-section-number">5.1</span> New to R?</a></li>
+</ul></li>
+<li><a href="#disclaimer" id="toc-disclaimer"><span class="toc-section-number">6</span> Disclaimer</a></li>
+</ul>
+</div>
+
+<p>The <code>dataRetrieval</code> package was created to simplify the
+process of loading hydrologic data into the R environment. It is
+designed to retrieve the major data types of U.S. Geological Survey
+(USGS) hydrologic data that are available on the Web, as well as data
+from the Water Quality Portal (WQP), which currently houses water
+quality data from the Environmental Protection Agency (EPA), U.S.
+Department of Agriculture (USDA), and USGS. Direct USGS data is obtained
+from a service called the National Water Information System (NWIS).</p>
+<p>For information on getting started in R and installing the package,
+see <a href="#getting-started-in-r">Getting Started</a>. Any use of
+trade, firm, or product names is for descriptive purposes only and does
+not imply endorsement by the U.S. Government.</p>
+<p>A quick workflow for USGS <code>dataRetrieval</code> functions:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dataRetrieval)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Choptank River near Greensboro, MD</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>siteNumber <span class="ot">&lt;-</span> <span class="st">&quot;01491000&quot;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>ChoptankInfo <span class="ot">&lt;-</span> <span class="fu">readNWISsite</span>(siteNumber)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>parameterCd <span class="ot">&lt;-</span> <span class="st">&quot;00060&quot;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Raw daily data:</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>rawDailyData <span class="ot">&lt;-</span> <span class="fu">readNWISdv</span>(</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  siteNumber, parameterCd,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;1980-01-01&quot;</span>, <span class="st">&quot;2010-01-01&quot;</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Sample data Nitrate:</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>parameterCd <span class="ot">&lt;-</span> <span class="st">&quot;00618&quot;</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>qwData <span class="ot">&lt;-</span> <span class="fu">readNWISqw</span>(</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  siteNumber, parameterCd,</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;1980-01-01&quot;</span>, <span class="st">&quot;2010-01-01&quot;</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>pCode <span class="ot">&lt;-</span> <span class="fu">readNWISpCode</span>(parameterCd)</span></code></pre></div>
+<p>USGS data are made available through the National Water Information
+System (NWIS).</p>
+<p>Table 1 describes the functions available in the
+<code>dataRetrieval</code> package.</p>
+<table style="width:100%;">
+<caption>Table 1: dataRetrieval functions</caption>
+<colgroup>
+<col width="9%" />
+<col width="26%" />
+<col width="7%" />
+<col width="7%" />
+<col width="12%" />
+<col width="31%" />
+<col width="4%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Data.Returned</th>
+<th align="left">siteNumbers</th>
+<th align="left">parameterCd</th>
+<th align="left">startDate…endDate</th>
+<th align="left">Arguments</th>
+<th align="left">Source</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">readNWISdata</td>
+<td align="left">Data using user-specified queries</td>
+<td align="left">opt.</td>
+<td align="left">opt.</td>
+<td align="left">opt.</td>
+<td align="left">service, tz=‘UTC’, …</td>
+<td align="left">NWIS</td>
+</tr>
+<tr class="even">
+<td align="left">readNWISdv</td>
+<td align="left">Daily values</td>
+<td align="left">req.</td>
+<td align="left">req.</td>
+<td align="left">req.</td>
+<td align="left">statCd=‘00003’</td>
+<td align="left">NWIS</td>
+</tr>
+<tr class="odd">
+<td align="left">readNWISqw</td>
+<td align="left">Water quality</td>
+<td align="left">req.</td>
+<td align="left">req.</td>
+<td align="left">req.</td>
+<td align="left">expanded=TRUE, tz=‘UTC’</td>
+<td align="left">NWIS</td>
+</tr>
+<tr class="even">
+<td align="left">readNWISuv</td>
+<td align="left">Instantaneous values</td>
+<td align="left">req.</td>
+<td align="left">req.</td>
+<td align="left">req.</td>
+<td align="left">tz=‘UTC’</td>
+<td align="left">NWIS</td>
+</tr>
+<tr class="odd">
+<td align="left">readNWISrating</td>
+<td align="left">Rating table for active streamgage</td>
+<td align="left">req.</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">type=’base</td>
+<td align="left">NWIS</td>
+</tr>
+<tr class="even">
+<td align="left">readNWISmeas</td>
+<td align="left">Surface-water measurements</td>
+<td align="left">req.</td>
+<td align="left"></td>
+<td align="left">req.</td>
+<td align="left">tz=‘UTC’</td>
+<td align="left">NWIS</td>
+</tr>
+<tr class="odd">
+<td align="left">readNWISpeak</td>
+<td align="left">Peak flow</td>
+<td align="left">req.</td>
+<td align="left"></td>
+<td align="left">req.</td>
+<td align="left"></td>
+<td align="left">NWIS</td>
+</tr>
+<tr class="even">
+<td align="left">readNWISgwl</td>
+<td align="left">Groundwater levels</td>
+<td align="left">req.</td>
+<td align="left"></td>
+<td align="left">req.</td>
+<td align="left">tz=‘UTC’</td>
+<td align="left">NWIS</td>
+</tr>
+<tr class="odd">
+<td align="left">readNWISuse</td>
+<td align="left">Water use</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">stateCd, countyCd, years=‘ALL’, categories=‘ALL’</td>
+<td align="left">NWIS</td>
+</tr>
+<tr class="even">
+<td align="left">readNWISstat</td>
+<td align="left">Statistical service</td>
+<td align="left">req.</td>
+<td align="left">req.</td>
+<td align="left">req.</td>
+<td align="left">statReportType=‘daily’, statType=‘mean’</td>
+<td align="left">NWIS</td>
+</tr>
+<tr class="odd">
+<td align="left">readNWISpCode</td>
+<td align="left">Parameter code information</td>
+<td align="left">req.</td>
+<td align="left">req.</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">NWIS</td>
+</tr>
+<tr class="even">
+<td align="left">readNWISsite</td>
+<td align="left">Site information</td>
+<td align="left">req.</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">NWIS</td>
+</tr>
+<tr class="odd">
+<td align="left">whatNWISsites</td>
+<td align="left">Site search using user-specified queries</td>
+<td align="left">req.</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">…</td>
+<td align="left">NWIS</td>
+</tr>
+<tr class="even">
+<td align="left">whatNWISdata</td>
+<td align="left">Data availability</td>
+<td align="left">opt.</td>
+<td align="left">opt.</td>
+<td align="left"></td>
+<td align="left">service, …</td>
+<td align="left">NWIS</td>
+</tr>
+<tr class="odd">
+<td align="left">readWQPdata</td>
+<td align="left">User-specified queries</td>
+<td align="left">opt.</td>
+<td align="left">opt.</td>
+<td align="left"></td>
+<td align="left">…</td>
+<td align="left">WQP</td>
+</tr>
+<tr class="even">
+<td align="left">readWQPqw</td>
+<td align="left">Water quality data</td>
+<td align="left">req.</td>
+<td align="left">req.</td>
+<td align="left">req.</td>
+<td align="left"></td>
+<td align="left">WQP</td>
+</tr>
+<tr class="odd">
+<td align="left">whatWQPsites</td>
+<td align="left">Site search</td>
+<td align="left">opt.</td>
+<td align="left"></td>
+<td align="left">opt.</td>
+<td align="left">…</td>
+<td align="left">WQP</td>
+</tr>
+<tr class="even">
+<td align="left">whatWQPdata</td>
+<td align="left">Data availability</td>
+<td align="left">opt.</td>
+<td align="left"></td>
+<td align="left">opt.</td>
+<td align="left">…</td>
+<td align="left">WQP</td>
+</tr>
+<tr class="odd">
+<td align="left">readWQPsummary</td>
+<td align="left">Summary data</td>
+<td align="left">opt.</td>
+<td align="left"></td>
+<td align="left">opt.</td>
+<td align="left">…</td>
+<td align="left">WQP</td>
+</tr>
+<tr class="even">
+<td align="left">whatWQPmetrics</td>
+<td align="left">Metric availability</td>
+<td align="left">opt.</td>
+<td align="left"></td>
+<td align="left">opt.</td>
+<td align="left">…</td>
+<td align="left">WQP</td>
+</tr>
+<tr class="odd">
+<td align="left">whatWQPsamples</td>
+<td align="left">Sample availability</td>
+<td align="left">opt.</td>
+<td align="left"></td>
+<td align="left">opt.</td>
+<td align="left">…</td>
+<td align="left">WQP</td>
+</tr>
+</tbody>
+</table>
+<p>The arguments <code>startDate</code> and <code>endDate</code> have
+defaults to request the maximum data.</p>
+<div id="usgs-web-retrievals" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> USGS Web
+Retrievals</h1>
+<p>In this section, examples of National Water Information System (NWIS)
+retrievals show how to get raw data into R. This data includes <a href="#site-information">site information</a>, measured <a href="#parameter-information">parameter information</a>, historical <a href="#daily-data">daily values</a>, <a href="#unit-data">unit
+values</a> (which include real-time data but can also include other
+sensor data stored at regular time intervals), <a href="#water-quality-data">water quality data</a>, <a href="#groundwater-level-data">groundwater level data</a>, <a href="#peak-flow-data">peak flow data</a>, <a href="#rating-curve-data">rating curve data</a>, <a href="#surface-water-measurement-data">surface-water measurement
+data</a>, <a href="#water-use-data">water use data</a>, and <a href="#statistics-data">statistics data</a>. The section <a href="#embedded-metadata">Embedded Metadata</a> shows instructions for
+getting metadata that is attached to each returned data frame.</p>
+<p>The USGS organizes hydrologic data in a standard structure.
+Streamgages are located throughout the United States, and each
+streamgage has a unique ID (referred in this document and throughout the
+<code>dataRetrieval</code> package as <code>siteNumber</code>). Often
+(but not always), these ID’s are 8 digits for surface-water sites and 15
+digits for groundwater sites. The first step to finding data is
+discovering this <code>siteNumber</code>. There are many ways to do
+this, one is the <a href="https://maps.waterdata.usgs.gov/mapper/index.html">National Water
+Information System: Mapper</a>.</p>
+<p>Once the <code>siteNumber</code> is known, the next required input
+for USGS data retrievals is the “parameter code”. This is a 5-digit code
+that specifies the measured parameter being requested. For example,
+parameter code 00631 represents “Nitrate plus nitrite, water, filtered,
+milligrams per liter as nitrogen”, with units of “mg/l as N”.</p>
+<p>Not every station will measure all parameters. A short list of
+commonly measured parameters is shown in Table 2.</p>
+<table>
+<caption>Table 2: Common USGS Parameter Codes</caption>
+<thead>
+<tr class="header">
+<th align="left">pCode</th>
+<th align="left">shortName</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">00060</td>
+<td align="left">Discharge [ft<sup>3</sup>/s]</td>
+</tr>
+<tr class="even">
+<td align="left">00065</td>
+<td align="left">Gage height [ft]</td>
+</tr>
+<tr class="odd">
+<td align="left">00010</td>
+<td align="left">Temperature [C]</td>
+</tr>
+<tr class="even">
+<td align="left">00045</td>
+<td align="left">Precipitation [in]</td>
+</tr>
+<tr class="odd">
+<td align="left">00400</td>
+<td align="left">pH</td>
+</tr>
+</tbody>
+</table>
+<p>Two output columns that may not be obvious are “srsname” and “casrn”.
+Srsname stands for “Substance Registry Services”. More information on
+the srs name can be found <a href="https://sor.epa.gov/sor_internet/registry/substreg/home/overview/home.do">here</a>.</p>
+<p>Casrn stands for “Chemical Abstracts Service (CAS) Registry Number”.
+More information on CAS can be found <a href="https://www.cas.org/support/documentation/chemical-substances/faqs">here</a>.</p>
+<p>For unit values data (sensor data measured at regular time intervals
+such as 15 minutes or hourly), knowing the parameter code and
+<code>siteNumber</code> is enough to make a request for data. For most
+variables that are measured on a continuous basis, the USGS also stores
+the historical data as daily values. These daily values are statistical
+summaries of the continuous data, e.g. maximum, minimum, mean, or
+median. The different statistics are specified by a 5-digit statistics
+code.</p>
+<p>Some common codes are shown in Table 3.</p>
+<table>
+<caption>Table 3: Commonly used USGS Stat Codes</caption>
+<thead>
+<tr class="header">
+<th align="left">StatCode</th>
+<th align="left">shortName</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">00001</td>
+<td align="left">Maximum</td>
+</tr>
+<tr class="even">
+<td align="left">00002</td>
+<td align="left">Minimum</td>
+</tr>
+<tr class="odd">
+<td align="left">00003</td>
+<td align="left">Mean</td>
+</tr>
+<tr class="even">
+<td align="left">00008</td>
+<td align="left">Median</td>
+</tr>
+</tbody>
+</table>
+<p>Examples for using these site numbers, parameter codes, and statistic
+codes will be presented in subsequent sections.</p>
+<p>There are occasions where NWIS values are not reported as numbers,
+instead there might be text describing a certain event such as “Ice”.
+Any value that cannot be converted to a number will be reported as NA in
+this package (not including remark code columns), unless the user sets
+an argument <code>convertType</code> to <code>FALSE</code>. In that
+case, the data is returned as a data frame that is entirely character
+columns.</p>
+<div id="site-information" class="section level2" number="1.1">
+<h2><span class="header-section-number">1.1</span> Site Information</h2>
+<div id="readnwissite" class="section level3" number="1.1.1">
+<h3><span class="header-section-number">1.1.1</span> readNWISsite</h3>
+<p>Use the <code>readNWISsite</code> function to obtain all of the
+information available for a particular USGS site (or sites) such as full
+station name, drainage area, latitude, and longitude.
+<code>readNWISsite</code> can also access information about multiple
+sites with a vector input.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>siteNumbers <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;01491000&quot;</span>, <span class="st">&quot;01645000&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>siteINFO <span class="ot">&lt;-</span> <span class="fu">readNWISsite</span>(siteNumbers)</span></code></pre></div>
+<p>Site information is obtained from: <a href="https://waterservices.usgs.gov/rest/Site-Test-Tool.html">https://waterservices.usgs.gov/rest/Site-Test-Tool.html</a></p>
+<p>Information on the returned data can be found with the
+<code>comment</code> function as described in the <a href="#embedded-metadata">Metadata</a> section.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">comment</span>(siteINFO)</span></code></pre></div>
+</div>
+<div id="whatnwisdata" class="section level3" number="1.1.2">
+<h3><span class="header-section-number">1.1.2</span> whatNWISdata</h3>
+<p>To discover what data is available for a particular USGS site,
+including measured parameters, period of record, and number of samples
+(count), use the <code>whatNWISdata</code> function. It is possible to
+limit the retrieval information to a subset of services. The possible
+choices for services are: “dv” (daily values), “uv”, or “iv” (unit
+values), “qw” (water-quality), “sv” (sites visits), “pk” (peak
+measurements), “gw” (groundwater levels), “ad” (sites included in USGS
+Annual Water Data Reports External Link), “aw” (sites monitored by the
+USGS Active Groundwater Level Network External Link), and “id”
+(historical instantaneous values).</p>
+<p>In the following example, we limit the retrieved data to only daily
+data. The default for “service” is <code>all</code>, which returns all
+of the available data for that site. Likewise, there are arguments for
+parameter code (<code>parameterCd</code>) and statistic code
+(<code>statCd</code>) to filter the results. The default for both is to
+return all possible values (<code>all</code>). The returned
+<code>count_nu</code> for “uv” data is the count of days with returned
+data, not the actual count of returned values.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Continuing from the previous example:</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># This pulls out just the daily, mean data:</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>dailyDataAvailable <span class="ot">&lt;-</span> <span class="fu">whatNWISdata</span>(</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">siteNumber =</span> siteNumbers,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">service =</span> <span class="st">&quot;dv&quot;</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">statCd =</span> <span class="st">&quot;00003&quot;</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<table>
+<caption>Table 4: Reformatted version of output from the whatNWISdata
+function for the Choptank River near Greensboro, MD, and from Seneca
+Creek at Dawsonville, MD from the daily values service [Some columns
+deleted for space considerations]</caption>
+<colgroup>
+<col width="12%" />
+<col width="40%" />
+<col width="11%" />
+<col width="11%" />
+<col width="6%" />
+<col width="17%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">siteNumbers</th>
+<th align="left">srsname</th>
+<th align="left">startDate</th>
+<th align="left">endDate</th>
+<th align="left">count</th>
+<th align="left">units</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">01491000</td>
+<td align="left">Temperature, water</td>
+<td align="left">2010-10-01</td>
+<td align="left">2012-05-09</td>
+<td align="left">529</td>
+<td align="left">deg C</td>
+</tr>
+<tr class="even">
+<td align="left">01491000</td>
+<td align="left">Stream flow, mean daily</td>
+<td align="left">1948-01-01</td>
+<td align="left">2017-05-17</td>
+<td align="left">25340</td>
+<td align="left">ft<sup>3</sup>/s</td>
+</tr>
+<tr class="odd">
+<td align="left">01645000</td>
+<td align="left">Stream flow, mean daily</td>
+<td align="left">1930-09-26</td>
+<td align="left">2017-05-17</td>
+<td align="left">31646</td>
+<td align="left">ft<sup>3</sup>/s</td>
+</tr>
+<tr class="even">
+<td align="left">01491000</td>
+<td align="left">Specific conductance</td>
+<td align="left">2010-10-01</td>
+<td align="left">2012-05-09</td>
+<td align="left">527</td>
+<td align="left">uS/cm <span class="citation">@25C</span></td>
+</tr>
+<tr class="odd">
+<td align="left">01491000</td>
+<td align="left">Suspended sediment concentration (SSC)</td>
+<td align="left">1980-10-01</td>
+<td align="left">1991-09-30</td>
+<td align="left">4017</td>
+<td align="left">mg/l</td>
+</tr>
+<tr class="even">
+<td align="left">01491000</td>
+<td align="left">Suspended sediment discharge</td>
+<td align="left">1980-10-01</td>
+<td align="left">1991-09-30</td>
+<td align="left">4017</td>
+<td align="left">tons/day</td>
+</tr>
+</tbody>
+</table>
+<p>See <a href="#creating-tables-in-microsoft-software-from-r">Creating
+Tables</a> for instructions on converting an R data frame to a table in
+Microsoft® software Excel or Word to display a data availability table
+similar to Table 4. Excel, Microsoft, PowerPoint, Windows, and Word are
+registered trademarks of Microsoft Corporation in the United States and
+other countries.</p>
+</div>
+</div>
+<div id="parameter-information" class="section level2" number="1.2">
+<h2><span class="header-section-number">1.2</span> Parameter
+Information</h2>
+<p>To obtain all of the available information concerning a measured
+parameter (or multiple parameters), use the <code>readNWISpCode</code>
+function:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Using defaults:</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>parameterCd <span class="ot">&lt;-</span> <span class="st">&quot;00618&quot;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>parameterINFO <span class="ot">&lt;-</span> <span class="fu">readNWISpCode</span>(parameterCd)</span></code></pre></div>
+</div>
+<div id="daily-data" class="section level2" number="1.3">
+<h2><span class="header-section-number">1.3</span> Daily Data</h2>
+<p>To obtain daily records of USGS data, use the <code>readNWISdv</code>
+function. The arguments for this function are <code>siteNumbers</code>,
+<code>parameterCd</code>, <code>startDate</code>, <code>endDate</code>,
+and <code>statCd</code> (defaults to “00003”). If you want to use the
+default values, you do not need to list them in the function call. Daily
+data is pulled from <a href="https://waterservices.usgs.gov/rest/DV-Test-Tool.html">https://waterservices.usgs.gov/rest/DV-Test-Tool.html</a>.</p>
+<p>The dates (start and end) must be in the format “YYYY-MM-DD” (note:
+the user must include the quotes). Setting the start date to “” (no
+space) will prompt the program to ask for the earliest date, and setting
+the end date to “” (no space) will prompt for the latest available
+date.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Choptank River near Greensboro, MD:</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>siteNumber <span class="ot">&lt;-</span> <span class="st">&quot;01491000&quot;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>parameterCd <span class="ot">&lt;-</span> <span class="st">&quot;00060&quot;</span> <span class="co"># Discharge</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>startDate <span class="ot">&lt;-</span> <span class="st">&quot;2009-10-01&quot;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>endDate <span class="ot">&lt;-</span> <span class="st">&quot;2012-09-30&quot;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>discharge <span class="ot">&lt;-</span> <span class="fu">readNWISdv</span>(siteNumber, parameterCd, startDate, endDate)</span></code></pre></div>
+<p>The column “datetime” in the returned data frame is automatically
+imported as a variable of class “Date” in R. Each requested parameter
+has a value and remark code column. The names of these columns depend on
+the requested parameter and stat code combinations. USGS daily value
+qualification codes are often “A” (approved for publication) or “P”
+(provisional data subject to revision).</p>
+<p>Another example would be a request for mean and maximum daily
+temperature and discharge in early 2012:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>siteNumber <span class="ot">&lt;-</span> <span class="st">&quot;01491000&quot;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>parameterCd <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;00010&quot;</span>, <span class="st">&quot;00060&quot;</span>) <span class="co"># Temperature and discharge</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>statCd <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;00001&quot;</span>, <span class="st">&quot;00003&quot;</span>) <span class="co"># Mean and maximum</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>startDate <span class="ot">&lt;-</span> <span class="st">&quot;2012-01-01&quot;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>endDate <span class="ot">&lt;-</span> <span class="st">&quot;2012-05-01&quot;</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>temperatureAndFlow <span class="ot">&lt;-</span> <span class="fu">readNWISdv</span>(siteNumber, parameterCd,</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  startDate, endDate,</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">statCd =</span> statCd</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>The column names can be shortened and simplified using the
+<code>renameNWISColumns</code> function. This is not necessary, but may
+streamline subsequent data analysis and presentation. Site information,
+daily statistic information, and measured parameter information is
+attached to the data frame as attributes. This is discussed further in
+the <a href="#embedded-metadata">metadata</a> section.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(temperatureAndFlow)</span></code></pre></div>
+<pre><code>## [1] &quot;agency_cd&quot;        &quot;site_no&quot;          &quot;Date&quot;            
+## [4] &quot;X_00010_00001_cd&quot; &quot;X_00010_00001&quot;    &quot;X_00010_00003_cd&quot;
+## [7] &quot;X_00010_00003&quot;    &quot;X_00060_00003_cd&quot; &quot;X_00060_00003&quot;</code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>temperatureAndFlow <span class="ot">&lt;-</span> <span class="fu">renameNWISColumns</span>(temperatureAndFlow)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(temperatureAndFlow)</span></code></pre></div>
+<pre><code>## [1] &quot;agency_cd&quot;    &quot;site_no&quot;      &quot;Date&quot;        
+## [4] &quot;Wtemp_Max_cd&quot; &quot;Wtemp_Max&quot;    &quot;Wtemp_cd&quot;    
+## [7] &quot;Wtemp&quot;        &quot;Flow_cd&quot;      &quot;Flow&quot;</code></pre>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Information about the data frame attributes:</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(<span class="fu">attributes</span>(temperatureAndFlow))</span></code></pre></div>
+<pre><code>## [1] &quot;names&quot;         &quot;row.names&quot;     &quot;url&quot;          
+## [4] &quot;siteInfo&quot;      &quot;variableInfo&quot;  &quot;disclaimer&quot;   
+## [7] &quot;statisticInfo&quot; &quot;queryTime&quot;     &quot;class&quot;</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>statInfo <span class="ot">&lt;-</span> <span class="fu">attr</span>(temperatureAndFlow, <span class="st">&quot;statisticInfo&quot;</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>variableInfo <span class="ot">&lt;-</span> <span class="fu">attr</span>(temperatureAndFlow, <span class="st">&quot;variableInfo&quot;</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>siteInfo <span class="ot">&lt;-</span> <span class="fu">attr</span>(temperatureAndFlow, <span class="st">&quot;siteInfo&quot;</span>)</span></code></pre></div>
+<p>An example of plotting the above data:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>variableInfo <span class="ot">&lt;-</span> <span class="fu">attr</span>(temperatureAndFlow, <span class="st">&quot;variableInfo&quot;</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>siteInfo <span class="ot">&lt;-</span> <span class="fu">attr</span>(temperatureAndFlow, <span class="st">&quot;siteInfo&quot;</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">5</span>)) <span class="co"># sets the size of the plot window</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(temperatureAndFlow<span class="sc">$</span>Date, temperatureAndFlow<span class="sc">$</span>Wtemp_Max,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">ylab =</span> variableInfo<span class="sc">$</span>parameter_desc[<span class="dv">1</span>],</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">new =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(temperatureAndFlow<span class="sc">$</span>Date,</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  temperatureAndFlow<span class="sc">$</span>Flow,</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">col =</span> <span class="st">&quot;red&quot;</span>, <span class="at">type =</span> <span class="st">&quot;l&quot;</span>,</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">xaxt =</span> <span class="st">&quot;n&quot;</span>, <span class="at">yaxt =</span> <span class="st">&quot;n&quot;</span>,</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;&quot;</span>,</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">axes =</span> <span class="cn">FALSE</span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">4</span>, <span class="at">col =</span> <span class="st">&quot;red&quot;</span>, <span class="at">col.axis =</span> <span class="st">&quot;red&quot;</span>)</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a><span class="fu">mtext</span>(variableInfo<span class="sc">$</span>parameter_desc[<span class="dv">2</span>], <span class="at">side =</span> <span class="dv">4</span>, <span class="at">line =</span> <span class="dv">3</span>, <span class="at">col =</span> <span class="st">&quot;red&quot;</span>)</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a><span class="fu">title</span>(<span class="fu">paste</span>(siteInfo<span class="sc">$</span>station_nm, <span class="st">&quot;2012&quot;</span>))</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">&quot;topleft&quot;</span>, variableInfo<span class="sc">$</span>param_units,</span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;red&quot;</span>), <span class="at">lty =</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="dv">1</span>),</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">pch =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="cn">NA</span>)</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="unit-data" class="section level2" number="1.4">
+<h2><span class="header-section-number">1.4</span> Unit Data</h2>
+<p>Any data collected at regular time intervals (such as 15-minute or
+hourly) are known as “unit values”. Many of these are delivered on a
+real time basis and very recent data (even less than an hour old in many
+cases) are available through the function <code>readNWISuv</code>. Some
+of these unit values are available for many years, and some are only
+available for a recent time period such as 120 days. Here is an example
+of a retrieval of such data.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>parameterCd <span class="ot">&lt;-</span> <span class="st">&quot;00060&quot;</span> <span class="co"># Discharge</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>startDate <span class="ot">&lt;-</span> <span class="st">&quot;2012-05-12&quot;</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>endDate <span class="ot">&lt;-</span> <span class="st">&quot;2012-05-13&quot;</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>dischargeUnit <span class="ot">&lt;-</span> <span class="fu">readNWISuv</span>(siteNumber, parameterCd, startDate, endDate)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>dischargeUnit <span class="ot">&lt;-</span> <span class="fu">renameNWISColumns</span>(dischargeUnit)</span></code></pre></div>
+<p>The retrieval produces a data frame that contains 96 rows (one for
+every 15 minute period in the day). They include all data collected from
+the <code>startDate</code> through the <code>endDate</code> (starting
+and ending with midnight locally-collected time). The dateTime column is
+converted to UTC (Coordinated Universal Time), so midnight EST will be 5
+hours earlier in the dateTime column (the previous day, at 7pm).</p>
+<p>To override the UTC timezone, specify a valid timezone in the tz
+argument. Default is ““, which will keep the dateTime column in UTC.
+Other valid timezones are:</p>
+<pre><code>America/New_York
+America/Chicago
+America/Denver
+America/Los_Angeles
+America/Anchorage
+America/Honolulu
+America/Jamaica
+America/Managua
+America/Phoenix
+America/Metlakatla</code></pre>
+<p>Data are retrieved from <a href="https://waterservices.usgs.gov/rest/IV-Test-Tool.html">https://waterservices.usgs.gov/rest/IV-Test-Tool.html</a>.
+There are occasions where NWIS values are not reported as numbers,
+instead a common example is “Ice”. Any value that cannot be converted to
+a number will be reported as NA in this package. Site information and
+measured parameter information is attached to the data frame as
+attributes. This is discussed further in <a href="#embedded-metadata">metadata</a> section.</p>
+</div>
+<div id="groundwater-level-data" class="section level2" number="1.5">
+<h2><span class="header-section-number">1.5</span> Groundwater Level
+Data</h2>
+<p>Groundwater level measurements can be obtained with the
+<code>readNWISgwl</code> function. Information on the returned data can
+be found with the <code>comment</code> function, and attached attributes
+as described in the <a href="#embedded-metadata">metadata</a>
+section.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>siteNumber <span class="ot">&lt;-</span> <span class="st">&quot;434400121275801&quot;</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>groundWater <span class="ot">&lt;-</span> <span class="fu">readNWISgwl</span>(siteNumber)</span></code></pre></div>
+</div>
+<div id="peak-flow-data" class="section level2" number="1.6">
+<h2><span class="header-section-number">1.6</span> Peak Flow Data</h2>
+<p>Peak flow data are instantaneous discharge or stage data that record
+the maximum values of these variables during a flood event. They include
+the annual peak flood event but can also include records of other peaks
+that are lower than the annual maximum. Peak discharge measurements can
+be obtained with the <code>readNWISpeak</code> function. Information on
+the returned data can be found with the <code>comment</code> function
+and attached attributes as described in the <a href="#embedded-metadata">metadata</a> section.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>siteNumber <span class="ot">&lt;-</span> <span class="st">&quot;01594440&quot;</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>peakData <span class="ot">&lt;-</span> <span class="fu">readNWISpeak</span>(siteNumber)</span></code></pre></div>
+</div>
+<div id="rating-curve-data" class="section level2" number="1.7">
+<h2><span class="header-section-number">1.7</span> Rating Curve
+Data</h2>
+<p>Rating curves are the calibration curves that are used to convert
+measurements of stage to discharge. Because of changing hydrologic
+conditions these rating curves change over time. Information on the
+returned data can be found with the <code>comment</code> function and
+attached attributes as described in the <a href="#embedded-metadata">metadata</a> section.</p>
+<p>Rating curves can be obtained with the <code>readNWISrating</code>
+function.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>ratingData <span class="ot">&lt;-</span> <span class="fu">readNWISrating</span>(siteNumber, <span class="st">&quot;base&quot;</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">attr</span>(ratingData, <span class="st">&quot;RATING&quot;</span>)</span></code></pre></div>
+</div>
+<div id="surface-water-measurement-data" class="section level2" number="1.8">
+<h2><span class="header-section-number">1.8</span> Surface-Water
+Measurement Data</h2>
+<p>These data are the discrete measurements of discharge that are made
+for the purpose of developing or revising the rating curve. Information
+on the returned data can be found with the <code>comment</code> function
+and attached attributes as described in the <a href="#embedded-metadata">metadata</a> section.</p>
+<p>Surface-water measurement data can be obtained with the
+<code>readNWISmeas</code> function.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>surfaceData <span class="ot">&lt;-</span> <span class="fu">readNWISmeas</span>(siteNumber)</span></code></pre></div>
+</div>
+<div id="water-use-data" class="section level2" number="1.9">
+<h2><span class="header-section-number">1.9</span> Water Use Data</h2>
+<p>Retrieves water use data from USGS Water Use Data for the Nation. See
+<a href="https://waterdata.usgs.gov/nwis/wu">https://waterdata.usgs.gov/nwis/wu</a>
+for more information. All available use categories for the supplied
+arguments are retrieved.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>allegheny <span class="ot">&lt;-</span> <span class="fu">readNWISuse</span>(</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">stateCd =</span> <span class="st">&quot;Pennsylvania&quot;</span>,</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">countyCd =</span> <span class="st">&quot;Allegheny&quot;</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>national <span class="ot">&lt;-</span> <span class="fu">readNWISuse</span>(</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">stateCd =</span> <span class="cn">NULL</span>,</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">countyCd =</span> <span class="cn">NULL</span>,</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">transform =</span> <span class="cn">TRUE</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="statistics-data" class="section level2" number="1.10">
+<h2><span class="header-section-number">1.10</span> Statistics Data</h2>
+<p>Retrieves site statistics from the USGS Statistics Web Service
+beta.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>discharge_stats <span class="ot">&lt;-</span> <span class="fu">readNWISstat</span>(</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">siteNumbers =</span> <span class="fu">c</span>(<span class="st">&quot;02319394&quot;</span>),</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">parameterCd =</span> <span class="fu">c</span>(<span class="st">&quot;00060&quot;</span>),</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">statReportType =</span> <span class="st">&quot;annual&quot;</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+</div>
+<div id="water-quality-portal-web-retrievals" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Water Quality Portal
+Web Retrievals</h1>
+<p>Water quality data sets available from the <a href="https://www.waterqualitydata.us/">Water Quality Data Portal</a>.
+These data sets can be housed in either the STORET database (data from
+EPA), NWIS database (data from USGS), STEWARDS database (data from
+USDA), and additional databases are slated to be included in the future.
+Because only USGS uses parameter codes, a “characteristic name” must be
+supplied. The <code>readWQPqw</code> function can take either a USGS
+parameter code, or a more general characteristic name in the parameterCd
+input argument. The Water Quality Data Portal includes data discovery
+tools and information on characteristic names. The following example
+retrieves specific conductance from a DNR site in Wisconsin.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>specificCond <span class="ot">&lt;-</span> <span class="fu">readWQPqw</span>(</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;WIDNR_WQX-10032762&quot;</span>,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Specific conductance&quot;</span>,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;2011-05-01&quot;</span>, <span class="st">&quot;2011-09-30&quot;</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="generalized-retrievals" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Generalized
+Retrievals</h1>
+<p>The previous examples all took specific input arguments:
+<code>siteNumber</code>, <code>parameterCd</code> (or characteristic
+name), <code>startDate</code>, <code>endDate</code>, etc. However, the
+Web services that supply the data can accept a wide variety of
+additional arguments.</p>
+<div id="nwis" class="section level2" number="3.1">
+<h2><span class="header-section-number">3.1</span> NWIS</h2>
+<div id="sites-whatnwissites" class="section level3" number="3.1.1">
+<h3><span class="header-section-number">3.1.1</span> Sites:
+whatNWISsites</h3>
+<p>The function <code>whatNWISsites</code> can be used to discover NWIS
+sites based on any query that the NWIS Site Service offers. This is done
+by using the <code>...</code> argument, which allows the user to use any
+arbitrary input argument. We can then use the service <a href="https://waterservices.usgs.gov/rest/Site-Test-Tool.html">here</a>
+to discover many options for searching for NWIS sites. For example, you
+may want to search for sites in a lat/lon bounding box, or only sites
+tidal streams, or sites with water quality samples, sites above a
+certain altitude, etc. The results of this site query generate a URL.
+For example, the tool provided a search within a specified bounding box,
+for sites that have daily discharge (parameter code = 00060) and
+temperature (parameter code = 00010). The generated URL is:</p>
+<p><a href="https://waterservices.usgs.gov/nwis/site/?format=rdb&amp;bBox=-83.0,36.5,-81.0,38.5&amp;parameterCd=00010,00060&amp;hasDataTypeCd=dv">https://waterservices.usgs.gov/nwis/site/?format=rdb&amp;bBox=-83.0,36.5,-81.0,38.5&amp;parameterCd=00010,00060&amp;hasDataTypeCd=dv</a></p>
+<p>The following <code>dataRetrieval</code> code can be used to get
+those sites:</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>sites <span class="ot">&lt;-</span> <span class="fu">whatNWISsites</span>(</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">bBox =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">83.0</span>, <span class="fl">36.5</span>, <span class="sc">-</span><span class="fl">81.0</span>, <span class="fl">38.5</span>),</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">parameterCd =</span> <span class="fu">c</span>(<span class="st">&quot;00010&quot;</span>, <span class="st">&quot;00060&quot;</span>),</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">hasDataTypeCd =</span> <span class="st">&quot;dv&quot;</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="data-readnwisdata" class="section level3" number="3.1.2">
+<h3><span class="header-section-number">3.1.2</span> Data:
+readNWISdata</h3>
+<p>For NWIS data, the function <code>readNWISdata</code> can be used.
+The argument listed in the R help file is <code>...</code> and
+<code>service</code> (only for data requests). Table 5 describes the
+services are available.</p>
+<table>
+<caption>Table 5: NWIS general data calls</caption>
+<colgroup>
+<col width="6%" />
+<col width="12%" />
+<col width="80%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Service</th>
+<th align="left">Description</th>
+<th align="left">URL</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">dv</td>
+<td align="left">Daily</td>
+<td align="left"><a href="https://waterservices.usgs.gov/rest/DV-Test-Tool.html" target="_blank"><a href="https://waterservices.usgs.gov/rest/DV-Test-Tool.html" class="uri">https://waterservices.usgs.gov/rest/DV-Test-Tool.html</a><a></td>
+</tr>
+<tr class="even">
+<td align="left">iv</td>
+<td align="left">Instantaneous</td>
+<td align="left"><a href="https://waterservices.usgs.gov/rest/IV-Test-Tool.html" target="_blank"><a href="https://waterservices.usgs.gov/rest/IV-Test-Tool.html" class="uri">https://waterservices.usgs.gov/rest/IV-Test-Tool.html</a><a></td>
+</tr>
+<tr class="odd">
+<td align="left">gwlevels</td>
+<td align="left">Groundwater Levels</td>
+<td align="left"><a href="https://waterservices.usgs.gov/rest/GW-Levels-Test-Tool.html" target="_blank"><a href="https://waterservices.usgs.gov/rest/GW-Levels-Test-Tool.html" class="uri">https://waterservices.usgs.gov/rest/GW-Levels-Test-Tool.html</a><a></td>
+</tr>
+<tr class="even">
+<td align="left">qwdata</td>
+<td align="left">Water Quality</td>
+<td align="left"><a href="https://nwis.waterdata.usgs.gov/nwis/qwdata" target="_blank"><a href="https://nwis.waterdata.usgs.gov/nwis/qwdata" class="uri">https://nwis.waterdata.usgs.gov/nwis/qwdata</a><a></td>
+</tr>
+<tr class="odd">
+<td align="left">measurements</td>
+<td align="left">Surface Water Measurements</td>
+<td align="left"><a href="https://waterdata.usgs.gov/nwis/measurements/" target="_blank"><a href="https://waterdata.usgs.gov/nwis/measurements/" class="uri">https://waterdata.usgs.gov/nwis/measurements/</a><a></td>
+</tr>
+<tr class="even">
+<td align="left">peak</td>
+<td align="left">Peak Flow</td>
+<td align="left"><a href="https://nwis.waterdata.usgs.gov/usa/nwis/peak/" target="_blank"><a href="https://nwis.waterdata.usgs.gov/usa/nwis/peak/" class="uri">https://nwis.waterdata.usgs.gov/usa/nwis/peak/</a><a></td>
+</tr>
+<tr class="odd">
+<td align="left">stat</td>
+<td align="left">Statistics Service</td>
+<td align="left"><a href="https://waterservices.usgs.gov/rest/Statistics-Service-Test-Tool.html" target="_blank"><a href="https://waterservices.usgs.gov/rest/Statistics-Service-Test-Tool.html" class="uri">https://waterservices.usgs.gov/rest/Statistics-Service-Test-Tool.html</a><a></td>
+</tr>
+</tbody>
+</table>
+<p>The <code>...</code> argument allows the user to create their own
+queries based on the instructions found in the web links above. The
+links provide instructions on how to create a URL to request data.
+Perhaps you want sites only in Wisconsin, with a drainage area less than
+50 mi<sup>2</sup>, and the most recent daily discharge data. That
+request would be done as follows:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>dischargeWI <span class="ot">&lt;-</span> <span class="fu">readNWISdata</span>(</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">service =</span> <span class="st">&quot;dv&quot;</span>,</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">stateCd =</span> <span class="st">&quot;WI&quot;</span>,</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">parameterCd =</span> <span class="st">&quot;00060&quot;</span>,</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">drainAreaMin =</span> <span class="st">&quot;50&quot;</span>,</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">statCd =</span> <span class="st">&quot;00003&quot;</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>siteInfo <span class="ot">&lt;-</span> <span class="fu">attr</span>(dischargeWI, <span class="st">&quot;siteInfo&quot;</span>)</span></code></pre></div>
+</div>
+</div>
+<div id="wqp" class="section level2" number="3.2">
+<h2><span class="header-section-number">3.2</span> WQP</h2>
+<p>Just as with NWIS, the Water Quality Portal (WQP) offers a variety of
+ways to search for sites and request data. The possible Web service
+arguments for WQP site searches is found <a href="https://www.waterqualitydata.us/webservices_documentation">here</a>.</p>
+<div id="sites-whatwqpsites" class="section level3" number="3.2.1">
+<h3><span class="header-section-number">3.2.1</span> Sites:
+whatWQPsites</h3>
+<p>To discover available sites in the WQP in New Jersey that have
+measured Chloride, use the function <code>whatWQPsites</code>.</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>sitesNJ <span class="ot">&lt;-</span> <span class="fu">whatWQPsites</span>(</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">statecode =</span> <span class="st">&quot;US:34&quot;</span>,</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">characteristicName =</span> <span class="st">&quot;Chloride&quot;</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="data-readwqpdata" class="section level3" number="3.2.2">
+<h3><span class="header-section-number">3.2.2</span> Data:
+readWQPdata</h3>
+<p>To get data from the WQP using generalized Web service calls, use the
+function <code>readWQPdata</code>. For example, to get all the pH data
+in Wisconsin:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>dataPH <span class="ot">&lt;-</span> <span class="fu">readWQPdata</span>(</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">statecode =</span> <span class="st">&quot;US:55&quot;</span>,</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">characteristicName =</span> <span class="st">&quot;pH&quot;</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="availability-whatwqpdata" class="section level3" number="3.2.3">
+<h3><span class="header-section-number">3.2.3</span> Availability:
+whatWQPdata</h3>
+<p>The function <code>whatWQPdata</code> returns a data frame with
+information on the amount of data collected at a site. For example:</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>type <span class="ot">&lt;-</span> <span class="st">&quot;Stream&quot;</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>sites <span class="ot">&lt;-</span> <span class="fu">whatWQPdata</span>(<span class="at">countycode =</span> <span class="st">&quot;US:55:025&quot;</span>, <span class="at">siteType =</span> type)</span></code></pre></div>
+<p>This returns a data frame with all of the sites that were measured in
+streams in Dane County, WI. Also, in that table, there is a measure of
+<code>activityCount</code> (how often the site was sampled), and
+<code>resultCount</code> (how many individual results are
+available).</p>
+</div>
+<div id="samples-whatwqpsamples" class="section level3" number="3.2.4">
+<h3><span class="header-section-number">3.2.4</span> Samples:
+whatWQPsamples</h3>
+<p>The function <code>whatWQPsamples</code> returns information on the
+individual samples collected at a site. For example:</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>site <span class="ot">&lt;-</span> <span class="fu">whatWQPsamples</span>(<span class="at">siteid =</span> <span class="st">&quot;USGS-01594440&quot;</span>)</span></code></pre></div>
+<p>This returns one row for each instance that a sample was collect.</p>
+</div>
+<div id="metrics-whatwqpmetrics" class="section level3" number="3.2.5">
+<h3><span class="header-section-number">3.2.5</span> Metrics:
+whatWQPmetrics</h3>
+<p>The function <code>whatWQPmetrics</code> provides metric information.
+This is only currently available for STORET data:</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>type <span class="ot">&lt;-</span> <span class="st">&quot;Stream&quot;</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>sites <span class="ot">&lt;-</span> <span class="fu">whatWQPmetrics</span>(<span class="at">countycode =</span> <span class="st">&quot;US:55:025&quot;</span>, <span class="at">siteType =</span> type)</span></code></pre></div>
+</div>
+</div>
+</div>
+<div id="embedded-metadata" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Embedded Metadata</h1>
+<p>All data frames returned from the Web services have some form of
+associated metadata. This information is included as attributes to the
+data frame. All data frames will have a <code>url</code> (returning a
+character of the url used to obtain the data), <code>siteInfo</code>
+(returning a data frame with information on sites), and
+<code>queryTime</code> (returning a POSIXct datetime) attributes. For
+example, the url and query time used to obtain the data can be found as
+follows:</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">attr</span>(dischargeWI, <span class="st">&quot;url&quot;</span>)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="fu">attr</span>(dischargeWI, <span class="st">&quot;queryTime&quot;</span>)</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>siteInfo <span class="ot">&lt;-</span> <span class="fu">attr</span>(dischargeWI, <span class="st">&quot;siteInfo&quot;</span>)</span></code></pre></div>
+<p>Depending on the format that the data was obtained (RDB, WaterML1,
+etc), there will be additional information embedded in the data frame as
+attributes. To discover the available attributes:</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(<span class="fu">attributes</span>(dischargeWI))</span></code></pre></div>
+<p>For data obtained from <code>readNWISuv</code>,
+<code>readNWISdv</code>, <code>readNWISgwl</code> there are two
+attributes that are particularly useful: <code>siteInfo</code> and
+<code>variableInfo</code>.</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>siteInfo <span class="ot">&lt;-</span> <span class="fu">attr</span>(dischargeWI, <span class="st">&quot;siteInfo&quot;</span>)</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>variableInfo <span class="ot">&lt;-</span> <span class="fu">attr</span>(dischargeWI, <span class="st">&quot;variableInfo&quot;</span>)</span></code></pre></div>
+<p>Data obtained from <code>readNWISpeak</code>,
+<code>readNWISmeas</code>, and <code>readNWISrating</code>, the
+<code>comment</code> attribute is useful.</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">comment</span>(peakData)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Which is equivalent to:</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="fu">attr</span>(peakData, <span class="st">&quot;comment&quot;</span>)</span></code></pre></div>
+</div>
+<div id="getting-started-in-r" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Getting Started in
+R</h1>
+<p>This section describes the options for downloading and installing the
+<code>dataRetrieval</code> package.</p>
+<div id="new-to-r" class="section level2" number="5.1">
+<h2><span class="header-section-number">5.1</span> New to R?</h2>
+<p>If you are new to R, you will need to first install the latest
+version of R, which can be found [here] (www.R-project.org).</p>
+<p>At any time, you can get information about any function in R by
+typing a question mark before the functions name. This will open a file
+(in RStudio, in the Help window) that describes the function, the
+required arguments, and provides working examples. This will open a help
+file similar to the image below. To see the raw code for a particular
+code, type the name of the function, without parentheses.</p>
+<pre><code>?readNWISpCode</code></pre>
+<div class="figure">
+<img src="data:image/png;base64,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" alt />
+<p class="caption">A simple R help file</p>
+</div>
+<p>Additionally, many R packages have vignette files attached (such as
+this paper). To view the vignette:</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vignette</span>(<span class="at">topic =</span> <span class="st">&quot;Introduction&quot;</span>, <span class="at">package =</span> <span class="st">&quot;dataRetrieval&quot;</span>)</span></code></pre></div>
+</div>
+</div>
+<div id="disclaimer" class="section level1" number="6">
+<h1><span class="header-section-number">6</span> Disclaimer</h1>
+<p>This information is preliminary and is subject to revision. It is
+being provided to meet the need for timely best science. The information
+is provided on the condition that neither the U.S. Geological Survey nor
+the U.S. Government may be held liable for any damages resulting from
+the authorized or unauthorized use of the information.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

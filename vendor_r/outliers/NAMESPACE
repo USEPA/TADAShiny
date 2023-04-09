@@ -1,0 +1,5 @@
+exportPattern(".*")
+  importFrom("stats", "IQR", "complete.cases", "lm", "mad", "median",
+             "pchisq", "pf", "pnorm", "predict", "pt", "qchisq", "qf",
+             "qnorm", "qt", "quantile", "sd", "terms", "uniroot", "var")
+

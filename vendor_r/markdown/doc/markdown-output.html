@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<title>HTML Output from Markdown Examples</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.6.0/build/styles/github.min.css">
+<script src="https://cdn.jsdelivr.net/combine/gh/highlightjs/cdn-release@11.6.0/build/highlight.min.js,npm/@xiee/utils/js/load-highlight.js" async></script>
+
+<!-- MathJax scripts -->
+<script src="https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML" async>
+</script>
+
+<style type="text/css">
+body, td {
+  font-family: sans-serif;
+  background-color: white;
+  font-size: 13px;
+}
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+tt, code, pre {
+  font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+a:visited { color: #80007f; }
+pre, img { max-width: 100%; }
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+code[class] { background-color: #F8F8F8; }
+code.language-undefined { background-color: inherit; }
+table {
+  margin: auto;
+  border-top: 1px solid #666;
+  border-bottom: 1px solid #666;
+}
+table thead th { border-bottom: 1px solid #ddd; }
+th, td { padding: 5px; }
+thead, tfoot, tr:nth-child(even) { background: #eee; }
+blockquote {
+  color:#666;
+  margin:0;
+  padding-left: 1em;
+  border-left: 0.5em #eee solid;
+}
+hr { border: 1px #ddd dashed; }
+.frontmatter { text-align: center; }
+
+@media print {
+  * {
+    background: transparent !important;
+    color: black !important;
+    filter:none !important;
+  }
+  body {
+    font-size: 12pt;
+    max-width: 100%;
+  }
+  a, a:visited { text-decoration: underline; }
+  hr {
+    visibility: hidden;
+    page-break-before: always;
+  }
+  pre, blockquote {
+    padding-right: 1em;
+    page-break-inside: avoid;
+  }
+  tr, img { page-break-inside: avoid; }
+  img { max-width: 100% !important; }
+  @page :left { margin: 15mm 20mm 15mm 10mm; }
+  @page :right { margin: 15mm 10mm 15mm 20mm; }
+  p, h2, h3 { orphans: 3; widows: 3; }
+  h2, h3 { page-break-after: avoid; }
+}
+</style>
+
+
+</head>
+
+<body>
+<div class="include-before">
+
+</div>
+
+<div class="frontmatter">
+<div class="title"><h1>HTML Output from Markdown Examples</h1></div>
+<div class="author"><h2></h2></div>
+<div class="date"><h3></h3></div>
+</div>
+
+<div class="body">
+<!--
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{HTML Output from Markdown Examples}
+-->
+<p>This vignette shows how the output looks like in HTML from the other vignette <code>markdown-examples.Rmd</code>, in which the literal HTML code was shown.</p>
+<pre><code class="language-r">library(markdown)
+
+# toc example
+mkd &lt;- c(&quot;# Header 1&quot;, &quot;p1&quot;, &quot;## Header 2&quot;, &quot;p2&quot;)
+
+cat(mark(mkd))
+</code></pre>
+<h1>Header 1</h1>
+<p>p1</p>
+<h2>Header 2</h2>
+<p>p2</p>
+<pre><code class="language-r">cat(mark(mkd, options = &quot;toc&quot;))
+</code></pre>
+<div id="TOC">
+<ul>
+<li>Header 1
+<ul>
+<li>Header 2</li>
+</ul>
+</li>
+</ul>
+</div>
+<h1>Header 1</h1>
+<p>p1</p>
+<h2>Header 2</h2>
+<p>p2</p>
+<pre><code class="language-r"># hard_wrap example
+cat(mark(&quot;foo\nbar\n&quot;))
+</code></pre>
+<p>foo
+bar</p>
+<pre><code class="language-r">cat(mark(&quot;foo\nbar\n&quot;, options = &quot;hard_wrap&quot;))
+</code></pre>
+<p>foo<br />
+bar</p>
+<pre><code class="language-r"># latex math example
+mkd &lt;- c(
+  &quot;`$x$` is inline math $x$!&quot;, &quot;&quot;, &quot;Display style:&quot;, &quot;&quot;, &quot;$$x + y$$&quot;, &quot;&quot;,
+  &quot;\\begin{eqnarray}
+a^{2}+b^{2} &amp; = &amp; c^{2}\\\\
+\\sin^{2}(x)+\\cos^{2}(x) &amp; = &amp; 1
+\\end{eqnarray}&quot;
+)
+
+cat(mark(mkd))
+</code></pre>
+<p><code>$x$</code> is inline math \(x\)!</p>
+<p>Display style:</p>
+<p>$$x + y$$</p>
+<p>\begin{eqnarray} a^{2}+b^{2} &amp; = &amp; c^{2}\\ \sin^{2}(x)+\cos^{2}(x) &amp; = &amp; 1 \end{eqnarray}</p>
+<pre><code class="language-r">cat(mark(mkd, options = &quot;-latex_math&quot;))
+</code></pre>
+<p><code>$x$</code> is inline math $x$!</p>
+<p>Display style:</p>
+<p>$$x + y$$</p>
+<p>\begin{eqnarray}
+a^{2}+b^{2} &amp; = &amp; c^{2}\
+\sin^{2}(x)+\cos^{2}(x) &amp; = &amp; 1
+\end{eqnarray}</p>
+<pre><code class="language-r"># tables example (need 4 spaces at beginning of line here)
+cat(mark(&quot;
+First Header  | Second Header
+------------- | -------------
+Content Cell  | Content Cell
+Content Cell  | Content Cell
+&quot;))
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>First Header</th>
+<th>Second Header</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Content Cell</td>
+<td>Content Cell</td>
+</tr>
+<tr>
+<td>Content Cell</td>
+<td>Content Cell</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-r"># but not here
+cat(mark(&quot;
+First Header  | Second Header
+------------- | -------------
+Content Cell  | Content Cell
+Content Cell  | Content Cell
+&quot;, options = '-table'))
+</code></pre>
+<p>First Header  | Second Header
+———–– | ———––
+Content Cell  | Content Cell
+Content Cell  | Content Cell</p>
+<pre><code class="language-r"># autolink example
+cat(mark(&quot;https://www.r-project.org/&quot;))
+</code></pre>
+<p><a href="https://www.r-project.org/">https://www.r-project.org/</a></p>
+<pre><code class="language-r">cat(mark(&quot;https://www.r-project.org/&quot;, options = &quot;-autolink&quot;))
+</code></pre>
+<p>https://www.r-project.org/</p>
+<pre><code class="language-r"># strikethrough example
+cat(mark(&quot;~~awesome~~&quot;))
+</code></pre>
+<p><del>awesome</del></p>
+<pre><code class="language-r">cat(mark(&quot;~~awesome~~&quot;, options = &quot;-strikethrough&quot;))
+</code></pre>
+<p>~~awesome~~</p>
+<pre><code class="language-r"># superscript and subscript examples
+cat(mark(&quot;2^10^&quot;))
+</code></pre>
+<p>2<sup>10</sup></p>
+<pre><code class="language-r">cat(mark(&quot;2^10^&quot;, options = &quot;-superscript&quot;))
+</code></pre>
+<p>2<sup>10</sup></p>
+<pre><code class="language-r">cat(mark(&quot;H~2~O&quot;))
+</code></pre>
+<p>H<sub>2</sub>O</p>
+<pre><code class="language-r">cat(mark(&quot;H~2~O&quot;, options = &quot;-subscript&quot;))
+</code></pre>
+<p>H<sub>2</sub>O</p>
+<pre><code class="language-r"># skip_html tags
+mkd = '&lt;style&gt;a {}&lt;/style&gt;&lt;script type=&quot;text/javascript&quot;&gt;console.log(&quot;No!&quot;);&lt;/script&gt;\n[Hello](#)'
+cat(mark(mkd))
+</code></pre>
+<style>a {}</style><script type="text/javascript">console.log("No!");</script>
+<p><a href="#">Hello</a></p>
+<pre><code class="language-r"># TODO: wait for https://github.com/r-lib/commonmark/issues/15 to be fixed
+# cat(mark(mkd, options = &quot;tagfilter&quot;))
+</code></pre>
+<pre><code class="language-r"># smartypants example
+cat(mark(&quot;1/2 (c)&quot;))
+</code></pre>
+<p>½ ©</p>
+<pre><code class="language-r">mkd &lt;- paste(names(markdown:::pants), collapse = ' ')
+cat(mark(mkd))
+</code></pre>
+<p>½ ⅓ ⅔ ¼ ¾ ⅕ ⅖ ⅗ ⅘ ⅙ ⅚ ⅛ ⅜ ⅝ ⅞ ⅐ ⅑ ⅒ © ® ™</p>
+
+</div>
+
+<div class="include-after">
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/combine/npm/@xiee/utils/js/center-img.min.js" async></script>
+<script>
+
+</script>
+</body>
+
+</html>

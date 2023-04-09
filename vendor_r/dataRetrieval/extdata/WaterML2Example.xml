@@ -1,0 +1,120 @@
+<wml2:Collection gml:id="C.USGS.01646500" xsi:schemaLocation="http://www.opengis.net/waterml/2.0 http://schemas.opengis.net/waterml/2.0/waterml2.xsd" xmlns:wml2="http://www.opengis.net/waterml/2.0" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:om="http://www.opengis.net/om/2.0" xmlns:sa="http://www.opengis.net/sampling/2.0" xmlns:sams="http://www.opengis.net/samplingSpatial/2.0" xmlns:swe="http://www.opengis.net/swe/2.0">
+  <gml:identifier codeSpace="http://waterservices.usgs.gov/nwis/dv">USGS.01646500</gml:identifier>
+  <gml:name codeSpace="http://waterservices.usgs.gov/nwis/dv">Timeseries collected at POTOMAC RIVER NEAR WASH, DC LITTLE FALLS PUMP STA</gml:name>
+  <wml2:metadata>
+    <wml2:DocumentMetadata gml:id="doc.USGS.MP.USGS.01646500">
+      <gml:metaDataProperty about="contact" xlink:href="http://waterservices.usgs.gov"/>
+      <wml2:generationDate>2014-10-30T13:46:03.425-04:00</wml2:generationDate>
+      <wml2:version xlink:href="http://www.opengis.net/waterml/2.0" xlink:title="WaterML 2.0"/>
+    </wml2:DocumentMetadata>
+  </wml2:metadata>
+  <wml2:observationMember>
+    <om:OM_Observation gml:id="obs.USGS.01646500.00060.1.00003">
+      <om:phenomenonTime>
+        <gml:TimePeriod gml:id="sample_time.USGS.01646500.00060.1.00003">
+          <gml:beginPosition>2014-09-01</gml:beginPosition>
+          <gml:endPosition>2014-09-08</gml:endPosition>
+        </gml:TimePeriod>
+      </om:phenomenonTime>
+      <om:resultTime>
+        <gml:TimeInstant gml:id="requested_time.USGS.01646500.00060.1.00003">
+          <gml:timePosition>2014-10-30T13:46:03.425-04:00</gml:timePosition>
+        </gml:TimeInstant>
+      </om:resultTime>
+      <om:procedure>
+        <wml2:ObservationProcess gml:id="process.USGS.01646500.00060.1.00003">
+          <wml2:processType xlink:href="http://www.opengis.net/def/waterml/2.0/processType/Sensor" xlink:title="Sensor"/>
+          <wml2:parameter xlink:title="Statistic" xlink:href="http://waterdata.usgs.gov/nwisweb/rdf?statCd=00003">
+            <om:NamedValue>
+              <om:name xlink:title="Mean"/>
+              <om:value xsi:type="xs:string" xmlns:xs="http://www.w3.org/2001/XMLSchema">00003</om:value>
+            </om:NamedValue>
+          </wml2:parameter>
+        </wml2:ObservationProcess>
+      </om:procedure>
+      <om:observedProperty xlink:title="Discharge" xlink:href="http://waterdata.usgs.gov/nwisweb/rdf?parmCd=00060"/>
+      <om:featureOfInterest xlink:title="POTOMAC RIVER NEAR WASH, DC LITTLE FALLS PUMP STA">
+        <wml2:MonitoringPoint gml:id="USGS.MP.USGS.01646500.00060.1.00003">
+          <gml:descriptionReference xlink:href="http://waterservices.usgs.gov/nwis/site/?sites=01646500&amp;agencyCd=USGS&amp;format=rdb" xlink:title="POTOMAC RIVER NEAR WASH, DC LITTLE FALLS PUMP STA"/>
+          <sa:sampledFeature xlink:title="POTOMAC RIVER NEAR WASH, DC LITTLE FALLS PUMP STA"/>
+          <sams:shape>
+            <gml:Point gml:id="USGS.P.USGS.01646500.00060.1.00003">
+              <gml:pos srsName="urn:ogc:def:crs:EPSG:4326">38.94977778 -77.12763889</gml:pos>
+            </gml:Point>
+          </sams:shape>
+        </wml2:MonitoringPoint>
+      </om:featureOfInterest>
+      <om:result>
+        <wml2:MeasurementTimeseries gml:id="TS.USGS.01646500.00060.1.00003">
+          <wml2:defaultPointMetadata>
+            <wml2:DefaultTVPMeasurementMetadata>
+              <wml2:qualifier xlink:title="Provisional data subject to revision.">
+                <swe:Category definition="http://waterdata.usgs.gov/nwisweb/rdf?dvQualCd=P">
+                  <swe:description>Provisional</swe:description>
+                  <swe:value>P</swe:value>
+                </swe:Category>
+              </wml2:qualifier>
+              <wml2:uom xlink:title="ft3/s"/>
+              <wml2:interpolationType/>
+            </wml2:DefaultTVPMeasurementMetadata>
+          </wml2:defaultPointMetadata>
+          <wml2:point>
+            <wml2:MeasurementTVP>
+              <wml2:metadata>
+                <wml2:TVPMeasurementMetadata/>
+              </wml2:metadata>
+            </wml2:MeasurementTVP>
+          </wml2:point>
+          <wml2:point>
+            <wml2:MeasurementTVP>
+              <wml2:time>2014-09-01</wml2:time>
+              <wml2:value>2690.0</wml2:value>
+            </wml2:MeasurementTVP>
+          </wml2:point>
+          <wml2:point>
+            <wml2:MeasurementTVP>
+              <wml2:time>2014-09-02</wml2:time>
+              <wml2:value>2750.0</wml2:value>
+            </wml2:MeasurementTVP>
+          </wml2:point>
+          <wml2:point>
+            <wml2:MeasurementTVP>
+              <wml2:time>2014-09-03</wml2:time>
+              <wml2:value>2990.0</wml2:value>
+            </wml2:MeasurementTVP>
+          </wml2:point>
+          <wml2:point>
+            <wml2:MeasurementTVP>
+              <wml2:time>2014-09-04</wml2:time>
+              <wml2:value>3180.0</wml2:value>
+            </wml2:MeasurementTVP>
+          </wml2:point>
+          <wml2:point>
+            <wml2:MeasurementTVP>
+              <wml2:time>2014-09-05</wml2:time>
+              <wml2:value>2940.0</wml2:value>
+            </wml2:MeasurementTVP>
+          </wml2:point>
+          <wml2:point>
+            <wml2:MeasurementTVP>
+              <wml2:time>2014-09-06</wml2:time>
+              <wml2:value>3100.0</wml2:value>
+            </wml2:MeasurementTVP>
+          </wml2:point>
+          <wml2:point>
+            <wml2:MeasurementTVP>
+              <wml2:time>2014-09-07</wml2:time>
+              <wml2:value>2620.0</wml2:value>
+            </wml2:MeasurementTVP>
+          </wml2:point>
+          <wml2:point>
+            <wml2:MeasurementTVP>
+              <wml2:time>2014-09-08</wml2:time>
+              <wml2:value>2300.0</wml2:value>
+            </wml2:MeasurementTVP>
+          </wml2:point>
+        </wml2:MeasurementTimeseries>
+      </om:result>
+    </om:OM_Observation>
+  </wml2:observationMember>
+</wml2:Collection>

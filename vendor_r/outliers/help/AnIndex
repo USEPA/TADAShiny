@@ -1,0 +1,14 @@
+chisq.out.test	chisq.out.test
+cochran.test	cochran.test
+dixon.test	dixon.test
+grubbs.test	grubbs.test
+outlier	outlier
+pcochran	qcochran
+pdixon	qdixon
+pgrubbs	qgrubbs
+qcochran	qcochran
+qdixon	qdixon
+qgrubbs	qgrubbs
+qtable	qtable
+rm.outlier	rm.outlier
+scores	scores

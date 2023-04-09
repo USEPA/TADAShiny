@@ -1,0 +1,20 @@
+add_busy_bar            Automatic busy indicator (Progress bar)
+add_busy_gif            Automatic busy indicator (GIF)
+add_busy_spinner        Automatic busy indicator (spinner)
+add_loading_state       Loading state for Shiny Outputs
+busy-start-up           Busy indicator at start up
+config_notify           Configure options for 'notify()' and others
+config_report           Configure options for 'report()' and others
+html-dependencies       HTML dependencies used by shinybusy
+logo_silex              Silex logo for Shiny use
+manual-gif              Manual busy indicator (GIF)
+manual-progressbar      Manual busy indicator (progress bar)
+manual-spinner          Manual busy indicator (spinner)
+modal-gif               Show a modal with a GIF
+modal-progress          Show a modal with a progress bar
+modal-spinner           Show a modal with a spinner
+notify                  Notifications
+progress                Create progress indicator
+report                  Reports
+spin_epic               Epic spinners
+spin_kit                SpinKit spinners

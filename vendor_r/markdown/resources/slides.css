@@ -1,0 +1,42 @@
+html {
+  scroll-snap-type: y mandatory;
+}
+.slide {
+  min-height: 100vh;
+  scroll-snap-align: start;
+  padding: 1em;
+  position: relative;
+}
+.slide > h2:first-child {
+  margin-top: unset;
+}
+body {
+  font-size: 2em;
+  max-width: fit-content;
+}
+.frontmatter {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+.page-number {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  font-size: .7em;
+  opacity: .5;
+}
+.overview {
+  font-size: .8em;
+}
+.overview .slide {
+  min-height: unset;
+  scroll-snap-align: unset;
+  padding: unset;
+}
+.overview .page-number {
+  display: none;
+}
+.mirrored {
+  transform: scale(-1, 1);
+}

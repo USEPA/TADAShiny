@@ -1,0 +1,11 @@
+html_format	html_format
+latex_format	html_format
+mark	mark
+markdown	markdown
+markdownToHTML	renderMarkdown
+markdown_options	markdown_options
+mark_html	mark
+mark_latex	mark
+renderMarkdown	renderMarkdown
+rpubsUpload	rpubsUpload
+smartypants	smartypants

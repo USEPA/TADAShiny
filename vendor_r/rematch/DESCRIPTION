@@ -1,0 +1,26 @@
+Package: rematch
+Title: Match Regular Expressions with a Nicer 'API'
+Version: 1.0.1
+Author: Gabor Csardi
+Maintainer: Gabor Csardi <gcsardi@mango-solutions.com>
+Description: A small wrapper on 'regexpr' to extract the matches and
+    captured groups from the match of a regular expression to a character
+    vector.
+License: MIT + file LICENSE
+LazyData: true
+URL: https://github.com/MangoTheCat/rematch
+BugReports: https://github.com/MangoTheCat/rematch/issues
+RoxygenNote: 5.0.1.9000
+Suggests: covr, testthat
+Encoding: UTF-8
+NeedsCompilation: no
+Packaged: 2016-04-20 19:54:37 UTC; gaborcsardi
+Repository: RSPM
+Date/Publication: 2016-04-21 08:20:46
+Built: R 4.2.0; ; 2022-05-06 22:44:04 UTC; unix
+RemoteType: standard
+RemotePkgRef: rematch
+RemoteRef: rematch
+RemoteRepos: https://packagemanager.posit.co/cran/__linux__/jammy/latest
+RemotePkgPlatform: source
+RemoteSha: 1.0.1
