@@ -74,14 +74,15 @@ download_and_build_package <- function(pack) {
     if ("fulltarget_tree" %in% names(dl)) {
         print(dl$fulltarget_tree)
         dir.create("junktemp2")
-        tryCatch(
-            {
-                untar(dl$fulltarget_tree, exdir = "junktemp2")
-            },
-            error = {
-                unzip(dl$fulltarget_tree, exdir = "junktemp2")
-            }
-        )
+        untar(dl$fulltarget_tree, exdir = "junktemp2")
+        # tryCatch(
+        #     {
+        #         untar(dl$fulltarget_tree, exdir = "junktemp2")
+        #     },
+        #     error = {
+        #         unzip(dl$fulltarget_tree, exdir = "junktemp2")
+        #     }
+        # )
         f <- list.files(path = "junktemp2")
         print(f)
         devtools::build(pkg = paste("junktemp2", f[1], sep = "/"),
