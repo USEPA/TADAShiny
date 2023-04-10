@@ -1,7 +1,7 @@
 ---
 applications:
 - name: tada-stage
-  memory: 256M
+  memory: 1000M
   disk_quota: 2G
   routes:
     - route: tada-stage.app.cloud.gov
