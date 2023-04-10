@@ -17,7 +17,8 @@ coverage](https://codecov.io/gh/USEPA/TADAShiny/branch/develop/graph/badge.svg)]
 [![R-CMD-check](https://github.com/USEPA/TADAShiny/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/USEPA/TADAShiny/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-TADAShiny provides a user interface on top of the TADAPackage
+TADAShiny provides a user interface 
+(https://owshiny-dev.app.cloud.gov/tada-dev/) on top of the TADAPackage
 (<https://github.com/USEPA/TADA>). This application can be used to
 compile and evaluate Water Quality Portal (WQP) data for samples
 collected from surface water monitoring sites on streams and lakes.
