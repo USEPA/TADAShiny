@@ -78,7 +78,7 @@ Imports: plyr, data.table, dplyr, grDevices, magrittr, stringr, utils,
 Suggests: readr, tidyverse, knitr, testthat, testthis, usethis,
         devtools, pkgdown, Rcpp, spelling
 License: CC0
-MD5sum: 97bcafbbf89fbba8b9609dc3e505de84
+MD5sum: c46ba95fbe15dc4a93dcbb79e1ec28e7
 NeedsCompilation: no
 
 Package: anytime
@@ -1059,6 +1059,25 @@ Suggests: bit64, covr, dichromat, ggplot2, hms (>= 0.5.0), stringi,
 License: MIT + file LICENSE
 MD5sum: 651702b055ef6479ebf4676f7124b285
 NeedsCompilation: no
+
+Package: sf
+Version: 1.0-12
+Depends: methods, R (>= 3.3.0)
+Imports: classInt (>= 0.4-1), DBI (>= 0.8), graphics, grDevices, grid,
+        magrittr, Rcpp (>= 0.12.18), s2 (>= 1.1.0), stats, tools, units
+        (>= 0.7-0), utils
+LinkingTo: Rcpp
+Suggests: blob, covr, dplyr (>= 0.8-3), ggplot2, knitr, lwgeom (>=
+        0.2-1), maps, mapview, Matrix, microbenchmark, odbc, pbapply,
+        pillar, pool, raster, rlang, rmarkdown, RPostgres (>= 1.1.0),
+        RPostgreSQL, RSQLite, sp (>= 1.2-4), spatstat (>= 2.0-1),
+        spatstat.geom, spatstat.random, spatstat.linnet,
+        spatstat.utils, stars (>= 0.2-0), terra, testthat (>= 3.0.0),
+        tibble (>= 1.4.1), tidyr (>= 1.2.0), tidyselect (>= 1.0.0),
+        tmap (>= 2.0), vctrs, wk
+License: GPL-2 | MIT + file LICENSE
+MD5sum: fd185265ff37cd53d063eb57bf329e39
+NeedsCompilation: yes
 
 Package: shinyWidgets
 Version: 0.7.6
