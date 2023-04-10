@@ -24,10 +24,13 @@ if (dir.exists(lib_dir)) {
   }
   if (dir.exists(local_bin_dir)) {
     Sys.setenv(RMARKDOWN_PANDOC = local_bin_dir)
-    Sys.setenv(PATH=paste("/home/vcap/app/", local_bin_dir, ":${PATH}", sep = ""))
+    Sys.setenv(PATH=paste("/home/vcap/app/", local_bin_dir, 
+      ":${PATH}", sep = ""))
   }
   print(list.files(lib_dir))
+  options(shiny.autoload.r = FALSE)
 }
 
 library(shiny)
-runApp(appDir="shiny-app", host="0.0.0.0", port=strtoi(Sys.getenv("PORT")))
+runApp(appDir = "shiny-app", host = "0.0.0.0", port = strtoi(Sys.getenv("PORT")))
+golem::disable_autoload()
