@@ -1,3 +1,5 @@
+name: Copy R Shiny app to cloud-gov branch and prepare for deployment
+
 on:
   workflow_dispatch:
     inputs:
@@ -76,6 +78,7 @@ jobs:
       uses: r-lib/actions/setup-r@v2
       with:
         r-version: 4.2.2
+        use-public-rspm: true
 
     - name: Setup pandoc
       uses: r-lib/actions/setup-pandoc@v2
@@ -86,6 +89,7 @@ jobs:
         packages: |
           stringr
           devtools
+          rlist
           sf
 
     - name: List R dependencies
@@ -95,19 +99,20 @@ jobs:
     - name: Download R packages
       run: |
         if [ -d "vendor_r" ]; then rm -fr vendor_r; fi
-        if [ -f "r-build-deps.txt" ]; then rm r-build-deps.txt; fi
         Rscript scripts/download_packages.R vendor_r/src/contrib ${{ env.packs }}
-        more r-build-deps.txt
-        if [ `grep sf r-build-deps.txt | wc -c` -gt 0 ]; then echo needs_geo=true; else echo needs_geo=false; fi >> $GITHUB_ENV
-        if [ `grep pandoc r-build-deps.txt | wc -c` -gt 0 ]; then echo needs_pandoc=true; else echo needs_pandoc=false; fi >> $GITHUB_ENV
-        # if [ -f "r-build-deps.txt" ]; then echo needs_libraries=true; else echo needs_libraries=false; fi >> $GITHUB_ENV
+        cd vendor_r/src/contrib
+        if ls sf_* >/dev/null 2>&1; then echo needs_geo=true; else echo needs_geo=false; fi >> $GITHUB_ENV
+        if ls rmarkdown_* >/dev/null 2>&1; then echo needs_pandoc=true; else echo needs_pandoc=false; fi >> $GITHUB_ENV
+        if ls *_R_x86_64-pc-linux-gnu.tar.gz >/dev/null 2>&1; then 
+          find -name '*_R_x86_64-pc-linux-gnu.tar.gz' -print0 | sed -ze "p;s/\_R_x86_64-pc-linux-gnu//" | xargs -0 -n2 mv;
+        fi
+        cd ../../..
+      env: 
+        GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Run lib_tar.sh to extract each of the libraries needed by sf
       if: ${{ env.needs_geo == 'true' }}
       run: |
-        cd vendor_r/src/contrib
-        find -name '*_R_x86_64-pc-linux-gnu.tar.gz' -print0 | sed -ze "p;s/\_R_x86_64-pc-linux-gnu//" | xargs -0 -n2 mv
-        cd ../../..
         if [ -d "r-lib" ]; then rm -fr r-lib; fi
         mkdir r-lib
         chmod +x scripts/lib_tar.sh
@@ -130,7 +135,7 @@ jobs:
         
     - name: Add additional files to repo if not already there
       run: |
-        if [ ! ls "manifest*.yml" 1> /dev/null 2>&1 ]; then
+        if ! ls manifest*.yml >/dev/null 2>&1; then
           mv scripts/include/manifest.yml .
           git add manifest.yml
         fi
