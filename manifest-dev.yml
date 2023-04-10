@@ -7,4 +7,4 @@ applications:
     - route: tada-dev.app.cloud.gov
   buildpacks:
     - r_buildpack
-  command: R -f shiny.R # Test manifest update
+  command: R -f shiny.R # Test manifest update again
