@@ -16,7 +16,7 @@ mod_overview_ui <- function(id){
     shiny::fluidRow(column(12, shiny::wellPanel(shiny::htmlOutput(ns("overview_totals"))))),
     htmltools::br(),
     shiny::fluidRow(column(6,shinycssloaders::withSpinner(leaflet::leafletOutput(ns("overview_map"), height = "400px"))),# "Larger point sizes represent more samples collected at a site; darker points represent more characteristics collected at a site. Click on a point to see the site ID, name, and sample/visit/parameter counts.",
-             column(6,DT::DTOutput(ns("overview_orgtable"), height="400px"))),#"Hover over a piece of the pie chart to see the characteristic name, count, and its percentage of the dataset. The pie shows the top ten characteristics as their own slices; all other characteristics fit into the 'ALL OTHERS' group.",
+             column(6,DT::DTOutput(ns("overview_orgtable")))),#"Hover over a piece of the pie chart to see the characteristic name, count, and its percentage of the dataset. The pie shows the top ten characteristics as their own slices; all other characteristics fit into the 'ALL OTHERS' group.",
     htmltools::br(),
     shiny::fluidRow(column(6,shiny::plotOutput(ns("overview_hist"), height="500px")),#"This histogram shows sample collection frequency for all sites over the time period queried.",
              column(6, shiny::plotOutput(ns("overview_barchar"), height="615px")))
@@ -90,13 +90,15 @@ mod_overview_server <- function(id, tadat){
       shiny::req(tadat$raw)
       ggplot2::ggplot(data = tadat$raw, ggplot2::aes(x = as.Date(ActivityStartDate, format = "%Y-%m-%d")))+ggplot2::geom_histogram(color = "black", fill = "#005ea2", binwidth = 7)+ggplot2::labs(title="Results collected per week over date range queried",x="Time", y = "Result Count")+ggplot2::theme_classic(base_size = 16)
     })
+    
     # organization numbers table
     output$overview_orgtable = DT::renderDT({
-      DT::datatable(mapdat$orgs,
-      options = list(dom="t", scrollY=TRUE, pageLength=10, order = list(list(2, 'desc')),
+      DT::datatable(data.frame(mapdat$orgs),
+      options = list(pageLength=10, colnames = c("Organization Name","Results Count"), searching = FALSE),
       rownames= FALSE,
-      selection = 'none'))
+      selection = 'none')
     })
+    
     # characteristics bar chart 
     output$overview_barchar = shiny::renderPlot({
       shiny::req(mapdat$chars)

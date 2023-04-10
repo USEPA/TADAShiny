@@ -32,13 +32,13 @@ app_ui <- function(request) {
         shiny::tabPanel("Flag",
                         htmltools::br(),
                  mod_data_flagging_ui("data_flagging_1")),
-        shiny::tabPanel("Filter", id="filter"),
-        shiny::tabPanel("Harmonize"),
+        # shiny::tabPanel("Filter", id="filter"),
+        # shiny::tabPanel("Harmonize"),
         shiny::tabPanel("Censored Data",
                         htmltools::br(),
                         mod_censored_data_ui("censored_data_1")),
-        shiny::tabPanel("Explore"),
-        shiny::tabPanel("Download")
+        # shiny::tabPanel("Explore"),
+        shiny::tabPanel("User Guide")
       ),
       htmltools::hr(),
       mod_TADA_summary_ui("TADA_summary_1"),

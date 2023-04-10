@@ -21,9 +21,15 @@ app_server <- function(input, output, session) {
   
   # switch to overview tab when tadat$new changes
   shiny::observeEvent(tadat$new,{
+    removed = length(tadat$raw$ResultIdentifier[tadat$raw$Removed==TRUE])
+    if(removed>0){
+      message = paste0("Your data were successfully loaded into the app and are displayed on the Overview tab. ", scales::comma(removed)," results were flagged for removal because their sample media was not WATER or the result value was text or NA and no detection limit value was provided. See dataset summary information in the gray box at the bottom of the app.")
+    }else{
+      message = "Your data were successfully loaded into the app and are displayed on the Overview tab. See summary information about your dataset in the gray box at the bottom of the app."
+    }
       shiny::showModal(shiny::modalDialog(
         title = "Data Loaded",
-        "Your data were successfully loaded into the app and are displayed on the Overview tab."
+        message
       ))
       shiny::updateTabsetPanel(session=session, inputId="tabbar", selected="Overview")
       tadat$new = NULL
