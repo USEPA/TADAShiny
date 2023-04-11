@@ -157,9 +157,10 @@ jobs:
         git push
 
   request_copy:
-    name: Request copy to deployment repo
+    name: Request copy uploaded to deployment repo
     needs: [copy_code_to_cloud-gov, download_and_vendor_dependencies]
-    if: always() && !contains(needs.*.result, 'failure')  # Needs to run even if download_and_vendor_dependencies waas skipped
+    if: always() && !contains(needs.*.result, 'failure') && ${{ secrets.TEST_OWSHINY_DEPLOY }}
+    # Needs to run even if download_and_vendor_dependencies was skipped
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Workflow to copy for deployment
