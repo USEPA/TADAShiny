@@ -166,11 +166,10 @@ jobs:
       - name: Trigger Workflow to copy for deployment
         uses: actions/github-script@v6
         env:
-          token: ${{ secrets.TEST_OWSHINY_DEPLOY }}
-        if:
-          ${{ ! env.token == '' }}
+          repo_token: ${{ secrets.TEST_OWSHINY_DEPLOY }}
+        if: ${{ ! env.repo_token == '' }}
         with:
-          github-token: process.env.token
+          github-token: `${process.env.repo_token}`
           script: |
             github.rest.actions.createWorkflowDispatch({
               owner: 'USEPA',
