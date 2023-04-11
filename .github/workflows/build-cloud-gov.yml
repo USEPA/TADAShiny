@@ -168,7 +168,7 @@ jobs:
         env:
           token: ${{ secrets.TEST_OWSHINY_DEPLOY }}
         if:
-          ${{ ! -z env.token }}
+          ${{ ! env.token == "" }}
         with:
           github-token: process.env.token
           script: |
