@@ -156,7 +156,6 @@ jobs:
         git diff-index --quiet HEAD || git commit -m "Automated workflow from GitHub Actions to vendor R dependencies"
         git push
 
-
   request_copy:
     name: Request copy to deployment repo
     needs: [copy_code_to_cloud-gov, download_and_vendor_dependencies]
@@ -174,6 +173,6 @@ jobs:
               workflow_id: 'copy_repo.yml',
               ref: 'develop',
               inputs: {
-                "repo_to_copy": context.repo.owner + "/" + context.repo.repo
+                "repo_to_copy": context.repo.repository
               }
             })
