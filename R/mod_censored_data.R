@@ -10,7 +10,7 @@
 mod_censored_data_ui <- function(id){
   ns <- NS(id)
   tagList(shiny::fluidRow(htmltools::h3("Categorize Censored Data Records")),
-          shiny::fluidRow("Press the button below to assign each detection limit record in your dataset to non-detect, over-detect, or other. Once finished a pie chart will display below and you will have options for simple censored data handling."),
+          shiny::fluidRow("Assign each detection limit record in your dataset to non-detect, over-detect, or other using the button below. Once finished a pie chart will display the results and you will have options for simple censored data handling."),
           htmltools::br(),
           shiny::fluidRow(column(4, shiny::fluidRow(shiny::actionButton(ns("id_cens"),"ID Censored Data",shiny::icon("fingerprint"),style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
                                  br()
@@ -23,7 +23,10 @@ mod_censored_data_ui <- function(id){
                           column(3, shiny::uiOutput(ns("nd_mult"))),
                           column(3, selectInput(ns("od_method"),"Over-Detect Handling Method",choices = c("Multiply detection limit by x","No change"), selected = "No change", multiple = FALSE)),
                           column(3, shiny::uiOutput(ns("od_mult")))),
-          shiny::fluidRow(column(4, shiny::actionButton(ns("apply_methods"),"Apply Methods to Dataset",style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))),
+          shiny::fluidRow(column(2, shiny::actionButton(ns("apply_methods"),"Apply Methods to Dataset",style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
+                          column(2, shiny::uiOutput(ns("undo_methods")))),
+          htmltools::br(),
+          shiny::fluidRow(column(12, shiny::plotOutput(ns("see_det")))),
           htmltools::br(),
           shiny::fluidRow(htmltools::h3("Consider More Complex Censored Data Handling Methods")),
           shiny::fluidRow("Use the picker list below to select grouping columns to create summary table. The summary table shows the number of non- and over-detects in each group, the total number of results in each group, and the percentage of the dataset that is censored. These numbers are then used to suggest a potential statistical censored data method to use. Currently, the user must perform more complex analyses outside of TADAShiny."),
@@ -48,6 +51,7 @@ mod_censored_data_server <- function(id, tadat){
     
     # hit the action button, run idCensoredData on Removed = FALSE dataset, mark flagged data records in tadat$raw as "not screened"
     observeEvent(input$id_cens,{
+      censdat$apply = NULL
       dat = subset(tadat$raw, tadat$raw$Removed==FALSE)
       removed = subset(tadat$raw, tadat$raw$Removed==TRUE)
       if(length(removed$ResultIdentifier)>0){
@@ -104,8 +108,44 @@ mod_censored_data_server <- function(id, tadat){
       }else{od_multiplier=input$od_mult}
       good = TADA::simpleCensoredMethods(good,nd_method = trans$actual[trans$input==input$nd_method], nd_multiplier = nd_multiplier, od_method = trans$actual[trans$input==input$od_method], od_multiplier = od_multiplier)
       tadat$raw = plyr::rbind.fill(removed, good)
-      print("I did it!")
+      
+      # create scatter plot dataset
+      dat = subset(good, good$TADA.CensoredData.Flag%in%c("Non-Detect","Over-Detect"))
+      dat = dat[order(dat$TADA.DetectionQuantitationLimitMeasure.MeasureValue),c("TADA.DetectionQuantitationLimitMeasure.MeasureValue","TADA.ResultMeasureValue")]
+      dat$order = 1:dim(dat)[1]
+      dat1 = dat%>%dplyr::select(order, TADA.DetectionQuantitationLimitMeasure.MeasureValue)%>%dplyr::rename(value = TADA.DetectionQuantitationLimitMeasure.MeasureValue)
+      dat1$Type = "Original Detection Limit Value"
+      dat2 = dat%>%dplyr::select(order, TADA.ResultMeasureValue)%>%dplyr::rename(value = TADA.ResultMeasureValue)
+      dat2$Type = "Estimated Detection Limit Value"
+      dat = plyr::rbind.fill(dat2, dat1)
+      censdat$plotdat = dat
     })
+    
+    output$undo_methods = shiny::renderUI({
+      shiny::req(censdat$plotdat)
+      shiny::actionButton(ns("undo_methods"),"Undo Method Application",style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
+    })
+    
+    shiny::observeEvent(input$undo_methods,{
+      censdat$plotdat = NULL
+      tadat$raw$TADA.ResultMeasureValue = ifelse(tadat$raw$TADA.ResultMeasureValueDataTypes.Flag=="Result Value/Unit Estimated from Detection Limit",tadat$raw$TADA.DetectionQuantitationLimitMeasure.MeasureValue,tadat$raw$TADA.ResultMeasureValue)
+      tadat$raw$TADA.ResultMeasureValueDataTypes.Flag[tadat$raw$TADA.ResultMeasureValueDataTypes.Flag=="Result Value/Unit Estimated from Detection Limit"] = "Result Value/Unit Copied from Detection Limit"
+      tadat$raw = tadat$raw%>%dplyr::select(-TADA.CensoredMethod)
+    })
+    
+    output$see_det = shiny::renderPlot({
+      shiny::req(censdat$plotdat)
+      ggplot2::ggplot(data=censdat$plotdat, ggplot2::aes(x=order, y=value, fill=Type))+
+        ggplot2::geom_point(pch=21, colour="gray", size=5)+
+        ggplot2::theme_classic(base_size = 16) +
+        ggplot2::labs(title="Detection limits sorted by value")+
+        ggplot2::xlab("Sorted detection limits from lowest to highest")+
+        ggplot2::ylab("Numeric value (log scale)")+
+        ggplot2::scale_y_log10(labels = scales::label_log())+
+        ggplot2::theme(axis.text.x = ggplot2::element_blank(), axis.ticks = ggplot2::element_blank())
+    })
+    
+    
     
     output$cens_groups = shiny::renderUI({
       shiny::req(censdat$dat)
