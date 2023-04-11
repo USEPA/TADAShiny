@@ -155,3 +155,22 @@ jobs:
         git add vendor_r
         git diff-index --quiet HEAD || git commit -m "Automated workflow from GitHub Actions to vendor R dependencies"
         git push
+
+
+  name: Request copy to deployment repo
+  request_copy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Workflow to copy for deployment
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: 'USEPA',
+              repo: 'test-copy-repo-ow',
+              workflow_id: 'copy_repo.yml',
+              ref: 'develop',
+              inputs: {
+                "repo_to_copy": context.repo.owner + "/" + context.repo.repo
+              }
+            })
