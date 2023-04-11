@@ -177,6 +177,6 @@ jobs:
               workflow_id: 'copy_repo.yml',
               ref: 'develop',
               inputs: {
-                "repo_to_copy": context.repo.repository
+                "repo_to_copy": context.repo.owner + "/" + context.repo.repo
               }
             })
