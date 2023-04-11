@@ -159,11 +159,13 @@ jobs:
 
   request_copy:
     name: Request copy to deployment repo
+    needs: [copy_code_to_cloud-gov, download_and_vendor_dependencies]
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Workflow to copy for deployment
         uses: actions/github-script@v6
         with:
+          github-token: ${{ secrets.TEST_OWSHINY_DEPLOY }}
           script: |
             github.rest.actions.createWorkflowDispatch({
               owner: 'USEPA',
