@@ -157,8 +157,8 @@ jobs:
         git push
 
 
-  name: Request copy to deployment repo
   request_copy:
+    name: Request copy to deployment repo
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Workflow to copy for deployment
