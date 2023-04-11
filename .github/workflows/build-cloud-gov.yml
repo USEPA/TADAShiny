@@ -160,6 +160,7 @@ jobs:
   request_copy:
     name: Request copy to deployment repo
     needs: [copy_code_to_cloud-gov, download_and_vendor_dependencies]
+    if: always() && !contains(needs.*.result, 'failure')  # Needs to run even if download_and_vendor_dependencies waas skipped
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Workflow to copy for deployment
