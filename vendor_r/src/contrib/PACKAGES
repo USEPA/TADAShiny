@@ -78,7 +78,7 @@ Imports: plyr, data.table, dplyr, grDevices, magrittr, stringr, utils,
 Suggests: readr, tidyverse, knitr, testthat, testthis, usethis,
         devtools, pkgdown, Rcpp, spelling
 License: CC0
-MD5sum: 2fe33e8a4dcc479d52a8e9028ce2527a
+MD5sum: 39ce4c2a4d0f632274aa9b9ec16a2b9d
 NeedsCompilation: no
 
 Package: anytime
@@ -713,12 +713,12 @@ MD5sum: 61459711c9a2561962eee2ea5a50732c
 NeedsCompilation: yes
 
 Package: markdown
-Version: 1.5
+Version: 1.6
 Depends: R (>= 2.11.1)
-Imports: utils, commonmark, xfun (>= 0.35)
+Imports: utils, commonmark (>= 1.9.0), xfun (>= 0.38)
 Suggests: knitr, rmarkdown (>= 2.18), yaml, RCurl
 License: GPL-2
-MD5sum: 5e432dee69c536dea2236efbaeb71091
+MD5sum: 98be8653b0196903c269ec7eeb85d6e8
 NeedsCompilation: no
 
 Package: memoise
@@ -1076,7 +1076,7 @@ Suggests: blob, covr, dplyr (>= 0.8-3), ggplot2, knitr, lwgeom (>=
         tibble (>= 1.4.1), tidyr (>= 1.2.0), tidyselect (>= 1.0.0),
         tmap (>= 2.0), vctrs, wk
 License: GPL-2 | MIT + file LICENSE
-MD5sum: f5aee7f9afbbc5972647011bc18ea5a9
+MD5sum: e47851c0385cfb24ca98a36bd3d1757f
 NeedsCompilation: yes
 
 Package: shinyWidgets
@@ -1188,14 +1188,14 @@ MD5sum: a08f1c17c95224168bf53547b4200ca3
 NeedsCompilation: yes
 
 Package: terra
-Version: 1.7-18
+Version: 1.7-23
 Depends: R (>= 3.5.0)
 Imports: methods, Rcpp (>= 1.0-10)
 LinkingTo: Rcpp
 Suggests: parallel, tinytest, ncdf4, sf (>= 0.9-8), deldir, XML,
-        leaflet
+        leaflet, htmlwidgets
 License: GPL (>= 3)
-MD5sum: e4ba9f83e3fe27050b6f7fa532e99cc8
+MD5sum: 1155be1d8d33f8a3e7665e1147c30523
 NeedsCompilation: yes
 
 Package: testthat
