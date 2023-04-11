@@ -169,7 +169,7 @@ jobs:
           repo_token: ${{ secrets.TEST_OWSHINY_DEPLOY }}
         if: ${{ ! env.repo_token == '' }}
         with:
-          github-token: `${process.env.repo_token}`
+          github-token: $env.repo_token
           script: |
             github.rest.actions.createWorkflowDispatch({
               owner: 'USEPA',
