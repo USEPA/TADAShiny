@@ -45,7 +45,7 @@ app_server <- function(input, output, session) {
     tadat$reup = NULL
   })
   
-  observe({
+  shiny::observe({
     shiny::req(tadat$raw)
     tadat$raw$tab = input$tabbar
     tadat$tab = input$tabbar

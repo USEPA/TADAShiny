@@ -12,16 +12,15 @@ mod_censored_data_ui <- function(id){
   tagList(shiny::fluidRow(htmltools::h3("Categorize Censored Data Records")),
           shiny::fluidRow("Assign each detection limit record in your dataset to non-detect, over-detect, or other using the button below. Once finished a pie chart will display the results and you will have options for simple censored data handling."),
           htmltools::br(),
-          shiny::fluidRow(column(4, shiny::fluidRow(shiny::actionButton(ns("id_cens"),"ID Censored Data",shiny::icon("fingerprint"),style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
-                                 br()
-                                 ),
+          shiny::fluidRow(column(4, shiny::fluidRow(shiny::actionButton(ns("id_cens"),"ID Censored Data",shiny::icon("fingerprint"),style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))),
                           column(6, shiny::plotOutput(ns("id_censplot")))),
+          htmltools::br(),
           shiny::fluidRow(htmltools::h3("Handle Censored Data Using Simple Methods")),
           shiny::fluidRow("Use the drop down menus below to pick a simple method for handling non-detects and over-detects in the dataset."),
           htmltools::br(),
-          shiny::fluidRow(column(3, selectInput(ns("nd_method"),"Non-Detect Handling Method",choices = c("Multiply detection limit by x","Random number between 0 and detection limit","No change"), multiple = FALSE)),
+          shiny::fluidRow(column(3, shiny::selectInput(ns("nd_method"),"Non-Detect Handling Method",choices = c("Multiply detection limit by x","Random number between 0 and detection limit","No change"), multiple = FALSE)),
                           column(3, shiny::uiOutput(ns("nd_mult"))),
-                          column(3, selectInput(ns("od_method"),"Over-Detect Handling Method",choices = c("Multiply detection limit by x","No change"), selected = "No change", multiple = FALSE)),
+                          column(3, shiny::selectInput(ns("od_method"),"Over-Detect Handling Method",choices = c("Multiply detection limit by x","No change"), selected = "No change", multiple = FALSE)),
                           column(3, shiny::uiOutput(ns("od_mult")))),
           shiny::fluidRow(column(2, shiny::actionButton(ns("apply_methods"),"Apply Methods to Dataset",style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
                           column(2, shiny::uiOutput(ns("undo_methods")))),
@@ -50,7 +49,7 @@ mod_censored_data_server <- function(id, tadat){
     censdat = shiny::reactiveValues()
     
     # hit the action button, run idCensoredData on Removed = FALSE dataset, mark flagged data records in tadat$raw as "not screened"
-    observeEvent(input$id_cens,{
+    shiny::observeEvent(input$id_cens,{
       dat = subset(tadat$raw, tadat$raw$Removed==FALSE)
       removed = subset(tadat$raw, tadat$raw$Removed==TRUE)
       if(length(removed$ResultIdentifier)>0){
@@ -69,7 +68,7 @@ mod_censored_data_server <- function(id, tadat){
     })
     
     output$id_censplot = shiny::renderPlot({
-      req(censdat$dat)
+      shiny::req(censdat$dat)
       piedat = censdat$dat%>%dplyr::group_by(TADA.CensoredData.Flag)%>%dplyr::summarise(num = length(ResultIdentifier))
       piedat$Label = paste0(piedat$TADA.CensoredData.Flag," - ", scales::comma(piedat$num)," results")
       # Basic piechart
@@ -96,6 +95,12 @@ mod_censored_data_server <- function(id, tadat){
     })
     
     shiny::observeEvent(input$apply_methods,{
+      shinybusy::show_modal_spinner(
+        spin = "double-bounce",
+        color = "#0071bc",
+        text = "Applying selected methods...",
+        session = shiny::getDefaultReactiveDomain()
+      )
       removed = subset(tadat$raw, tadat$raw$Removed==TRUE)
       good = subset(tadat$raw, tadat$raw$Removed==FALSE)
       trans = data.frame(input = c("Multiply detection limit by x","Random number between 0 and detection limit","No change"),actual = c("multiplier","randombelowlimit","as-is"))
@@ -118,6 +123,7 @@ mod_censored_data_server <- function(id, tadat){
       dat2$Type = "Estimated Detection Limit Value"
       dat = plyr::rbind.fill(dat2, dat1)
       censdat$plotdat = dat
+      shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
     })
     
     output$undo_methods = shiny::renderUI({
