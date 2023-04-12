@@ -23,7 +23,7 @@ app_server <- function(input, output, session) {
   shiny::observeEvent(tadat$new,{
     removed = length(tadat$raw$ResultIdentifier[tadat$raw$Removed==TRUE])
     if(removed>0){
-      message = paste0("Your data were successfully loaded into the app and are displayed on the Overview tab. ", scales::comma(removed)," results were flagged for removal because their sample media was not WATER or the result value was text or NA and no detection limit value was provided. See dataset summary information in the gray box at the bottom of the app.")
+      message = paste0("Your data were successfully loaded and displayed on the Overview tab. ", scales::comma(removed)," results were flagged for removal because their sample media was not WATER or the result value was text or NA and no detection limit value was provided. See dataset summary information in the gray box at the bottom of the app.")
     }else{
       message = "Your data were successfully loaded into the app and are displayed on the Overview tab. See summary information about your dataset in the gray box at the bottom of the app."
     }
@@ -35,8 +35,18 @@ app_server <- function(input, output, session) {
       tadat$new = NULL
   })
   
+  # switch to tab user left off on when tadat$reup changes
+  shiny::observeEvent(tadat$reup,{
+    shiny::showModal(shiny::modalDialog(
+      title = "Data Loaded",
+      "Your working dataset has been uploaded and the app switched to the tab where you left off."
+    ))
+    shiny::updateTabsetPanel(session=session, inputId="tabbar", selected=unique(tadat$raw$tab))
+    tadat$reup = NULL
+  })
+  
   observe({
-    req(tadat$raw)
+    shiny::req(tadat$raw)
     tadat$raw$tab = input$tabbar
     tadat$tab = input$tabbar
   })

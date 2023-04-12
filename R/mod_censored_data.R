@@ -17,7 +17,7 @@ mod_censored_data_ui <- function(id){
                                  ),
                           column(6, shiny::plotOutput(ns("id_censplot")))),
           shiny::fluidRow(htmltools::h3("Handle Censored Data Using Simple Methods")),
-          shiny::fluidRow("Use the drop down menus below to pick a single simple method for handling non-detects and over-detects in the dataset."),
+          shiny::fluidRow("Use the drop down menus below to pick a simple method for handling non-detects and over-detects in the dataset."),
           htmltools::br(),
           shiny::fluidRow(column(3, selectInput(ns("nd_method"),"Non-Detect Handling Method",choices = c("Multiply detection limit by x","Random number between 0 and detection limit","No change"), multiple = FALSE)),
                           column(3, shiny::uiOutput(ns("nd_mult"))),
@@ -51,7 +51,6 @@ mod_censored_data_server <- function(id, tadat){
     
     # hit the action button, run idCensoredData on Removed = FALSE dataset, mark flagged data records in tadat$raw as "not screened"
     observeEvent(input$id_cens,{
-      censdat$apply = NULL
       dat = subset(tadat$raw, tadat$raw$Removed==FALSE)
       removed = subset(tadat$raw, tadat$raw$Removed==TRUE)
       if(length(removed$ResultIdentifier)>0){
@@ -135,17 +134,16 @@ mod_censored_data_server <- function(id, tadat){
     
     output$see_det = shiny::renderPlot({
       shiny::req(censdat$plotdat)
-      ggplot2::ggplot(data=censdat$plotdat, ggplot2::aes(x=order, y=value, fill=Type))+
-        ggplot2::geom_point(pch=21, colour="gray", size=5)+
+      ggplot2::ggplot(data=censdat$plotdat, ggplot2::aes(x=order, y=value))+
+        ggplot2::geom_point(ggplot2::aes(color=Type),pch=1, size=5)+
+        ggplot2::scale_colour_manual(values = c("#005ea2","#ff5a5f"))+
         ggplot2::theme_classic(base_size = 16) +
         ggplot2::labs(title="Detection limits sorted by value")+
-        ggplot2::xlab("Sorted detection limits from lowest to highest")+
+        ggplot2::xlab("Ordered detection limits from lowest to highest value")+
         ggplot2::ylab("Numeric value (log scale)")+
         ggplot2::scale_y_log10(labels = scales::label_log())+
         ggplot2::theme(axis.text.x = ggplot2::element_blank(), axis.ticks = ggplot2::element_blank())
     })
-    
-    
     
     output$cens_groups = shiny::renderUI({
       shiny::req(censdat$dat)
