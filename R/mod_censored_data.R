@@ -166,7 +166,8 @@ mod_censored_data_server <- function(id, tadat){
     
     output$cens_sumtable = DT::renderDT({
       DT::datatable(censdat$summary,
-                    options = list(scrollX=TRUE, pageLength=10,searching = FALSE, order = list(list(length(input$cens_groups), 'desc'))),
+                    extensions = 'Buttons',
+                    options = list(dom="Blftipr",scrollX=TRUE, pageLength=10,searching = FALSE, order = list(list(length(input$cens_groups), 'desc')), buttons = c('csv')),
                     selection = 'none', rownames=FALSE)
     })
  
