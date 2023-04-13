@@ -50,23 +50,24 @@ mod_censored_data_server <- function(id, tadat){
     
     # hit the action button, run idCensoredData on Removed = FALSE dataset, mark flagged data records in tadat$raw as "not screened"
     shiny::observeEvent(input$id_cens,{
-      dat = subset(tadat$raw, tadat$raw$Removed==FALSE)
+      dat = subset(tadat$raw, tadat$raw$Removed==FALSE) # first, get rid of anything that has removed=FALSE flag
       removed = subset(tadat$raw, tadat$raw$Removed==TRUE)
       if(length(removed$ResultIdentifier)>0){
-        removed$TADA.CensoredData.Flag = "Not screened"
+        removed$TADA.CensoredData.Flag = "Not screened" # this provides a flag for things not screened for censored metadata
       }
-      dat = TADA::idCensoredData(dat)
+      dat = TADA::idCensoredData(dat) # identify censored data records based on DetectionQuantitationLimitTypeName and ResultDetectionConditionText
       dat$Removed = ifelse(dat$TADA.CensoredData.Flag%in%c("Censored but not Categorized","Conflict between Condition and Limit"),TRUE,dat$Removed)
-      if(any(dat$Removed==TRUE)){
+      if(any(dat$Removed==TRUE)){ # let users know when there are "problem" censored data results that will be flagged for removal.
           shiny::showModal(shiny::modalDialog(
           title = "Detection Limit Data Warning",
           paste0(length(dat$ResultIdentifier[dat$Removed==TRUE])," results were flagged for removal because they have ambiguous and/or unfamiliar detection limits and conditions. These will show up in the pie chart as 'Censored but not Categorized' and 'Conflict between Condition and Limit', but will not be used in the sections below. You may download your dataset for review at any time using the 'Download Working Dataset' button at the bottom of the page.")
         ))
       }
-      tadat$raw = plyr::rbind.fill(dat, removed)
-      censdat$dat = dat
+      tadat$raw = plyr::rbind.fill(dat, removed) # but bring them all back together for tadat$raw object
+      censdat$dat = dat # however, this reactive object has all of the data that were not previously removed and do not have ambiguous detection limit data. This is the "clean" dataset
     })
     
+    # pie chart showing breakdown of censored/uncensored data passed through idCensoredData function
     output$id_censplot = shiny::renderPlot({
       shiny::req(censdat$dat)
       piedat = censdat$dat%>%dplyr::group_by(TADA.CensoredData.Flag)%>%dplyr::summarise(num = length(ResultIdentifier))
@@ -82,18 +83,21 @@ mod_censored_data_server <- function(id, tadat){
         # ggplot2::geom_text(ggplot2::aes(label = scales::comma(num)), color = "white", size=6,position = ggplot2::position_stack(vjust = 0.5))
     })
     
+    # this adds the multiplier numeric input next to the method selection if the nd method selected is to mult det limit by x
     output$nd_mult = shiny::renderUI({
       if(input$nd_method=="Multiply detection limit by x"){
         shiny::numericInput(ns("nd_mult"),"Multiplier (x)",value = 0.5, min=0)
       }
     })
     
+    # this adds the multiplier numeric input next to the method selection if the od method selected is to mult det limit by x
     output$od_mult = shiny::renderUI({
       if(input$od_method=="Multiply detection limit by x"){
         shiny::numericInput(ns("od_mult"),"Multiplier (x)",value = 1, min=0)
       }
     })
     
+    # Button to apply the simple methods to the nd and od results in the dataset.
     shiny::observeEvent(input$apply_methods,{
       shinybusy::show_modal_spinner(
         spin = "double-bounce",
@@ -101,38 +105,41 @@ mod_censored_data_server <- function(id, tadat){
         text = "Applying selected methods...",
         session = shiny::getDefaultReactiveDomain()
       )
-      removed = subset(tadat$raw, tadat$raw$Removed==TRUE)
-      good = subset(tadat$raw, tadat$raw$Removed==FALSE)
+      removed = subset(tadat$raw, tadat$raw$Removed==TRUE) # first, remove results we dont want to handle at all
+      good = subset(tadat$raw, tadat$raw$Removed==FALSE) # keep the "goods" that will be run through the simpleCensoredMethods function
       trans = data.frame(input = c("Multiply detection limit by x","Random number between 0 and detection limit","No change"),actual = c("multiplier","randombelowlimit","as-is"))
-      if(is.null(input$nd_mult)){
+      if(is.null(input$nd_mult)){ # these if's get the reactive inputs into a format that the TADA function will understand
         nd_multiplier = "null"
       }else{nd_multiplier=input$nd_mult}
       if(is.null(input$od_mult)){
         od_multiplier = "null"
       }else{od_multiplier=input$od_mult}
       good = TADA::simpleCensoredMethods(good,nd_method = trans$actual[trans$input==input$nd_method], nd_multiplier = nd_multiplier, od_method = trans$actual[trans$input==input$od_method], od_multiplier = od_multiplier)
-      tadat$raw = plyr::rbind.fill(removed, good)
+      tadat$raw = plyr::rbind.fill(removed, good) # stitch good and removed datasets back together in tadat$raw
       
-      # create scatter plot dataset
+      # create dataset displayed in table below
       dat = subset(good, good$TADA.CensoredData.Flag%in%c("Non-Detect","Over-Detect"))
       dat = dat[,c("ResultIdentifier","TADA.CharacteristicName","TADA.DetectionQuantitationLimitMeasure.MeasureValue","TADA.ResultMeasureValue", "TADA.ResultMeasure.MeasureUnitCode")]
       dat = dat%>%dplyr::rename("Estimated Value" = TADA.ResultMeasureValue, "Original Detection Limit Value" = "TADA.DetectionQuantitationLimitMeasure.MeasureValue")
-      censdat$exdat = dat
+      censdat$exdat = dat[1:10,] # just show the first 10 records so user can see what happened to data 
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
     })
     
+    # this button appears after someone has applied the OD/ND methods, in case they want to undo and try another method instead
     output$undo_methods = shiny::renderUI({
       shiny::req(censdat$exdat)
       shiny::actionButton(ns("undo_methods"),"Undo Method Application",style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
     })
     
+    # executes the undo if undo methods button is pressed.
     shiny::observeEvent(input$undo_methods,{
-      censdat$exdat = NULL
-      tadat$raw$TADA.ResultMeasureValue = ifelse(tadat$raw$TADA.ResultMeasureValueDataTypes.Flag=="Result Value/Unit Estimated from Detection Limit",tadat$raw$TADA.DetectionQuantitationLimitMeasure.MeasureValue,tadat$raw$TADA.ResultMeasureValue)
-      tadat$raw$TADA.ResultMeasureValueDataTypes.Flag[tadat$raw$TADA.ResultMeasureValueDataTypes.Flag=="Result Value/Unit Estimated from Detection Limit"] = "Result Value/Unit Copied from Detection Limit"
+      censdat$exdat = NULL # reset exdat 
+      tadat$raw$TADA.ResultMeasureValue = ifelse(tadat$raw$TADA.ResultMeasureValueDataTypes.Flag=="Result Value/Unit Estimated from Detection Limit",tadat$raw$TADA.DetectionQuantitationLimitMeasure.MeasureValue,tadat$raw$TADA.ResultMeasureValue) # reset to detection quantitation limit value
+      tadat$raw$TADA.ResultMeasureValueDataTypes.Flag[tadat$raw$TADA.ResultMeasureValueDataTypes.Flag=="Result Value/Unit Estimated from Detection Limit"] = "Result Value/Unit Copied from Detection Limit" # reset data types flag to what it was before simpleCensoredMethods function run
       tadat$raw = tadat$raw%>%dplyr::select(-TADA.CensoredMethod)
     })
     
+    # creates a nice table showing an example of how censored data were changed.
     output$see_det = DT::renderDT({
       shiny::req(censdat$exdat)
       DT::datatable(censdat$exdat[1:10,],
@@ -140,19 +147,22 @@ mod_censored_data_server <- function(id, tadat){
                     selection = 'none', rownames=FALSE)
       })
     
+    # from the clean dataset, get all of the column names someone might want to group by when summarizing their data for use in more advanced censored data methods.
     output$cens_groups = shiny::renderUI({
       shiny::req(censdat$dat)
-      ccols = names(tadat$raw)[!names(tadat$raw)%in%c("Removed","tab","TADA.ResultMeasureValue","ResultMeasureValue","ResultIdentifier","TADA.DetectionQuantitationLimitMeasure.MeasureValue","DetectionQuantitationLimitMeasure.MeasureValue")]
-      tcols = ccols[grepl("TADA.",ccols)]
-      ucols = ccols[!grepl("TADA.",ccols)]
-      ccols = c(tcols, ucols)
+      ccols = names(tadat$raw)[!names(tadat$raw)%in%c("Removed","tab","TADA.ResultMeasureValue","ResultMeasureValue","ResultIdentifier","TADA.DetectionQuantitationLimitMeasure.MeasureValue","DetectionQuantitationLimitMeasure.MeasureValue")] # remove the columns that are generally unique to each result from consideration. Why would someone want to group by result value or identifier? Then every summary would be unique to one value...not a "summary"
+      tcols = ccols[grepl("TADA.",ccols)] # put all of the TADA columns at the top of the selection drop down
+      ucols = ccols[!grepl("TADA.",ccols)] # then have the WQP columns
+      ccols = c(tcols, ucols) # string them back together in one vector used in the selection widget below
       shiny::selectizeInput(ns("cens_groups"), label = "Select Grouping Columns for Summarization", choices = ccols, selected = c("TADA.CharacteristicName","TADA.ResultMeasure.MeasureUnitCode","TADA.ResultSampleFractionText","TADA.MethodSpecificationName"), multiple = TRUE)
     })
     
+    # runs the summary function when cens button is pushed following group selection
     shiny::observeEvent(input$cens_sumbutton,{
       censdat$summary = TADA::summarizeCensoredData(censdat$dat, spec_cols = input$cens_groups)
     })
     
+    # creates summary table complete with csv button in case someone wants to donwload the summary table
     output$cens_sumtable = DT::renderDT({
       DT::datatable(censdat$summary,
                     extensions = 'Buttons',

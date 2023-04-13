@@ -19,7 +19,7 @@ app_server <- function(input, output, session) {
   mod_censored_data_server("censored_data_1", tadat)
   mod_TADA_summary_server("TADA_summary_1", tadat)
   
-  # switch to overview tab when tadat$new changes
+  # switch to overview tab when tadat$new changes and provide user with window letting them know how many records were automatically flagged for removal upon upload
   shiny::observeEvent(tadat$new,{
     removed = length(tadat$raw$ResultIdentifier[tadat$raw$Removed==TRUE])
     if(removed>0){
@@ -35,20 +35,22 @@ app_server <- function(input, output, session) {
       tadat$new = NULL
   })
   
-  # switch to tab user left off on when tadat$reup changes
+  # this observes when the user switches tabs and adds the current tab they're on as a column to their dataset. 
+  shiny::observe({
+    shiny::req(tadat$raw)
+    tadat$raw$tab = input$tabbar
+    tadat$tab = input$tabbar
+  })
+  
+  # switch to tab user left off on when tadat$reup changes, which only happens when someone uploads a workbook with the column "Removed" in it
   shiny::observeEvent(tadat$reup,{
     shiny::showModal(shiny::modalDialog(
       title = "Data Loaded",
       "Your working dataset has been uploaded and the app switched to the tab where you left off."
     ))
+    # the switch tab command
     shiny::updateTabsetPanel(session=session, inputId="tabbar", selected=unique(tadat$raw$tab))
     tadat$reup = NULL
-  })
-  
-  shiny::observe({
-    shiny::req(tadat$raw)
-    tadat$raw$tab = input$tabbar
-    tadat$tab = input$tabbar
   })
 
 }
