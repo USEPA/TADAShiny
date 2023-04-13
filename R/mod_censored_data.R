@@ -16,7 +16,7 @@ mod_censored_data_ui <- function(id){
                           column(6, shiny::plotOutput(ns("id_censplot")))),
           htmltools::br(),
           shiny::fluidRow(htmltools::h3("Handle Censored Data Using Simple Methods")),
-          shiny::fluidRow("Use the drop down menus below to pick a simple method for handling non-detects and over-detects in the dataset."),
+          shiny::fluidRow("Use the drop down menus below to pick a simple method for handling non-detects and over-detects in the dataset. When you press 'Apply Methods to Dataset', a table will appear below with the first 10 detection limit results, showing their initial values and estimated values."),
           htmltools::br(),
           shiny::fluidRow(column(3, shiny::selectInput(ns("nd_method"),"Non-Detect Handling Method",choices = c("Multiply detection limit by x","Random number between 0 and detection limit","No change"), multiple = FALSE)),
                           column(3, shiny::uiOutput(ns("nd_mult"))),
@@ -25,7 +25,7 @@ mod_censored_data_ui <- function(id){
           shiny::fluidRow(column(2, shiny::actionButton(ns("apply_methods"),"Apply Methods to Dataset",style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
                           column(2, shiny::uiOutput(ns("undo_methods")))),
           htmltools::br(),
-          shiny::fluidRow(column(12, shiny::plotOutput(ns("see_det")))),
+          shiny::fluidRow(column(12, DT::DTOutput(ns("see_det")))),
           htmltools::br(),
           shiny::fluidRow(htmltools::h3("Consider More Complex Censored Data Handling Methods")),
           shiny::fluidRow("Use the picker list below to select grouping columns to create summary table. The summary table shows the number of non- and over-detects in each group, the total number of results in each group, and the percentage of the dataset that is censored. These numbers are then used to suggest a potential statistical censored data method to use. Currently, the user must perform more complex analyses outside of TADAShiny."),
@@ -76,7 +76,7 @@ mod_censored_data_server <- function(id, tadat){
         ggplot2::geom_bar(stat="identity", width=1, color="white") +
         ggplot2::labs(title="Number of Results per Censored Data Category")+
         ggplot2::coord_polar("y", start=0) +
-        ggplot2::scale_fill_brewer(palette = "Blues") +
+        ggplot2::scale_fill_brewer(palette = "Dark2") +
         ggplot2::theme_void() + # remove background, grid, numeric labels
         ggplot2::theme(plot.title = ggplot2::element_text(face = "bold", size = 18),legend.title=ggplot2::element_text(size=16), legend.text = ggplot2::element_text(size = 14))  #+
         # ggplot2::geom_text(ggplot2::aes(label = scales::comma(num)), color = "white", size=6,position = ggplot2::position_stack(vjust = 0.5))
@@ -115,41 +115,30 @@ mod_censored_data_server <- function(id, tadat){
       
       # create scatter plot dataset
       dat = subset(good, good$TADA.CensoredData.Flag%in%c("Non-Detect","Over-Detect"))
-      dat = dat[order(dat$TADA.DetectionQuantitationLimitMeasure.MeasureValue),c("TADA.DetectionQuantitationLimitMeasure.MeasureValue","TADA.ResultMeasureValue")]
-      dat$order = 1:dim(dat)[1]
-      dat1 = dat%>%dplyr::select(order, TADA.DetectionQuantitationLimitMeasure.MeasureValue)%>%dplyr::rename(value = TADA.DetectionQuantitationLimitMeasure.MeasureValue)
-      dat1$Type = "Original Detection Limit Value"
-      dat2 = dat%>%dplyr::select(order, TADA.ResultMeasureValue)%>%dplyr::rename(value = TADA.ResultMeasureValue)
-      dat2$Type = "Estimated Detection Limit Value"
-      dat = plyr::rbind.fill(dat2, dat1)
-      censdat$plotdat = dat
+      dat = dat[,c("ResultIdentifier","TADA.CharacteristicName","TADA.DetectionQuantitationLimitMeasure.MeasureValue","TADA.ResultMeasureValue", "TADA.ResultMeasure.MeasureUnitCode")]
+      dat = dat%>%dplyr::rename("Estimated Value" = TADA.ResultMeasureValue, "Original Detection Limit Value" = "TADA.DetectionQuantitationLimitMeasure.MeasureValue")
+      censdat$exdat = dat
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
     })
     
     output$undo_methods = shiny::renderUI({
-      shiny::req(censdat$plotdat)
+      shiny::req(censdat$exdat)
       shiny::actionButton(ns("undo_methods"),"Undo Method Application",style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
     })
     
     shiny::observeEvent(input$undo_methods,{
-      censdat$plotdat = NULL
+      censdat$exdat = NULL
       tadat$raw$TADA.ResultMeasureValue = ifelse(tadat$raw$TADA.ResultMeasureValueDataTypes.Flag=="Result Value/Unit Estimated from Detection Limit",tadat$raw$TADA.DetectionQuantitationLimitMeasure.MeasureValue,tadat$raw$TADA.ResultMeasureValue)
       tadat$raw$TADA.ResultMeasureValueDataTypes.Flag[tadat$raw$TADA.ResultMeasureValueDataTypes.Flag=="Result Value/Unit Estimated from Detection Limit"] = "Result Value/Unit Copied from Detection Limit"
       tadat$raw = tadat$raw%>%dplyr::select(-TADA.CensoredMethod)
     })
     
-    output$see_det = shiny::renderPlot({
-      shiny::req(censdat$plotdat)
-      ggplot2::ggplot(data=censdat$plotdat, ggplot2::aes(x=order, y=value))+
-        ggplot2::geom_point(ggplot2::aes(color=Type),pch=1, size=5)+
-        ggplot2::scale_colour_manual(values = c("#005ea2","#ff5a5f"))+
-        ggplot2::theme_classic(base_size = 16) +
-        ggplot2::labs(title="Detection limits sorted by value")+
-        ggplot2::xlab("Ordered detection limits from lowest to highest value")+
-        ggplot2::ylab("Numeric value (log scale)")+
-        ggplot2::scale_y_log10(labels = scales::label_log())+
-        ggplot2::theme(axis.text.x = ggplot2::element_blank(), axis.ticks = ggplot2::element_blank())
-    })
+    output$see_det = DT::renderDT({
+      shiny::req(censdat$exdat)
+      DT::datatable(censdat$exdat[1:10,],
+                    options = list(dom='t', pageLength=10,searching = FALSE),
+                    selection = 'none', rownames=FALSE)
+      })
     
     output$cens_groups = shiny::renderUI({
       shiny::req(censdat$dat)
