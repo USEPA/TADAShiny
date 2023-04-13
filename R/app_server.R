@@ -16,14 +16,41 @@ app_server <- function(input, output, session) {
   mod_data_flagging_server("data_flagging_1", tadat)
   mod_summary_server("summary_1", tadat)
   mod_overview_server("overview_1", tadat)
+  mod_censored_data_server("censored_data_1", tadat)
   mod_TADA_summary_server("TADA_summary_1", tadat)
-
-  shiny::observeEvent(tadat$raw,{
+  
+  # switch to overview tab when tadat$new changes and provide user with window letting them know how many records were automatically flagged for removal upon upload
+  shiny::observeEvent(tadat$new,{
+    removed = length(tadat$raw$ResultIdentifier[tadat$raw$Removed==TRUE])
+    if(removed>0){
+      message = paste0("Your data were successfully loaded and displayed on the Overview tab. ", scales::comma(removed)," results were flagged for removal because their sample media was not WATER or the result value was text or NA and no detection limit value was provided. See dataset summary information in the gray box at the bottom of the app.")
+    }else{
+      message = "Your data were successfully loaded into the app and are displayed on the Overview tab. See summary information about your dataset in the gray box at the bottom of the app."
+    }
+      shiny::showModal(shiny::modalDialog(
+        title = "Data Loaded",
+        message
+      ))
+      shiny::updateTabsetPanel(session=session, inputId="tabbar", selected="Overview")
+      tadat$new = NULL
+  })
+  
+  # this observes when the user switches tabs and adds the current tab they're on as a column to their dataset. 
+  shiny::observe({
+    shiny::req(tadat$raw)
+    tadat$raw$tab = input$tabbar
+    tadat$tab = input$tabbar
+  })
+  
+  # switch to tab user left off on when tadat$reup changes, which only happens when someone uploads a workbook with the column "Removed" in it
+  shiny::observeEvent(tadat$reup,{
     shiny::showModal(shiny::modalDialog(
       title = "Data Loaded",
-      "Your data were successfully loaded into the app and are displayed on the Overview tab."
+      "Your working dataset has been uploaded and the app switched to the tab where you left off."
     ))
-    shiny::updateTabsetPanel(session=session, inputId="tabbar", selected="Overview")
+    # the switch tab command
+    shiny::updateTabsetPanel(session=session, inputId="tabbar", selected=unique(tadat$raw$tab))
+    tadat$reup = NULL
   })
 
 }

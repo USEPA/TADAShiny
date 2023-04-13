@@ -26,6 +26,7 @@ usethis::use_package("bootstrap")
 usethis::use_package("stringr")
 usethis::use_package("NADA")
 usethis::use_package("readxl")
+usethis::use_package("writexl")
 usethis::use_package("DT")
 usethis::use_package("EnvStats")
 usethis::use_package("shinyjs")
@@ -34,8 +35,9 @@ usethis::use_package("leaflet")
 usethis::use_package("sf")
 usethis::use_package("shinybusy")
 usethis::use_package("shinyWidgets")
-usethis::use_package("plotly")
+usethis::use_package("forcats")
 usethis::use_package("TADA")
+usethis::use_package("scales")
 
 ## Add modules ----
 ## Create a module infrastructure in R/
@@ -46,6 +48,7 @@ usethis::use_package("TADA")
 # golem::add_module(name = "upload_data", with_test = TRUE) # Name of the module
 # golem::add_module(name = "summary", with_test = TRUE) # Name of the module
 # golem::add_module(name = "TADA_summary") # Name of the module
+# golem::add_module(name = "censored_data")
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*
