@@ -15,8 +15,8 @@ mod_overview_ui <- function(id){
     htmltools::h3("Data Overview"),
     shiny::fluidRow(column(12, shiny::wellPanel(shiny::htmlOutput(ns("overview_totals"))))),
     htmltools::br(),
-    shiny::fluidRow(column(7,shinycssloaders::withSpinner(leaflet::leafletOutput(ns("overview_map")))),# "Larger point sizes represent more samples collected at a site; darker points represent more characteristics collected at a site. Click on a point to see the site ID, name, and sample/visit/parameter counts.",
-             column(5,DT::DTOutput(ns("overview_orgtable"), height="400px"))),#"Hover over a piece of the pie chart to see the characteristic name, count, and its percentage of the dataset. The pie shows the top ten characteristics as their own slices; all other characteristics fit into the 'ALL OTHERS' group.",
+    shiny::fluidRow(column(6,shinycssloaders::withSpinner(leaflet::leafletOutput(ns("overview_map"), height = "400px"))),# "Larger point sizes represent more samples collected at a site; darker points represent more characteristics collected at a site. Click on a point to see the site ID, name, and sample/visit/parameter counts.",
+             column(6,DT::DTOutput(ns("overview_orgtable")))),#"Hover over a piece of the pie chart to see the characteristic name, count, and its percentage of the dataset. The pie shows the top ten characteristics as their own slices; all other characteristics fit into the 'ALL OTHERS' group.",
     htmltools::br(),
     shiny::fluidRow(column(6,shiny::plotOutput(ns("overview_hist"), height="500px")),#"This histogram shows sample collection frequency for all sites over the time period queried.",
              column(6, shiny::plotOutput(ns("overview_barchar"), height="615px")))
@@ -39,7 +39,9 @@ mod_overview_server <- function(id, tadat){
 
     # create dataset for map and histogram using raw data
     shiny::observeEvent(tadat$raw, {
-      mapdat$sumdat = tadat$raw%>%dplyr::group_by(MonitoringLocationIdentifier,MonitoringLocationName,TADA.LatitudeMeasure, TADA.LongitudeMeasure)%>%dplyr::summarise("Sample_Count" = length(unique(ResultIdentifier)), "Visit_Count" = length(unique(ActivityStartDate)), "Parameter_Count" = length(unique(TADA.CharacteristicName)), "Organization_Count" = length(unique(OrganizationIdentifier)))
+      usedata = tadat$raw%>%dplyr::filter(Removed==FALSE) # do not consider data automatically removed upon upload for plots and maps
+      # create summary info and binning for map
+      mapdat$sumdat = usedata%>%dplyr::group_by(MonitoringLocationIdentifier,MonitoringLocationName,TADA.LatitudeMeasure, TADA.LongitudeMeasure)%>%dplyr::summarise("Sample_Count" = length(unique(ResultIdentifier)), "Visit_Count" = length(unique(ActivityStartDate)), "Parameter_Count" = length(unique(TADA.CharacteristicName)), "Organization_Count" = length(unique(OrganizationIdentifier)))
       mapdat$sumdat$radius = 3
       mapdat$sumdat$radius = ifelse(mapdat$sumdat$Sample_Count>10,5,mapdat$sumdat$radius)
       mapdat$sumdat$radius = ifelse(mapdat$sumdat$Sample_Count>50,8,mapdat$sumdat$radius)
@@ -47,9 +49,10 @@ mod_overview_server <- function(id, tadat){
       mapdat$sumdat$radius = ifelse(mapdat$sumdat$Sample_Count>200,15,mapdat$sumdat$radius)
       mapdat$sumdat$radius = ifelse(mapdat$sumdat$Sample_Count>500,20,mapdat$sumdat$radius)
       mapdat$sumdat$radius = ifelse(mapdat$sumdat$Sample_Count>1500,30,mapdat$sumdat$radius)
-      orgs = tadat$raw%>%dplyr::group_by(OrganizationFormalName)%>%dplyr::summarise("Sample_Count" = length(unique(ResultIdentifier)))
-      mapdat$orgs = orgs%>%dplyr::mutate(OrganizationFormalName = forcats::fct_reorder(OrganizationFormalName, Sample_Count, .desc=TRUE))
-      chars = tadat$raw%>%dplyr::group_by(TADA.CharacteristicName)%>%dplyr::summarise("Sample_Count" = length(unique(ResultIdentifier)))
+      # create org summary for table.
+      mapdat$orgs = usedata%>%dplyr::group_by(OrganizationFormalName)%>%dplyr::summarise("Sample_Count" = length(unique(ResultIdentifier)))
+      # get top 10 characteristics by result number in the dataset and place the rest in a group called "all others"
+      chars = usedata%>%dplyr::group_by(TADA.CharacteristicName)%>%dplyr::summarise("Sample_Count" = length(unique(ResultIdentifier)))
       topslice = chars%>%dplyr::slice_max(order_by = Sample_Count, n = 10)
       bottomslice = chars%>%dplyr::ungroup()%>%dplyr::filter(!TADA.CharacteristicName%in%topslice$TADA.CharacteristicName)%>%dplyr::select("Sample_Count")%>%dplyr::summarise("Sample_Count" = sum(Sample_Count))%>%dplyr::mutate("TADA.CharacteristicName" = "ALL OTHERS")
       chars = plyr::rbind.fill(topslice, bottomslice)%>%dplyr::filter(Sample_Count>0)
@@ -57,22 +60,19 @@ mod_overview_server <- function(id, tadat){
       chars$TADA.Chars = ifelse(nchar(chars$TADA.CharacteristicName)>22,paste0(chars$TADA.Chars, "..."),chars$TADA.Chars)
       chars = chars%>%dplyr::mutate(TADA.Chars = forcats::fct_reorder(TADA.Chars, Sample_Count, .desc=TRUE))
       mapdat$chars = chars
-
       })
 
     # the leaflet map
     output$overview_map = leaflet::renderLeaflet({
       shiny::req(mapdat$sumdat)
+      # blue color palette
       pal <- leaflet::colorBin(
         palette = "Blues",
         domain = mapdat$sumdat$Parameter_Count)
       leaflet::leaflet()%>%
-        # leaflet::addProviderTiles("Esri.WorldImagery", group = "Satellite", options = leaflet::providerTileOptions(updateWhenZooming = FALSE,updateWhenIdle = TRUE)) %>%
         leaflet::addProviderTiles("Esri.WorldTopoMap", group = "World topo", options = leaflet::providerTileOptions(updateWhenZooming = FALSE,updateWhenIdle = TRUE))%>%
-        # leaflet::addLayersControl(position ="topright",
-        #                  baseGroups = c("World topo", "Satellite"))%>%
-        leaflet::clearShapes()%>%
-        leaflet::fitBounds(lng1 = min(mapdat$sumdat$TADA.LongitudeMeasure), lat1 = min(mapdat$sumdat$TADA.LatitudeMeasure), lng2 = max(mapdat$sumdat$TADA.LongitudeMeasure), lat2 = max(mapdat$sumdat$TADA.LatitudeMeasure))%>%
+        leaflet::clearShapes()%>% # get rid of whatever was there before if loading a second dataset
+        leaflet::fitBounds(lng1 = min(mapdat$sumdat$TADA.LongitudeMeasure), lat1 = min(mapdat$sumdat$TADA.LatitudeMeasure), lng2 = max(mapdat$sumdat$TADA.LongitudeMeasure), lat2 = max(mapdat$sumdat$TADA.LatitudeMeasure))%>% # fit to bounds of data in tadat$raw
         leaflet::addCircleMarkers(data = mapdat$sumdat, lng=~TADA.LongitudeMeasure, lat=~TADA.LatitudeMeasure, color="black",fillColor=~pal(Parameter_Count), fillOpacity = 0.7, stroke = TRUE, weight = 1.5, radius=mapdat$sumdat$radius,
                          popup = paste0("Site ID: ", mapdat$sumdat$MonitoringLocationIdentifier,
                                         "<br> Site Name: ", mapdat$sumdat$MonitoringLocationName,
@@ -85,19 +85,21 @@ mod_overview_server <- function(id, tadat){
         )
     })
 
-    # histogram
+    # histogram showing results collected over time.
     output$overview_hist = shiny::renderPlot({
       shiny::req(tadat$raw)
-      ggplot2::ggplot(data = tadat$raw, ggplot2::aes(x = as.Date(ActivityStartDate, format = "%Y-%m-%d")))+ggplot2::geom_histogram(color = "black", fill = "#005ea2", binwidth = 7)+ggplot2::labs(title="Results collected per week over date range queried",x="Time", y = "Result Count")+ggplot2::theme_classic(base_size = 16)
+      ggplot2::ggplot(data = tadat$raw[tadat$raw$Removed==FALSE,], ggplot2::aes(x = as.Date(ActivityStartDate, format = "%Y-%m-%d")))+ggplot2::geom_histogram(color = "black", fill = "#005ea2", binwidth = 7)+ggplot2::labs(title="Results collected per week over date range queried",x="Time", y = "Result Count")+ggplot2::theme_classic(base_size = 16)
     })
+    
     # organization numbers table
-    output$overview_orgtable = DT::renderDT(
-      mapdat$orgs,
-      options = list(dom="t", scrollY=TRUE, pageLength=5),
+    output$overview_orgtable = DT::renderDT({
+      DT::datatable(data.frame(mapdat$orgs),
+      options = list(pageLength=10, colnames = c("Organization Name","Results Count"), searching = FALSE),
       rownames= FALSE,
-      selection = 'none'
-    )
-    # characteristics bar chart 
+      selection = 'none')
+    })
+    
+    # characteristics bar chart showing top characteristics by result number in dataset
     output$overview_barchar = shiny::renderPlot({
       shiny::req(mapdat$chars)
       ggplot2::ggplot(mapdat$chars, ggplot2::aes(x=TADA.Chars, y=Sample_Count)) +
@@ -106,10 +108,8 @@ mod_overview_server <- function(id, tadat){
         ggplot2::theme_classic(base_size = 16) +
         ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1)) +
         ggplot2::geom_text(ggplot2::aes(x = TADA.Chars, y = Sample_Count+(0.07*max(Sample_Count)), label = Sample_Count), size = 5, color="black") #+
-        # ggplot2::coord_flip()
-      # fig = plotly::plot_ly(data = mapdat$chars, labels =~TADA.CharacteristicName, values =~Sample_Count, textinfo = "text", text =~Sample_Count, marker = list(colorscale="Viridis"))%>%plotly::add_pie(hole = 0.3)%>%
-      #   plotly::layout(title = "Characteristics in Dataset", showlegend = FALSE, font = list(family = "Arial", size = 12))
-    })
+   
+          })
 
   })
 }
