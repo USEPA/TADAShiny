@@ -4,10 +4,10 @@
 #'
 #' @param id,input,output,session Internal parameters for {shiny}.
 #'
-#' @noRd 
+#' @noRd
 #'
 #' @importFrom shiny NS tagList
-#' 
+#'
 
 mod_data_flagging_ui <- function(id) {
   ns <- NS(id)
@@ -15,15 +15,14 @@ mod_data_flagging_ui <- function(id) {
     tags$div(style = "display: none;",
              shinyWidgets::prettySwitch("dummy", label = NULL)),
     shiny::htmlOutput(ns('step_1')),
-    "Here",
     shiny::fluidRow(column(
       3, shiny::actionButton(ns("runFlags"), "Run Data Flagging")
     )),
     shiny::htmlOutput(ns('step_2')),
     DT::DTOutput(ns('flagTable')),
     htmltools::br(),
-    shiny::htmlOutput(ns('step_3')),
-    DT::DTOutput(ns('summaryTable'))
+    shiny::htmlOutput(ns('step_3'))
+    #DT::DTOutput(ns('summaryTable'))
   )
 }
 
@@ -33,7 +32,7 @@ mod_data_flagging_server <- function(id, tadat) {
     
     output$step_1 = shiny::renderUI(
       HTML(
-        "<h3>Step 1</h3> Click the button below to scan the dataset for
+        "1: Click the button below to scan the dataset for
         potential missing or out-of-range data"
       )
     )
@@ -44,16 +43,19 @@ mod_data_flagging_server <- function(id, tadat) {
       }
       inputs = character(len)
       for (i in seq_len(len)) {
-        inputs[i] = as.character(shinyWidgets::prettySwitch(
-          ns(paste0(id, i)),
-          label = NULL,
-          value = value[i],
-          status = "primary",
-          fill = TRUE
-        ))
+        inputs[i] = as.character(
+          shinyWidgets::prettySwitch(
+            ns(paste0(id, i)),
+            label = NULL,
+            value = value[i],
+            status = "primary",
+            fill = TRUE
+          )
+        )
       }
       inputs
     }
+    
     shinyValue = function(id, len) {
       unlist(lapply(seq_len(len), function(i) {
         value = input[[paste0(id, i)]]
@@ -63,10 +65,13 @@ mod_data_flagging_server <- function(id, tadat) {
           value
       }))
     }
+    
+    # Create a separate column in the raw data to indicate whether records
+    # were excluded during the first step
     values = shiny::reactiveValues()
-    values$census = integer(length(n_switches))
-
-    # 
+    values$n_fails = integer(length(n_switches))
+    
+    # Runs when the flag button is clicked
     shiny::observeEvent(input$runFlags, {
       shinybusy::show_modal_spinner(
         spin = "double-bounce",
@@ -74,68 +79,64 @@ mod_data_flagging_server <- function(id, tadat) {
         text = "Flagging invalid or out-of-range data...",
         session = shiny::getDefaultReactiveDomain()
       )
-      flagged = applyFlags(tadat$raw)
-      values$censusTable <- flagCensus(flagged)
-      values$census <- colSums(values$censusTable)
-      values$sites = flagged$MonitoringLocationIdentifier
+      
+      # The raw table, plus flagging columns (jch - just return flagging?)
+      values$flagged = applyFlags(tadat$raw)
+      
+      # Record which records have already been flagged
+      AlreadyRemoved = tadat$raw$Removed
+      
+      # A table (raw rows, flags) indicating whether each record passes each test
+      values$testResults <- flagCensus(values$flagged)
+      
+      # The number of records failing each test
+      values$n_fails <- colSums(values$testResults)
+      
+      # The site id for each record (used for counting sites)
+      values$sites = values$flagged$MonitoringLocationIdentifier
+      
+      # Remove progress bar and display instructions
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
-      output$step_2 = shiny::renderUI(HTML(
-        "<h3>Step 2</h3>Select the types of flagged data to be removed"
-      ))
-      output$step_3 = shiny::renderUI(HTML(
-        "<h3>Summary of data to be removed"
-      ))
-      
-      shiny::observe({
-        values$summaryTable = getCounts(
-          values$sites, 
-          values$censusTable[flag_types[shinyValue('switch_', n_switches)]])
-      })
-      
-      switchTable = shiny::reactive({
-        df = data.frame(
-          Prompt = prompts,
-          Count = values$census,
-          Remove = flagSwitch(n_switches, 'switch_', FALSE)
-        )
-      })
-      
-      output$flagTable = DT::renderDT(
-        shiny::isolate(switchTable()),
-        escape = FALSE,
-        selection = 'none',
-        rownames = FALSE,
-        options = list(
-          dom = 't',
-          paging = TRUE,
-          ordering = FALSE,
-          preDrawCallback = DT::JS(
-            'function() { Shiny.unbindAll(this.api().table().node()); }'
-          ),
-          drawCallback = DT::JS(
-            'function() { Shiny.bindAll(this.api().table().node()); } '
-          )
-        )
-      )
-      
-      output$summaryTable = DT::renderDT(
-        values$summaryTable,
-        escape = FALSE,
-        selection = 'none',
-        rownames = TRUE,
-        options = list(
-          dom = 't',
-          paging = FALSE,
-          ordering = FALSE,
-          preDrawCallback = DT::JS(
-            'function() { Shiny.unbindAll(this.api().table().node()); }'
-          ),
-          drawCallback = DT::JS(
-            'function() { Shiny.bindAll(this.api().table().node()); } '
-          )
-        )
-      )
+      output$step_2 = shiny::renderUI(HTML("2: Select the types of flagged data to be removed"))
+      output$step_3 = shiny::renderUI(HTML("Summary of data to be removed"))
 
+    # Runs when any of the flag switches are changed
+    shiny::observe({
+      # A list of all the flags that are selected
+      selected = flag_types[shinyValue('switch_', n_switches)]
+      # Update which rows get removed with the selected
+      NewRemovals = apply(values$testResults[selected], 1, any)
+      NewRemovals[is.na(NewRemovals)] <- FALSE
+      tadat$raw$Removed = as.logical(AlreadyRemoved + NewRemovals)
     })
+    
+    switchTable = shiny::reactive({
+      df = data.frame(
+        Prompt = prompts,
+        Count = values$n_fails,
+        Remove = flagSwitch(n_switches, 'switch_', FALSE)
+      )
+    })
+    
+    output$flagTable = DT::renderDT(
+      shiny::isolate(switchTable()),
+      escape = FALSE,
+      selection = 'none',
+      rownames = FALSE,
+      options = list(
+        dom = 't',
+        paging = TRUE,
+        ordering = FALSE,
+        preDrawCallback = DT::JS(
+          'function() { Shiny.unbindAll(this.api().table().node()); }'
+        ),
+        drawCallback = DT::JS(
+          'function() { Shiny.bindAll(this.api().table().node()); } '
+        )
+      )
+    )
+    })
+    
+    
   })
 }

@@ -12,11 +12,13 @@ options(shiny.maxRequestSize=30*1024^2)
 app_server <- function(input, output, session) {
   # Your application server logic
   tadat = shiny::reactiveValues() # create a list object that holds reactive values passed between modules
+  mod_filtering_server("filtering_1", tadat)
   mod_query_data_server("query_data_1", tadat) # server call to the module servers with the name of the module and any dependecies (this one uses the tadat reactive values object)
   mod_data_flagging_server("data_flagging_1", tadat)
   mod_summary_server("summary_1", tadat)
   mod_overview_server("overview_1", tadat)
   mod_TADA_summary_server("TADA_summary_1", tadat)
+
   
   # switch to overview tab when tadat$new changes
   shiny::observeEvent(tadat$new,{

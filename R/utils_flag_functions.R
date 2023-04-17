@@ -1,16 +1,18 @@
 # Read in the tables
-prompt_table = read.csv(app_sys("flag_prompts.csv"))
-test_table = read.csv(app_sys("flag_tests.csv"))
+prompt_table = read.csv("inst/flag_prompts.csv")
+test_table = read.csv("inst/flag_tests.csv")
+#prompt_table = read.csv(app_sys("flag_prompts.csv"))
+#test_table = read.csv(app_sys("flag_tests.csv"))
 prompt_table <- prompt_table[order(prompt_table$Order),]
 prompts <- prompt_table$Prompt
 n_switches <- length(prompts)
 flag_types <- prompt_table$flagType
 
 flagCensus <- function(table) {
-  print(length(flag_types))
   tabular_results = data.frame(matrix(ncol = length(flag_types), nrow =
                                         nrow(table)))
   colnames(tabular_results) <- flag_types
+  test_table = subset(test_table, test_table$remove==1)
   for (flag in flag_types) {
     flag_count = 0
     tests = test_table[test_table$flagType == flag, ]
@@ -33,20 +35,18 @@ flagCensus <- function(table) {
   return(tabular_results)
 }
 
-getCounts <- function(sites, censusTable){
+getCounts <- function(sites, removed_records){
   
   summary_names = c(
     "Total in Raw File",
     "Total Removed",
     "Total in Clean File")
   
-  removed_records = apply(censusTable, 1, any)
-  
   # Records
-  n_raw_records = nrow(censusTable)
+  n_raw_records = length(removed_records)
   n_removed_records = sum(removed_records)
   n_clean_records = n_raw_records - n_removed_records
-  
+
   # Sites
   n_raw_sites = length(unique(sites))
   n_removed_sites = length(unique(sites[removed_records]))
@@ -109,10 +109,9 @@ out = out
   # Convert depth height units - THIS ONE ONLY GETS RUN WHEN USER RUNS THE CLEANING
   # FILTER AFTER MAKING ALL DECISIONS, AND SUMMARY COUNTS BASED ON UNIQUE UNITS IN
   # DEPTH HEIGHT COLUMNS
-  print(1)
   out <-
     TADA::ConvertDepthUnits(out, unit = 'ft', transform = TRUE) # input$depthunit is dummy variable that would connect to the drop down
-  print(2)
+
   # Convert time zones - no flag function to run beforehand. This one might be
   # tricky to implement - acts on ActivityStartTime.Time?
   #out = out
@@ -125,11 +124,11 @@ out = out
       clean_imprecise = FALSE,
       errorsonly = FALSE
     )
-  print(3)
+
   ##### OTHERS
   # Remove ambiguous censored data records -- might be better suited later on in
   # the app?? Maybe not because could be a QC issue?
   out = TADA::idCensoredData(out)
-  print(4)
+
   return(out)
 }
