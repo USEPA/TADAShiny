@@ -40,9 +40,9 @@ app_ui <- function(request) {
         # shiny::tabPanel("Harmonize"),
         shiny::tabPanel("Censored Data",
                         htmltools::br(),
-                        mod_censored_data_ui("censored_data_1")),
+                        mod_censored_data_ui("censored_data_1")) #,
         # shiny::tabPanel("Explore"),
-        shiny::tabPanel("User Guide")
+        # shiny::tabPanel("User Guide")
 
       ),
       htmltools::hr(),
