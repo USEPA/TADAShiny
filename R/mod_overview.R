@@ -13,6 +13,9 @@ mod_overview_ui <- function(id){
   ns <- NS(id)
   tagList(
     htmltools::h3("Data Overview"),
+    htmltools::HTML("<B>Note:</B> This page shows maps and figures using the <B>original</B> dataset uploaded to this TADAShiny session. If you'd like to see updated figures after working in other tabs, please press the 'Refresh' button."),
+    shiny::fluidRow(column(3, shiny::actionButton(ns("refresh_overview"),"Refresh",icon("arrows-rotate"),style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))),
+    htmltools::hr(),
     shiny::fluidRow(column(12, shiny::wellPanel(shiny::htmlOutput(ns("overview_totals"))))),
     htmltools::br(),
     shiny::fluidRow(column(6,shinycssloaders::withSpinner(leaflet::leafletOutput(ns("overview_map"), height = "400px"))),# "Larger point sizes represent more samples collected at a site; darker points represent more characteristics collected at a site. Click on a point to see the site ID, name, and sample/visit/parameter counts.",
@@ -38,7 +41,7 @@ mod_overview_server <- function(id, tadat){
     mapdat = shiny::reactiveValues()
 
     # create dataset for map and histogram using raw data
-    shiny::observeEvent(tadat$raw, {
+    shiny::observeEvent(tadat$ovgo, {
       usedata = tadat$raw%>%dplyr::filter(Removed==FALSE) # do not consider data automatically removed upon upload for plots and maps
       # create summary info and binning for map
       mapdat$sumdat = usedata%>%dplyr::group_by(MonitoringLocationIdentifier,MonitoringLocationName,TADA.LatitudeMeasure, TADA.LongitudeMeasure)%>%dplyr::summarise("Sample_Count" = length(unique(ResultIdentifier)), "Visit_Count" = length(unique(ActivityStartDate)), "Parameter_Count" = length(unique(TADA.CharacteristicName)), "Organization_Count" = length(unique(OrganizationIdentifier)))
@@ -110,6 +113,11 @@ mod_overview_server <- function(id, tadat){
         ggplot2::geom_text(ggplot2::aes(x = TADA.Chars, y = Sample_Count+(0.07*max(Sample_Count)), label = Sample_Count), size = 5, color="black") #+
    
           })
+    
+    shiny::observeEvent(input$refresh_overview,{
+      shiny::req(tadat$raw)
+      tadat$ovgo = 2
+    })
 
   })
 }
