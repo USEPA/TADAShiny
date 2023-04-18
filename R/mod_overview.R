@@ -14,7 +14,7 @@ mod_overview_ui <- function(id){
   tagList(
     htmltools::h3("Data Overview"),
     htmltools::HTML("<B>Note:</B> This page shows maps and figures using the <B>original</B> dataset uploaded to this TADAShiny session. If you'd like to see updated figures after working in other tabs, please press the 'Refresh' button."),
-    shiny::fluidRow(column(3, shiny::actionButton(ns("refresh_overview"),"Refresh",icon("arrows-rotate"),style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))),
+    shiny::fluidRow(column(3, shiny::actionButton(ns("refresh_overview"),"Refresh",shiny::icon("arrows-rotate"),style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))),
     htmltools::hr(),
     shiny::fluidRow(column(12, shiny::wellPanel(shiny::htmlOutput(ns("overview_totals"))))),
     htmltools::br(),
