@@ -74,11 +74,11 @@ Version: 0.0.1
 Depends: R (>= 3.5.0)
 Imports: plyr, data.table, dplyr, grDevices, magrittr, stringr, utils,
         RColorBrewer, stats, lubridate, dataRetrieval, ggplot2, sf,
-        maps, plotly, rmarkdown, outliers, remotes
+        maps, leaflet, plotly, rmarkdown, outliers, remotes
 Suggests: readr, tidyverse, knitr, testthat, testthis, usethis,
         devtools, pkgdown, Rcpp, spelling
 License: CC0
-MD5sum: 39ce4c2a4d0f632274aa9b9ec16a2b9d
+MD5sum: e1323907fedf0fcce5190ccd20b8fd9a
 NeedsCompilation: no
 
 Package: anytime
@@ -1076,7 +1076,7 @@ Suggests: blob, covr, dplyr (>= 0.8-3), ggplot2, knitr, lwgeom (>=
         tibble (>= 1.4.1), tidyr (>= 1.2.0), tidyselect (>= 1.0.0),
         tmap (>= 2.0), vctrs, wk
 License: GPL-2 | MIT + file LICENSE
-MD5sum: e47851c0385cfb24ca98a36bd3d1757f
+MD5sum: 7930df91c1599c6a7c83ad0c4f11a018
 NeedsCompilation: yes
 
 Package: shinyWidgets
