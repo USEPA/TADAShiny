@@ -142,7 +142,17 @@ mod_query_data_server <- function(id, tadat){
       }else{
         siteid = input$siteid
         # siteid = stringr::str_trim(unlist(strsplit(input$siteids,",")))
-        }
+      }
+      if(is.null(input$enddate)){
+        enddate = "null"
+      }else{
+        enddate = as.character(input$enddate)
+      }
+      if(is.null(input$startdate)){
+        startdate = "null"
+      }else{
+        startdate = as.character(input$startdate)
+      }
       # a modal that pops up showing it's working on querying the portal
       shinybusy::show_modal_spinner(
         spin = "double-bounce",
@@ -161,8 +171,8 @@ mod_query_data_server <- function(id, tadat){
                                         sampleMedia = sampleMedia,
                                         project = project,
                                         organization = organization,
-                                        startDate = as.character(input$startdate),
-                                        endDate = as.character(input$enddate),
+                                        startDate = startdate,
+                                        endDate = enddate,
                                         applyautoclean = TRUE
       )
       # remove the modal once the dataset has been pulled
