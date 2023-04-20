@@ -17,7 +17,7 @@ app_ui <- function(request) {
       shiny::includeHTML(app_sys("app/www/header.html")),
       shinyjs::useShinyjs(),
       htmltools::br(),
-      shiny::headerPanel(title = "Tools for Automated Data Analysis (TADA) Module 1: Water Quality Portal Data Discovery, Wrangling, and Cleaning"),
+      shiny::headerPanel(title = "Tools for Automated Data Analysis (TADA) Module 1: Water Quality Portal Data Discovery and Cleaning"),
       htmltools::br(),
       shiny::tabsetPanel( # create a navbar page with tabs at the top
         id = "tabbar",
