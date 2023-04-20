@@ -15,12 +15,13 @@ mod_data_flagging_ui <- function(id) {
     tags$div(style = "display: none;",
              shinyWidgets::prettySwitch("dummy", label = NULL)),
     shiny::htmlOutput(ns('step_1')),
-    htmltools::br(),
+    htmltools::div(style="margin-bottom:10px"),
     shiny::fluidRow(column(
       3, shiny::actionButton(ns("runFlags"), "Run Data Flagging", style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
     )),
-    shiny::htmlOutput(ns('step_2')),
     htmltools::br(),
+    shiny::htmlOutput(ns('step_2')),
+    htmltools::div(style="margin-bottom:10px"),
     DT::DTOutput(ns('flagTable')),
     htmltools::br(),
     shiny::htmlOutput(ns('step_3'))
