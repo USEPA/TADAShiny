@@ -148,13 +148,13 @@ mod_query_data_server <- function(id, tadat){
         siteid = input$siteid
         # siteid = stringr::str_trim(unlist(strsplit(input$siteids,",")))
       }
-      if(is.null(input$enddate)){
+      if(length(input$enddate)==0){ # ensure if date is empty, the query receives a proper input ("null")
         enddate = "null"
       }else{
         enddate = as.character(input$enddate)
       }
-      if(is.null(input$startdate)){
-        startdate = "null"
+      if(length(input$startdate)==0){ # ensure if date is empty, the query receives a proper start date. Might want a warning message instead.
+        startdate = "1800-01-01"
       }else{
         startdate = as.character(input$startdate)
       }
