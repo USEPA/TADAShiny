@@ -64,6 +64,7 @@ mod_overview_server <- function(id, tadat){
       chars$TADA.Chars = ifelse(nchar(chars$TADA.CharacteristicName)>22,paste0(chars$TADA.Chars, "..."),chars$TADA.Chars)
       chars = chars%>%dplyr::mutate(TADA.Chars = forcats::fct_reorder(TADA.Chars, Result_Count, .desc=TRUE))
       mapdat$chars = chars
+      tadat$ovgo = NULL
       })
 
     # the leaflet map
