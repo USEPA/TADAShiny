@@ -88,7 +88,7 @@ mod_query_data_server <- function(id, tadat){
     })
   # if user presses example data button, make tadat$raw the nutrients dataset contained within the TADA package.
     shiny::observeEvent(input$example_data,{
-      raw = TADA::Nutrients_Utah
+      raw = TADA::TribalData
       raw$Removed = FALSE
       raw$Removed = ifelse(!raw$TADA.ActivityMediaName%in%c("WATER"),TRUE,raw$Removed)
       raw$Removed = ifelse(raw$TADA.ResultMeasureValueDataTypes.Flag%in%c("ND or NA","Text","Coerced to NA"),TRUE,raw$Removed)

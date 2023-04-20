@@ -21,6 +21,7 @@ Method Speciation,TADA.MethodSpeciation.Flag,Nonstandardized,0
 Method Speciation,TADA.MethodSpeciation.Flag,Invalid,1
 QAPP Approved,QAPPApprovedIndicator,NA,1
 QAPP Approved,QAPPApprovedIndicator,Y,0
+QAPP Approved,QAPPApprovedIndicator,NA,1
 QAPP Approved,QAPPApprovedIndicator,N,1
 QAPP Documentation,TADA.QAPPDocAvailable,Y_ProjectFileUrlProvided,0
 QAPP Documentation,TADA.QAPPDocAvailable,N,1
