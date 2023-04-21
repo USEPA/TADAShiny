@@ -72,7 +72,7 @@ Imports: plyr, data.table, dplyr, grDevices, magrittr, stringr, utils,
 Suggests: readr, tidyverse, knitr, testthat, testthis, usethis,
         devtools, pkgdown, Rcpp, spelling
 License: CC0
-MD5sum: 51e9b86ea09a142cc5eff407316a211c
+MD5sum: 8a2d10dd78882079a1d7c0256f442432
 NeedsCompilation: no
 
 Package: anytime
@@ -323,10 +323,10 @@ MD5sum: a25bf9fbb3ed35348f54f63b8b566f05
 NeedsCompilation: yes
 
 Package: dplyr
-Version: 1.1.1
+Version: 1.1.2
 Depends: R (>= 3.5.0)
 Imports: cli (>= 3.4.0), generics, glue (>= 1.3.2), lifecycle (>=
-        1.0.3), magrittr (>= 1.5), methods, pillar (>= 1.5.1), R6,
+        1.0.3), magrittr (>= 1.5), methods, pillar (>= 1.9.0), R6,
         rlang (>= 1.1.0), tibble (>= 3.2.0), tidyselect (>= 1.2.0),
         utils, vctrs (>= 0.6.0)
 Suggests: bench, broom, callr, covr, DBI, dbplyr (>= 2.2.1), ggplot2,
@@ -334,7 +334,7 @@ Suggests: bench, broom, callr, covr, DBI, dbplyr (>= 2.2.1), ggplot2,
         rmarkdown, RMySQL, RPostgreSQL, RSQLite, stringi (>= 1.7.6),
         testthat (>= 3.1.5), tidyr (>= 1.3.0), withr
 License: MIT + file LICENSE
-MD5sum: 30dd7cbfa4cd7a62faa9e69853245d5d
+MD5sum: 2632fd1ddadb207afcc2ac1bd82787d0
 NeedsCompilation: yes
 
 Package: e1071
@@ -1047,7 +1047,7 @@ Suggests: blob, covr, dplyr (>= 0.8-3), ggplot2, knitr, lwgeom (>=
         tibble (>= 1.4.1), tidyr (>= 1.2.0), tidyselect (>= 1.0.0),
         tmap (>= 2.0), vctrs, wk
 License: GPL-2 | MIT + file LICENSE
-MD5sum: 1f5000a27783d6f5f056885b1db76469
+MD5sum: 794507ac49c89e0d9e6111a161649d0c
 NeedsCompilation: yes
 
 Package: shinyWidgets
@@ -1159,14 +1159,14 @@ MD5sum: a08f1c17c95224168bf53547b4200ca3
 NeedsCompilation: yes
 
 Package: terra
-Version: 1.7-23
+Version: 1.7-28
 Depends: R (>= 3.5.0)
 Imports: methods, Rcpp (>= 1.0-10)
 LinkingTo: Rcpp
 Suggests: parallel, tinytest, ncdf4, sf (>= 0.9-8), deldir, XML,
         leaflet, htmlwidgets
 License: GPL (>= 3)
-MD5sum: 1155be1d8d33f8a3e7665e1147c30523
+MD5sum: 91e71e498ae8319023967711acbdadb9
 NeedsCompilation: yes
 
 Package: testthat
@@ -1350,13 +1350,13 @@ MD5sum: 850bc0b20918b0b95e96997ba95d0324
 NeedsCompilation: yes
 
 Package: xfun
-Version: 0.38
+Version: 0.39
 Imports: stats, tools
 Suggests: testit, parallel, codetools, rstudioapi, tinytex (>= 0.30),
         mime, markdown (>= 1.5), knitr (>= 1.42), htmltools, remotes,
         pak, rhub, renv, curl, jsonlite, magick, yaml, rmarkdown
 License: MIT + file LICENSE
-MD5sum: 86bdf4d8e92b5c8971aa5b1c656e2371
+MD5sum: 70b5c0b2009cc5d2154f85252056b2d1
 NeedsCompilation: yes
 
 Package: xml2
