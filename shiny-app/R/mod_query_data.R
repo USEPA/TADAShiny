@@ -26,33 +26,38 @@ load("inst/extdata/query_choices.Rdata")
 
 mod_query_data_ui <- function(id){
   ns <- NS(id)
-  tagList(shiny::fluidRow(htmltools::h3("Upload dataset..."),
-                   htmltools::HTML("Select a file from your computer. The file can be a <B>fresh</B> TADA dataset or a <B>working</B> TADA dataset that you are return to the app to work on. Currently supports .xls and .xlsx only. If you'd like to format a non-WQP dataset to work in the tool, you can find the WQX profile templates "),
-                   tags$a(href="https://www.epa.gov/waterdata/water-quality-exchange-web-template-files", "here."),
-                   # widget to upload WQP profile or WQX formatted spreadsheet
-                   column(9,shiny::fileInput(ns("file"), "",
-                             multiple = TRUE,
-                             accept = c(".xlsx", ".xls"),
-                             width = "100%"))),
-          shiny::fluidRow(column(3,shiny::actionButton(ns("example_data"),"Use example data",shiny::icon("gift"),style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))),
+  tagList(shiny::fluidRow(htmltools::h3("Option A: Use example data"),
+                          column(3,shiny::actionButton(ns("example_data"),"Use example data",shiny::icon("gift"),style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))),
           htmltools::hr(),
-          shiny::fluidRow(htmltools::h3("...or Query the WQP"),
+          shiny::fluidRow(htmltools::h3("Option B: Query the Water Quality Portal (WQP)"),
                    "Use the fields below to download a dataset directly from WQP. Fields with '(s)' in the label allow multiple selections. Hydrologic Units may be at any scale, from subwatershed to region. However, be mindful that large queries may time out."),
           htmltools::br(), # styling several fluid rows with columns to hold the input drop down widgets
           shiny::fluidRow(column(4,shiny::selectizeInput(ns("state"),"State", choices = NULL)), # widgets shown when app opens
                     column(4,shiny::selectizeInput(ns("county"), "County (pick state first)", choices = NULL)),
                     column(4,shiny::textInput(ns("huc"),"Hydrologic Unit", placeholder = "e.g. 020700100103"))),
-         shiny::fluidRow(column(4, shiny::selectizeInput(ns("siteid"), "Monitoring Location ID(s)", choices = NULL,multiple = TRUE)),
+          shiny::fluidRow(column(4, shiny::selectizeInput(ns("siteid"), "Monitoring Location ID(s)", choices = NULL,multiple = TRUE)),
                     column(4, shiny::selectizeInput(ns("org"),"Organization(s)", choices = NULL, multiple = TRUE)),
                     column(4, shiny::selectizeInput(ns("proj"),"Project(s)", choices = NULL, multiple = TRUE))),
-         shiny::fluidRow(column(4, shiny::selectizeInput(ns("chargroup"),"Characteristic Group", choices = NULL)),
+          shiny::fluidRow(column(4, shiny::selectizeInput(ns("chargroup"),"Characteristic Group", choices = NULL)),
                     column(4, shiny::selectizeInput(ns("characteristic"),"Characteristic(s)", choices = NULL, multiple = TRUE)),
                     column(4, shiny::selectizeInput(ns("media"), "Sample Media", choices = c("",media), selected = "Water", multiple = TRUE))),
-         shiny::fluidRow(column(4, shiny::selectizeInput(ns("type"), "Site Type(s)", choices = c("",sitetype), multiple = TRUE)),
+          shiny::fluidRow(column(4, shiny::selectizeInput(ns("type"), "Site Type(s)", choices = c("",sitetype), multiple = TRUE)),
                     column(4, shiny::dateInput(ns("startdate"),"Start Date", format = "yyyy-mm-dd", startview = "year")),
                     column(4, shiny::dateInput(ns("enddate"),"End Date", format = "yyyy-mm-dd", startview = "year"))),
-         shiny::fluidRow(column(4, shiny::actionButton(ns("querynow"),"Run Query",shiny::icon("cloud"),
-                                          style="color: #fff; background-color: #337ab7; border-color: #2e6da4")))
+          shiny::fluidRow(column(4, shiny::actionButton(ns("querynow"),"Run Query",shiny::icon("cloud"),
+                                          style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))),
+          htmltools::hr(),
+          shiny::fluidRow(htmltools::h3("Option C: Upload dataset"),
+                   htmltools::HTML(("Select a file from your computer. This upload feature currently only accepts data in .xls and .xlsx formats.
+                                    The file can be a <B>fresh</B> TADA dataset or a <B>working</B> TADA dataset that you are returning to the
+                                    app to iterate on. Data must also be formatted in the EPA Water Quality eXchange (WQX) schema to leverage
+                                    this tool. You may reach out to the WQX helpdesk at WQX@epa.gov for assistance preparing and submitting your data 
+                                    to the WQP through EPA's WQX.")),
+                   # widget to upload WQP profile or WQX formatted spreadsheet
+                   column(9,shiny::fileInput(ns("file"), "",
+                             multiple = TRUE,
+                             accept = c(".xlsx", ".xls"),
+                             width = "100%")))
       )
 }
 
@@ -83,7 +88,7 @@ mod_query_data_server <- function(id, tadat){
     })
   # if user presses example data button, make tadat$raw the nutrients dataset contained within the TADA package.
     shiny::observeEvent(input$example_data,{
-      raw = TADA::Nutrients_Utah
+      raw = TADA::TribalData
       raw$Removed = FALSE
       raw$Removed = ifelse(!raw$TADA.ActivityMediaName%in%c("WATER"),TRUE,raw$Removed)
       raw$Removed = ifelse(raw$TADA.ResultMeasureValueDataTypes.Flag%in%c("ND or NA","Text","Coerced to NA"),TRUE,raw$Removed)
@@ -142,7 +147,17 @@ mod_query_data_server <- function(id, tadat){
       }else{
         siteid = input$siteid
         # siteid = stringr::str_trim(unlist(strsplit(input$siteids,",")))
-        }
+      }
+      if(length(input$enddate)==0){ # ensure if date is empty, the query receives a proper input ("null")
+        enddate = "null"
+      }else{
+        enddate = as.character(input$enddate)
+      }
+      if(length(input$startdate)==0){ # ensure if date is empty, the query receives a proper start date. Might want a warning message instead.
+        startdate = "1800-01-01"
+      }else{
+        startdate = as.character(input$startdate)
+      }
       # a modal that pops up showing it's working on querying the portal
       shinybusy::show_modal_spinner(
         spin = "double-bounce",
@@ -161,8 +176,8 @@ mod_query_data_server <- function(id, tadat){
                                         sampleMedia = sampleMedia,
                                         project = project,
                                         organization = organization,
-                                        startDate = as.character(input$startdate),
-                                        endDate = as.character(input$enddate),
+                                        startDate = startdate,
+                                        endDate = enddate,
                                         applyautoclean = TRUE
       )
       # remove the modal once the dataset has been pulled

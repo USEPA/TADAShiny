@@ -21,6 +21,7 @@ Method Speciation,TADA.MethodSpeciation.Flag,Nonstandardized,0
 Method Speciation,TADA.MethodSpeciation.Flag,Invalid,1
 QAPP Approved,QAPPApprovedIndicator,NA,1
 QAPP Approved,QAPPApprovedIndicator,Y,0
+QAPP Approved,QAPPApprovedIndicator,NA,1
 QAPP Approved,QAPPApprovedIndicator,N,1
 QAPP Documentation,TADA.QAPPDocAvailable,Y_ProjectFileUrlProvided,0
 QAPP Documentation,TADA.QAPPDocAvailable,N,1
@@ -33,15 +34,15 @@ Spatial Flags,TADA.InvalidCoordinates.Flag,Imprecise_Latincludes999,0
 Spatial Flags,TADA.InvalidCoordinates.Flag,Imprecise_Longincludes999,0
 Spatial Flags,TADA.InvalidCoordinates.Flag,Imprecise_lessthan3decimaldigits,0
 Spatial Flags,TADA.InvalidCoordinates.Flag,OK,0
-Special Characters,TADA.ResultMeasureValueDataTypes.Flag,ND or NA,1
-Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Coerced to NA,1
+Special Characters,TADA.ResultMeasureValueDataTypes.Flag,ND or NA,0
+Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Coerced to NA,0
 Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Numeric,0
 Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Less Than,0
 Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Greater Than,0
 Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Approximate Value,0
 Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Percentage,0
 Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Comma-Separated Numeric,0
-Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Text,1
+Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Text,0
 Units,TADA.ResultUnit.Flag,Valid,0
 Units,TADA.ResultUnit.Flag,Nonstandardized,0
 Units,TADA.ResultUnit.Flag,Invalid,1
