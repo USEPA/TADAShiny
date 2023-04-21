@@ -13,7 +13,7 @@ app_server <- function(input, output, session) {
   # Your application server logic
   tadat = shiny::reactiveValues() # create a list object that holds reactive values passed between modules
   mod_filtering_server("filtering_1", tadat)
-  mod_query_data_server("query_data_1", tadat) # server call to the module servers with the name of the module and any dependecies (this one uses the tadat reactive values object)
+  mod_query_data_server("query_data_1", tadat) # server call to the module servers with the name of the module and any dependencies (this one uses the tadat reactive values object)
   mod_data_flagging_server("data_flagging_1", tadat)
   mod_summary_server("summary_1", tadat)
   mod_overview_server("overview_1", tadat)
@@ -25,7 +25,7 @@ app_server <- function(input, output, session) {
   shiny::observeEvent(tadat$new,{
     removed = length(tadat$raw$ResultIdentifier[tadat$raw$Removed==TRUE])
     if(removed>0){
-      message = paste0("Your data were successfully loaded and displayed on the Overview tab. ", scales::comma(removed)," results were flagged for removal because their sample media was not WATER or the result value was text or NA and no detection limit value was provided. See dataset summary information in the gray box at the bottom of the app.")
+      message = paste0("Your data were successfully loaded and displayed on the Overview tab. TADA is currently only designed for analyzing numerical water data. Therefore, ", scales::comma(removed)," results were flagged for removal because their sample media was not WATER or the result value was text or NA and no detection limit value was provided. See dataset summary information in the gray box at the bottom of the app.")
     }else{
       message = "Your data were successfully loaded into the app and are displayed on the Overview tab. See summary information about your dataset in the gray box at the bottom of the app."
     }

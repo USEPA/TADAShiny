@@ -17,32 +17,32 @@ app_ui <- function(request) {
       shiny::includeHTML(app_sys("app/www/header.html")),
       shinyjs::useShinyjs(),
       htmltools::br(),
-      shiny::headerPanel(title = "TADAShiny"),
+      shiny::headerPanel(title = "Tools for Automated Data Analysis (TADA) Module 1: Water Quality Portal Data Discovery and Cleaning"),
       htmltools::br(),
       shiny::tabsetPanel( # create a navbar page with tabs at the top
         id = "tabbar",
-        shiny::tabPanel("Load", # each tabPanel represents a tab page at the top of the navbar
+        shiny::tabPanel("1. Load", value = "Load",# each tabPanel represents a tab page at the top of the navbar
                  htmltools::br(),
                  mod_query_data_ui("query_data_1")), #,
-        shiny::tabPanel("Overview",
+        shiny::tabPanel("2. Overview", value = "Overview",
                  htmltools::br(),
                  mod_overview_ui("overview_1")),
                  # htmltools::hr()),
                  # mod_summary_ui("summary_1")),
-        shiny::tabPanel("Flag",
+        shiny::tabPanel("3. Flag", value = "Flag",
                         htmltools::br(),
                  mod_data_flagging_ui("data_flagging_1")),
-
-        shiny::tabPanel("Filter", id="filter",
-                        htmltools::br(),
-                        mod_filtering_ui("filtering_1"),
-                        htmltools::hr()),
+# 
+#         shiny::tabPanel("4. Filter", value ="Filter",
+#                         htmltools::br(),
+#                         mod_filtering_ui("filtering_1"),
+#                         htmltools::hr()),
         # shiny::tabPanel("Harmonize"),
-        shiny::tabPanel("Censored Data",
+        shiny::tabPanel("4. Censored Data", value = "Censored",
                         htmltools::br(),
-                        mod_censored_data_ui("censored_data_1")),
+                        mod_censored_data_ui("censored_data_1")) #,
         # shiny::tabPanel("Explore"),
-        shiny::tabPanel("User Guide")
+        # shiny::tabPanel("User Guide")
 
       ),
       htmltools::hr(),

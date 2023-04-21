@@ -22,8 +22,8 @@ mod_censored_data_ui <- function(id){
                           column(3, shiny::uiOutput(ns("nd_mult"))),
                           column(3, shiny::selectInput(ns("od_method"),"Over-Detect Handling Method",choices = c("Multiply detection limit by x","No change"), selected = "No change", multiple = FALSE)),
                           column(3, shiny::uiOutput(ns("od_mult")))),
-          shiny::fluidRow(column(2, shiny::actionButton(ns("apply_methods"),"Apply Methods to Dataset",style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
-                          column(2, shiny::uiOutput(ns("undo_methods")))),
+          shiny::fluidRow(column(3, shiny::actionButton(ns("apply_methods"),"Apply Methods to Dataset",style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
+                          column(3, shiny::uiOutput(ns("undo_methods")))),
           htmltools::br(),
           shiny::fluidRow(column(12, DT::DTOutput(ns("see_det")))),
           htmltools::br(),
@@ -56,11 +56,11 @@ mod_censored_data_server <- function(id, tadat){
         removed$TADA.CensoredData.Flag = "Not screened" # this provides a flag for things not screened for censored metadata
       }
       dat = TADA::idCensoredData(dat) # identify censored data records based on DetectionQuantitationLimitTypeName and ResultDetectionConditionText
-      dat$Removed = ifelse(dat$TADA.CensoredData.Flag%in%c("Censored but not Categorized","Conflict between Condition and Limit"),TRUE,dat$Removed)
+      dat$Removed = ifelse(!dat$TADA.CensoredData.Flag%in%c("Non-Detect","Over-Detect","Uncensored", "Other Condition/Limit Populated"),TRUE,dat$Removed)
       if(any(dat$Removed==TRUE)){ # let users know when there are "problem" censored data results that will be flagged for removal.
           shiny::showModal(shiny::modalDialog(
           title = "Detection Limit Data Warning",
-          paste0(length(dat$ResultIdentifier[dat$Removed==TRUE])," results were flagged for removal because they have ambiguous and/or unfamiliar detection limits and conditions. These will show up in the pie chart as 'Censored but not Categorized' and 'Conflict between Condition and Limit', but will not be used in the sections below. You may download your dataset for review at any time using the 'Download Working Dataset' button at the bottom of the page.")
+          paste0(length(dat$ResultIdentifier[dat$Removed==TRUE])," results were flagged for removal because they have conflicting, ambiguous and/or unfamiliar detection limits and conditions. These will show up in the pie chart, but only 'Non-Detect', 'Over-Detect', and 'Uncensored' results will be used in the sections below. You may download your dataset for review at any time using the 'Download Working Dataset' button at the bottom of the page.")
         ))
       }
       tadat$raw = plyr::rbind.fill(dat, removed) # but bring them all back together for tadat$raw object

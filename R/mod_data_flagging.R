@@ -15,10 +15,13 @@ mod_data_flagging_ui <- function(id) {
     tags$div(style = "display: none;",
              shinyWidgets::prettySwitch("dummy", label = NULL)),
     shiny::htmlOutput(ns('step_1')),
+    htmltools::div(style="margin-bottom:10px"),
     shiny::fluidRow(column(
-      3, shiny::actionButton(ns("runFlags"), "Run Data Flagging")
+      3, shiny::actionButton(ns("runFlags"), "Run Data Flagging", style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
     )),
+    htmltools::br(),
     shiny::htmlOutput(ns('step_2')),
+    htmltools::div(style="margin-bottom:10px"),
     DT::DTOutput(ns('flagTable')),
     htmltools::br(),
     shiny::htmlOutput(ns('step_3'))
@@ -32,8 +35,8 @@ mod_data_flagging_server <- function(id, tadat) {
     
     output$step_1 = shiny::renderUI(
       HTML(
-        "1: Click the button below to scan the dataset for
-        potential missing or out-of-range data"
+        "<h4>Click the button below to scan the dataset for
+        potential missing or out-of-range data</h3>"
       )
     )
     
@@ -97,8 +100,8 @@ mod_data_flagging_server <- function(id, tadat) {
       
       # Remove progress bar and display instructions
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
-      output$step_2 = shiny::renderUI(HTML("2: Select the types of flagged data to be removed"))
-      output$step_3 = shiny::renderUI(HTML("Summary of data to be removed"))
+      output$step_2 = shiny::renderUI(HTML("<h4>Select the types of flagged data to be removed</h3>"))
+      # output$step_3 = shiny::renderUI(HTML("Summary of data to be removed"))
 
     # Runs when any of the flag switches are changed
     shiny::observe({
