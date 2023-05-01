@@ -1,4 +1,4 @@
-# Welcome to TADAShiny: Data Discovery, Wrangling, and Cleaning
+# Welcome to TADAShiny: Data Discovery and Cleaning
 
 [![](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 
