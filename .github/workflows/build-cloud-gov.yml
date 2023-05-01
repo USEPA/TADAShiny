@@ -1,4 +1,4 @@
-name: Copy R Shiny app to cloud-gov branch and prepare for deployment
+name: Copy R Shiny app to cloud-gov branch and request push to dev
 
 on:
   workflow_dispatch:
@@ -6,6 +6,7 @@ on:
       build_deps:
         description: 'Also build R dependencies?'
         required: true
+        default: true
         type: boolean
 
 permissions:
@@ -154,3 +155,26 @@ jobs:
         git add vendor_r
         git diff-index --quiet HEAD || git commit -m "Automated workflow from GitHub Actions to vendor R dependencies"
         git push
+
+  request_copy:
+    # Note: this step will fail if OWSHINY_ACTION secret is not set up in the repo and should be removed
+    name: Request copy uploaded to deployment repo if permitted
+    needs: [copy_code_to_cloud-gov, download_and_vendor_dependencies]
+    if: always() && !contains(needs.*.result, 'failure')
+    # Needs to run even if download_and_vendor_dependencies was skipped
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Workflow to copy for deployment
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.OWSHINY_ACTION }}
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: 'USEPA',
+              repo: 'OWShiny',
+              workflow_id: 'copy_repo.yml',
+              ref: 'develop',
+              inputs: {
+                "repo_to_copy": context.repo.owner + "/" + context.repo.repo
+              }
+            })
