@@ -72,7 +72,7 @@ Imports: plyr, data.table, dplyr, grDevices, magrittr, stringr, utils,
 Suggests: readr, tidyverse, knitr, testthat, testthis, usethis,
         devtools, pkgdown, Rcpp, spelling
 License: CC0
-MD5sum: 6c5674ff2865bbcf4bd528ac897d04d3
+MD5sum: 642830cf8d4c19002afe9198d730d355
 NeedsCompilation: no
 
 Package: anytime
@@ -145,11 +145,11 @@ MD5sum: 98f14c700c08aba5bcd150d983fd1f9e
 NeedsCompilation: no
 
 Package: cachem
-Version: 1.0.7
-Imports: rlang, fastmap
+Version: 1.0.8
+Imports: rlang, fastmap (>= 1.1.1)
 Suggests: testthat
 License: MIT + file LICENSE
-MD5sum: 7b34f9942a6657d09da2631b8a0bfb7a
+MD5sum: 06ff598f7a28eaeaf10fdd426a5d2b4b
 NeedsCompilation: yes
 
 Package: callr
@@ -1047,7 +1047,7 @@ Suggests: blob, covr, dplyr (>= 0.8-3), ggplot2, knitr, lwgeom (>=
         tibble (>= 1.4.1), tidyr (>= 1.2.0), tidyselect (>= 1.0.0),
         tmap (>= 2.0), vctrs, wk
 License: GPL-2 | MIT + file LICENSE
-MD5sum: eb6857c482c505f6dd4b263554eaac4f
+MD5sum: e3381b23c707c6ff7473942e6d7fd2a7
 NeedsCompilation: yes
 
 Package: shinyWidgets
@@ -1316,12 +1316,12 @@ MD5sum: d304b06df6933c25f0dbe5c75fcd6904
 NeedsCompilation: yes
 
 Package: waldo
-Version: 0.4.0
+Version: 0.5.0
 Imports: cli, diffobj (>= 0.3.4), fansi, glue, methods, rematch2, rlang
         (>= 1.0.0), tibble
 Suggests: covr, R6, testthat (>= 3.0.0), withr, xml2
 License: MIT + file LICENSE
-MD5sum: d1b5a3cbabbb3b02456512c2250f3323
+MD5sum: a1a85e53538a4d53acb3c815f354f873
 NeedsCompilation: no
 
 Package: withr
