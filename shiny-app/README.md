@@ -17,10 +17,12 @@ TADAShiny (Module 1: Data Discovery and Cleaning) retrieves data from the WQP, a
 You can install and run the development version of TADAShiny from [GitHub](https://github.com/USEPA/TADAShiny) by running:
 
 ``` r
-library (remotes)
+if(!"remotes"%in%installed.packages()){
+install.packages("remotes")
+}
+
 remotes::install_github("USEPA/TADAShiny", ref = "develop", dependencies = TRUE)
 
-library (TADAShiny)
 TADAShiny::run_app()
 ```
 
