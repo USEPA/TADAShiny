@@ -1,7 +1,7 @@
 ---
 applications:
 - name: tada
-  memory: 1500M
+  memory: 2800M
   disk_quota: 2G
   routes:
     - route: tada.app.cloud.gov
