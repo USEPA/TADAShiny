@@ -195,8 +195,8 @@ initializeTable <- function(tadat, raw){
   # Run initial tests
   raw$Removed = FALSE
   removals <- data.frame(matrix(nrow = nrow(raw), ncol = 0))
-  removals["Media Type"] = ifelse(!raw$TADA.ActivityMediaName%in%c("WATER"),TRUE,raw$Removed)
-  removals["Special Characters"] = ifelse(raw$TADA.ResultMeasureValueDataTypes.Flag%in%c("ND or NA","Text","Coerced to NA"),TRUE,raw$Removed)
+  # removals["Media Type"] = ifelse(!raw$TADA.ActivityMediaName%in%c("WATER"),TRUE,raw$Removed)
+  # removals["Special Characters"] = ifelse(raw$TADA.ResultMeasureValueDataTypes.Flag%in%c("ND or NA","Text","Coerced to NA"),TRUE,raw$Removed)
 
   
   tadat$raw = raw
