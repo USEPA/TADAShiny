@@ -8,22 +8,31 @@ prompts <- prompt_table$Prompt
 n_switches <- length(prompts)
 flag_types <- prompt_table$flagType
 
-flagCensus <- function(table) {
-  tabular_results = data.frame(matrix(ncol = length(flag_types), nrow =
-                                        nrow(table)))
+switch_defaults <- prompt_table$Level != "Optional"
+switch_disabled <- prompt_table$Level == "Required"
+
+
+flagCensus <- function(raw) {
+  tabular_results = data.frame(matrix(ncol = length(flag_types), nrow = nrow(raw)))
   colnames(tabular_results) <- flag_types
   test_table = subset(test_table, test_table$remove==1)
   for (flag in flag_types) {
     flag_count = 0
     tests = test_table[test_table$flagType == flag, ]
-    results = integer(nrow(table))
+    results = integer(nrow(raw))
     if (nrow(tests) > 0) {
       for (row in 1:nrow(tests)) {
         test_col = tests[row, 'columnName']
         test_val = tests[row, 'flagValue']
+        keep = tests[row, 'keep']
         if (test_col != 'Unknown') {
-          results =
-            results + as.integer(as.logical(table[test_col] == test_val))
+          test_results = as.integer(as.logical(raw[test_col] == test_val))
+          if (tests[row, 'keep']){
+            test_results = !test_results
+          } else{
+            
+          }
+          results = results + test_results
         }
         tabular_results[flag] <- (results > 0)
       }
@@ -85,9 +94,9 @@ applyFlags <- function(in_table) {
   # No QAPP doc available
   out <- TADA::QAPPDocAvailable(out, clean = FALSE)
   
-  # Dataset includes depth profile data - no function for this? How is this one
-  # supposed to work?
-out = out
+    # Dataset includes depth profile data - no function for this? How is this one
+    # supposed to work?
+  out = out
   
   # Aggregated continuous data
   out <- TADA::AggregatedContinuousData(out, clean = FALSE)

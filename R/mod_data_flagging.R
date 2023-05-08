@@ -17,7 +17,9 @@ mod_data_flagging_ui <- function(id) {
     shiny::htmlOutput(ns('step_1')),
     htmltools::div(style="margin-bottom:10px"),
     shiny::fluidRow(column(
-      3, shiny::actionButton(ns("runFlags"), "Run Data Flagging", style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
+      3, shiny::actionButton(ns("runFlags"), 
+                             "Run Data Flagging", 
+                             style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
     )),
     htmltools::br(),
     shiny::htmlOutput(ns('step_2')),
@@ -25,7 +27,6 @@ mod_data_flagging_ui <- function(id) {
     DT::DTOutput(ns('flagTable')),
     htmltools::br(),
     shiny::htmlOutput(ns('step_3'))
-    #DT::DTOutput(ns('summaryTable'))
   )
 }
 
@@ -40,22 +41,18 @@ mod_data_flagging_server <- function(id, tadat) {
       )
     )
     
-    flagSwitch = function(len, id, value) {
-      if (length(value) == 1) {
-        value <- rep(value, len)
-      }
+    flagSwitch = function(len) {
       inputs = character(len)
       for (i in seq_len(len)) {
+        switch_name <- paste0("switch_", i)
         inputs[i] = as.character(
           shinyWidgets::prettySwitch(
-            ns(paste0(id, i)),
+            ns(switch_name),
             label = NULL,
-            value = value[i],
+            value = switch_defaults[i],
             status = "primary",
             fill = TRUE
-          )
-        )
-      }
+          ))}
       inputs
     }
     
@@ -74,6 +71,7 @@ mod_data_flagging_server <- function(id, tadat) {
     values = shiny::reactiveValues()
     values$n_fails = integer(length(n_switches))
     
+    
     # Runs when the flag button is clicked
     shiny::observeEvent(input$runFlags, {
       shinybusy::show_modal_spinner(
@@ -83,41 +81,40 @@ mod_data_flagging_server <- function(id, tadat) {
         session = shiny::getDefaultReactiveDomain()
       )
       
-      # The raw table, plus flagging columns (jch - just return flagging?)
-      values$flagged = applyFlags(tadat$raw)
-      
-      # Record which records have already been flagged
-      AlreadyRemoved = tadat$raw$Removed
+      # Add flagging columns to raw table
+      #tadat$raw = applyFlags(tadat$raw)
+      #write.csv(tadat$raw, "flagged.csv")
+      tadat$raw = read.csv("flagged.csv")
+      values$init_cols = colnames(tadat$removals)
       
       # A table (raw rows, flags) indicating whether each record passes each test
-      values$testResults <- flagCensus(values$flagged)
-      
+      values$testResults <- flagCensus(tadat$raw)
+
       # The number of records failing each test
       values$n_fails <- colSums(values$testResults)
-      
-      # The site id for each record (used for counting sites)
-      values$sites = values$flagged$MonitoringLocationIdentifier
       
       # Remove progress bar and display instructions
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
       output$step_2 = shiny::renderUI(HTML("<h4>Select the types of flagged data to be removed</h3>"))
-      # output$step_3 = shiny::renderUI(HTML("Summary of data to be removed"))
 
     # Runs when any of the flag switches are changed
     shiny::observe({
+      switch_id = "switch_"
       # A list of all the flags that are selected
-      selected = flag_types[shinyValue('switch_', n_switches)]
+      selected = flag_types[shinyValue(switch_id, n_switches)]
+
       # Update which rows get removed with the selected
-      NewRemovals = apply(values$testResults[selected], 1, any)
-      NewRemovals[is.na(NewRemovals)] <- FALSE
-      tadat$raw$Removed = as.logical(AlreadyRemoved + NewRemovals)
-    })
+      tadat$removals = values$testResults[selected]
+      for (i in which(switch_disabled)){
+        shinyjs::disable(paste0(switch_id, i))
+      }
+      })
     
     switchTable = shiny::reactive({
       df = data.frame(
         Prompt = prompts,
         Count = values$n_fails,
-        Remove = flagSwitch(n_switches, 'switch_', FALSE)
+        Remove = flagSwitch(n_switches)
       )
     })
     
@@ -128,7 +125,7 @@ mod_data_flagging_server <- function(id, tadat) {
       rownames = FALSE,
       options = list(
         dom = 't',
-        paging = TRUE,
+        paging = FALSE,
         ordering = FALSE,
         preDrawCallback = DT::JS(
           'function() { Shiny.unbindAll(this.api().table().node()); }'

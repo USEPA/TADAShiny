@@ -51,6 +51,18 @@ mod_filtering_server <- function(id, tadat) {
     output$filterStep2 = DT::renderDataTable(NULL)
     output$filterStep3 = DT::renderDataTable(NULL)
     
+    addButton = function(len) {
+      inputs = character(len)
+      for (i in seq_len(len)) {
+        switch_name <- paste0("button_", i)
+        inputs[i] = as.character(
+          shiny::actionButton(
+            ns(switch_name),
+            label = "Add"
+          ))}
+      inputs
+    }
+    
     shiny::observeEvent(input$runFilter, {
       shinybusy::show_modal_spinner(
         spin = "double-bounce",
@@ -72,7 +84,7 @@ mod_filtering_server <- function(id, tadat) {
     })
     
     shiny::observeEvent(input$filterStep1_rows_selected, {
-      values$selected_field = tables$filter_fields[input$filterStep1_rows_selected,]$FieldName
+      values$selected_field = tables$filter_fields[input$filterStep1_rows_selected,]$Field
       shinybusy::show_modal_spinner(
         spin = "double-bounce",
         color = "#0071bc",
@@ -83,8 +95,11 @@ mod_filtering_server <- function(id, tadat) {
         ),
         session = shiny::getDefaultReactiveDomain()
       )
-      
+      print(012)
       tables$filter_values = data.frame(TADA::FilterFieldReview(values$selected_field, tadat$raw))
+      print(123)
+      tables$filter_values$Add = addButton(nrow(tables$filter_values))
+      print(234)
       output$promptStep2 = shiny::renderText(paste0("2: Filter by ", values$selected_field))
       output$filterStep2 = DT::renderDataTable(
         tables$filter_values,
