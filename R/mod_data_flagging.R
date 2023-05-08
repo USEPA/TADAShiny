@@ -82,9 +82,9 @@ mod_data_flagging_server <- function(id, tadat) {
       )
       
       # Add flagging columns to raw table
-      #tadat$raw = applyFlags(tadat$raw)
+      tadat$raw = applyFlags(tadat$raw)
       #write.csv(tadat$raw, "flagged.csv")
-      tadat$raw = read.csv("flagged.csv")
+      #tadat$raw = read.csv("flagged.csv")
       values$init_cols = colnames(tadat$removals)
       
       # A table (raw rows, flags) indicating whether each record passes each test
