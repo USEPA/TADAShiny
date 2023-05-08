@@ -1,48 +1,48 @@
-﻿flagType,columnName,flagValue,remove
-Above National Threshold,TADA.ResultValueAboveUpperThreshold.Flag,Y,1
-Above National Threshold,TADA.ResultValueAboveUpperThreshold.Flag,No threshold avilable,0
-Analytical Method,TADA.AnalyticalMethod.Flag,Nonstandardized,0
-Analytical Method,TADA.AnalyticalMethod.Flag,Invalid,1
-Below National Threshold,TADA.ResultValueBelowLowerThreshold.Flag,Y,1
-Below National Threshold,TADA.ResultValueBelowLowerThreshold.Flag,No threshold avilable,0
-Censored Data,TADA.CensoredData.Flag,Censored but not Categorized,0
-Censored Data,TADA.CensoredData.Flag,Conflict between Condition and Limit,0
-Censored Data,TADA.CensoredData.Flag,Non-Detect,0
-Censored Data,TADA.CensoredData.Flag,Over-Detect,0
-Censored Data,TADA.CensoredData.Flag,Other Condition/Limit Populated,0
-Continuous Data,TADA.AggregatedContinuousData.Flag,Unknown,0
-Continuous Data,TADA.AggregatedContinuousData.Flag,Y,1
-Convert Depth Units,Unknown,m or ft or feet or meters: depends on user decision,1
-Convert Time Zone,Unknown,Unknown,0
-Duplicates,Unknown,Unknown,0
-Media Type,TADA.ActivityMediaName,"Anything that isn't WATER (TISSUE, AIR, SEDIMENT)",1
-Method Speciation,TADA.MethodSpeciation.Flag,Valid,0
-Method Speciation,TADA.MethodSpeciation.Flag,Nonstandardized,0
-Method Speciation,TADA.MethodSpeciation.Flag,Invalid,1
-QAPP Approved,QAPPApprovedIndicator,NA,1
-QAPP Approved,QAPPApprovedIndicator,Y,0
-QAPP Approved,QAPPApprovedIndicator,NA,1
-QAPP Approved,QAPPApprovedIndicator,N,1
-QAPP Documentation,TADA.QAPPDocAvailable,Y_ProjectFileUrlProvided,0
-QAPP Documentation,TADA.QAPPDocAvailable,N,1
-Sample Fraction,TADA.SampleFraction.Flag,Valid,0
-Sample Fraction,TADA.SampleFraction.Flag,Nonstandardized,0
-Sample Fraction,TADA.SampleFraction.Flag,Invalid,1
-Spatial Flags,TADA.InvalidCoordinates.Flag,LAT_OutsideUSA,1
-Spatial Flags,TADA.InvalidCoordinates.Flag,LONG_OutsideUSA,1
-Spatial Flags,TADA.InvalidCoordinates.Flag,Imprecise_Latincludes999,0
-Spatial Flags,TADA.InvalidCoordinates.Flag,Imprecise_Longincludes999,0
-Spatial Flags,TADA.InvalidCoordinates.Flag,Imprecise_lessthan3decimaldigits,0
-Spatial Flags,TADA.InvalidCoordinates.Flag,OK,0
-Special Characters,TADA.ResultMeasureValueDataTypes.Flag,ND or NA,0
-Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Coerced to NA,0
-Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Numeric,0
-Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Less Than,0
-Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Greater Than,0
-Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Approximate Value,0
-Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Percentage,0
-Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Comma-Separated Numeric,0
-Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Text,0
-Units,TADA.ResultUnit.Flag,Valid,0
-Units,TADA.ResultUnit.Flag,Nonstandardized,0
-Units,TADA.ResultUnit.Flag,Invalid,1
+﻿flagType,columnName,flagValue,keep,remove
+Above National Threshold,TADA.ResultValueAboveUpperThreshold.Flag,Y,0,1
+Above National Threshold,TADA.ResultValueAboveUpperThreshold.Flag,No threshold avilable,0,0
+Analytical Method,TADA.AnalyticalMethod.Flag,Nonstandardized,0,0
+Analytical Method,TADA.AnalyticalMethod.Flag,Invalid,0,1
+Below National Threshold,TADA.ResultValueBelowLowerThreshold.Flag,Y,0,1
+Below National Threshold,TADA.ResultValueBelowLowerThreshold.Flag,No threshold avilable,0,0
+Censored Data,TADA.CensoredData.Flag,Censored but not Categorized,0,0
+Censored Data,TADA.CensoredData.Flag,Conflict between Condition and Limit,0,0
+Censored Data,TADA.CensoredData.Flag,Non-Detect,0,0
+Censored Data,TADA.CensoredData.Flag,Over-Detect,0,0
+Censored Data,TADA.CensoredData.Flag,Other Condition/Limit Populated,0,0
+Continuous Data,TADA.AggregatedContinuousData.Flag,Unknown,0,0
+Continuous Data,TADA.AggregatedContinuousData.Flag,Y,0,1
+Convert Depth Units,Unknown,m or ft or feet or meters: depends on user decision,0,1
+Convert Time Zone,Unknown,Unknown,0,0
+Duplicates,Unknown,Unknown,0,0
+Media Type,TADA.ActivityMediaName,WATER,1,1
+Method Speciation,TADA.MethodSpeciation.Flag,Valid,0,0
+Method Speciation,TADA.MethodSpeciation.Flag,Nonstandardized,0,0
+Method Speciation,TADA.MethodSpeciation.Flag,Invalid,0,1
+QAPP Approved,QAPPApprovedIndicator,NA,0,1
+QAPP Approved,QAPPApprovedIndicator,Y,0,0
+QAPP Approved,QAPPApprovedIndicator,NA,0,1
+QAPP Approved,QAPPApprovedIndicator,N,0,1
+QAPP Documentation,TADA.QAPPDocAvailable,Y_ProjectFileUrlProvided,0,0
+QAPP Documentation,TADA.QAPPDocAvailable,N,0,1
+Sample Fraction,TADA.SampleFraction.Flag,Valid,0,0
+Sample Fraction,TADA.SampleFraction.Flag,Nonstandardized,0,0
+Sample Fraction,TADA.SampleFraction.Flag,Invalid,0,1
+Spatial Flags,TADA.InvalidCoordinates.Flag,LAT_OutsideUSA,0,1
+Spatial Flags,TADA.InvalidCoordinates.Flag,LONG_OutsideUSA,0,1
+Spatial Flags,TADA.InvalidCoordinates.Flag,Imprecise_Latincludes999,0,0
+Spatial Flags,TADA.InvalidCoordinates.Flag,Imprecise_Longincludes999,0,0
+Spatial Flags,TADA.InvalidCoordinates.Flag,Imprecise_lessthan3decimaldigits,0,0
+Spatial Flags,TADA.InvalidCoordinates.Flag,OK,0,0
+Special Characters,TADA.ResultMeasureValueDataTypes.Flag,ND or NA,0,1
+Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Coerced to NA,0,1
+Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Numeric,0,0
+Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Less Than,0,0
+Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Greater Than,0,0
+Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Approximate Value,0,0
+Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Percentage,0,0
+Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Comma-Separated Numeric,0,0
+Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Text,0,1
+Units,TADA.ResultUnit.Flag,Valid,0,0
+Units,TADA.ResultUnit.Flag,Nonstandardized,0,0
+Units,TADA.ResultUnit.Flag,Invalid,0,1
