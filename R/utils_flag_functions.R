@@ -26,7 +26,13 @@ flagCensus <- function(raw) {
         test_val = tests[row, 'flagValue']
         keep = tests[row, 'keep']
         if (test_col != 'Unknown') {
-          test_results = as.integer(as.logical(raw[test_col] == test_val))
+          if(!is.na(test_val)){
+            rawt_col = raw[,test_col]
+            rawt_col[is.na(rawt_col)] = "NA"
+            test_results = as.integer(as.logical(rawt_col == test_val))
+          }else{
+            test_results = as.integer(as.logical(is.na(raw[test_col])))
+          }
           if (tests[row, 'keep']){
             test_results = !test_results
           } else{
@@ -89,11 +95,11 @@ applyFlags <- function(in_table) {
   # QAPP Not Approved - this flag isn't looking for a TADA-created flag column,
   # so do not need to run any flag function here. If switched ON, remove all data
   # with QAPPApproved == N or NA.
-  out = out
   
   # No QAPP doc available
-  out <- TADA::QAPPDocAvailable(out, clean = FALSE)
-  
+  if("ProjectFileUrl"%in%names(out)){
+    out <- TADA::QAPPDocAvailable(out, clean = FALSE)
+  }
     # Dataset includes depth profile data - no function for this? How is this one
     # supposed to work?
   out = out
@@ -118,8 +124,8 @@ applyFlags <- function(in_table) {
   # Convert depth height units - THIS ONE ONLY GETS RUN WHEN USER RUNS THE CLEANING
   # FILTER AFTER MAKING ALL DECISIONS, AND SUMMARY COUNTS BASED ON UNIQUE UNITS IN
   # DEPTH HEIGHT COLUMNS
-  out <-
-    TADA::ConvertDepthUnits(out, unit = 'ft', transform = TRUE) # input$depthunit is dummy variable that would connect to the drop down
+  # out <-
+  #   TADA::ConvertDepthUnits(out, unit = 'ft', transform = TRUE) # input$depthunit is dummy variable that would connect to the drop down
 
   # Convert time zones - no flag function to run beforehand. This one might be
   # tricky to implement - acts on ActivityStartTime.Time?

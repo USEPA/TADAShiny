@@ -34,9 +34,9 @@ mod_TADA_summary_server <- function(id, tadat){
     # calculate the stats needed to fill the summary box
     shiny::observe({
       shiny::req(tadat$raw)
-      summary_things$rem_rec = length(tadat$raw$ResultIdentifier[tadat$raw$Removed==TRUE])
-      summary_things$clean_rec = length(tadat$raw$ResultIdentifier[tadat$raw$Removed==FALSE])
-      clean_sites = unique(tadat$raw$MonitoringLocationIdentifier[tadat$raw$Removed==FALSE])
+      summary_things$rem_rec = length(tadat$raw$ResultIdentifier[tadat$raw$TADA.Remove==TRUE])
+      summary_things$clean_rec = length(tadat$raw$ResultIdentifier[tadat$raw$TADA.Remove==FALSE])
+      clean_sites = unique(tadat$raw$MonitoringLocationIdentifier[tadat$raw$TADA.Remove==FALSE])
       summary_things$clean_site = length(clean_sites)
       summary_things$rem_site = length(unique(tadat$raw$MonitoringLocationIdentifier[!tadat$raw$MonitoringLocationIdentifier%in%clean_sites]))
     })
@@ -100,7 +100,7 @@ mod_TADA_summary_server <- function(id, tadat){
             paste('TADAShiny_datadownload_', tadat$tab, '.xlsx', sep='')
           },
           content = function(file) {
-            writexl::write_xlsx(tadat$raw, path = file)
+            writexl::write_xlsx(TADA::OrderTADACols(tadat$raw), path = file)
           }
     )
 

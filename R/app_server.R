@@ -24,7 +24,7 @@ app_server <- function(input, output, session) {
   # switch to overview tab when tadat$new changes and provide user with window letting them know how many records were automatically flagged for removal upon upload
   # move this to query_data?
   shiny::observeEvent(tadat$new,{
-    removed = length(tadat$raw$ResultIdentifier[tadat$raw$Removed==TRUE])
+    removed = length(tadat$raw$ResultIdentifier[tadat$raw$TADA.Remove==TRUE])
     if(removed>0){
       message = paste0("Your data were successfully loaded and displayed on the Overview tab. TADA is currently only designed for analyzing numerical water data. Therefore, ", scales::comma(removed)," results were flagged for removal because their sample media was not WATER or the result value was text or NA and no detection limit value was provided. See dataset summary information in the gray box at the bottom of the app.")
     }else{
@@ -41,13 +41,13 @@ app_server <- function(input, output, session) {
   # update the master 'Remove' column anytime data is added to the 'remove' table
   shiny::observeEvent(tadat$removals,{
     print(colnames(tadat$removals))
-    tadat$raw$Removed = apply(tadat$removals, 1, any)
+    tadat$raw$TADA.Remove = apply(tadat$removals, 1, any)
   })
   
   # this observes when the user switches tabs and adds the current tab they're on as a column to their dataset. 
   shiny::observe({
     shiny::req(tadat$raw)
-    tadat$raw$tab = input$tabbar
+    tadat$raw$TADAShiny.tab = input$tabbar
     tadat$tab = input$tabbar
   })
   
