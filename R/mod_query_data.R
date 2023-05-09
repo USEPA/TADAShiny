@@ -184,7 +184,7 @@ mod_query_data_server <- function(id, tadat){
 
 initializeTable <- function(tadat, raw){
   # Test to see if this is a raw table or one previously worked on in TADA
-  if("Removed"%in%names(raw)){
+  if("TADA.Remove"%in%names(raw)){
     tadat$new = FALSE
     tadat$ovgo = FALSE
   } else {
@@ -192,12 +192,11 @@ initializeTable <- function(tadat, raw){
     tadat$ovgo = TRUE # load data into overview page
   }
   
-  # Run initial tests
-  raw$Removed = FALSE
+  # Set flagging column to FALSE
+  raw$TADA.Remove = FALSE
   removals <- data.frame(matrix(nrow = nrow(raw), ncol = 0))
   # removals["Media Type"] = ifelse(!raw$TADA.ActivityMediaName%in%c("WATER"),TRUE,raw$Removed)
   # removals["Special Characters"] = ifelse(raw$TADA.ResultMeasureValueDataTypes.Flag%in%c("ND or NA","Text","Coerced to NA"),TRUE,raw$Removed)
-
   
   tadat$raw = raw
   tadat$removals = removals

@@ -51,12 +51,12 @@ mod_censored_data_server <- function(id, tadat){
     shiny::observeEvent(tadat$tab,{
       shiny::req(tadat$raw)
       if(tadat$tab=="Censored"){
-        dat = subset(tadat$raw, tadat$raw$Removed==FALSE) # first, get rid of anything that has removed=FALSE flag
-        dat$Removed = ifelse(!dat$TADA.CensoredData.Flag%in%c("Non-Detect","Over-Detect","Uncensored", "Other Condition/Limit Populated"),TRUE,dat$Removed)
-        if(any(dat$Removed==TRUE)){ # let users know when there are "problem" censored data results that will be flagged for removal.
+        dat = subset(tadat$raw, tadat$raw$TADA.Remove==FALSE) # first, get rid of anything that has removed=FALSE flag
+        dat$TADA.Remove = ifelse(!dat$TADA.CensoredData.Flag%in%c("Non-Detect","Over-Detect","Uncensored", "Other Condition/Limit Populated"),TRUE,dat$TADA.Remove)
+        if(any(dat$TADA.Remove==TRUE)){ # let users know when there are "problem" censored data results that will be flagged for removal.
           shiny::showModal(shiny::modalDialog(
             title = "Detection Limit Data Warning",
-            paste0(length(dat$ResultIdentifier[dat$Removed==TRUE])," results were flagged for removal because they have conflicting, ambiguous and/or unfamiliar detection limits and conditions. These will show up in the pie chart, but only 'Non-Detect', 'Over-Detect', and 'Uncensored' results will be used in the sections below. You may download your dataset for review at any time using the 'Download Working Dataset' button at the bottom of the page.")
+            paste0(length(dat$ResultIdentifier[dat$TADA.Remove==TRUE])," results were flagged for removal because they have conflicting, ambiguous and/or unfamiliar detection limits and conditions. These will show up in the pie chart, but only 'Non-Detect', 'Over-Detect', and 'Uncensored' results will be used in the sections below. You may download your dataset for review at any time using the 'Download Working Dataset' button at the bottom of the page.")
           ))
         }
         censdat$dat = dat # however, this reactive object has all of the data that were not previously removed and do not have ambiguous detection limit data. This is the "clean" dataset
@@ -101,8 +101,8 @@ mod_censored_data_server <- function(id, tadat){
         text = "Applying selected methods...",
         session = shiny::getDefaultReactiveDomain()
       )
-      removed = subset(tadat$raw, tadat$raw$Removed==TRUE) # first, remove results we dont want to handle at all
-      good = subset(tadat$raw, tadat$raw$Removed==FALSE) # keep the "goods" that will be run through the simpleCensoredMethods function
+      removed = subset(tadat$raw, tadat$raw$TADA.Remove==TRUE) # first, remove results we dont want to handle at all
+      good = subset(tadat$raw, tadat$raw$TADA.Remove==FALSE) # keep the "goods" that will be run through the simpleCensoredMethods function
       trans = data.frame(input = c("Multiply detection limit by x","Random number between 0 and detection limit","No change"),actual = c("multiplier","randombelowlimit","as-is"))
       if(is.null(input$nd_mult)){ # these if's get the reactive inputs into a format that the TADA function will understand
         nd_multiplier = "null"
@@ -146,7 +146,7 @@ mod_censored_data_server <- function(id, tadat){
     # from the clean dataset, get all of the column names someone might want to group by when summarizing their data for use in more advanced censored data methods.
     output$cens_groups = shiny::renderUI({
       shiny::req(censdat$dat)
-      ccols = names(tadat$raw)[!names(tadat$raw)%in%c("Removed","tab","TADA.ResultMeasureValue","ResultMeasureValue","ResultIdentifier","TADA.DetectionQuantitationLimitMeasure.MeasureValue","DetectionQuantitationLimitMeasure.MeasureValue")] # remove the columns that are generally unique to each result from consideration. Why would someone want to group by result value or identifier? Then every summary would be unique to one value...not a "summary"
+      ccols = names(tadat$raw)[!names(tadat$raw)%in%c("TADA.Remove","TADAShiny.tab","TADA.ResultMeasureValue","ResultMeasureValue","ResultIdentifier","TADA.DetectionQuantitationLimitMeasure.MeasureValue","DetectionQuantitationLimitMeasure.MeasureValue")] # remove the columns that are generally unique to each result from consideration. Why would someone want to group by result value or identifier? Then every summary would be unique to one value...not a "summary"
       tcols = ccols[grepl("TADA.",ccols)] # put all of the TADA columns at the top of the selection drop down
       ucols = ccols[!grepl("TADA.",ccols)] # then have the WQP columns
       ccols = c(tcols, ucols) # string them back together in one vector used in the selection widget below
