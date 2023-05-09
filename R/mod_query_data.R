@@ -120,9 +120,9 @@ mod_query_data_server <- function(id, tadat){
       if(is.null(input$media)){
         sampleMedia = "null"
       }else{sampleMedia = input$media}
-      if(is.null(input$project)){
+      if(is.null(input$proj)){
         project = "null"
-      }else{project = input$project}
+      }else{project = input$proj}
       if(is.null(input$org)){
         organization = "null"
       }else{organization = input$org}
