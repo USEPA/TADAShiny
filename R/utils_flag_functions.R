@@ -5,6 +5,7 @@ test_table = read.csv("inst/flag_tests.csv")
 #test_table = read.csv(app_sys("flag_tests.csv"))
 prompt_table <- prompt_table[order(prompt_table$Order),]
 prompts <- prompt_table$Prompt
+levs <- prompt_table$Level
 n_switches <- length(prompts)
 flag_types <- prompt_table$flagType
 

@@ -112,28 +112,30 @@ mod_data_flagging_server <- function(id, tadat) {
     
     switchTable = shiny::reactive({
       df = data.frame(
-        Prompt = prompts,
-        Count = values$n_fails,
-        Remove = flagSwitch(n_switches)
+        Reason = prompts,
+        Results = values$n_fails,
+        Required = levs,
+        Decision = flagSwitch(n_switches)
       )
     })
     
     output$flagTable = DT::renderDT(
       shiny::isolate(switchTable()),
-      escape = FALSE,
-      selection = 'none',
-      rownames = FALSE,
-      options = list(
-        dom = 't',
-        paging = FALSE,
-        ordering = FALSE,
-        preDrawCallback = DT::JS(
-          'function() { Shiny.unbindAll(this.api().table().node()); }'
-        ),
-        drawCallback = DT::JS(
-          'function() { Shiny.bindAll(this.api().table().node()); } '
-        )
-      )
+                    escape = FALSE,
+                    selection = 'none',
+                    colnames = c("Flag reason","Results affected","Required/Optional","Switch 'on' to flag for removal"),
+                    rownames = FALSE,
+                    options = list(
+                      dom = 't',
+                      paging = FALSE,
+                      ordering = FALSE,
+                      preDrawCallback = DT::JS(
+                        'function() { Shiny.unbindAll(this.api().table().node()); }'
+                      ),
+                      drawCallback = DT::JS(
+                        'function() { Shiny.bindAll(this.api().table().node()); } '
+                      )
+                    )
     )
     })
     
