@@ -38,6 +38,7 @@ usethis::use_package("shinyWidgets")
 usethis::use_package("forcats")
 usethis::use_package("TADA")
 usethis::use_package("scales")
+usethis::use_package("combinat")
 
 ## Add modules ----
 ## Create a module infrastructure in R/

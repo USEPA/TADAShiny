@@ -14,8 +14,10 @@ switch_disabled <- prompt_table$Level == "Required"
 
 
 flagCensus <- function(raw) {
+  # JCH - seems like there are NA values here that aren't getting counted right
   tabular_results = data.frame(matrix(ncol = length(flag_types), nrow = nrow(raw)))
   colnames(tabular_results) <- flag_types
+  
   test_table = subset(test_table, test_table$remove==1)
   for (flag in flag_types) {
     flag_count = 0

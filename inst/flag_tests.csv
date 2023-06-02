@@ -5,9 +5,9 @@ Analytical Method,TADA.AnalyticalMethod.Flag,Nonstandardized,0,0
 Analytical Method,TADA.AnalyticalMethod.Flag,Invalid,0,1
 Below National Threshold,TADA.ResultValueBelowLowerThreshold.Flag,Y,0,1
 Below National Threshold,TADA.ResultValueBelowLowerThreshold.Flag,No threshold avilable,0,0
-Censored Data,TADA.CensoredData.Flag,Detection condition or detection limit is not documented in TADA reference tables.,0,1
-Censored Data,TADA.CensoredData.Flag,Detection condition is missing and required for censored data ID.,0,1
-Censored Data,TADA.CensoredData.Flag,Conflict between Condition and Limit,0,1
+Censored Data,TADA.CensoredData.Flag,Detection condition or detection limit is not documented in TADA reference tables.,0,0
+Censored Data,TADA.CensoredData.Flag,Detection condition is missing and required for censored data ID.,0,0
+Censored Data,TADA.CensoredData.Flag,Conflict between Condition and Limit,0,0
 Censored Data,TADA.CensoredData.Flag,Non-Detect,0,0
 Censored Data,TADA.CensoredData.Flag,Over-Detect,0,0
 Censored Data,TADA.CensoredData.Flag,Other Condition/Limit Populated,0,0

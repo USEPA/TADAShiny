@@ -40,7 +40,6 @@ app_server <- function(input, output, session) {
   
   # update the master 'Remove' column anytime data is added to the 'remove' table
   shiny::observeEvent(tadat$removals,{
-    print(colnames(tadat$removals))
     tadat$raw$TADA.Remove = apply(tadat$removals, 1, any)
   })
   
@@ -61,5 +60,6 @@ app_server <- function(input, output, session) {
     shiny::updateTabsetPanel(session=session, inputId="tabbar", selected=unique(tadat$raw$tab))
     tadat$reup = NULL
   })
+  
 
 }
