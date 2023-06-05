@@ -5,25 +5,43 @@ test_table = read.csv("inst/flag_tests.csv")
 #test_table = read.csv(app_sys("flag_tests.csv"))
 prompt_table <- prompt_table[order(prompt_table$Order),]
 prompts <- prompt_table$Prompt
+levs <- prompt_table$Level
 n_switches <- length(prompts)
 flag_types <- prompt_table$flagType
 
-flagCensus <- function(table) {
-  tabular_results = data.frame(matrix(ncol = length(flag_types), nrow =
-                                        nrow(table)))
+switch_defaults <- prompt_table$Level != "Optional"
+switch_disabled <- prompt_table$Level == "Required"
+
+
+flagCensus <- function(raw) {
+  # JCH - seems like there are NA values here that aren't getting counted right
+  tabular_results = data.frame(matrix(ncol = length(flag_types), nrow = nrow(raw)))
   colnames(tabular_results) <- flag_types
+  
   test_table = subset(test_table, test_table$remove==1)
   for (flag in flag_types) {
     flag_count = 0
     tests = test_table[test_table$flagType == flag, ]
-    results = integer(nrow(table))
+    results = integer(nrow(raw))
     if (nrow(tests) > 0) {
       for (row in 1:nrow(tests)) {
         test_col = tests[row, 'columnName']
         test_val = tests[row, 'flagValue']
+        keep = tests[row, 'keep']
         if (test_col != 'Unknown') {
-          results =
-            results + as.integer(as.logical(table[test_col] == test_val))
+          if(!is.na(test_val)){
+            rawt_col = raw[,test_col]
+            rawt_col[is.na(rawt_col)] = "NA"
+            test_results = as.integer(as.logical(rawt_col == test_val))
+          }else{
+            test_results = as.integer(as.logical(is.na(raw[test_col])))
+          }
+          if (tests[row, 'keep']){
+            test_results = !test_results
+          } else{
+            
+          }
+          results = results + test_results
         }
         tabular_results[flag] <- (results > 0)
       }
@@ -80,14 +98,14 @@ applyFlags <- function(in_table) {
   # QAPP Not Approved - this flag isn't looking for a TADA-created flag column,
   # so do not need to run any flag function here. If switched ON, remove all data
   # with QAPPApproved == N or NA.
-  out = out
   
   # No QAPP doc available
-  out <- TADA::QAPPDocAvailable(out, clean = FALSE)
-  
-  # Dataset includes depth profile data - no function for this? How is this one
-  # supposed to work?
-out = out
+  if("ProjectFileUrl"%in%names(out)){
+    out <- TADA::QAPPDocAvailable(out, clean = FALSE)
+  }
+    # Dataset includes depth profile data - no function for this? How is this one
+    # supposed to work?
+  out = out
   
   # Aggregated continuous data
   out <- TADA::AggregatedContinuousData(out, clean = FALSE)
@@ -109,8 +127,8 @@ out = out
   # Convert depth height units - THIS ONE ONLY GETS RUN WHEN USER RUNS THE CLEANING
   # FILTER AFTER MAKING ALL DECISIONS, AND SUMMARY COUNTS BASED ON UNIQUE UNITS IN
   # DEPTH HEIGHT COLUMNS
-  out <-
-    TADA::ConvertDepthUnits(out, unit = 'ft', transform = TRUE) # input$depthunit is dummy variable that would connect to the drop down
+  # out <-
+  #   TADA::ConvertDepthUnits(out, unit = 'ft', transform = TRUE) # input$depthunit is dummy variable that would connect to the drop down
 
   # Convert time zones - no flag function to run beforehand. This one might be
   # tricky to implement - acts on ActivityStartTime.Time?

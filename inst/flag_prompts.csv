@@ -1,13 +1,16 @@
-﻿Order,Prompt,flagType
-1,The speciation provided for a given characteristic is not valid. Would you like to remove invalid speciation results? (Recommended),Method Speciation
-2,Remove result(s) with invalid characteristic and fraction combinations? (Recommended),Sample Fraction
-3,Remove result(s) with invalid units for a given characteristic and media combination? (Recommended),Units
-4,Analytical method is uncommon. Remove result(s) with uncommon methods?,Analytical Method
-5,Remove result(s) if Quality Assurance Project Plan was not approved?,QAPP Approved
-6,Remove data if Quality Assurance Project Plan URL is missing? (URLs are uncommon),QAPP Documentation
-7,"Would you like to remove aggregate, high frequency, continuous, sensor results?",Continuous Data
-8,"Identical result value, unit, date, time, and approximate location submitted by two or more organizations. Remove potential duplicates?",Potential Duplicates
-9,"Result value(s) outside of the national lower range for a given characteristic, possibly indicating non-sensical value(s). Remove?",Above National Threshold
-10,"Result value(s) outside of the national lower range for a given characteristic, possibly indicating non-sensical value(s). Remove?",Below National Threshold
-11,Would you like to convert to ft or m?,Convert Depth Units
-12,Would you like to convert to a standard time zone?,Convert Time Zone
+Order,Level,Prompt,flagType
+1,Required,Sample media is not water,Media Type
+2,Required,"Result value is not numeric, or result value is NA with no detection limit information",Special Characters
+3,Recommended,Censored results have conflicting or missing detection condition/limit metadata,Censored Data
+4,Recommended,Invalid speciation for associated characteristic,Method Speciation
+5,Recommended,Invalid characteristic and fraction combinations,Sample Fraction
+6,Recommended,Invalid units for a given characteristic and media combination,Units
+7,Optional,Uncommon analytical methods,Analytical Method
+8,Optional,"QAPP approval column is ""N"" (indicating not approved) or NA",QAPP Approved
+9,Optional,Quality Assurance Project Plan URL is missing,QAPP Documentation
+10,Optional,"Metadata indicates result(s) are aggregate, high-frequency continuous sensor results, not discrete samples",Continuous Data
+11,Optional,"Identical result value, unit, date, time, and approximate location submitted by multiple organizations, indicating potential duplicate results",Potential duplicates
+12,Optional,"Result value(s) outside of the national lower range for a given characteristic, possibly indicating non-sensical value(s)",Above National Threshold
+13,Optional,"Result value(s) outside of the national lower range for a given characteristic, possibly indicating non-sensical value(s)",Below National Threshold
+14,Optional,Would you like to convert to ft or m?,Convert Depth Units
+15,Optional,Would you like to convert to a standard time zone?,Convert Time Zone
