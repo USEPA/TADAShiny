@@ -73,29 +73,13 @@ mod_query_data_server <- function(id, tadat){
       shiny::req(input$file)
       # user uploaded data
       raw <- suppressWarnings(readxl::read_excel(input$file$datapath, sheet = 1))
-      if(!"Removed"%in%names(raw)){
-        raw$Removed = FALSE
-        raw$Removed = ifelse(!raw$TADA.ActivityMediaName%in%c("WATER"),TRUE,raw$Removed)
-        raw$Removed = ifelse(raw$TADA.ResultMeasureValueDataTypes.Flag%in%c("ND or NA","Text","Coerced to NA"),TRUE,raw$Removed)
-        tadat$new = 1 # this is used to determine if the app should go to the overview page first - only for datasets that are new to TADAShiny
-      }else{
-        tadat$reup = 1 # this is used to determine if the app should go to the page they left off on - only for datasets that are re-uploaded to TADAShiny
-      }
-      tadat$ovgo = 1 # load data into overview page
-      tadat$raw = raw
-      tadat$init_rem = unique(raw[,c("ResultIdentifier","Removed")]) # this is a reactive object that saves the initial records removed in anticipation of a "Reset" button that allows users to go back to the initial conditions. May not be used.
-      
+      initializeTable(tadat, raw)
     })
+    
   # if user presses example data button, make tadat$raw the nutrients dataset contained within the TADA package.
     shiny::observeEvent(input$example_data,{
       raw = TADA::TribalData
-      raw$Removed = FALSE
-      raw$Removed = ifelse(!raw$TADA.ActivityMediaName%in%c("WATER"),TRUE,raw$Removed)
-      raw$Removed = ifelse(raw$TADA.ResultMeasureValueDataTypes.Flag%in%c("ND or NA","Text","Coerced to NA"),TRUE,raw$Removed)
-      tadat$raw = raw
-      tadat$init_rem = unique(raw[,c("ResultIdentifier","Removed")]) # this is a reactive object that saves the initial records removed in anticipation of a "Reset" button that allows users to go back to the initial conditions. May not be used.
-      tadat$new = 1 # this is used to determine if the app should go to the overview page first - only for datasets that are new to TADAShiny
-      tadat$ovgo = 1 # load data into overview page
+      initializeTable(tadat, raw)
     })
 
     # this section has widget update commands for the selectizeinputs that have a lot of possible selections - shiny suggested hosting the choices server-side rather than ui-side
@@ -136,9 +120,9 @@ mod_query_data_server <- function(id, tadat){
       if(is.null(input$media)){
         sampleMedia = "null"
       }else{sampleMedia = input$media}
-      if(is.null(input$project)){
+      if(is.null(input$proj)){
         project = "null"
-      }else{project = input$project}
+      }else{project = input$proj}
       if(is.null(input$org)){
         organization = "null"
       }else{organization = input$org}
@@ -191,17 +175,33 @@ mod_query_data_server <- function(id, tadat){
           "Your query returned zero results. Please adjust your search inputs and try again."
         ))
       }else{
-          raw$Removed = FALSE
-          raw$Removed = ifelse(!raw$TADA.ActivityMediaName%in%c("WATER"),TRUE,raw$Removed)
-          raw$Removed = ifelse(raw$TADA.ResultMeasureValueDataTypes.Flag%in%c("ND or NA","Text","Coerced to NA"),TRUE,raw$Removed)
-          tadat$raw = raw
-          tadat$new = 1 # this is used to determine if the app should go to the overview page first - only for datasets that are new to TADAShiny
-          tadat$ovgo = 1 # load data into overview page
+          initializeTable(tadat, raw)
           }
     })
 
   })
 }
+
+initializeTable <- function(tadat, raw){
+  # Test to see if this is a raw table or one previously worked on in TADA
+  if("TADA.Remove"%in%names(raw)){
+    tadat$new = FALSE
+    tadat$ovgo = FALSE
+  } else {
+    tadat$new = TRUE # this is used to determine if the app should go to the overview page first - only for datasets that are new to TADAShiny
+    tadat$ovgo = TRUE # load data into overview page
+  }
+  
+  # Set flagging column to FALSE
+  raw$TADA.Remove = FALSE
+  removals <- data.frame(matrix(nrow = nrow(raw), ncol = 0))
+  # removals["Media Type"] = ifelse(!raw$TADA.ActivityMediaName%in%c("WATER"),TRUE,raw$Removed)
+  # removals["Special Characters"] = ifelse(raw$TADA.ResultMeasureValueDataTypes.Flag%in%c("ND or NA","Text","Coerced to NA"),TRUE,raw$Removed)
+  
+  tadat$raw = raw
+  tadat$removals = removals
+  }
+
 
 ## To be copied in the UI
 # mod_query_data_ui("query_data_1")

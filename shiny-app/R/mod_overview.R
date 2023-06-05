@@ -43,7 +43,7 @@ mod_overview_server <- function(id, tadat){
 
     # create dataset for map and histogram using raw data
     shiny::observeEvent(tadat$ovgo, {
-      usedata = tadat$raw%>%dplyr::filter(Removed==FALSE) # do not consider data automatically removed upon upload for plots and maps
+      usedata = tadat$raw%>%dplyr::filter(TADA.Remove==FALSE) # do not consider data automatically removed upon upload for plots and maps
       # create summary info and binning for map
       mapdat$sumdat = usedata%>%dplyr::group_by(MonitoringLocationIdentifier,MonitoringLocationName,TADA.LatitudeMeasure, TADA.LongitudeMeasure)%>%dplyr::summarise("Result_Count" = length(unique(ResultIdentifier)), "Visit_Count" = length(unique(ActivityStartDate)), "Parameter_Count" = length(unique(TADA.CharacteristicName)), "Organization_Count" = length(unique(OrganizationIdentifier)))
       mapdat$sumdat$radius = 3
@@ -93,7 +93,7 @@ mod_overview_server <- function(id, tadat){
     # histogram showing results collected over time.
     output$overview_hist = shiny::renderPlot({
       shiny::req(tadat$raw)
-      ggplot2::ggplot(data = tadat$raw[tadat$raw$Removed==FALSE,], ggplot2::aes(x = as.Date(ActivityStartDate, format = "%Y-%m-%d")))+ggplot2::geom_histogram(color = "black", fill = "#005ea2", binwidth = 7)+ggplot2::labs(title="Results collected per week over date range queried",x="Time", y = "Result Count")+ggplot2::theme_classic(base_size = 16)
+      ggplot2::ggplot(data = tadat$raw[tadat$raw$TADA.Remove==FALSE,], ggplot2::aes(x = as.Date(ActivityStartDate, format = "%Y-%m-%d")))+ggplot2::geom_histogram(color = "black", fill = "#005ea2", binwidth = 7)+ggplot2::labs(title="Results collected per week over date range queried",x="Time", y = "Result Count")+ggplot2::theme_classic(base_size = 16)
     })
     
     # organization numbers table
