@@ -85,9 +85,9 @@ mod_data_flagging_server <- function(id, tadat) {
       )
       
       # Add flagging columns to raw table
-      #tadat$raw = applyFlags(tadat$raw)
-      #write.csv(tadat$raw, "flagged.csv")
-      tadat$raw = utils::read.csv("flagged.csv")
+      tadat$raw = applyFlags(tadat$raw)
+      # write.csv(tadat$raw, "flagged.csv")
+      # tadat$raw = utils::read.csv("flagged.csv")
       
       # A table (raw rows, flags) indicating whether each record passes each test
       values$testResults <- flagCensus(tadat$raw)
@@ -111,7 +111,7 @@ mod_data_flagging_server <- function(id, tadat) {
       
       shiny::observeEvent(values$selected_flags, {
         prefix = "Flag: "
-        tadat$removals = dplyr::select(tadat$removals, -dplyr::starts_with(prefix))
+        tadat$removals = dplyr::select(tadat$removals, -starts_with(prefix))
         for (flag in values$selected_flags) {
           if (!all(is.na(values$testResults[flag]))) {
             tadat$removals[paste0(prefix, flag)] = values$testResults[flag]
