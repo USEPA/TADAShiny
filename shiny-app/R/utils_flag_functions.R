@@ -1,8 +1,8 @@
 # Read in the tables
-prompt_table = read.csv("inst/flag_prompts.csv")
-test_table = read.csv("inst/flag_tests.csv")
-#prompt_table = read.csv(app_sys("flag_prompts.csv"))
-#test_table = read.csv(app_sys("flag_tests.csv"))
+prompt_table = utils::read.csv("inst/flag_prompts.csv")
+test_table = utils::read.csv("inst/flag_tests.csv")
+#prompt_table = utils::read.csv(app_sys("flag_prompts.csv"))
+#test_table = utils::read.csv(app_sys("flag_tests.csv"))
 prompt_table <- prompt_table[order(prompt_table$Order),]
 prompts <- prompt_table$Prompt
 levs <- prompt_table$Level

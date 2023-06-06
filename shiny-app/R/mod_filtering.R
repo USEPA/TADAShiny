@@ -32,8 +32,8 @@ mod_filtering_ui <- function(id) {
 mod_filtering_server <- function(id, tadat) {
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
-    tables = reactiveValues()
-    values = reactiveValues()
+    tables = shiny::reactiveValues()
+    values = shiny::reactiveValues()
     values$locked <- character()
     values$selected_field <- NULL
     shinyjs::hide("addOnlys")
@@ -190,7 +190,7 @@ mod_filtering_server <- function(id, tadat) {
       prefix = "Filter: "
       # Remove all the filter columns from the removals table (start fresh)
       if (!is.null(tadat$removals)) {
-        tadat$removals = dplyr::select(tadat$removals,-starts_with(prefix))
+        tadat$removals = dplyr::select(tadat$removals,-dplyr::starts_with(prefix))
       }
       
       # Only proceed if filters have been selected
