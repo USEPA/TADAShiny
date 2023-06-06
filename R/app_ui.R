@@ -14,7 +14,7 @@ app_ui <- function(request) {
     shiny::fluidPage(
       tags$html(class = "no-js", lang="en"),
       HTML("<div id='eq-disclaimer-banner' class='padding-1 text-center text-white bg-secondary-dark'><strong>EPA development environment:</strong> The
-      content on this page is not production data and this site is being used
+      content on this page is not production ready. This site is being used
       for <strong>development</strong> and/or <strong>testing</strong> purposes
       only.</div>"),
       epa_header,

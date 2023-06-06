@@ -190,7 +190,7 @@ mod_filtering_server <- function(id, tadat) {
       prefix = "Filter: "
       # Remove all the filter columns from the removals table (start fresh)
       if (!is.null(tadat$removals)) {
-        tadat$removals = dplyr::select(tadat$removals,-dplyr::starts_with(prefix))
+        tadat$removals = dplyr::select(tadat$removals,-starts_with(prefix))
       }
       
       # Only proceed if filters have been selected
