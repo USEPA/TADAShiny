@@ -49,3 +49,8 @@ Special Characters,TADA.ResultMeasureValueDataTypes.Flag,Text,0,1
 Units,TADA.ResultUnit.Flag,Valid,0,0
 Units,TADA.ResultUnit.Flag,Nonstandardized,0,0
 Units,TADA.ResultUnit.Flag,Invalid,0,1
+Activity Type,TADA.ActivityType.Flag,Non_QC,0,0
+Activity Type,TADA.ActivityType.Flag,QC_duplicate,0,1
+Activity Type,TADA.ActivityType.Flag,QC_calibration,0,1
+Activity Type,TADA.ActivityType.Flag,QC_blank,0,1
+Activity Type,TADA.ActivityType.Flag,QC_other,0,1

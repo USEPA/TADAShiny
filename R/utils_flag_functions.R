@@ -89,8 +89,8 @@ applyFlags <- function(in_table) {
   # Invalid result unit
   out <- TADA::InvalidResultUnit(out, clean = "none")
   
-  # Special characters - data are already run through autoclean when downloaded, this switch doesn't require any additional functions to flag data for special characters
-  out = out
+  # QC rep/blank
+  out <- TADA::QualityControlActivity(out, clean = FALSE)
   
   # Invalid analytical method
   out <- TADA::InvalidMethod(out, clean = FALSE)
@@ -135,13 +135,13 @@ applyFlags <- function(in_table) {
   #out = out
   
   # Invalid coordinates - not included in mock up page?
-  out <-
-    TADA::InvalidCoordinates(
-      out,
-      clean_outsideUSA = "no",
-      clean_imprecise = FALSE,
-      errorsonly = FALSE
-    )
+  # out <-
+  #   TADA::InvalidCoordinates(
+  #     out,
+  #     clean_outsideUSA = "no",
+  #     clean_imprecise = FALSE,
+  #     errorsonly = FALSE
+  #   )
 
   ##### OTHERS
   # Remove ambiguous censored data records -- might be better suited later on in
