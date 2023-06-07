@@ -5,7 +5,7 @@ Order,Level,Prompt,flagType
 4,Recommended,Invalid speciation for associated characteristic,Method Speciation
 5,Recommended,Invalid characteristic and fraction combinations,Sample Fraction
 6,Recommended,Invalid units for a given characteristic and media combination,Units
-7,Recommended,Duplicate and replicate samples in the dataset,Activity Type
+7,Recommended,Duplicate and replicate measurements,Activity Type
 8,Optional,Uncommon analytical methods,Analytical Method
 9,Optional,"QAPP approval column is ""N"" (indicating not approved) or NA",QAPP Approved
 10,Optional,Quality Assurance Project Plan URL is missing,QAPP Documentation
