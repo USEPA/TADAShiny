@@ -143,10 +143,6 @@ applyFlags <- function(in_table) {
   #     errorsonly = FALSE
   #   )
 
-  ##### OTHERS
-  # Remove ambiguous censored data records -- might be better suited later on in
-  # the app?? Maybe not because could be a QC issue?
-  # out = TADA::idCensoredData(out)
 
   return(out)
 }
