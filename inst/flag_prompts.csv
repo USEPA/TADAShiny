@@ -1,11 +1,11 @@
 Order,Level,Prompt,flagType
 1,Required,Sample media is not water,Media Type
 2,Required,Result value is not numeric or result value is NA and no detection limit value is provided,Special Characters
-3,Required,Conflict between detection condition text and detection limit type or detection limit type is not documented in TADA reference tables ,Censored Data
+3,Required,Conflict between detection condition text and detection limit type or detection limit type is not in WQX domain tables (likely USGS/NWIS-specific) ,Censored Data
 4,Recommended,Invalid speciation for associated characteristic,Method Speciation
 5,Recommended,Invalid characteristic and fraction combinations,Sample Fraction
 6,Recommended,Invalid units for a given characteristic and media combination,Units
-7,Recommended,Duplicate and replicate measurements,Activity Type
+7,Recommended,"Measurement activity type code indicates it is a QC replicate, duplicate, or blank",Activity Type
 8,Optional,Uncommon analytical methods,Analytical Method
 9,Optional,"QAPP approval column is ""N"" (indicating not approved) or NA",QAPP Approved
 10,Optional,Quality Assurance Project Plan URL is missing,QAPP Documentation
