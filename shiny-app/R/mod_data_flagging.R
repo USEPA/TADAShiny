@@ -28,6 +28,7 @@ mod_data_flagging_ui <- function(id) {
     DT::DTOutput(ns('flagTable')),
     htmltools::br(),
     shiny::htmlOutput(ns('step_3')),
+    shiny::fluidRow(column(6, shiny::uiOutput(ns('m2f'))))
   )
 }
 
@@ -37,8 +38,8 @@ mod_data_flagging_server <- function(id, tadat) {
     
     output$step_1 = shiny::renderUI(
       HTML(
-        "<h4>Click the button below to scan the dataset for
-        potential missing or out-of-range data</h3>"
+        "<h3>Click the 'Run Data Flagging' button to scan the dataset for
+        potential quality control issues</h3>"
       )
     )
     
@@ -97,7 +98,7 @@ mod_data_flagging_server <- function(id, tadat) {
       
       # Remove progress bar and display instructions
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
-      output$step_2 = shiny::renderUI(HTML("<h4>Select the types of flagged data to be removed</h3>"))
+      output$step_2 = shiny::renderUI(HTML("<h3> Review quality control (QC) test results below. Each row describes the QC test, reports the number of results that failed the test, and contains a switch the user may toggle on/off to decide whether to flag results for removal.</h3>"))
       
       
       # Runs when any of the flag switches are changed
@@ -153,6 +154,47 @@ mod_data_flagging_server <- function(id, tadat) {
       )
     })
     
+    output$step_3 = shiny::renderUI({
+      shiny::req(values$testResults)
+      HTML("<h3>Convert depth units (Optional)</h3>")
+    })
     
+    output$m2f <- shiny::renderUI({
+      shiny::req(values$testResults)
+      shiny::radioButtons(ns('m2f'), label = "Result depth units are currently in meters. Click the radio buttons below to convert depth units to feet, inches, or back to meters.", choices = c("feet","inches","meters"), selected = character(0), inline = TRUE)
+      
+    })
+    
+    shiny::observeEvent(input$m2f,{
+      shiny::req(input$m2f)
+      if(input$m2f=="feet"){
+        shinybusy::show_modal_spinner(
+          spin = "double-bounce",
+          color = "#0071bc",
+          text = "Converting depth units to feet...",
+          session = shiny::getDefaultReactiveDomain()
+        )
+        tadat$raw = TADA::TADA_ConvertDepthUnits(tadat$raw, unit = "ft")
+      }
+      if(input$m2f=="inches"){
+        shinybusy::show_modal_spinner(
+          spin = "double-bounce",
+          color = "#0071bc",
+          text = "Converting depth units to inches...",
+          session = shiny::getDefaultReactiveDomain()
+        )
+        tadat$raw = TADA::TADA_ConvertDepthUnits(tadat$raw, unit = "in")
+      }
+      if(input$m2f=="meters"){
+        shinybusy::show_modal_spinner(
+          spin = "double-bounce",
+          color = "#0071bc",
+          text = "Converting depth units to meters...",
+          session = shiny::getDefaultReactiveDomain()
+        )
+        tadat$raw = TADA::TADA_ConvertDepthUnits(tadat$raw, unit = "m")
+      }
+      shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+    })
   })
 }
