@@ -15,7 +15,7 @@ mod_data_flagging_ui <- function(id) {
     tags$div(style = "display: none;",
              shinyWidgets::prettySwitch("dummy", label = NULL)),
     htmltools::h3("Flag data for potential issues"),
-    htmltools::HTML("Click the button below to run a series of tests that check for quality control issues or data formats not compatible with TADA. When the tests are finished running, a table will appear below. Each row describes an evaluation test, reports the number of results affected, and contains a switch users may toggle on/off to decide whether to flag results for removal."),
+    htmltools::HTML("Click the button below to run a series of tests that check for quality control issues or data formats not compatible with TADA. When the tests are finished running, a table will appear below. Each row describes an evaluation test, reports the number of results affected, and contains a switch users may toggle on/off to decide whether to flag results for removal. However, evaluation tests marked as <B>Required</B> have permanently 'ON' greyed out switches that cannot be changed."),
     htmltools::div(style = "margin-bottom:10px"),
     shiny::fluidRow(column(
       3,
