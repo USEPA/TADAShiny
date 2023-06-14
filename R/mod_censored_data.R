@@ -10,7 +10,7 @@
 mod_censored_data_ui <- function(id){
   ns <- NS(id)
   tagList(shiny::fluidRow(htmltools::h3("Censored Data Categories")),
-          shiny::fluidRow("TADAdataRetrieval assigns each detection limit record in your dataset to non-detect, over-detect, or other. The pie chart below displays the relative proportions of results in each category. Please note that "),
+          shiny::fluidRow("TADAdataRetrieval assigns each result in your dataset to non-detect, over-detect, other, or uncensored. The pie chart below displays the relative proportions of results in each category. Please note that detection limit data with conflicts or data quality issues are not displayed in this pie chart or handled in the methods below."),
           htmltools::br(),
           shiny::fluidRow(column(12, shiny::plotOutput(ns("id_censplot")))),
           htmltools::br(),
@@ -27,7 +27,7 @@ mod_censored_data_ui <- function(id){
           shiny::fluidRow(column(12, DT::DTOutput(ns("see_det")))),
           htmltools::br(),
           shiny::fluidRow(htmltools::h3("Consider More Complex Censored Data Handling Methods")),
-          shiny::fluidRow("Use the picker list below to select grouping columns to create summary table. The summary table shows the number of non- and over-detects in each group, the total number of results in each group, and the percentage of the dataset that is censored. These numbers are then used to suggest a potential statistical censored data method to use. Currently, the user must perform more complex analyses outside of TADAShiny."),
+          shiny::fluidRow("Use the picker list below to select grouping columns to create summary table. The summary table shows the number of non- and over-detects in each group, the total number of results in each group, the number of detection limit types (censoring levels) and the percentage of the dataset that is censored. These numbers are then used to suggest a potential statistical censored data method to use. Currently, the user must perform more complex analyses outside of TADAShiny."),
           htmltools::br(),
     shiny::fluidRow(shiny::wellPanel(shiny::fluidRow(column(12,shiny::uiOutput(ns("cens_groups")))),
                                      shiny::fluidRow(column(12,shiny::actionButton(ns("cens_sumbutton"),"ID and Summarize Censored Data", style="color: #fff; background-color: #337ab7; border-color: #2e6da4")))),
@@ -51,15 +51,15 @@ mod_censored_data_server <- function(id, tadat){
     shiny::observeEvent(tadat$tab,{
       shiny::req(tadat$raw)
       if(tadat$tab=="Censored"){
-        dat = subset(tadat$raw, tadat$raw$TADA.Remove==FALSE) # first, get rid of anything that has removed=FALSE flag
-        dat$TADA.Remove = ifelse(!dat$TADA.CensoredData.Flag%in%c("Non-Detect","Over-Detect","Uncensored", "Other Condition/Limit Populated"),TRUE,dat$TADA.Remove)
-        if(any(dat$TADA.Remove==TRUE)){ # let users know when there are "problem" censored data results that will be flagged for removal.
-          shiny::showModal(shiny::modalDialog(
-            title = "Detection Limit Data Warning",
-            paste0(length(dat$ResultIdentifier[dat$TADA.Remove==TRUE])," results were flagged for removal because they have conflicting, ambiguous and/or unfamiliar detection limits and conditions. These will show up in the pie chart, but only 'Non-Detect', 'Over-Detect', and 'Uncensored' results will be used in the sections below. You may download your dataset for review at any time using the 'Download Working Dataset' button at the bottom of the page.")
-          ))
-        }
-        censdat$dat = dat # however, this reactive object has all of the data that were not previously removed and do not have ambiguous detection limit data. This is the "clean" dataset
+        # dat = subset(tadat$raw, tadat$raw$TADA.Remove==FALSE) # first, get rid of anything that has removed=FALSE flag
+        # dat$TADA.Remove = ifelse(!dat$TADA.CensoredData.Flag%in%c("Non-Detect","Over-Detect","Uncensored", "Other Condition/Limit Populated"),TRUE,dat$TADA.Remove)
+        # if(any(dat$TADA.Remove==TRUE)){ # let users know when there are "problem" censored data results that will be flagged for removal.
+        #   shiny::showModal(shiny::modalDialog(
+        #     title = "Detection Limit Data Warning",
+        #     paste0(length(dat$ResultIdentifier[dat$TADA.Remove==TRUE])," results were flagged for removal because they have conflicting, ambiguous and/or unfamiliar detection limits and conditions. These will show up in the pie chart, but only 'Non-Detect', 'Over-Detect', and 'Uncensored' results will be used in the sections below. You may download your dataset for review at any time using the 'Download Working Dataset' button at the bottom of the page.")
+        #   ))
+        # }
+        censdat$dat = subset(tadat$raw, tadat$raw$TADA.Remove==FALSE) # however, this reactive object has all of the data that were not previously removed and do not have ambiguous detection limit data. This is the "clean" dataset
         }
       })
     

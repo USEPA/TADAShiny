@@ -158,7 +158,7 @@ mod_TADA_summary_server <- function(id, tadat) {
         paste('TADAShiny_datadownload_', tadat$tab, '.xlsx', sep = '')
       },
       content = function(file) {
-        writexl::write_xlsx(TADA::OrderTADACols(tadat$raw), path = file)
+        writexl::write_xlsx(TADA::TADA_OrderCols(tadat$raw), path = file)
       }
     )
     
