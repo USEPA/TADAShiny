@@ -34,11 +34,14 @@ app_server <- function(input, output, session) {
         "Your data were successfully loaded into the app and are displayed on the Overview tab. See summary information about your dataset in the gray box at the bottom of the app."
       ))
       shiny::updateTabsetPanel(session=session, inputId="tabbar", selected="Overview")
+      tadat$new = NULL
   })
   
   # update the master 'Remove' column anytime data is added to the 'remove' table
   shiny::observeEvent(tadat$removals,{
-    tadat$raw$TADA.Remove = apply(tadat$removals, 1, any)
+    if(dim(tadat$removals)[2]>0){
+      tadat$raw$TADA.Remove = apply(tadat$removals, 1, any)
+    }
   })
   
   # this observes when the user switches tabs and adds the current tab they're on as a column to their dataset. 

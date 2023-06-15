@@ -234,11 +234,6 @@ mod_filtering_server <- function(id, tadat) {
       print(unique(tadat$raw$TADA.RemovalReason))
     })
     
-    observe({
-      req(tadat$raw)
-      rems <<- tadat$removals
-    })
-    
     
     getValues <- function(.data, field) {
       counts = table(.data[[field]])
