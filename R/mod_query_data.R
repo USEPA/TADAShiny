@@ -190,10 +190,16 @@ initializeTable <- function(tadat, raw){
   if("TADA.Remove"%in%names(raw)){
     tadat$reup = TRUE
     tadat$ovgo = FALSE
+    shinyjs::enable(selector = '.nav li a[data-value="Overview"]')
+    shinyjs::enable(selector = '.nav li a[data-value="Flag"]')
+    shinyjs::enable(selector = '.nav li a[data-value="Filter"]')
+    shinyjs::enable(selector = '.nav li a[data-value="Censored"]')
+    shinyjs::enable(selector = '.nav li a[data-value="Review"]')
   } else {
     tadat$new = TRUE # this is used to determine if the app should go to the overview page first - only for datasets that are new to TADAShiny
     tadat$ovgo = TRUE # load data into overview page
-    
+    shinyjs::enable(selector = '.nav li a[data-value="Overview"]')
+    shinyjs::enable(selector = '.nav li a[data-value="Flag"]')
     # Set flagging column to FALSE
     raw$TADA.Remove = FALSE
   }

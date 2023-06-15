@@ -144,6 +144,9 @@ mod_data_flagging_server <- function(id, tadat) {
           )
         )
       )
+      shinyjs::enable(selector = '.nav li a[data-value="Filter"]')
+      shinyjs::enable(selector = '.nav li a[data-value="Censored"]')
+      shinyjs::enable(selector = '.nav li a[data-value="Review"]')
     })
     
     shiny::observeEvent(input$m2f,{
