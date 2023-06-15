@@ -32,18 +32,21 @@ mod_query_data_ui <- function(id){
           shiny::fluidRow(htmltools::h3("Option B: Query the Water Quality Portal (WQP)"),
                    "Use the fields below to download a dataset directly from WQP. Fields with '(s)' in the label allow multiple selections. Hydrologic Units may be at any scale, from subwatershed to region. However, be mindful that large queries may time out."),
           htmltools::br(), # styling several fluid rows with columns to hold the input drop down widgets
-          shiny::fluidRow(column(4,shiny::selectizeInput(ns("state"),"State", choices = NULL)), # widgets shown when app opens
-                    column(4,shiny::selectizeInput(ns("county"), "County (pick state first)", choices = NULL)),
-                    column(4,shiny::textInput(ns("huc"),"Hydrologic Unit", placeholder = "e.g. 020700100103"))),
-          shiny::fluidRow(column(4, shiny::selectizeInput(ns("siteid"), "Monitoring Location ID(s)", choices = NULL,multiple = TRUE)),
-                    column(4, shiny::selectizeInput(ns("org"),"Organization(s)", choices = NULL, multiple = TRUE)),
-                    column(4, shiny::selectizeInput(ns("proj"),"Project(s)", choices = NULL, multiple = TRUE))),
-          shiny::fluidRow(column(4, shiny::selectizeInput(ns("chargroup"),"Characteristic Group", choices = NULL)),
-                    column(4, shiny::selectizeInput(ns("characteristic"),"Characteristic(s)", choices = NULL, multiple = TRUE)),
-                    column(4, shiny::selectizeInput(ns("media"), "Sample Media", choices = c("",media), selected = "Water", multiple = TRUE))),
-          shiny::fluidRow(column(4, shiny::selectizeInput(ns("type"), "Site Type(s)", choices = c("",sitetype), multiple = TRUE)),
-                    column(4, shiny::dateInput(ns("startdate"),"Start Date", format = "yyyy-mm-dd", startview = "year")),
-                    column(4, shiny::dateInput(ns("enddate"),"End Date", format = "yyyy-mm-dd", startview = "year"))),
+          htmltools::h4("Date Range"),
+          shiny::fluidRow(column(4, shiny::dateInput(ns("startdate"),"Start Date", format = "yyyy-mm-dd", startview = "year")),
+                          column(4, shiny::dateInput(ns("enddate"),"End Date", format = "yyyy-mm-dd", startview = "year"))),
+          htmltools::h4("Location Information"),
+          shiny::fluidRow(column(4,shiny::selectizeInput(ns("state"),"State", choices = NULL)),
+                          column(4,shiny::selectizeInput(ns("county"), "County (pick state first)", choices = NULL)),
+                          column(4,shiny::textInput(ns("huc"),"Hydrologic Unit", placeholder = "e.g. 020700100103"))),
+          shiny::fluidRow(column(4, shiny::selectizeInput(ns("siteid"), "Monitoring Location ID(s)", choices = NULL,multiple = TRUE))),
+          htmltools::h4("Metadata Filters"),
+          shiny::fluidRow(column(4, shiny::selectizeInput(ns("org"),"Organization(s)", choices = NULL, multiple = TRUE)),
+                          column(4, shiny::selectizeInput(ns("proj"),"Project(s)", choices = NULL, multiple = TRUE)),
+                          column(4, shiny::selectizeInput(ns("type"), "Site Type(s)", choices = c("",sitetype), multiple = TRUE))),
+          shiny::fluidRow(column(4, shiny::selectizeInput(ns("media"), "Sample Media", choices = c("",media), selected = "Water", multiple = TRUE)),
+                          column(4, shiny::selectizeInput(ns("chargroup"),"Characteristic Group", choices = NULL)),
+                          column(4, shiny::selectizeInput(ns("characteristic"),"Characteristic(s)", choices = NULL, multiple = TRUE))),
           shiny::fluidRow(column(4, shiny::actionButton(ns("querynow"),"Run Query",shiny::icon("cloud"),
                                           style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))),
           htmltools::hr(),
@@ -185,15 +188,16 @@ mod_query_data_server <- function(id, tadat){
 initializeTable <- function(tadat, raw){
   # Test to see if this is a raw table or one previously worked on in TADA
   if("TADA.Remove"%in%names(raw)){
-    tadat$new = FALSE
+    tadat$reup = TRUE
     tadat$ovgo = FALSE
   } else {
     tadat$new = TRUE # this is used to determine if the app should go to the overview page first - only for datasets that are new to TADAShiny
     tadat$ovgo = TRUE # load data into overview page
+    
+    # Set flagging column to FALSE
+    raw$TADA.Remove = FALSE
   }
   
-  # Set flagging column to FALSE
-  raw$TADA.Remove = FALSE
   removals <- data.frame(matrix(nrow = nrow(raw), ncol = 0))
   # removals["Media Type"] = ifelse(!raw$TADA.ActivityMediaName%in%c("WATER"),TRUE,raw$Removed)
   # removals["Special Characters"] = ifelse(raw$TADA.ResultMeasureValueDataTypes.Flag%in%c("ND or NA","Text","Coerced to NA"),TRUE,raw$Removed)
