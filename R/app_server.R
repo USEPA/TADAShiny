@@ -24,9 +24,15 @@ app_server <- function(input, output, session) {
   # switch to overview tab when tadat$new changes and provide user with window letting them know how many records were automatically flagged for removal upon upload
   # move this to query_data?
   shiny::observeEvent(tadat$new,{
+    removed = length(tadat$raw$ResultIdentifier[tadat$raw$TADA.Remove==TRUE])
+    if(removed>0){
+      message = paste0("Your data were successfully loaded and displayed on the Overview tab. TADA is currently only designed for analyzing numerical water data. Therefore, ", scales::comma(removed)," results were flagged for removal because their sample media was not WATER or the result value was text or NA and no detection limit value was provided. See dataset summary information in the gray box at the bottom of the app.")
+    }else{
+      message = "Your data were successfully loaded into the app and are displayed on the Overview tab. See summary information about your dataset in the gray box at the bottom of the app."
+    }
       shiny::showModal(shiny::modalDialog(
         title = "Data Loaded",
-        message = "Your data were successfully loaded into the app and are displayed on the Overview tab. See summary information about your dataset in the gray box at the bottom of the app."
+        message
       ))
       shiny::updateTabsetPanel(session=session, inputId="tabbar", selected="Overview")
       tadat$new = NULL
