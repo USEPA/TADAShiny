@@ -27,7 +27,9 @@ load("inst/extdata/query_choices.Rdata")
 mod_query_data_ui <- function(id){
   ns <- NS(id)
   tagList(shiny::fluidRow(htmltools::h3("Option A: Use example data"),
-                          column(3,shiny::actionButton(ns("example_data"),"Use example data",shiny::icon("gift"),style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))),
+                          column(3,shiny::selectInput(ns("example_data"),"Use example data",choices = c("","Nutrients Utah (15k results)","Shepherdstown (34k results)","Tribal (132k results)")))),
+          shiny::fluidRow(column(3, shiny::actionButton(ns("example_data_go"), "Load",shiny::icon("truck-ramp-box"),
+                                                        style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))),
           htmltools::hr(),
           shiny::fluidRow(htmltools::h3("Option B: Query the Water Quality Portal (WQP)"),
                    "Use the fields below to download a dataset directly from WQP. Fields with '(s)' in the label allow multiple selections. Hydrologic Units may be at any scale, from subwatershed to region. However, be mindful that large queries may time out."),
@@ -44,7 +46,13 @@ mod_query_data_ui <- function(id){
           shiny::fluidRow(column(4, shiny::selectizeInput(ns("org"),"Organization(s)", choices = NULL, multiple = TRUE)),
                           column(4, shiny::selectizeInput(ns("proj"),"Project(s)", choices = NULL, multiple = TRUE)),
                           column(4, shiny::selectizeInput(ns("type"), "Site Type(s)", choices = c("",sitetype), multiple = TRUE))),
-          shiny::fluidRow(column(4, shiny::selectizeInput(ns("media"), "Sample Media", choices = c("",media), selected = "Water", multiple = TRUE)),
+          shiny::fluidRow(column(4, shiny::selectizeInput(ns("media"), tags$span("Sample Media", 
+            tags$i(
+              class = "glyphicon glyphicon-info-sign", 
+              style = "color:#0072B2;",
+              title = "At present, TADA is only designed to work with water sample media"
+            )
+          ), choices = c("",media), selected = "Water", multiple = TRUE)),
                           column(4, shiny::selectizeInput(ns("chargroup"),"Characteristic Group", choices = NULL)),
                           column(4, shiny::selectizeInput(ns("characteristic"),"Characteristic(s)", choices = NULL, multiple = TRUE))),
           shiny::fluidRow(column(4, shiny::actionButton(ns("querynow"),"Run Query",shiny::icon("cloud"),
@@ -80,8 +88,16 @@ mod_query_data_server <- function(id, tadat){
     })
     
   # if user presses example data button, make tadat$raw the nutrients dataset contained within the TADA package.
-    shiny::observeEvent(input$example_data,{
-      raw = TADA::TribalData
+    shiny::observeEvent(input$example_data_go,{
+      if(input$example_data == "Shepherdstown (34k results)"){
+        raw = TADA::NCTCShepherdstown_HUC12
+      }
+      if(input$example_data == "Tribal (132k results)"){
+        raw = TADA::TribalData
+      }
+      if(input$example_data == "Nutrients Utah (15k results)"){
+        raw = TADA::Nutrients_Utah
+      }
       initializeTable(tadat, raw)
     })
 
