@@ -40,12 +40,12 @@ mod_TADA_summary_ui <- function(id) {
           "dwn_all"
         ))))
       )
-    ),
-    column(4,
-           shiny::wellPanel(
-             htmltools::h3("Removed Record Summary"),
-             DT::DTOutput(ns("removal_summary"))
-           ))
+    ) #,
+    # column(4,
+    #        shiny::wellPanel(
+    #          htmltools::h3("Removed Record Summary"),
+    #          DT::DTOutput(ns("removal_summary"))
+    #        ))
   ))
 }
 
@@ -79,16 +79,16 @@ mod_TADA_summary_server <- function(id, tadat) {
       dimnames = list(NULL, c("Reason", "Count"))
     ))
     
-    output$removal_summary = DT::renderDataTable(
-      summary_things$removals,
-      escape = FALSE,
-      rownames = FALSE,
-      options = list(
-        dom = 't',
-        paging = FALSE,
-        language = list(zeroRecords = "No records removed")
-      )
-    )
+    # output$removal_summary = DT::renderDataTable(
+    #   summary_things$removals,
+    #   escape = FALSE,
+    #   rownames = FALSE,
+    #   options = list(
+    #     dom = 't',
+    #     paging = FALSE,
+    #     language = list(zeroRecords = "No records removed")
+    #   )
+    # )
     
     # summary text = total records
     output$rec_tot = shiny::renderText({

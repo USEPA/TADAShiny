@@ -18,21 +18,20 @@ app_server <- function(input, output, session) {
   mod_summary_server("summary_1", tadat)
   mod_overview_server("overview_1", tadat)
   mod_censored_data_server("censored_data_1", tadat)
+  mod_review_data_server("review_data_1", tadat)
   mod_TADA_summary_server("TADA_summary_1", tadat)
 
-
+  shinyjs::disable(selector = '.nav li a[data-value="Overview"]')
+  shinyjs::disable(selector = '.nav li a[data-value="Flag"]')
+  shinyjs::disable(selector = '.nav li a[data-value="Filter"]')
+  shinyjs::disable(selector = '.nav li a[data-value="Censored"]')
+  shinyjs::disable(selector = '.nav li a[data-value="Review"]')
   # switch to overview tab when tadat$new changes and provide user with window letting them know how many records were automatically flagged for removal upon upload
   # move this to query_data?
   shiny::observeEvent(tadat$new,{
-    removed = length(tadat$raw$ResultIdentifier[tadat$raw$TADA.Remove==TRUE])
-    if(removed>0){
-      message = paste0("Your data were successfully loaded and displayed on the Overview tab. TADA is currently only designed for analyzing numerical water data. Therefore, ", scales::comma(removed)," results were flagged for removal because their sample media was not WATER or the result value was text or NA and no detection limit value was provided. See dataset summary information in the gray box at the bottom of the app.")
-    }else{
-      message = "Your data were successfully loaded into the app and are displayed on the Overview tab. See summary information about your dataset in the gray box at the bottom of the app."
-    }
       shiny::showModal(shiny::modalDialog(
         title = "Data Loaded",
-        message
+        "Your data were successfully loaded into the app and are displayed on the Overview tab. See summary information about your dataset in the gray box at the bottom of the app."
       ))
       shiny::updateTabsetPanel(session=session, inputId="tabbar", selected="Overview")
       tadat$new = NULL
@@ -40,7 +39,9 @@ app_server <- function(input, output, session) {
   
   # update the master 'Remove' column anytime data is added to the 'remove' table
   shiny::observeEvent(tadat$removals,{
-    tadat$raw$TADA.Remove = apply(tadat$removals, 1, any)
+    if(dim(tadat$removals)[2]>0){
+      tadat$raw$TADA.Remove = apply(tadat$removals, 1, any)
+    }
   })
   
   # this observes when the user switches tabs and adds the current tab they're on as a column to their dataset. 

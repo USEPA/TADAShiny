@@ -45,7 +45,9 @@ Imports:
     dplyr, 
     plyr,
     scales,
-    forcats
+    forcats,
+    RColorBrewer,
+    grDevices
 Remotes: 
     github::USEPA/TADA
 Suggests: 

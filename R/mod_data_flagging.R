@@ -14,34 +14,27 @@ mod_data_flagging_ui <- function(id) {
   tagList(
     tags$div(style = "display: none;",
              shinyWidgets::prettySwitch("dummy", label = NULL)),
-    shiny::htmlOutput(ns('step_1')),
+    htmltools::h3("Flag data for potential issues"),
+    htmltools::HTML("Click the button below to run a series of tests that check for quality control issues or data formats not compatible with TADA. When the tests are finished running, a table will appear below. Each row describes an evaluation test, reports the number of results affected, and contains a switch users may toggle on/off to decide whether to flag results for removal. However, evaluation tests marked as <B>Required</B> have permanently 'ON' greyed out switches that cannot be changed."),
     htmltools::div(style = "margin-bottom:10px"),
     shiny::fluidRow(column(
       3,
       shiny::actionButton(ns("runFlags"),
-                          "Run Data Flagging",
+                          "Run Tests",
                           style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
     )),
-    htmltools::br(),
-    shiny::htmlOutput(ns('step_2')),
     htmltools::div(style = "margin-bottom:10px"),
     DT::DTOutput(ns('flagTable')),
     htmltools::br(),
-    shiny::htmlOutput(ns('step_3')),
-    shiny::fluidRow(column(6, shiny::uiOutput(ns('m2f'))))
+    htmltools::h3("Convert depth units (Optional)"),
+    htmltools::HTML("Result depth units are currently in <B>meters</B>. Click the radio buttons below to convert depth units to feet, inches, or back to meters."),
+    shiny::fluidRow(column(6, shiny::radioButtons(ns('m2f'), label = "", choices = c("feet","inches","meters"), selected = character(0), inline = TRUE)))
   )
 }
 
 mod_data_flagging_server <- function(id, tadat) {
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
-    
-    output$step_1 = shiny::renderUI(
-      HTML(
-        "<h3>Click the 'Run Data Flagging' button to scan the dataset for
-        potential quality control issues</h3>"
-      )
-    )
     
     flagSwitch = function(len) {
       inputs = character(len)
@@ -81,7 +74,7 @@ mod_data_flagging_server <- function(id, tadat) {
       shinybusy::show_modal_spinner(
         spin = "double-bounce",
         color = "#0071bc",
-        text = "Flagging invalid or out-of-range data...",
+        text = "Running TADA flagging functions...",
         session = shiny::getDefaultReactiveDomain()
       )
       
@@ -98,7 +91,6 @@ mod_data_flagging_server <- function(id, tadat) {
       
       # Remove progress bar and display instructions
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
-      output$step_2 = shiny::renderUI(HTML("<h3> Review quality control (QC) test results below. Each row describes the QC test, reports the number of results that failed the test, and contains a switch the user may toggle on/off to decide whether to flag results for removal.</h3>"))
       
       
       # Runs when any of the flag switches are changed
@@ -152,21 +144,13 @@ mod_data_flagging_server <- function(id, tadat) {
           )
         )
       )
-    })
-    
-    output$step_3 = shiny::renderUI({
-      shiny::req(values$testResults)
-      HTML("<h3>Convert depth units (Optional)</h3>")
-    })
-    
-    output$m2f <- shiny::renderUI({
-      shiny::req(values$testResults)
-      shiny::radioButtons(ns('m2f'), label = "Result depth units are currently in meters. Click the radio buttons below to convert depth units to feet, inches, or back to meters.", choices = c("feet","inches","meters"), selected = character(0), inline = TRUE)
-      
+      shinyjs::enable(selector = '.nav li a[data-value="Filter"]')
+      shinyjs::enable(selector = '.nav li a[data-value="Censored"]')
+      shinyjs::enable(selector = '.nav li a[data-value="Review"]')
     })
     
     shiny::observeEvent(input$m2f,{
-      shiny::req(input$m2f)
+      shiny::req(tadat$raw)
       if(input$m2f=="feet"){
         shinybusy::show_modal_spinner(
           spin = "double-bounce",

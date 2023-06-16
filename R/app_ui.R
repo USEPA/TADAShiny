@@ -6,6 +6,14 @@
 #'
 
 # THE BUSINESS STARTS ON line 223 or thereabouts.
+css <- "
+.nav li a.disabled {
+  background-color: #F5F5F5 !important;
+  color: #333 !important;
+  cursor: not-allowed !important;
+  border-color: #F5F5F5 !important;
+}"
+
 app_ui <- function(request) {
   tagList(
     # Leave this function for adding external resources
@@ -20,6 +28,7 @@ app_ui <- function(request) {
       epa_header,
       shiny::includeHTML(app_sys("app/www/header.html")),
       shinyjs::useShinyjs(),
+      shinyjs::inlineCSS(css),
       htmltools::br(),
       shiny::headerPanel(title = "Tools for Automated Data Analysis (TADA) Module 1: Water Quality Portal Data Discovery and Cleaning"),
       htmltools::br(),
@@ -39,12 +48,14 @@ app_ui <- function(request) {
  
          shiny::tabPanel("4. Filter", value ="Filter",
                          htmltools::br(),
-                         mod_filtering_ui("filtering_1"),
-                         htmltools::hr()),
+                         mod_filtering_ui("filtering_1")),
         # shiny::tabPanel("Harmonize"),
         shiny::tabPanel("5. Censored Data", value = "Censored",
                         htmltools::br(),
-                        mod_censored_data_ui("censored_data_1")) #,
+                        mod_censored_data_ui("censored_data_1")),
+        shiny::tabPanel("6. Review and Explore", value = "Review",
+                        htmltools::br(),
+                        mod_review_data_ui("review_data_1"))#,
         # shiny::tabPanel("Explore"),
         # shiny::tabPanel("User Guide")
 
