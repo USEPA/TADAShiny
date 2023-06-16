@@ -28,7 +28,7 @@ flagCensus <- function(raw) {
         test_col = tests[row, 'columnName']
         test_val = tests[row, 'flagValue']
         keep = tests[row, 'keep']
-        if (test_col != 'Unknown') {
+        if (test_col != 'Unknown'&test_col%in%names(raw)) {
           if(!is.na(test_val)){
             rawt_col = raw[,test_col]
             rawt_col[is.na(rawt_col)] = "NA"

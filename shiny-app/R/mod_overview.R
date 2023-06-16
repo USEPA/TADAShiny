@@ -33,19 +33,16 @@ mod_overview_ui <- function(id){
 mod_overview_server <- function(id, tadat){
   shiny::moduleServer( id, function(input, output, session){
     ns <- session$ns
-    # this widget produces the text at the top of the page describing record, site, and org numbers in dataset
-    output$overview_totals = shiny::renderText({
-      shiny::req(tadat$raw)
-      paste0("Your dataset contains <B>",scales::comma(length(unique(tadat$raw$ResultIdentifier))),"</B> unique results from <B>",scales::comma(length(unique(tadat$raw$MonitoringLocationIdentifier))),"</B> monitoring location(s) and <B>", scales::comma(length(unique(tadat$raw$OrganizationFormalName))),"</B> unique organization(s).")
-    })
+    
     # this a reactive list created to hold all the reactive objects specific to this module.
     mapdat = shiny::reactiveValues()
 
     # create dataset for map and histogram using raw data
     shiny::observeEvent(tadat$ovgo, {
-      usedata = tadat$raw%>%dplyr::filter(TADA.Remove==FALSE) # do not consider data automatically removed upon upload for plots and maps
+      # create gray text tile info
+      mapdat$text = tadat$raw%>%dplyr::filter(TADA.Remove==FALSE)%>%dplyr::select(ResultIdentifier,MonitoringLocationIdentifier,OrganizationFormalName,ActivityStartDate)
       # create summary info and binning for map
-      mapdat$sumdat = usedata%>%dplyr::group_by(MonitoringLocationIdentifier,MonitoringLocationName,TADA.LatitudeMeasure, TADA.LongitudeMeasure)%>%dplyr::summarise("Result_Count" = length(unique(ResultIdentifier)), "Visit_Count" = length(unique(ActivityStartDate)), "Parameter_Count" = length(unique(TADA.CharacteristicName)), "Organization_Count" = length(unique(OrganizationIdentifier)))
+      mapdat$sumdat = tadat$raw%>%dplyr::filter(TADA.Remove==FALSE)%>%dplyr::group_by(MonitoringLocationIdentifier,MonitoringLocationName,TADA.LatitudeMeasure, TADA.LongitudeMeasure)%>%dplyr::summarise("Result_Count" = length(unique(ResultIdentifier)), "Visit_Count" = length(unique(ActivityStartDate)), "Parameter_Count" = length(unique(TADA.CharacteristicName)), "Organization_Count" = length(unique(OrganizationIdentifier)))
       mapdat$sumdat$radius = 3
       mapdat$sumdat$radius = ifelse(mapdat$sumdat$Result_Count>10,5,mapdat$sumdat$radius)
       mapdat$sumdat$radius = ifelse(mapdat$sumdat$Result_Count>50,8,mapdat$sumdat$radius)
@@ -54,9 +51,9 @@ mod_overview_server <- function(id, tadat){
       mapdat$sumdat$radius = ifelse(mapdat$sumdat$Result_Count>500,20,mapdat$sumdat$radius)
       mapdat$sumdat$radius = ifelse(mapdat$sumdat$Result_Count>1500,30,mapdat$sumdat$radius)
       # create org summary for table.
-      mapdat$orgs = usedata%>%dplyr::group_by(OrganizationFormalName)%>%dplyr::summarise("Result_Count" = length(unique(ResultIdentifier)))
+      mapdat$orgs = tadat$raw%>%dplyr::filter(TADA.Remove==FALSE)%>%dplyr::group_by(OrganizationFormalName)%>%dplyr::summarise("Result_Count" = length(unique(ResultIdentifier)))
       # get top 10 characteristics by result number in the dataset and place the rest in a group called "all others"
-      chars = usedata%>%dplyr::group_by(TADA.CharacteristicName)%>%dplyr::summarise("Result_Count" = length(unique(ResultIdentifier)))
+      chars = tadat$raw%>%dplyr::filter(TADA.Remove==FALSE)%>%dplyr::group_by(TADA.CharacteristicName)%>%dplyr::summarise("Result_Count" = length(unique(ResultIdentifier)))
       topslice = chars%>%dplyr::slice_max(order_by = Result_Count, n = 10)
       bottomslice = chars%>%dplyr::ungroup()%>%dplyr::filter(!TADA.CharacteristicName%in%topslice$TADA.CharacteristicName)%>%dplyr::select("Result_Count")%>%dplyr::summarise("Result_Count" = sum(Result_Count))%>%dplyr::mutate("TADA.CharacteristicName" = "ALL OTHERS")
       chars = plyr::rbind.fill(topslice, bottomslice)%>%dplyr::filter(Result_Count>0)
@@ -66,6 +63,12 @@ mod_overview_server <- function(id, tadat){
       mapdat$chars = chars
       tadat$ovgo = NULL
       })
+    
+    # this widget produces the text at the top of the page describing record, site, and org numbers in dataset
+    output$overview_totals = shiny::renderText({
+      shiny::req(mapdat$text)
+      paste0("Your dataset contains <B>",scales::comma(length(unique(mapdat$text$ResultIdentifier))),"</B> unique results from <B>",scales::comma(length(unique(mapdat$text$MonitoringLocationIdentifier))),"</B> monitoring location(s) and <B>", scales::comma(length(unique(mapdat$text$OrganizationFormalName))),"</B> unique organization(s).")
+    })
 
     # the leaflet map
     output$overview_map = leaflet::renderLeaflet({
@@ -92,8 +95,8 @@ mod_overview_server <- function(id, tadat){
 
     # histogram showing results collected over time.
     output$overview_hist = shiny::renderPlot({
-      shiny::req(tadat$raw)
-      ggplot2::ggplot(data = tadat$raw[tadat$raw$TADA.Remove==FALSE,], ggplot2::aes(x = as.Date(ActivityStartDate, format = "%Y-%m-%d")))+ggplot2::geom_histogram(color = "black", fill = "#005ea2", binwidth = 7)+ggplot2::labs(title="Results collected per week over date range queried",x="Time", y = "Result Count")+ggplot2::theme_classic(base_size = 16)
+      shiny::req(mapdat$text)
+      ggplot2::ggplot(data = mapdat$text, ggplot2::aes(x = as.Date(ActivityStartDate, format = "%Y-%m-%d")))+ggplot2::geom_histogram(color = "black", fill = "#005ea2", binwidth = 7)+ggplot2::labs(title="Results collected per week over date range queried",x="Time", y = "Result Count")+ggplot2::theme_classic(base_size = 16)
     })
     
     # organization numbers table
@@ -109,7 +112,7 @@ mod_overview_server <- function(id, tadat){
       shiny::req(mapdat$chars)
       ggplot2::ggplot(mapdat$chars, ggplot2::aes(x=TADA.Chars, y=Result_Count)) +
         ggplot2::geom_bar(stat = "identity", fill = "#005ea2", color = "black") +
-        ggplot2::labs(title="Number of Results per Characteristic",x="", y = "Results Count")+
+        ggplot2::labs(title="Results per Characteristic",x="", y = "Results Count")+
         ggplot2::theme_classic(base_size = 16) +
         ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1)) +
         ggplot2::geom_text(ggplot2::aes(x = TADA.Chars, y = Result_Count+(0.07*max(Result_Count)), label = Result_Count), size = 5, color="black") #+
@@ -117,8 +120,8 @@ mod_overview_server <- function(id, tadat){
           })
     
     shiny::observeEvent(input$refresh_overview,{
-      shiny::req(tadat$raw)
-      tadat$ovgo = 2
+      shiny::req(mapdat$text)
+      tadat$ovgo = TRUE
     })
 
   })

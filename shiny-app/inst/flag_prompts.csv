@@ -1,14 +1,14 @@
 Order,Level,Prompt,flagType
-1,Required,Sample media is not water,Media Type
-2,Required,Result value is not numeric or result value is NA and no detection limit value is provided,Special Characters
-3,Required,Conflict between detection condition text and detection limit type or detection limit type is not documented in TADA reference tables ,Censored Data
-4,Recommended,Invalid speciation for associated characteristic,Method Speciation
-5,Recommended,Invalid characteristic and fraction combinations,Sample Fraction
-6,Recommended,Invalid units for a given characteristic and media combination,Units
-7,Recommended,Duplicate and replicate measurements,Activity Type
-8,Optional,Uncommon analytical methods,Analytical Method
-9,Optional,"QAPP approval column is ""N"" (indicating not approved) or NA",QAPP Approved
-10,Optional,Quality Assurance Project Plan URL is missing,QAPP Documentation
-11,Optional,"Metadata indicates result(s) are aggregate, high-frequency continuous sensor results, not discrete samples",Continuous Data
-13,Optional,"Result value(s) outside of the national lower range for a given characteristic, possibly indicating non-sensical value(s)",Above National Threshold
-14,Optional,"Result value(s) outside of the national lower range for a given characteristic, possibly indicating non-sensical value(s)",Below National Threshold
+1,Required,Sample media is not water,Sample media is not water
+2,Required,Result value is not numeric or result value is NA and no detection limit value is provided,Result value is not numeric or result value is NA and no detection limit value is provided
+3,Required,Conflict between detection condition text and detection limit type or detection limit type is not in WQX domain tables (likely USGS/NWIS-specific) ,Conflict between detection condition text and detection limit type or detection limit type is not in WQX domain tables (likely USGS/NWIS-specific) 
+4,Recommended,Invalid speciation for associated characteristic,Invalid speciation for associated characteristic
+5,Recommended,Invalid characteristic and fraction combination,Invalid characteristic and fraction combination
+6,Recommended,Invalid units for a given characteristic and media combination,Invalid units for a given characteristic and media combination
+7,Recommended,"Measurement activity type code indicates it is a QC replicate, duplicate, or blank","Measurement activity type code indicates it is a QC replicate, duplicate, or blank"
+8,Optional,Uncommon analytical methods,Uncommon analytical methods
+9,Optional,"QAPP approval column is ""N"" (indicating not approved) or NA","QAPP approval column is ""N"" (indicating not approved) or NA"
+10,Optional,Quality Assurance Project Plan URL is missing,Quality Assurance Project Plan URL is missing
+11,Optional,"Metadata indicates result(s) are aggregate, high-frequency continuous sensor results, not discrete samples","Metadata indicates result(s) are aggregate, high-frequency continuous sensor results, not discrete samples"
+13,Optional,"Result value(s) outside of the national upper range for a given characteristic, possibly indicating non-sensical value(s)","Result value(s) outside of the national upper range for a given characteristic, possibly indicating non-sensical value(s)"
+14,Optional,"Result value(s) outside of the national lower range for a given characteristic, possibly indicating non-sensical value(s)","Result value(s) outside of the national lower range for a given characteristic, possibly indicating non-sensical value(s)"

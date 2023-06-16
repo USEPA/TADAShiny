@@ -1,29 +1,31 @@
 mod_filtering_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    shiny::actionButton(ns("describe_removals"), "Describe Removals"),
-    shiny::htmlOutput(ns("promptStep1")),
+    htmltools::HTML("<h3>Select field to filter on:</h3>"),
+    htmltools::HTML("Key columns are listed in the table below, along with the number of unique values present in that field. These counts do not include unique values from results flagged for removal. Click on a field name and a new table will appear below showing the counts associated with each unique value in the selected field."),
     DT::dataTableOutput(ns("filterStep1")),
     htmltools::br(),
     shiny::htmlOutput(ns("promptStep2")),
     DT::DTOutput(ns("filterStep2")),
-    shiny::actionButton(ns("addOnlys"),
-                        "Include Only These Values",
-                        style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"),
-    shiny::actionButton(ns("addExcludes"),
-                        "Exclude These Values",
-                        style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"),
+    htmltools::br(),
+    shiny::fluidRow(column(3, shiny::actionButton(ns("addOnlys"),
+                                                  "Include Only Selected Values",
+                                                  style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")),
+                    column(3, shiny::actionButton(ns("addExcludes"),
+                                                  "Exclude Selected Values",
+                                                  style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"))),
     htmltools::br(),
     htmltools::br(),
-    shiny::htmlOutput(ns("promptStep3")),
+    htmltools::h3("Selected filters"),
+    htmltools::HTML("Your exclude/include filters are documented below. You can easily reset one or more filter decisions by clicking on rows of interest and then hitting the 'Remove Selected Filters' button. Alternatively, you can reset/remove all filters on this page by clicking the 'Reset All Filters' button."),
     DT::DTOutput(ns("selectedFilters")),
-    shiny::actionButton(ns("removeFilters"),
-                        "Remove These Filters",
-                        style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"),
-    
-    shiny::actionButton(ns("resetFilters"),
-                        "Reset All Filters",
-                        style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
+    htmltools::br(),
+    shiny::fluidRow(column(3, shiny::actionButton(ns("removeFilters"),
+                                                  "Remove Selected Filters",
+                                                  style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")),
+                    column(3, shiny::actionButton(ns("resetFilters"),
+                                                  "Reset All Filters",
+                                                  style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")))
   )
 }
 
@@ -38,8 +40,51 @@ mod_filtering_server <- function(id, tadat) {
     values$selected_field <- NULL
     shinyjs::hide("addOnlys")
     shinyjs::hide("addExcludes")
+  
+    # make sure dataset being used to create filters is only REMOVE = FALSE
+    shiny::observe({
+      shiny::req(tadat$tab)
+      if(tadat$tab=="Filter"){
+        # only show unique values from data that have not been flagged for removal
+        tables$dat = subset(tadat$raw, tadat$raw$TADA.Remove==FALSE)
+        tables$filter_fields = TADA::fieldCounts(tables$dat, display = "key")
+      }
+    })
     
-    output$filterStep2 = DT::renderDataTable(NULL)
+  # First data table with key columns    
+  output$filterStep1 = DT::renderDT(
+        tables$filter_fields,
+        escape = FALSE,
+        selection = 'single',
+        rownames = FALSE,
+        options = list(dom = 't',
+                       pageLength = dim(tables$filter_fields)[1],
+                       paging = FALSE))
+    
+  # When key column selected, get unique values for that column
+    shiny::observeEvent(input$filterStep1_rows_selected, {
+      # Get the name of the selected field
+      values$selected_field = tables$filter_fields[input$filterStep1_rows_selected,]$Field
+      applyLocks()
+      tables$filter_values = data.frame(getValues(tables$dat, values$selected_field))
+      output$promptStep2 = shiny::renderUI(HTML(
+        paste0("<h3>Filter by '", values$selected_field, "'</h3>
+               <p>In this table, you may either exclude selected values, or ONLY include selected values and exclude all other non-selected values. Use the buttons at the bottom of this table to make your decisions. Note that once you select a filtering type (Exclude or Include), the other filtering type button is disabled for that field.</p>")
+      ))
+      shinyjs::show("addOnlys")
+      shinyjs::show("addExcludes")
+    })
+    
+    # show unique values for selected column
+    output$filterStep2 = DT::renderDT(
+      tables$filter_values,
+      escape = FALSE,
+      selection = 'multiple',
+      rownames = FALSE,
+      options = list(dom = 't', pageLength = dim(tables$filter_values)[1])
+    )
+    
+    # empty selected table on open
     tables$selected <-
       data.frame(matrix(
         ncol = 4,
@@ -47,8 +92,7 @@ mod_filtering_server <- function(id, tadat) {
         dimnames = list(NULL, c("Field", "Value", "Filter", "Count"))
       ))
     
-    
-    output$promptStep3 = shiny::renderUI(HTML("<h3>Selected Filters</h3>"))
+    # selected table at bottom
     output$selectedFilters =  DT::renderDT(
       tables$selected,
       escape = FALSE,
@@ -61,55 +105,45 @@ mod_filtering_server <- function(id, tadat) {
       )
     )
     
-    
-    output$promptStep1 = shiny::renderUI(HTML("<h4>Select field to filter on:</h4>"))
-    
-    shiny::observeEvent(tadat$ovgo, {
-      tables$filter_fields = getFieldNames(tadat$raw)
-      output$filterStep1 = DT::renderDT(
-        tables$filter_fields,
-        escape = FALSE,
-        selection = 'single',
-        rownames = FALSE,
-        options = list(dom = 't',
-                       paging = FALSE)
-      )
-    })
-    
-    shiny::observeEvent(input$filterStep1_rows_selected, {
-      # Get the name of the selected field
-      values$selected_field = tables$filter_fields[input$filterStep1_rows_selected,]$Field
-      applyLocks()
-      tables$filter_values = data.frame(getValues(tadat$raw, values$selected_field))
-      output$promptStep2 = shiny::renderUI(HTML(
-        paste0("<h4>Filter by '", values$selected_field, "'</h4>")
-      ))
-      output$filterStep2 = DT::renderDT(
-        tables$filter_values,
-        escape = FALSE,
-        selection = 'multiple',
-        rownames = FALSE,
-        options = list(dom = 't', paging = TRUE)
-      )
-      shinyjs::show("addOnlys")
-      shinyjs::show("addExcludes")
-    })
-    
+    # what happens when you click "Include Only Selected Values"
     shiny::observeEvent(input$addOnlys, {
-      selectFilters("Only")
+      if(is.null(input$filterStep2_rows_selected)){ # make sure something is selected
+        shiny::showModal(shiny::modalDialog(
+          title = "Select Field Values",
+          "You must select (by clicking on) the field value(s) you'd like to include in your dataset before clicking Include Only Selected Values."
+        ))
+      }else{
+        selectFilters("Keep only")
+      }
     })
     
+    # what happens when you click "Exclude Selected Values"
     shiny::observeEvent(input$addExcludes, {
-      selectFilters("Exclude")
+      if(is.null(input$filterStep2_rows_selected)){ # make sure something is selected
+        shiny::showModal(shiny::modalDialog(
+          title = "Select Field Values",
+          "You must select (by clicking on) the field value(s) you'd like to exclude from your dataset before clicking Exclude Selected Values."
+        ))
+      }else{
+        selectFilters("Exclude")
+      }
     })
     
+    # reset all filters in bottom table
     shiny::observeEvent(input$resetFilters, {
       tables$selected = tables$selected[0, ]
     })
     
+    # reset selected filters in bottom table
     shiny::observeEvent(input$removeFilters, {
-      current_field = values$selected_field
-      tables$selected = tables$selected[-input$selectedFilters_rows_selected, ]
+      if(is.null(input$selectedFilters_rows_selected)){
+        shiny::showModal(shiny::modalDialog(
+          title = "Select Filter",
+          "You must select (by clicking on) the filter(s) you'd like to remove from the applied filters table."
+        ))
+      }else{
+        tables$selected = tables$selected[-input$selectedFilters_rows_selected, ]
+      }
     })
     
     selectFilters <- function(Filter) {
@@ -153,38 +187,6 @@ mod_filtering_server <- function(id, tadat) {
       applyLocks()
     })
     
-    getFieldNames <- function(.data) {
-      valid_fields = c(
-        "ActivityTypeCode",
-        "TADA.ActivityMediaName",
-        "ActivityMediaSubdivisionName",
-        "ActivityCommentText",
-        "MonitoringLocationTypeName",
-        "StateName",
-        "TribalLandName",
-        "OrganizationFormalName",
-        "TADA.CharacteristicName",
-        "HydrologicCondition",
-        "HydrologicEvent",
-        "BiologicalIntentName",
-        "MeasureQualifierCode",
-        "ActivityGroup",
-        "AssemblageSampledName",
-        "ProjectName",
-        "CharacteristicNameUserSupplied",
-        "DetectionQuantitationLimitTypeName",
-        "SampleTissueAnatomyName",
-        "LaboratoryName"
-      )
-      fields <- intersect(colnames(.data), valid_fields)
-      counts <-
-        apply(.data[fields], 2, function(x)
-          length(unique(x[!is.na(x)])))
-      field_table = data.frame(Field = names(counts), Count = as.vector(counts))
-      field_table = field_table[field_table$Count > 0,]
-      return(field_table)
-    }
-    
     # This gets run whenever a change in selected filters happens
     shiny::observeEvent(tables$selected, {
       prefix = "Filter: "
@@ -221,18 +223,6 @@ mod_filtering_server <- function(id, tadat) {
       }
     })
     
-    shiny::observeEvent(input$describe_removals, {
-      removals <- tadat$removals
-      sel <- which(removals == TRUE, arr.ind = TRUE)
-      removals[sel] <- names(removals)[sel[, "col"]]
-      removals[removals == FALSE] = ""
-      tadat$raw$RemovalReason = apply(removals, 1,
-                                      function(row)
-                                        paste(row[nzchar(row)], collapse = ", "))
-      print(unique(tadat$raw$RemovalReason))
-    })
-    
-    
     getValues <- function(.data, field) {
       counts = table(.data[[field]])
       if (length(rownames(counts) > 0)) {
@@ -242,5 +232,6 @@ mod_filtering_server <- function(id, tadat) {
       }
       return(value_table)
     }
+    
   })
 }
