@@ -15,7 +15,7 @@ mod_data_flagging_ui <- function(id) {
     tags$div(style = "display: none;",
              shinyWidgets::prettySwitch("dummy", label = NULL)),
     htmltools::h3("Flag data for potential issues"),
-    htmltools::HTML("Click the button below to run a series of tests that check for quality control issues or data formats not compatible with TADA. When the tests are finished running, a table will appear below. Each row describes an evaluation test, reports the number of results affected, and contains a switch users may toggle on/off to decide whether to flag results for removal. However, evaluation tests marked as <B>Required</B> have permanently 'ON' greyed out switches that cannot be changed."),
+    htmltools::HTML("Click the button below to run a series of tests that check for quality control issues or data formats not compatible with TADA. When the tests are finished running, a table will appear below. Each row describes an evaluation test, reports the number of results affected, and contains a switch users may toggle on/off to decide whether to flag results for removal. However, evaluation tests marked as <B>Required</B> have permanently 'ON' light blue switches that cannot be changed. <B>Recommended</B> tests are automatically switched 'ON' (darker blue), and <B>Optional</B> tests are automatically switched 'OFF' (gray)."),
     htmltools::div(style = "margin-bottom:10px"),
     shiny::fluidRow(column(
       3,
@@ -27,7 +27,7 @@ mod_data_flagging_ui <- function(id) {
     DT::DTOutput(ns('flagTable')),
     htmltools::br(),
     htmltools::h3("Convert depth units (Optional)"),
-    htmltools::HTML("Result depth units are currently in <B>meters</B>. Click the radio buttons below to convert depth units to feet, inches, or back to meters."),
+    htmltools::HTML("Depth units in the dataset are automatically converted to <B>meters</B> upon data retrieval. Click the radio buttons below to convert depth units to feet, inches, or back to meters."),
     shiny::fluidRow(column(6, shiny::radioButtons(ns('m2f'), label = "", choices = c("feet","inches","meters"), selected = character(0), inline = TRUE)))
   )
 }

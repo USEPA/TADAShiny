@@ -8,9 +8,10 @@ mod_filtering_ui <- function(id) {
     shiny::htmlOutput(ns("promptStep2")),
     DT::DTOutput(ns("filterStep2")),
     htmltools::br(),
-    shiny::fluidRow(column(3, shiny::actionButton(ns("addOnlys"),
-                                                  "Include Only Selected Values",
-                                                  style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")),
+    shiny::fluidRow(
+      # column(3, shiny::actionButton(ns("addOnlys"),
+      #                                             "Include Only Selected Values",
+      #                                             style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")),
                     column(3, shiny::actionButton(ns("addExcludes"),
                                                   "Exclude Selected Values",
                                                   style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"))),
@@ -21,7 +22,7 @@ mod_filtering_ui <- function(id) {
     DT::DTOutput(ns("selectedFilters")),
     htmltools::br(),
     shiny::fluidRow(column(3, shiny::actionButton(ns("removeFilters"),
-                                                  "Remove Selected Filters",
+                                                  "Reset Selected Filters",
                                                   style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")),
                     column(3, shiny::actionButton(ns("resetFilters"),
                                                   "Reset All Filters",
@@ -38,7 +39,7 @@ mod_filtering_server <- function(id, tadat) {
     values = shiny::reactiveValues()
     values$locked <- character()
     values$selected_field <- NULL
-    shinyjs::hide("addOnlys")
+    # shinyjs::hide("addOnlys")
     shinyjs::hide("addExcludes")
   
     # make sure dataset being used to create filters is only REMOVE = FALSE
@@ -71,7 +72,7 @@ mod_filtering_server <- function(id, tadat) {
         paste0("<h3>Filter by '", values$selected_field, "'</h3>
                <p>In this table, you may either exclude selected values, or ONLY include selected values and exclude all other non-selected values. Use the buttons at the bottom of this table to make your decisions. Note that once you select a filtering type (Exclude or Include), the other filtering type button is disabled for that field.</p>")
       ))
-      shinyjs::show("addOnlys")
+      # shinyjs::show("addOnlys")
       shinyjs::show("addExcludes")
     })
     
@@ -168,17 +169,17 @@ mod_filtering_server <- function(id, tadat) {
       if (!is.null(values$selected_field)) {
         active_lock <- values$locked[values$selected_field]
         if (is.na(active_lock)) {
-          shinyjs::enable("addOnlys")
+          # shinyjs::enable("addOnlys")
           shinyjs::enable("addExcludes")
         } else if (active_lock == "Only") {
-          shinyjs::enable("addOnlys")
+          # shinyjs::enable("addOnlys")
           shinyjs::disable("addExcludes")
         } else {
-          shinyjs::disable("addOnlys")
+          # shinyjs::disable("addOnlys")
           shinyjs::enable("addExcludes")
         }
       } else{
-        shinyjs::disable("addOnlys")
+        # shinyjs::disable("addOnlys")
         shinyjs::disable("addExcludes")
       }
     }
