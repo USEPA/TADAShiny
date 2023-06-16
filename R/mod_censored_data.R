@@ -112,10 +112,11 @@ mod_censored_data_server <- function(id, tadat){
       }else{od_multiplier=input$od_mult}
       good = TADA::simpleCensoredMethods(good,nd_method = trans$actual[trans$input==input$nd_method], nd_multiplier = nd_multiplier, od_method = trans$actual[trans$input==input$od_method], od_multiplier = od_multiplier)
       tadat$raw = plyr::rbind.fill(removed, good) # stitch good and removed datasets back together in tadat$raw
+      tadat$raw = TADA::TADA_OrderCols(tadat$raw)
       
       # create dataset displayed in table below
       dat = subset(good, good$TADA.CensoredData.Flag%in%c("Non-Detect","Over-Detect"))
-      dat = dat[,c("ResultIdentifier","TADA.CharacteristicName","TADA.DetectionQuantitationLimitMeasure.MeasureValue","ResultMeasure.MeasureUnitCode","TADA.ResultMeasureValue", "TADA.ResultMeasure.MeasureUnitCode")]
+      dat = dat[,c("ResultIdentifier","TADA.CharacteristicName","TADA.DetectionQuantitationLimitMeasure.MeasureValue","DetectionQuantitationLimitMeasure.MeasureUnitCode","TADA.ResultMeasureValue", "TADA.ResultMeasure.MeasureUnitCode")]
       dat = dat%>%dplyr::rename("Estimated Value" = TADA.ResultMeasureValue, "Original Detection Limit Value" = "TADA.DetectionQuantitationLimitMeasure.MeasureValue")
       censdat$exdat = dat[1:10,] # just show the first 10 records so user can see what happened to data 
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())

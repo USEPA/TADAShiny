@@ -10,12 +10,13 @@
 mod_review_data_ui <- function(id){
   ns <- NS(id)
   tagList(
-    htmltools::h3("Data Review"),
+    htmltools::h3("Removal Review"),
     htmltools::HTML("Use this tab to review flagging and filter decisions and explore the filtered dataset (still under development). Click the button below to begin."),
     shiny::fluidRow(column(4, shiny::actionButton(ns("review_go"),"Load Review Data",style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"))),
     htmltools::br(),
     shiny::fluidRow(column(8, shiny::plotOutput(ns("review_barchar"),height="500px"))),
-    shiny::fluidRow(column(8, shiny::plotOutput(ns("reason_pie"),height="500px")))
+    shiny::fluidRow(column(12, shiny::plotOutput(ns("reason_pie"),height="800px"))),
+    htmltools::HTML("<B>Note:</B> This pie chart shows the number of results flagged/filtered for each reason. Some results may be removed for multiple reasons. Because of this, the total number of flagged results in this pie chart is equal to or greater than the number of unique results removed.")
   )
 }
     
@@ -83,8 +84,7 @@ mod_review_data_server <- function(id, tadat){
         ggplot2::scale_fill_manual(values = getPalette(colorCount), name = "Removal Reasons Pie Chart") +
         ggplot2::geom_bar(stat = "identity", width = 1) +
         ggplot2::coord_polar("y", start = 0) +
-        ggplot2::theme_void() +
-        ggplot2::labs(caption = "Note that some results may be removed for multiple reasons, so the numbers in this plot add up to greater than or equal to the total results removed.")
+        ggplot2::theme_void() 
     })
  
   })
