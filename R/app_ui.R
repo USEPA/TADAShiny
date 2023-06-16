@@ -53,7 +53,7 @@ app_ui <- function(request) {
         shiny::tabPanel("5. Censored Data", value = "Censored",
                         htmltools::br(),
                         mod_censored_data_ui("censored_data_1")),
-        shiny::tabPanel("6. Review", value = "Review",
+        shiny::tabPanel("6. Review and Explore", value = "Review",
                         htmltools::br(),
                         mod_review_data_ui("review_data_1"))#,
         # shiny::tabPanel("Explore"),

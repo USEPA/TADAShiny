@@ -41,7 +41,7 @@ mod_censored_data_ui <- function(id){
 #'
 #' @noRd 
 mod_censored_data_server <- function(id, tadat){
-  shiny::moduleServer( id, function(input, output, session){
+  shiny::moduleServer(id, function(input, output, session){
     ns <- session$ns
     
     # reactive values specific to this module
@@ -115,7 +115,7 @@ mod_censored_data_server <- function(id, tadat){
       
       # create dataset displayed in table below
       dat = subset(good, good$TADA.CensoredData.Flag%in%c("Non-Detect","Over-Detect"))
-      dat = dat[,c("ResultIdentifier","TADA.CharacteristicName","TADA.DetectionQuantitationLimitMeasure.MeasureValue","TADA.ResultMeasureValue", "TADA.ResultMeasure.MeasureUnitCode")]
+      dat = dat[,c("ResultIdentifier","TADA.CharacteristicName","TADA.DetectionQuantitationLimitMeasure.MeasureValue","ResultMeasure.MeasureUnitCode","TADA.ResultMeasureValue", "TADA.ResultMeasure.MeasureUnitCode")]
       dat = dat%>%dplyr::rename("Estimated Value" = TADA.ResultMeasureValue, "Original Detection Limit Value" = "TADA.DetectionQuantitationLimitMeasure.MeasureValue")
       censdat$exdat = dat[1:10,] # just show the first 10 records so user can see what happened to data 
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())

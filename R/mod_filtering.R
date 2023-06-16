@@ -113,7 +113,7 @@ mod_filtering_server <- function(id, tadat) {
           "You must select (by clicking on) the field value(s) you'd like to include in your dataset before clicking Include Only Selected Values."
         ))
       }else{
-        selectFilters("Only")
+        selectFilters("Keep only")
       }
     })
     
@@ -222,18 +222,6 @@ mod_filtering_server <- function(id, tadat) {
         }
       }
     })
-    
-    shiny::observeEvent(input$describe_removals, {
-      removals <- tadat$removals
-      sel <- which(removals == TRUE, arr.ind = TRUE)
-      removals[sel] <- names(removals)[sel[, "col"]]
-      removals[removals == FALSE] = ""
-      tadat$raw$TADA.RemovalReason = apply(removals, 1,
-                                      function(row)
-                                        paste(row[nzchar(row)], collapse = ", "))
-      print(unique(tadat$raw$TADA.RemovalReason))
-    })
-    
     
     getValues <- function(.data, field) {
       counts = table(.data[[field]])
