@@ -82,7 +82,7 @@ Imports: plyr, data.table, dplyr, tidyr, grDevices, magrittr, stringr,
 Suggests: readr, tidyverse, knitr, testthat, testthis, usethis,
         devtools, pkgdown, Rcpp, spelling
 License: CC0
-MD5sum: e88cf98cee83b5ca76278b93dda74825
+MD5sum: ecf7628189e1d08d335352d67077888c
 NeedsCompilation: no
 
 Package: anytime
@@ -1059,7 +1059,7 @@ Suggests: blob, covr, dplyr (>= 0.8-3), ggplot2, knitr, lwgeom (>=
         tibble (>= 1.4.1), tidyr (>= 1.2.0), tidyselect (>= 1.0.0),
         tmap (>= 2.0), vctrs, wk
 License: GPL-2 | MIT + file LICENSE
-MD5sum: 06202d51787f392688b1e5a898f1ffe6
+MD5sum: b3ecbf76ad856efbefd850c37f84cc23
 NeedsCompilation: yes
 
 Package: shinyWidgets
@@ -1171,27 +1171,28 @@ MD5sum: f36defad42a3c8ad39a5740d6a527ec2
 NeedsCompilation: yes
 
 Package: terra
-Version: 1.7-29
+Version: 1.7-37
 Depends: R (>= 3.5.0)
 Imports: methods, Rcpp (>= 1.0-10)
 LinkingTo: Rcpp
 Suggests: parallel, tinytest, ncdf4, sf (>= 0.9-8), deldir, XML,
         leaflet, htmlwidgets
 License: GPL (>= 3)
-MD5sum: d3d63360e637ce635de8fb26d6e26d86
+MD5sum: 6a58e6ae46b6e8115dbaf0be5b6b03c2
 NeedsCompilation: yes
 
 Package: testthat
-Version: 3.1.8
+Version: 3.1.9
 Depends: R (>= 3.1)
 Imports: brio, callr (>= 3.5.1), cli (>= 3.4.0), desc, digest, ellipsis
         (>= 0.2.0), evaluate, jsonlite, lifecycle, magrittr, methods,
-        pkgload, praise, processx, ps (>= 1.3.4), R6 (>= 2.2.0), rlang
-        (>= 1.1.0), utils, waldo (>= 0.5.0), withr (>= 2.4.3)
+        pkgload (>= 1.3.0), praise, processx, ps (>= 1.3.4), R6 (>=
+        2.2.0), rlang (>= 1.1.0), utils, waldo (>= 0.5.0), withr (>=
+        2.4.3)
 Suggests: covr, curl (>= 0.9.5), diffviewer (>= 0.1.0), knitr,
         rmarkdown, rstudioapi, shiny, usethis, vctrs (>= 0.1.0), xml2
 License: MIT + file LICENSE
-MD5sum: 6254f796b86e8496c4fda90f67f760e3
+MD5sum: 74fdf2b0e66ea509b56703f55f45f522
 NeedsCompilation: yes
 
 Package: tibble
@@ -1282,7 +1283,7 @@ MD5sum: 535189707355ddc39632b0a36113b135
 NeedsCompilation: yes
 
 Package: vctrs
-Version: 0.6.2
+Version: 0.6.3
 Depends: R (>= 3.5.0)
 Imports: cli (>= 3.4.0), glue, lifecycle (>= 1.0.3), rlang (>= 1.1.0)
 Suggests: bit64, covr, crayon, dplyr (>= 0.8.5), generics, knitr,
@@ -1290,7 +1291,7 @@ Suggests: bit64, covr, crayon, dplyr (>= 0.8.5), generics, knitr,
         3.0.0), tibble (>= 3.1.3), waldo (>= 0.2.0), withr, xml2,
         zeallot
 License: MIT + file LICENSE
-MD5sum: ac5f90786b4668d9151e6c596935d26c
+MD5sum: 33f59bd117d966edd6b79c129e7b95d1
 NeedsCompilation: yes
 
 Package: viridisLite
