@@ -28,4 +28,3 @@ packages:
     - name: sf
     - name: shinyjs
     - name: stringr
-    - name: utils
