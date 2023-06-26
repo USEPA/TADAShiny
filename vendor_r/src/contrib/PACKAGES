@@ -82,7 +82,7 @@ Imports: plyr, data.table, dplyr, tidyr, grDevices, magrittr, stringr,
 Suggests: readr, tidyverse, knitr, testthat, testthis, usethis,
         devtools, pkgdown, Rcpp, spelling
 License: CC0
-MD5sum: 3cfe827187b775ae94c572f636469d17
+MD5sum: 1808df3a172828dc42c2b4b50f0072d8
 NeedsCompilation: no
 
 Package: anytime
@@ -1059,7 +1059,7 @@ Suggests: blob, covr, dplyr (>= 0.8-3), ggplot2, knitr, lwgeom (>=
         tibble (>= 1.4.1), tidyr (>= 1.2.0), tidyselect (>= 1.0.0),
         tmap (>= 2.0), vctrs, wk
 License: GPL-2 | MIT + file LICENSE
-MD5sum: 9950f54d9245c632c9a43e11f953441e
+MD5sum: 618a3d78368c5de69d589fa96407f482
 NeedsCompilation: yes
 
 Package: shinyWidgets
@@ -1126,13 +1126,13 @@ MD5sum: a91d72f65fe487bee82c6d30dd835cd0
 NeedsCompilation: yes
 
 Package: sp
-Version: 1.6-1
-Depends: R (>= 3.0.0), methods
+Version: 2.0-0
+Depends: R (>= 3.2.0), methods
 Imports: utils, stats, graphics, grDevices, lattice, grid
 Suggests: RColorBrewer, rgdal (>= 1.2-3), rgeos (>= 0.3-13), gstat,
         maptools, deldir, knitr, rmarkdown, sf, terra, raster
 License: GPL (>= 2)
-MD5sum: 38b400e0d40bf6f79ee96102d6e34d17
+MD5sum: c5ac2b4261d913b9ba441e87c6f9d0e9
 NeedsCompilation: yes
 
 Package: spelling
