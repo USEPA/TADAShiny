@@ -82,7 +82,7 @@ Imports: plyr, data.table, dplyr, tidyr, grDevices, magrittr, stringr,
 Suggests: readr, tidyverse, knitr, testthat, testthis, usethis,
         devtools, pkgdown, Rcpp, spelling
 License: CC0
-MD5sum: 1808df3a172828dc42c2b4b50f0072d8
+MD5sum: 6f672df6b0383cb07dfb7095803ae660
 NeedsCompilation: no
 
 Package: anytime
@@ -325,12 +325,12 @@ MD5sum: 6900297de0eb296c198920ae005b92e7
 NeedsCompilation: yes
 
 Package: digest
-Version: 0.6.31
+Version: 0.6.32
 Depends: R (>= 3.3.0)
 Imports: utils
 Suggests: tinytest, simplermarkdown
 License: GPL (>= 2)
-MD5sum: a25bf9fbb3ed35348f54f63b8b566f05
+MD5sum: fdd1eb0c46b799dd85bec98d661529cd
 NeedsCompilation: yes
 
 Package: dplyr
@@ -727,16 +727,6 @@ License: MIT + file LICENSE
 MD5sum: ec7201a3eebcbedbbc6350770fc18d3b
 NeedsCompilation: no
 
-Package: mgcv
-Version: 1.8-42
-Priority: recommended
-Depends: R (>= 3.6.0), nlme (>= 3.1-64)
-Imports: methods, stats, graphics, Matrix, splines, utils
-Suggests: parallel, survival, MASS
-License: GPL (>= 2)
-MD5sum: d0b706f39165a4416d297d8336ac43d7
-NeedsCompilation: yes
-
 Package: mime
 Version: 0.12
 Imports: tools
@@ -751,16 +741,6 @@ Suggests: ggplot2, testthat
 License: MIT + file LICENSE
 MD5sum: 337c4bdb2819b10829842a4deb049906
 NeedsCompilation: no
-
-Package: nlme
-Version: 3.1-162
-Priority: recommended
-Depends: R (>= 3.5.0)
-Imports: graphics, stats, utils, lattice
-Suggests: Hmisc, MASS, SASmixed
-License: GPL (>= 2)
-MD5sum: 7b58d4f16294c04d54ff8043b5bfecfc
-NeedsCompilation: yes
 
 Package: openssl
 Version: 2.0.6
@@ -1059,7 +1039,7 @@ Suggests: blob, covr, dplyr (>= 0.8-3), ggplot2, knitr, lwgeom (>=
         tibble (>= 1.4.1), tidyr (>= 1.2.0), tidyselect (>= 1.0.0),
         tmap (>= 2.0), vctrs, wk
 License: GPL-2 | MIT + file LICENSE
-MD5sum: 618a3d78368c5de69d589fa96407f482
+MD5sum: 0e39f893bf29618b015e6770e06fdfc8
 NeedsCompilation: yes
 
 Package: shinyWidgets
@@ -1171,14 +1151,14 @@ MD5sum: f36defad42a3c8ad39a5740d6a527ec2
 NeedsCompilation: yes
 
 Package: terra
-Version: 1.7-37
+Version: 1.7-39
 Depends: R (>= 3.5.0)
 Imports: methods, Rcpp (>= 1.0-10)
 LinkingTo: Rcpp
 Suggests: parallel, tinytest, ncdf4, sf (>= 0.9-8), deldir, XML,
         leaflet, htmlwidgets
 License: GPL (>= 3)
-MD5sum: 6a58e6ae46b6e8115dbaf0be5b6b03c2
+MD5sum: 7209bdab022f251bc22f2144484ce32f
 NeedsCompilation: yes
 
 Package: testthat
