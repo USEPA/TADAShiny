@@ -15,11 +15,14 @@ A clear and concise description of the question.
 
 **To Reproduce**
 
+Include the Water Quality Portal data query inputs entered on the Load
+data tab:
+
 If possible, narrow down the question to a specific dataset and
-`TADA`function:
+`TADAShiny`tab or function:
 
 ``` r
-library(TADA)
+library(TADAShiny)
 # Data used 
 df <- TADAdataRetrieval("a","b","c","d")
 
