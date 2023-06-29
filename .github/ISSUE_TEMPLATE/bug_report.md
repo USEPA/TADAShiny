@@ -45,7 +45,7 @@ If applicable, add screenshots to help explain your problem.
 
 **Session Info**
 
-lease include your session info:
+Please include your session info:
 
 ``` r
 sessionInfo()
