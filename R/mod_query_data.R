@@ -52,7 +52,7 @@ mod_query_data_ui <- function(id){
               style = "color:#0072B2;",
               title = "At present, TADA is only designed to work with water sample media"
             )
-          ), choices = c("",media), selected = "Water", multiple = TRUE)),
+          ), choices = c("",media), selected = c("Water", "water"), multiple = TRUE)),
                           column(4, shiny::selectizeInput(ns("chargroup"),"Characteristic Group", choices = NULL)),
                           column(4, shiny::selectizeInput(ns("characteristic"),"Characteristic(s)", choices = NULL, multiple = TRUE))),
           shiny::fluidRow(column(4, shiny::actionButton(ns("querynow"),"Run Query",shiny::icon("cloud"),
