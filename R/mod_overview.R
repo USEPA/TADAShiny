@@ -38,7 +38,7 @@ mod_overview_server <- function(id, tadat){
     mapdat = shiny::reactiveValues()
 
     # create dataset for map and histogram using raw data
-    shiny::observe({
+    shiny::observeEvent(tadat$ovgo, {
       req(tadat$raw)
       # create gray text tile info
       mapdat$text = tadat$raw%>%dplyr::filter(TADA.Remove==FALSE)%>%dplyr::select(ResultIdentifier,MonitoringLocationIdentifier,OrganizationFormalName,ActivityStartDate)
@@ -53,6 +53,8 @@ mod_overview_server <- function(id, tadat){
       chars$TADA.Chars = ifelse(nchar(chars$TADA.CharacteristicName)>22,paste0(chars$TADA.Chars, "..."),chars$TADA.Chars)
       chars = chars%>%dplyr::mutate(TADA.Chars = forcats::fct_reorder(TADA.Chars, Result_Count, .desc=TRUE))
       mapdat$chars = chars
+      
+      tadat$ovgo = NULL
       })
     
     # this widget produces the text at the top of the page describing record, site, and org numbers in dataset
