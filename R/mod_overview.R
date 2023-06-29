@@ -38,19 +38,11 @@ mod_overview_server <- function(id, tadat){
     mapdat = shiny::reactiveValues()
 
     # create dataset for map and histogram using raw data
-    shiny::observeEvent(tadat$ovgo, {
+    shiny::observe({
+      req(tadat$raw)
       # create gray text tile info
       mapdat$text = tadat$raw%>%dplyr::filter(TADA.Remove==FALSE)%>%dplyr::select(ResultIdentifier,MonitoringLocationIdentifier,OrganizationFormalName,ActivityStartDate)
       # create summary info and binning for map
-      mapdat$sumdat = tadat$raw%>%dplyr::filter(TADA.Remove==FALSE)%>%dplyr::group_by(MonitoringLocationIdentifier,MonitoringLocationName,TADA.LatitudeMeasure, TADA.LongitudeMeasure)%>%dplyr::summarise("Result_Count" = length(unique(ResultIdentifier)), "Visit_Count" = length(unique(ActivityStartDate)), "Parameter_Count" = length(unique(TADA.CharacteristicName)), "Organization_Count" = length(unique(OrganizationIdentifier)))
-      mapdat$sumdat$radius = 3
-      mapdat$sumdat$radius = ifelse(mapdat$sumdat$Result_Count>10,5,mapdat$sumdat$radius)
-      mapdat$sumdat$radius = ifelse(mapdat$sumdat$Result_Count>50,8,mapdat$sumdat$radius)
-      mapdat$sumdat$radius = ifelse(mapdat$sumdat$Result_Count>100,10,mapdat$sumdat$radius)
-      mapdat$sumdat$radius = ifelse(mapdat$sumdat$Result_Count>200,15,mapdat$sumdat$radius)
-      mapdat$sumdat$radius = ifelse(mapdat$sumdat$Result_Count>500,20,mapdat$sumdat$radius)
-      mapdat$sumdat$radius = ifelse(mapdat$sumdat$Result_Count>1500,30,mapdat$sumdat$radius)
-      # create org summary for table.
       mapdat$orgs = tadat$raw%>%dplyr::filter(TADA.Remove==FALSE)%>%dplyr::group_by(OrganizationFormalName)%>%dplyr::summarise("Result_Count" = length(unique(ResultIdentifier)))
       # get top 10 characteristics by result number in the dataset and place the rest in a group called "all others"
       chars = tadat$raw%>%dplyr::filter(TADA.Remove==FALSE)%>%dplyr::group_by(TADA.CharacteristicName)%>%dplyr::summarise("Result_Count" = length(unique(ResultIdentifier)))
@@ -61,7 +53,6 @@ mod_overview_server <- function(id, tadat){
       chars$TADA.Chars = ifelse(nchar(chars$TADA.CharacteristicName)>22,paste0(chars$TADA.Chars, "..."),chars$TADA.Chars)
       chars = chars%>%dplyr::mutate(TADA.Chars = forcats::fct_reorder(TADA.Chars, Result_Count, .desc=TRUE))
       mapdat$chars = chars
-      tadat$ovgo = NULL
       })
     
     # this widget produces the text at the top of the page describing record, site, and org numbers in dataset
@@ -72,25 +63,8 @@ mod_overview_server <- function(id, tadat){
 
     # the leaflet map
     output$overview_map = leaflet::renderLeaflet({
-      shiny::req(mapdat$sumdat)
-      # blue color palette
-      pal <- leaflet::colorBin(
-        palette = "Blues",
-        domain = mapdat$sumdat$Parameter_Count)
-      leaflet::leaflet()%>%
-        leaflet::addProviderTiles("Esri.WorldTopoMap", group = "World topo", options = leaflet::providerTileOptions(updateWhenZooming = FALSE,updateWhenIdle = TRUE))%>%
-        leaflet::clearShapes()%>% # get rid of whatever was there before if loading a second dataset
-        leaflet::fitBounds(lng1 = min(mapdat$sumdat$TADA.LongitudeMeasure), lat1 = min(mapdat$sumdat$TADA.LatitudeMeasure), lng2 = max(mapdat$sumdat$TADA.LongitudeMeasure), lat2 = max(mapdat$sumdat$TADA.LatitudeMeasure))%>% # fit to bounds of data in tadat$raw
-        leaflet::addCircleMarkers(data = mapdat$sumdat, lng=~TADA.LongitudeMeasure, lat=~TADA.LatitudeMeasure, color="black",fillColor=~pal(Parameter_Count), fillOpacity = 0.7, stroke = TRUE, weight = 1.5, radius=mapdat$sumdat$radius,
-                         popup = paste0("Site ID: ", mapdat$sumdat$MonitoringLocationIdentifier,
-                                        "<br> Site Name: ", mapdat$sumdat$MonitoringLocationName,
-                                        "<br> Result Count: ", mapdat$sumdat$Result_Count,
-                                        "<br> Visit Count: ", mapdat$sumdat$Visit_Count,
-                                        "<br> Characteristic Count: ", mapdat$sumdat$Parameter_Count))%>%
-        leaflet::addLegend("bottomright", pal = pal, values =mapdat$sumdat$Parameter_Count,
-                  title = "Characteristics",
-                  opacity = 0.5
-        )
+      shiny::req(mapdat$text)
+      TADA::TADA_OverviewMap(tadat$raw[tadat$raw$TADA.Remove==FALSE,])
     })
 
     # histogram showing results collected over time.

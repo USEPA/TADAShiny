@@ -169,7 +169,7 @@ mod_query_data_server <- function(id, tadat){
         session = shiny::getDefaultReactiveDomain()
       )
       # storing the output of TADAdataRetrieval with the user's input choices as a reactive object named "raw" in the tadat list.
-      raw = TADA::TADAdataRetrieval(statecode = statecode,
+      raw = TADA::TADA_DataRetrieval(statecode = statecode,
                                         countycode = countycode,
                                         huc = huc,
                                         siteid = siteid,
