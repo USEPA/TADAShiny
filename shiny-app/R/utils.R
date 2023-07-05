@@ -5,4 +5,5 @@ utils::globalVariables(c("TADA.CensoredData.Flag", "ResultIdentifier",
                          "TADA.LatitudeMeasure", "TADA.LongitudeMeasure", 
                          "ActivityStartDate", "TADA.CharacteristicName", 
                          "OrganizationIdentifier", "OrganizationFormalName", 
-                         "Result_Count", "TADA.Chars"))
+                         "Result_Count", "TADA.Chars", "Step", "Count", 
+                         "Legend"))

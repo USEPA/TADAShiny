@@ -1,22 +1,25 @@
-
-# hz updated the following line to check and install the golem and used packages 1/4/2022
-if (!require("pacman")) install.packages("pacman")
-pacman::p_load("golem", "thinkr", "shiny", "shinycssloaders", "dplyr", "xlsx",
-               "readr", "magrittr", "bootstrap", "stringr",
-               "readxl", "DT", "plotly", "ggplot2", "tidyr", "ggpubr",
-               "cowplot", "textshape",  "boot", "remotes", "shinybusy", 
-               "leaflet", "sf", "TADA")
-
 # Set options here
 options(golem.app.prod = FALSE) # TRUE = production mode, FALSE = development mode
 
+# When developing, work within a project (do not commit the project file to GitHub).
+# Set your working directory to the package directory on your local drive.
+# Then use devtools to load TADAShiny
+library(devtools)
+devtools::load_all()
+
+# Document and reload your package
+devtools::document()
+
+# Run check often to catch and fix warnings and notes
+devtools::check()
+
+# Alternatively, you can use golem to load TADAShiny
 # Detach all loaded packages and clean your environment
+library(golem)
 golem::detach_all_attached()
-# rm(list=ls(all.names = TRUE))
 
 # Document and reload your package
 golem::document_and_reload()
 
 # Run the application
 run_app()
-

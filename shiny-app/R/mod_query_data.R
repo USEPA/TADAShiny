@@ -17,7 +17,7 @@ load("inst/extdata/query_choices.Rdata")
 # orgs = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/Organization.CSV"))$ID)
 # chars = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/Characteristic.CSV"))$Name)
 # chargroup = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/CharacteristicGroup.CSV"))$Name)
-# media = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/ActivityMedia.CSV"))$Name)
+# media = c(unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/ActivityMedia.CSV"))$Name),"water","Biological Tissue","No media")
 # # sitetype = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/MonitoringLocationType.CSV"))$Name)
 # sitetype = c("Aggregate groundwater use","Aggregate surface-water-use","Aggregate water-use establishment","Atmosphere","Estuary","Facility","Glacier","Lake, Reservoir, Impoundment","Land","Not Assigned","Ocean","Spring","Stream","Subsurface","Well","Wetland")
 # projects = unique(data.table::fread("https://www.waterqualitydata.us/data/Project/search?mimeType=csv&zip=no&providers=NWIS&providers=STEWARDS&providers=STORET")$ProjectIdentifier)
@@ -52,7 +52,7 @@ mod_query_data_ui <- function(id){
               style = "color:#0072B2;",
               title = "At present, TADA is only designed to work with water sample media"
             )
-          ), choices = c("",media), selected = "Water", multiple = TRUE)),
+          ), choices = c("",media), selected = c("Water", "water"), multiple = TRUE)),
                           column(4, shiny::selectizeInput(ns("chargroup"),"Characteristic Group", choices = NULL)),
                           column(4, shiny::selectizeInput(ns("characteristic"),"Characteristic(s)", choices = NULL, multiple = TRUE))),
           shiny::fluidRow(column(4, shiny::actionButton(ns("querynow"),"Run Query",shiny::icon("cloud"),
