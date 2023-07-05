@@ -81,19 +81,19 @@ getCounts <- function(sites, removed_records){
 applyFlags <- function(in_table) {
   
   # Invalid Speciation
-  out <- TADA::TADA_InvalidSpeciation(in_table, clean = "none")
+  out <- TADA::TADA_FlagSpeciation(in_table, clean = "none")
   
   # Invalid fraction
-  out <- TADA::TADA_InvalidFraction(out, clean = FALSE)
+  out <- TADA::TADA_FlagFraction(out, clean = FALSE)
   
   # Invalid result unit
-  out <- TADA::TADA_InvalidResultUnit(out, clean = "none")
+  out <- TADA::TADA_FlagResultUnit(out, clean = "none")
   
   # QC rep/blank
-  out <- TADA::TADA_QualityControlActivity(out, clean = FALSE)
+  out <- TADA::TADA_FindQualityControlData(out, clean = FALSE)
   
   # Invalid analytical method
-  out <- TADA::TADA_InvalidMethod(out, clean = FALSE)
+  out <- TADA::TADA_FlagMethod(out, clean = FALSE)
   
   # QAPP Not Approved - this flag isn't looking for a TADA-created flag column,
   # so do not need to run any flag function here. If switched ON, remove all data
@@ -108,7 +108,7 @@ applyFlags <- function(in_table) {
   out = out
   
   # Aggregated continuous data
-  out <- TADA::TADA_AggregatedContinuousData(out, clean = FALSE)
+  out <- TADA::TADA_FindContinuousData(out, clean = FALSE)
   
   # True duplicates - not needed, true duplicates automatically removed in
   # autoclean. "ALMOST" duplicates function still in dev.
@@ -119,10 +119,10 @@ applyFlags <- function(in_table) {
   #out = out
   
   # Above WQX Upper Threshold
-  out <- TADA::TADA_AboveNationalWQXUpperThreshold(out, clean = FALSE)
+  out <- TADA::TADA_FlagResultAboveThreshold(out, clean = FALSE)
   
   # Below WQX Lower Threshold
-  out <- TADA::TADA_BelowNationalWQXLowerThreshold(out, clean = FALSE)
+  out <- TADA::TADA_FlagResultBelowThreshold(out, clean = FALSE)
   
   # Convert depth height units - THIS ONE ONLY GETS RUN WHEN USER RUNS THE CLEANING
   # FILTER AFTER MAKING ALL DECISIONS, AND SUMMARY COUNTS BASED ON UNIQUE UNITS IN
@@ -136,7 +136,7 @@ applyFlags <- function(in_table) {
   
   # Invalid coordinates - not included in mock up page?
   # out <-
-  #   TADA::TADA_InvalidCoordinates(
+  #   TADA::TADA_FlagCoordinates(
   #     out,
   #     clean_outsideUSA = "no",
   #     clean_imprecise = FALSE,
