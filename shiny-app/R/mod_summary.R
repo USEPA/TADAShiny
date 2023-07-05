@@ -56,7 +56,7 @@ mod_summary_server <- function(id, tadat){
 
         # Apply the instance specific processing to the dataframe and render
         #use TADA R package for table contents
-        import_summary_table <- TADA::TADA_summarizeColumn(tadat$raw, col = "TADA.CharacteristicName")
+        import_summary_table <- TADA::TADA_SummarizeColumn(tadat$raw, col = "TADA.CharacteristicName")
 
         return(import_summary_table)
       }

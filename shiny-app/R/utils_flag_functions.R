@@ -81,19 +81,19 @@ getCounts <- function(sites, removed_records){
 applyFlags <- function(in_table) {
   
   # Invalid Speciation
-  out <- TADA::InvalidSpeciation(in_table, clean = "none")
+  out <- TADA::TADA_FlagSpeciation(in_table, clean = "none")
   
   # Invalid fraction
-  out <- TADA::InvalidFraction(out, clean = FALSE)
+  out <- TADA::TADA_FlagFraction(out, clean = FALSE)
   
   # Invalid result unit
-  out <- TADA::InvalidResultUnit(out, clean = "none")
+  out <- TADA::TADA_FlagResultUnit(out, clean = "none")
   
   # QC rep/blank
-  out <- TADA::QualityControlActivity(out, clean = FALSE)
+  out <- TADA::TADA_FindQualityControlData(out, clean = FALSE)
   
   # Invalid analytical method
-  out <- TADA::InvalidMethod(out, clean = FALSE)
+  out <- TADA::TADA_FlagMethod(out, clean = FALSE)
   
   # QAPP Not Approved - this flag isn't looking for a TADA-created flag column,
   # so do not need to run any flag function here. If switched ON, remove all data
@@ -101,14 +101,14 @@ applyFlags <- function(in_table) {
   
   # No QAPP doc available
   if("ProjectFileUrl"%in%names(out)){
-    out <- TADA::QAPPDocAvailable(out, clean = FALSE)
+    out <- TADA::TADA_QAPPDocAvailable(out, clean = FALSE)
   }
     # Dataset includes depth profile data - no function for this? How is this one
     # supposed to work?
   out = out
   
   # Aggregated continuous data
-  out <- TADA::AggregatedContinuousData(out, clean = FALSE)
+  out <- TADA::TADA_FindContinuousData(out, clean = FALSE)
   
   # True duplicates - not needed, true duplicates automatically removed in
   # autoclean. "ALMOST" duplicates function still in dev.
@@ -119,16 +119,16 @@ applyFlags <- function(in_table) {
   #out = out
   
   # Above WQX Upper Threshold
-  out <- TADA::AboveNationalWQXUpperThreshold(out, clean = FALSE)
+  out <- TADA::TADA_FlagResultAboveThreshold(out, clean = FALSE)
   
   # Below WQX Lower Threshold
-  out <- TADA::BelowNationalWQXLowerThreshold(out, clean = FALSE)
+  out <- TADA::TADA_FlagResultBelowThreshold(out, clean = FALSE)
   
   # Convert depth height units - THIS ONE ONLY GETS RUN WHEN USER RUNS THE CLEANING
   # FILTER AFTER MAKING ALL DECISIONS, AND SUMMARY COUNTS BASED ON UNIQUE UNITS IN
   # DEPTH HEIGHT COLUMNS
   # out <-
-  #   TADA::ConvertDepthUnits(out, unit = 'ft', transform = TRUE) # input$depthunit is dummy variable that would connect to the drop down
+  #   TADA::TADA_ConvertDepthUnits(out, unit = 'ft', transform = TRUE) # input$depthunit is dummy variable that would connect to the drop down
 
   # Convert time zones - no flag function to run beforehand. This one might be
   # tricky to implement - acts on ActivityStartTime.Time?
@@ -136,7 +136,7 @@ applyFlags <- function(in_table) {
   
   # Invalid coordinates - not included in mock up page?
   # out <-
-  #   TADA::InvalidCoordinates(
+  #   TADA::TADA_FlagCoordinates(
   #     out,
   #     clean_outsideUSA = "no",
   #     clean_imprecise = FALSE,

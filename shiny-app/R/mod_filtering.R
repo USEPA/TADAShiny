@@ -48,7 +48,7 @@ mod_filtering_server <- function(id, tadat) {
       if(tadat$tab=="Filter"){
         # only show unique values from data that have not been flagged for removal
         tables$dat = subset(tadat$raw, tadat$raw$TADA.Remove==FALSE)
-        tables$filter_fields = TADA::fieldCounts(tables$dat, display = "key")
+        tables$filter_fields = TADA::TADA_FieldCounts(tables$dat, display = "key")
       }
     })
     
