@@ -110,7 +110,7 @@ mod_censored_data_server <- function(id, tadat){
       if(is.null(input$od_mult)){
         od_multiplier = "null"
       }else{od_multiplier=input$od_mult}
-      good = TADA::simpleCensoredMethods(good,nd_method = trans$actual[trans$input==input$nd_method], nd_multiplier = nd_multiplier, od_method = trans$actual[trans$input==input$od_method], od_multiplier = od_multiplier)
+      good = TADA::TADA_SimpleCensoredMethods(good,nd_method = trans$actual[trans$input==input$nd_method], nd_multiplier = nd_multiplier, od_method = trans$actual[trans$input==input$od_method], od_multiplier = od_multiplier)
       tadat$raw = plyr::rbind.fill(removed, good) # stitch good and removed datasets back together in tadat$raw
       tadat$raw = TADA::TADA_OrderCols(tadat$raw)
       
@@ -156,7 +156,7 @@ mod_censored_data_server <- function(id, tadat){
     
     # runs the summary function when cens button is pushed following group selection
     shiny::observeEvent(input$cens_sumbutton,{
-      censdat$summary = TADA::summarizeCensoredData(censdat$dat, spec_cols = input$cens_groups)
+      censdat$summary = TADA::TADA_SummarizeCensoredData(censdat$dat, spec_cols = input$cens_groups)
     })
     
     # creates summary table complete with csv button in case someone wants to donwload the summary table
