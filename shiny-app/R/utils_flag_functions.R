@@ -90,7 +90,7 @@ applyFlags <- function(in_table) {
   out <- TADA::TADA_FlagResultUnit(out, clean = "none")
   
   # QC rep/blank
-  out <- TADA::TADA_FindQualityControlData(out, clean = FALSE)
+  out <- TADA::TADA_FindQCActivities(out, clean = FALSE)
   
   # Invalid analytical method
   out <- TADA::TADA_FlagMethod(out, clean = FALSE)
@@ -101,7 +101,7 @@ applyFlags <- function(in_table) {
   
   # No QAPP doc available
   if("ProjectFileUrl"%in%names(out)){
-    out <- TADA::TADA_QAPPDocAvailable(out, clean = FALSE)
+    out <- TADA::TADA_FindQAPPDoc(out, clean = FALSE)
   }
     # Dataset includes depth profile data - no function for this? How is this one
     # supposed to work?
@@ -119,10 +119,10 @@ applyFlags <- function(in_table) {
   #out = out
   
   # Above WQX Upper Threshold
-  out <- TADA::TADA_FlagResultAboveThreshold(out, clean = FALSE)
+  out <- TADA::TADA_FlagAboveThreshold(out, clean = FALSE)
   
   # Below WQX Lower Threshold
-  out <- TADA::TADA_FlagResultBelowThreshold(out, clean = FALSE)
+  out <- TADA::TADA_FlagBelowThreshold(out, clean = FALSE)
   
   # Convert depth height units - THIS ONE ONLY GETS RUN WHEN USER RUNS THE CLEANING
   # FILTER AFTER MAKING ALL DECISIONS, AND SUMMARY COUNTS BASED ON UNIQUE UNITS IN
