@@ -90,13 +90,13 @@ mod_query_data_server <- function(id, tadat){
   # if user presses example data button, make tadat$raw the nutrients dataset contained within the TADA package.
     shiny::observeEvent(input$example_data_go,{
       if(input$example_data == "Shepherdstown (34k results)"){
-        raw = TADA::NCTCShepherdstown_HUC12
+        raw = TADA::Data_NCTCShepherdstown_HUC12
       }
       if(input$example_data == "Tribal (132k results)"){
-        raw = TADA::TribalData
+        raw = TADA::Data_6Tribes_5y
       }
       if(input$example_data == "Nutrients Utah (15k results)"){
-        raw = TADA::Nutrients_Utah
+        raw = TADA::Data_Nutrients_UT
       }
       initializeTable(tadat, raw)
     })
