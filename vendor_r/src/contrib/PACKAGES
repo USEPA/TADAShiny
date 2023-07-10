@@ -81,7 +81,7 @@ Imports: plyr, data.table, dplyr, tidyr, grDevices, magrittr, stringr,
 Suggests: rmarkdown, readr, tidyverse, knitr, testthat, testthis,
         usethis, devtools, pkgdown, spelling
 License: CC0
-MD5sum: 40e5f2759ef80c2a94a63aa455aea5a3
+MD5sum: c6bf33d0b0c2d4a49bd5aa5abb24223d
 NeedsCompilation: no
 
 Package: anytime
@@ -259,6 +259,15 @@ License: MIT + file LICENSE
 MD5sum: 2220418f96e27a820099a03b039a65c2
 NeedsCompilation: yes
 
+Package: cpp11
+Version: 0.4.4
+Suggests: bench, brio, callr, cli, covr, decor, desc, ggplot2, glue,
+        knitr, lobstr, mockery, progress, rmarkdown, scales, Rcpp,
+        testthat, tibble, utils, vctrs, withr
+License: MIT + file LICENSE
+MD5sum: e02e3b63a5fa664f8278e470bc048aaa
+NeedsCompilation: no
+
 Package: crayon
 Version: 1.5.2
 Imports: grDevices, methods, utils
@@ -320,7 +329,7 @@ Depends: R (>= 3.1.0)
 Imports: crayon (>= 1.3.2), tools, methods, utils, stats
 Suggests: knitr, rmarkdown
 License: GPL-2 | GPL-3
-MD5sum: 6900297de0eb296c198920ae005b92e7
+MD5sum: 554b7e2e0504765e6d9163105decef60
 NeedsCompilation: yes
 
 Package: digest
@@ -461,7 +470,7 @@ Suggests: covr, crayon, DBI, dplyr, forcats, ggplot2, knitr, magrittr,
         microbenchmark, R.utils, rmarkdown, rprintf, RSQLite, stringr,
         testthat (>= 3.0.0), vctrs (>= 0.3.0), waldo (>= 0.3.0), withr
 License: MIT + file LICENSE
-MD5sum: 34dcc402f727205655ee9efd99748d7e
+MD5sum: 82ac761b7640c577a03f140767833b89
 NeedsCompilation: yes
 
 Package: golem
@@ -530,7 +539,7 @@ Imports: utils, digest, grDevices, base64enc, rlang (>= 0.4.10),
 Suggests: markdown, testthat, withr, Cairo, ragg, shiny
 Enhances: knitr
 License: GPL (>= 2)
-MD5sum: 87828af494a60cf172ffe414c6d10080
+MD5sum: 6a0d844d93f5ce4e622a19a0c4f5987f
 NeedsCompilation: yes
 
 Package: htmlwidgets
@@ -580,7 +589,7 @@ Imports: grid, utils
 Suggests: covr, ggplot2, knitr, magick, microbenchmark, rmarkdown, sf,
         testthat, xml2
 License: MIT + file LICENSE
-MD5sum: 8cdfd55f1149f1b02a93703f1615a88c
+MD5sum: ab48662598a987cb596a0511ed4cbc5a
 NeedsCompilation: yes
 
 Package: jquerylib
@@ -814,6 +823,13 @@ License: MIT + file LICENSE
 MD5sum: 09699e5f8fcae41bfd986fe73ddf4720
 NeedsCompilation: no
 
+Package: prettyunits
+Version: 1.1.1
+Suggests: codetools, covr, testthat
+License: MIT + file LICENSE
+MD5sum: 9bf8aae3491ea8f547cdf2b40bcbe15e
+NeedsCompilation: no
+
 Package: processx
 Version: 3.8.2
 Depends: R (>= 3.4.0)
@@ -824,6 +840,14 @@ Suggests: callr (>= 3.7.3), cli (>= 3.3.0), codetools, covr, curl,
 License: MIT + file LICENSE
 MD5sum: 6baffbfba3eaffad131be07a6b75e5d2
 NeedsCompilation: yes
+
+Package: progress
+Version: 1.2.2
+Imports: hms, prettyunits, R6, crayon
+Suggests: Rcpp, testthat, withr
+License: MIT + file LICENSE
+MD5sum: 4e2f9ed23a183ef90dd5f66200c4720f
+NeedsCompilation: no
 
 Package: promises
 Version: 1.2.0.1
@@ -1022,7 +1046,7 @@ Suggests: blob, covr, dplyr (>= 0.8-3), ggplot2, knitr, lwgeom (>=
         tibble (>= 1.4.1), tidyr (>= 1.2.0), tidyselect (>= 1.0.0),
         tmap (>= 2.0), vctrs, wk
 License: GPL-2 | MIT + file LICENSE
-MD5sum: d1562b17285c53fffde49fa9927a38a0
+MD5sum: a2d5012ed21024830b237777b2cf2b7e
 NeedsCompilation: yes
 
 Package: shinyWidgets
