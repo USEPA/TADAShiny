@@ -80,8 +80,8 @@ mod_data_flagging_server <- function(id, tadat) {
       
       # Add flagging columns to raw table
       tadat$raw = applyFlags(tadat$raw)
-      # write.csv(tadat$raw, "flagged.csv")
-      # tadat$raw = utils::read.csv("flagged.csv")
+      #write.csv(tadat$raw, "flagged.csv")
+      # tadat$raw = utils::read.csv("flagged.csv") # THIS IS TRIPS WORKING FILE FOR TESTING, COMMENT OUT WHEN COMMITTING TO DEVELOP
       
       # A table (raw rows, flags) indicating whether each record passes each test
       values$testResults <- flagCensus(tadat$raw)
