@@ -6,4 +6,4 @@ utils::globalVariables(c("TADA.CensoredData.Flag", "ResultIdentifier",
                          "ActivityStartDate", "TADA.CharacteristicName", 
                          "OrganizationIdentifier", "OrganizationFormalName", 
                          "Result_Count", "TADA.Chars", "Step", "Count", 
-                         "Legend"))
+                         "Legend", "req"))
