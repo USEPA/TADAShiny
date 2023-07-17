@@ -30,10 +30,8 @@ mod_censored_data_ui <- function(id){
           shiny::fluidRow("Use the picker list below to select grouping columns to create summary table. The summary table shows the number of non- and over-detects in each group, the total number of results in each group, the number of detection limit types (censoring levels) and the percentage of the dataset that is censored. These numbers are then used to suggest a potential statistical censored data method to use. Currently, the user must perform more complex analyses outside of TADAShiny."),
           htmltools::br(),
     shiny::fluidRow(shiny::wellPanel(shiny::fluidRow(column(12,shiny::uiOutput(ns("cens_groups")))),
-                                     shiny::fluidRow(column(12,shiny::actionButton(ns("cens_sumbutton"),"ID and Summarize Censored Data", style="color: #fff; background-color: #337ab7; border-color: #2e6da4")))),
-                    DT::DTOutput(ns("cens_sumtable")))
-    
- 
+                                     shiny::fluidRow(column(12,shiny::actionButton(ns("cens_sumbutton"),"ID and Summarize Censored Data", style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))))),
+    shiny::fluidRow(DT::DTOutput(ns("cens_sumtable")), width = 600)
   )
 }
     
@@ -147,23 +145,37 @@ mod_censored_data_server <- function(id, tadat){
     # from the clean dataset, get all of the column names someone might want to group by when summarizing their data for use in more advanced censored data methods.
     output$cens_groups = shiny::renderUI({
       shiny::req(censdat$dat)
-      ccols = names(tadat$raw)[!names(tadat$raw)%in%c("TADA.Remove","TADAShiny.tab","TADA.ResultMeasureValue","ResultMeasureValue","ResultIdentifier","TADA.DetectionQuantitationLimitMeasure.MeasureValue","DetectionQuantitationLimitMeasure.MeasureValue")] # remove the columns that are generally unique to each result from consideration. Why would someone want to group by result value or identifier? Then every summary would be unique to one value...not a "summary"
+      ccols = names(tadat$raw)[!names(tadat$raw)%in%c("TADA.Remove",
+                                                      "TADAShiny.tab",
+                                                      "TADA.ResultMeasureValue",
+                                                      "ResultMeasureValue",
+                                                      "ResultIdentifier",
+                                                      "TADA.DetectionQuantitationLimitMeasure.MeasureValue",
+                                                      "DetectionQuantitationLimitMeasure.MeasureValue")] # remove the columns that are generally unique to each result from consideration. Why would someone want to group by result value or identifier? Then every summary would be unique to one value...not a "summary"
       tcols = ccols[grepl("TADA.",ccols)] # put all of the TADA columns at the top of the selection drop down
       ucols = ccols[!grepl("TADA.",ccols)] # then have the WQP columns
       ccols = c(tcols, ucols) # string them back together in one vector used in the selection widget below
-      shiny::selectizeInput(ns("cens_groups"), label = "Select Grouping Columns for Summarization", choices = ccols, selected = c("TADA.CharacteristicName","TADA.ResultMeasure.MeasureUnitCode","TADA.ResultSampleFractionText","TADA.MethodSpecificationName"), multiple = TRUE)
+      shiny::selectizeInput(ns("cens_groups"), 
+                            label = "Select Grouping Columns for Summarization",
+                            choices = ccols, selected = c("TADA.ComparableDataIdentifier"), 
+                            multiple = TRUE)
     })
     
     # runs the summary function when cens button is pushed following group selection
     shiny::observeEvent(input$cens_sumbutton,{
-      censdat$summary = TADA::TADA_SummarizeCensoredData(censdat$dat, spec_cols = input$cens_groups)
+      summary = TADA::TADA_Stats(censdat$dat, group_cols = input$cens_groups)
+      censdat$summary = summary[,!names(summary)%in%c("UpperFence","LowerFence","Min","Max","Mean","Percentile_5th","Percentile_10th","Percentile_15th","Percentile_25th","Percentile_50th_Median","Percentile_75th","Percentile_85th","Percentile_95th","Percentile_98th")]
     })
     
-    # creates summary table complete with csv button in case someone wants to donwload the summary table
+    # creates summary table complete with csv button in case someone wants to
+    # download the summary table
     output$cens_sumtable = DT::renderDT({
       DT::datatable(censdat$summary,
                     extensions = 'Buttons',
-                    options = list(dom="Blftipr",scrollX=TRUE, pageLength=10,searching = FALSE, order = list(list(length(input$cens_groups), 'desc')), buttons = c('csv')),
+                    options = list(dom="Blftipr",scrollX=TRUE, 
+                                   pageLength=10,searching = FALSE, 
+                                   order = list(list(length(input$cens_groups), 'desc')),
+                                   buttons = c('csv')),
                     selection = 'none', rownames=FALSE)
     })
  
