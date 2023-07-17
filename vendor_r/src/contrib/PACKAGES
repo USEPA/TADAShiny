@@ -80,7 +80,7 @@ Imports: plyr, data.table, dplyr, tidyr, grDevices, magrittr, stringr,
 Suggests: rmarkdown, readr, tidyverse, knitr, testthat, testthis,
         usethis, devtools, pkgdown, spelling
 License: CC0
-MD5sum: f676a61f88c9eea41b5363eec2d8e74a
+MD5sum: 578648ae3a5ebec0963bfa7376998ead
 NeedsCompilation: no
 
 Package: anytime
@@ -742,12 +742,12 @@ MD5sum: 337c4bdb2819b10829842a4deb049906
 NeedsCompilation: no
 
 Package: openssl
-Version: 2.0.6
+Version: 2.1.0
 Imports: askpass
 Suggests: curl, testthat (>= 2.1.0), digest, knitr, rmarkdown,
         jsonlite, jose, sodium
 License: MIT + file LICENSE
-MD5sum: 9c990a4d629733520322f2a5ebc45484
+MD5sum: c5966aea7c876f88e905909f0e3cdf20
 NeedsCompilation: yes
 
 Package: pillar
@@ -997,11 +997,12 @@ MD5sum: d7f097ea848513f377359b18d8238175
 NeedsCompilation: yes
 
 Package: sass
-Version: 0.4.6
-Imports: fs, rlang (>= 0.4.10), htmltools (>= 0.5.1), R6, rappdirs
+Version: 0.4.7
+Imports: fs (>= 1.2.4), rlang (>= 0.4.10), htmltools (>= 0.5.1), R6,
+        rappdirs
 Suggests: testthat, knitr, rmarkdown, withr, shiny, curl
 License: MIT + file LICENSE
-MD5sum: b2b2a587d9752619c75682893b530da5
+MD5sum: f6fb575c5b76abc6491c4d8630fd7f33
 NeedsCompilation: yes
 
 Package: scales
@@ -1031,7 +1032,7 @@ Suggests: blob, covr, dplyr (>= 0.8-3), ggplot2, knitr, lwgeom (>=
         tibble (>= 1.4.1), tidyr (>= 1.2.0), tidyselect (>= 1.0.0),
         tmap (>= 2.0), vctrs, wk
 License: GPL-2 | MIT + file LICENSE
-MD5sum: eddb8ef9fc7e5237b05d29f94b85d04a
+MD5sum: be84a396df66cb8a3f98eb1f02297d42
 NeedsCompilation: yes
 
 Package: shinyWidgets
