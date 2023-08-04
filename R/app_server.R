@@ -19,6 +19,7 @@ app_server <- function(input, output, session) {
   mod_overview_server("overview_1", tadat)
   mod_censored_data_server("censored_data_1", tadat)
   mod_review_data_server("review_data_1", tadat)
+  mod_figures_server("figures_1", tadat)
   mod_TADA_summary_server("TADA_summary_1", tadat)
   
   # this ensures all tabs except Upload are disabled upon app start
@@ -26,6 +27,7 @@ app_server <- function(input, output, session) {
   shinyjs::disable(selector = '.nav li a[data-value="Flag"]')
   shinyjs::disable(selector = '.nav li a[data-value="Filter"]')
   shinyjs::disable(selector = '.nav li a[data-value="Censored"]')
+  shinyjs::disable(selector = '.nav li a[data-value="Figures"]')
   shinyjs::disable(selector = '.nav li a[data-value="Review"]')
   
   shiny::showModal(shiny::modalDialog(title = "Disclaimer",
