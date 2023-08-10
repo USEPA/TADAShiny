@@ -55,7 +55,7 @@ mod_harmonize_np_server <- function(id, tadat){
     
     # when user hits harm go button, runs TADA_GetSynonymRef and makes friendly column names for table.
     shiny::observeEvent(input$harm_go,{
-      ref = TADA::TADA_GetSynonymRef(tadat$raw)
+      ref = TADA::TADA_GetSynonymRef(tadat$raw[tadat$raw$TADA.Remove==FALSE,])
       ref = ref %>% dplyr::arrange(Target.TADA.CharacteristicName, Target.TADA.ResultSampleFractionText, Target.TADA.MethodSpecificationName)
       colns = names(ref)
       harm$colns = colns %>% dplyr::recode(TADA.ActivityMediaName = "Media",
@@ -141,12 +141,17 @@ mod_harmonize_np_server <- function(id, tadat){
         text = "Harmonizing data...",
         session = shiny::getDefaultReactiveDomain()
       )
-      tadat$raw = TADA::TADA_HarmonizeSynonyms(tadat$raw, ref = harm$ref)
       
+      dat = subset(tadat$raw, tadat$raw$TADA.Remove==FALSE)
+      rem = subset(tadat$raw, tadat$raw$TADA.Remove==TRUE)
+      dat = TADA::TADA_HarmonizeSynonyms(dat, ref = harm$ref)
+      tadat$raw = plyr::rbind.fill(dat, rem)
+      tadat$raw = TADA::TADA_OrderCols(tadat$raw)
+
       # remove the modal once the dataset has been harmonized
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
       
-      num = length(tadat$raw$TADA.Harmonized.Flag[tadat$raw$TADA.Harmonized.Flag==TRUE])
+      num = length(dat$TADA.Harmonized.Flag[dat$TADA.Harmonized.Flag==TRUE])
       shiny::showModal(shiny::modalDialog(
         title = "Success! Harmonization Complete.",
         paste0("Synonym reference table was successfully applied to TADA dataset. ",num," results were harmonized to fit into more informative characteristic-fraction-speciation-unit groups.")
@@ -175,10 +180,17 @@ mod_harmonize_np_server <- function(id, tadat){
         text = "Calculating Total N and P...",
         session = shiny::getDefaultReactiveDomain()
       )
-      tadat$raw = TADA::TADA_CalculateTotalNP(tadat$raw, daily_agg = "max")
       
-      nitrolen = length(tadat$raw$TADA.NutrientSummation.Flag[tadat$raw$TADA.NutrientSummation.Flag%in%c("Nutrient summation from one or more subspecies.")])
-      phoslen = length(tadat$raw$TADA.NutrientSummation.Flag[tadat$raw$TADA.NutrientSummation.Flag%in%c("Nutrient summation from one subspecies.")])
+      dat = subset(tadat$raw, tadat$raw$TADA.Remove==FALSE)
+      rem = subset(tadat$raw, tadat$raw$TADA.Remove==TRUE)
+      dat = TADA::TADA_CalculateTotalNP(dat, daily_agg = "max")
+      dat$TADA.Remove[is.na(dat$TADA.Remove)] = FALSE
+      
+      tadat$raw = plyr::rbind.fill(dat, rem)
+      tadat$raw = TADA::TADA_OrderCols(tadat$raw)
+      
+      nitrolen = length(dat$TADA.NutrientSummation.Flag[dat$TADA.NutrientSummation.Flag%in%c("Nutrient summation from one or more subspecies.")])
+      phoslen = length(dat$TADA.NutrientSummation.Flag[dat$TADA.NutrientSummation.Flag%in%c("Nutrient summation from one subspecies.")])
       # remove the modal once the dataset has been harmonized
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
       
