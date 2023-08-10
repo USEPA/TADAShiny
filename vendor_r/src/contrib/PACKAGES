@@ -27,16 +27,6 @@ License: Unlimited
 MD5sum: 9144f1f80699b84329ae6da890298c51
 NeedsCompilation: yes
 
-Package: MASS
-Version: 7.3-60
-Priority: recommended
-Depends: R (>= 4.0), grDevices, graphics, stats, utils
-Imports: methods
-Suggests: lattice, nlme, nnet, survival
-License: GPL-2 | GPL-3
-MD5sum: 7c933b8efdb5c583747e77ff0b4e2671
-NeedsCompilation: yes
-
 Package: Matrix
 Version: 1.6-0
 Priority: recommended
@@ -80,7 +70,7 @@ Imports: plyr, data.table, dplyr, tidyr, grDevices, magrittr, stringr,
 Suggests: rmarkdown, readr, tidyverse, knitr, testthat, testthis,
         usethis, devtools, pkgdown, spelling
 License: CC0
-MD5sum: 578648ae3a5ebec0963bfa7376998ead
+MD5sum: f8119ec8a5249406924dcc815681b8a1
 NeedsCompilation: no
 
 Package: anytime
@@ -294,14 +284,14 @@ MD5sum: 2647fd0f47a7d1212d65fb6806b98b72
 NeedsCompilation: yes
 
 Package: dataRetrieval
-Version: 2.7.12
+Version: 2.7.13
 Depends: R (>= 3.5.0)
 Imports: httr (>= 1.0.0), curl, lubridate (>= 1.5.0), stats, utils,
-        xml2, readr (>= 1.0.0), jsonlite
+        xml2, readr (>= 1.4.0), jsonlite
 Suggests: covr, dplyr, ggplot2, DT, gridExtra, knitr, rmarkdown, sf,
         testthat
 License: CC0
-MD5sum: 43f668be61efe277e6808e265a237c25
+MD5sum: 3cb6a02eed7918d911ee541430c9b414
 NeedsCompilation: no
 
 Package: desc
@@ -418,13 +408,13 @@ MD5sum: e21a5596693ef20b8126ddb9d219006a
 NeedsCompilation: no
 
 Package: fs
-Version: 1.6.2
+Version: 1.6.3
 Depends: R (>= 3.4)
 Imports: methods
 Suggests: covr, crayon, knitr, pillar (>= 1.0.0), rmarkdown, spelling,
         testthat (>= 3.0.0), tibble (>= 1.1.0), vctrs (>= 0.3.0), withr
 License: MIT + file LICENSE
-MD5sum: f37f37580ce7567443bf155fcd30bb73
+MD5sum: 98d943c2f654cda67e09e5e5597dcf16
 NeedsCompilation: yes
 
 Package: generics
@@ -741,6 +731,16 @@ License: MIT + file LICENSE
 MD5sum: 337c4bdb2819b10829842a4deb049906
 NeedsCompilation: no
 
+Package: nlme
+Version: 3.1-163
+Priority: recommended
+Depends: R (>= 3.5.0)
+Imports: graphics, stats, utils, lattice
+Suggests: Hmisc, MASS, SASmixed
+License: GPL (>= 2)
+MD5sum: fd718fd4c0d1ac2d667999be43b8c17b
+NeedsCompilation: yes
+
 Package: openssl
 Version: 2.1.0
 Imports: askpass
@@ -903,7 +903,7 @@ LinkingTo: cpp11, tzdb (>= 0.1.1)
 Suggests: covr, curl, datasets, knitr, rmarkdown, spelling, stringi,
         testthat (>= 3.1.2), tzdb (>= 0.1.1), waldo, withr, xml2
 License: MIT + file LICENSE
-MD5sum: 019cbafda06ecd5ad3bdee240076ed57
+MD5sum: cc5b687152545aea116f3f5a41ab467b
 NeedsCompilation: yes
 
 Package: readxl
@@ -913,7 +913,7 @@ Imports: cellranger, tibble (>= 2.0.1), utils
 LinkingTo: cpp11 (>= 0.4.0), progress
 Suggests: covr, knitr, rmarkdown, testthat (>= 3.1.6), withr
 License: MIT + file LICENSE
-MD5sum: 55955c6e6f35bc85c8113582bbc7ebe9
+MD5sum: 6bb94529c6eb2e8403af4c7eac062303
 NeedsCompilation: yes
 
 Package: rematch2
@@ -932,14 +932,14 @@ MD5sum: eb36ec4bf2c7166dd3352af654dd3b90
 NeedsCompilation: no
 
 Package: remotes
-Version: 2.4.2
+Version: 2.4.2.1
 Depends: R (>= 3.0.0)
 Imports: methods, stats, tools, utils
 Suggests: brew, callr, codetools, curl, covr, git2r (>= 0.23.0), knitr,
         mockery, pkgbuild (>= 1.0.1), pingr, rmarkdown, rprojroot,
         testthat, webfakes, withr
 License: MIT + file LICENSE
-MD5sum: 8b89998c439cfae614701dbdb42e712e
+MD5sum: 9df1c2497c49d882176d32c364d3905b
 NeedsCompilation: no
 
 Package: rex
@@ -1032,7 +1032,7 @@ Suggests: blob, covr, dplyr (>= 0.8-3), ggplot2, knitr, lwgeom (>=
         tibble (>= 1.4.1), tidyr (>= 1.2.0), tidyselect (>= 1.0.0),
         tmap (>= 2.0), vctrs, wk
 License: GPL-2 | MIT + file LICENSE
-MD5sum: be84a396df66cb8a3f98eb1f02297d42
+MD5sum: d328fb4ffcb49ab207dc830ebc929f16
 NeedsCompilation: yes
 
 Package: shinyWidgets
@@ -1194,7 +1194,7 @@ LinkingTo: cpp11 (>= 0.4.0)
 Suggests: covr, data.table, knitr, readr, repurrrsive (>= 1.1.0),
         rmarkdown, testthat (>= 3.0.0)
 License: MIT + file LICENSE
-MD5sum: 626ce1ed939acf109eee638872dc015c
+MD5sum: afe6e924904aaace990af822fbb1bb98
 NeedsCompilation: yes
 
 Package: tidyselect
@@ -1214,15 +1214,15 @@ Depends: R (>= 3.3)
 LinkingTo: cpp11 (>= 0.2.7)
 Suggests: testthat (>= 0.7.1.99), knitr
 License: GPL-3
-MD5sum: 7691e31125f6c1d2b8bd5a82aff818eb
+MD5sum: 55103cdc3eb70a7817d1ccbcb7bf72e3
 NeedsCompilation: yes
 
 Package: tinytex
-Version: 0.45
+Version: 0.46
 Imports: xfun (>= 0.29)
 Suggests: testit, rstudioapi
 License: MIT + file LICENSE
-MD5sum: 3cc9b07894b83c9db470710b6127e9e1
+MD5sum: 56469c93dc3183f0b729983c117f6642
 NeedsCompilation: no
 
 Package: tzdb
@@ -1231,7 +1231,7 @@ Depends: R (>= 3.5.0)
 LinkingTo: cpp11 (>= 0.4.2)
 Suggests: covr, testthat (>= 3.0.0)
 License: MIT + file LICENSE
-MD5sum: adc9839d858dab3e74955dd8657532d8
+MD5sum: a5e4c03fd394f4bd2f38e5f0ee94efb7
 NeedsCompilation: yes
 
 Package: units
@@ -1276,14 +1276,14 @@ MD5sum: 13aedd2ec3c461438e8ad8d6fb771ab6
 NeedsCompilation: no
 
 Package: viridis
-Version: 0.6.3
+Version: 0.6.4
 Depends: R (>= 2.10), viridisLite (>= 0.4.0)
 Imports: ggplot2 (>= 1.0.1), gridExtra
 Suggests: hexbin (>= 1.27.0), scales, MASS, knitr, dichromat,
         colorspace, httr, mapproj, vdiffr, svglite (>= 1.2.0),
         testthat, covr, rmarkdown, maps, terra
 License: MIT + file LICENSE
-MD5sum: 8391eb01448456f5bf63c97d38016561
+MD5sum: b80b7c2deaec95a14b899a229062bc78
 NeedsCompilation: no
 
 Package: vroom
@@ -1298,7 +1298,7 @@ Suggests: archive, bench (>= 1.1.0), covr, curl, dplyr, forcats, fs,
         rstudioapi, scales, spelling, testthat (>= 2.1.0), tidyr,
         utils, waldo, xml2
 License: MIT + file LICENSE
-MD5sum: e8a9dc55bf8311d8fe4f712ee78974e1
+MD5sum: 153fb309f9a8052e004acac69b93f490
 NeedsCompilation: yes
 
 Package: waldo
@@ -1336,13 +1336,13 @@ MD5sum: 850bc0b20918b0b95e96997ba95d0324
 NeedsCompilation: yes
 
 Package: xfun
-Version: 0.39
+Version: 0.40
 Imports: stats, tools
 Suggests: testit, parallel, codetools, rstudioapi, tinytex (>= 0.30),
         mime, markdown (>= 1.5), knitr (>= 1.42), htmltools, remotes,
         pak, rhub, renv, curl, jsonlite, magick, yaml, rmarkdown
 License: MIT + file LICENSE
-MD5sum: 70b5c0b2009cc5d2154f85252056b2d1
+MD5sum: b705117e47f7aabe0ce066cee68af0a0
 NeedsCompilation: yes
 
 Package: xml2
