@@ -186,6 +186,14 @@ mod_harmonize_np_server <- function(id, tadat){
       dat = TADA::TADA_CalculateTotalNP(dat, daily_agg = "max")
       dat$TADA.Remove[is.na(dat$TADA.Remove)] = FALSE
       
+      # add new measurements to tadat$removals, all equal FALSE
+      ## NOTE THAT THIS ASSUMES NEWLY CREATED RESULTS FROM TOTAL NP WILL NECESSARILY BE ADDED TO END OF TADAT$RAW DATA FRAME
+      ncols = ncol(tadat$removals)
+      nrows = length(dat$ResultIdentifier[grepl("TADA-",dat$ResultIdentifier)])
+      new_df = as.data.frame(matrix(FALSE, ncol = ncols, nrow = nrows))
+      names(new_df) = names(tadat$removals)
+      tadat$removals = plyr::rbind.fill(tadat$removals, new_df)
+      
       tadat$raw = plyr::rbind.fill(dat, rem)
       tadat$raw = TADA::TADA_OrderCols(tadat$raw)
       
