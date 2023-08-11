@@ -47,7 +47,9 @@ Imports:
     scales,
     forcats,
     RColorBrewer,
-    grDevices
+    grDevices,
+    stringi,
+    shinyjqui
 Remotes: 
     github::USEPA/TADA
 Suggests: 
