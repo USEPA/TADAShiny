@@ -26,6 +26,14 @@ mod_data_flagging_ui <- function(id) {
     htmltools::div(style = "margin-bottom:10px"),
     DT::DTOutput(ns('flagTable')),
     htmltools::br(),
+    htmltools::h3("Flag duplicative results uploaded multiple times by multiple organizations"),
+    htmltools::HTML("Sometimes organizations unintentionally upload the same dataset multiple times to the WQP. For example, sometimes USGS collects data at the request of state agencies. The USGS 'copy' of the results is uploaded to NWIS and made available in the portal, and the state agency's 'copy' of the results is uploaded to WQX. This step flags these duplicative uploads and selects one representative result. Use ordering widget to create a hierarchy of organizations for selecting the representative result. For example, if the state agency's organization name is at the top of the list, its result will be selected over the USGS upload of the sample, and the USGS version will be flagged for removal."),
+    htmltools::br(),
+    htmltools::br(),
+    shiny::fluidRow(column(8, shiny::uiOutput(ns("org_order")))),
+    htmltools::br(),
+    shiny::fluidRow(column(2, shiny::actionButton(ns("run_dups"), "Flag duplicate uploads", style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"))),
+    htmltools::br(),
     htmltools::h3("Convert depth units (Optional)"),
     htmltools::HTML("Depth units in the dataset are automatically converted to <B>meters</B> upon data retrieval. Click the radio buttons below to convert depth units to feet, inches, or back to meters."),
     shiny::fluidRow(column(6, shiny::radioButtons(ns('m2f'), label = "", choices = c("feet","inches","meters"), selected = character(0), inline = TRUE)))
@@ -35,6 +43,8 @@ mod_data_flagging_ui <- function(id) {
 mod_data_flagging_server <- function(id, tadat) {
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
+    
+    flags <- shiny::reactiveValues()
     
     flagSwitch = function(len) {
       inputs = character(len)
@@ -181,5 +191,35 @@ mod_data_flagging_server <- function(id, tadat) {
       }
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
     })
+    
+    # This widget creates the interactive ordering list
+    output$org_order <- shiny::renderUI({
+      shiny::req(tadat$raw)
+      labels = data.frame(OrganizationFormalName = unique(tadat$raw$OrganizationFormalName),
+                          label = substr(unique(tadat$raw$OrganizationFormalName),1,70))
+      labels$label = ifelse(nchar(labels$OrganizationFormalName)>70,paste0(labels$label, "..."),labels$OrganizationFormalName)
+      flags$labels = labels
+      shinyjqui::orderInput(ns("org_order"), label = "Drag and drop organization names in preferential order",
+                          items = labels$label,
+                          class = "btn-group-vertical")
+    })
+    
+    shiny::observeEvent(input$run_dups,{
+      order = input$org_order
+      flags$labels = flags$labels[match(order, flags$labels$label),]
+      orgs = flags$labels$OrganizationFormalName
+      
+      
+    })
+    
+    # insertbreak <- function(x, len = 50){
+    #   y = unlist(gregexpr(' ', x))
+    #   y = y[y>len][1]
+    #   z = y+1
+    #   stringi::stri_sub(x, z, y) <- "\n "
+    #   return(x)
+    # }
+    
+    
   })
 }
