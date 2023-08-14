@@ -39,8 +39,12 @@ mod_TADA_summary_ui <- function(id) {
         shiny::fluidRow(column(6, shiny::uiOutput(ns(
           "dwn_all"
         ))))
-      )
-    ) #,
+      ),
+      shiny::fluidRow(column(2, actionButton(ns("disclaimer"),"DISCLAIMER"))),
+      htmltools::br(),
+      htmltools::br()
+    ),
+    #,
     # column(4,
     #        shiny::wellPanel(
     #          htmltools::h3("Removed Record Summary"),
@@ -161,6 +165,12 @@ mod_TADA_summary_server <- function(id, tadat) {
         writexl::write_xlsx(TADA::TADA_OrderCols(tadat$raw), path = file)
       }
     )
+    
+    shiny::observeEvent(input$disclaimer, {
+      shiny::showModal(shiny::modalDialog(title = "Disclaimer",
+                                          "This United States Environmental Protection Agency (EPA) GitHub project code is provided on an 'as is' basis and the user assumes responsibility for its use. EPA has relinquished control of the information and no longer has responsibility to protect the integrity, confidentiality, or availability of the information. Any reference to specific commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply their endorsement, recommendation or favoring by EPA. The EPA seal and logo shall not be used in any manner to imply endorsement of any commercial product or activity by EPA or the United States Government."))
+      
+    })
     
   })
 }
