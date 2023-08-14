@@ -120,19 +120,6 @@ mod_query_data_server <- function(id, tadat){
                                     placeholder = "Select county",
                                     maxItems = 1), server = TRUE)
     })
-    
-    shiny::observe({
-      print(input$state)
-      print(input$county)
-      print(input$huc)
-      print(input$siteid)
-      print(input$org)
-      print(input$project)
-      print(input$type)
-      print(input$media)
-      print(input$chargroup)
-      print(input$characteristic)
-    })
 
     # this event observer is triggered when the user hits the "Query Now" button, and then runs the TADAdataRetrieval function
     shiny::observeEvent(input$querynow,{
@@ -229,6 +216,7 @@ initializeTable <- function(tadat, raw){
     shinyjs::enable(selector = '.nav li a[data-value="Flag"]')
     shinyjs::enable(selector = '.nav li a[data-value="Filter"]')
     shinyjs::enable(selector = '.nav li a[data-value="Censored"]')
+    shinyjs::enable(selector = '.nav li a[data-value="Harmonize"]')
     shinyjs::enable(selector = '.nav li a[data-value="Review"]')
   } else {
     tadat$new = TRUE # this is used to determine if the app should go to the overview page first - only for datasets that are new to TADAShiny
