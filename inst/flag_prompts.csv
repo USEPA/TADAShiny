@@ -6,7 +6,7 @@ Order,Level,Prompt,flagType
 5,Recommended,Invalid characteristic and fraction combination,Invalid characteristic and fraction combination
 6,Recommended,Invalid units for a given characteristic and media combination,Invalid units for a given characteristic and media combination
 7,Recommended,"Measurement activity type code indicates it is a QC replicate, duplicate, or blank","Measurement activity type code indicates it is a QC replicate, duplicate, or blank"
-8,Recommended,Metadata indicates duplicative uploads of the same results within a single organization,Metadata indicates duplicative uploads of the same results within a single organization
+8,Optional,Metadata indicates duplicative uploads of the same results within a single organization,Metadata indicates duplicative uploads of the same results within a single organization
 9,Optional,Uncommon analytical methods,Uncommon analytical methods
 10,Optional,"QAPP approval column is ""N"" (indicating not approved) or NA","QAPP approval column is ""N"" (indicating not approved) or NA"
 11,Optional,Quality Assurance Project Plan URL is missing,Quality Assurance Project Plan URL is missing
