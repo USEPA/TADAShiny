@@ -235,7 +235,7 @@ mod_data_flagging_server <- function(id, tadat) {
     
     output$dup_nums <- shiny::renderUI({
       shiny::req(flags$mult_org_num)
-      htmltools::h5(paste0(flags$mult_org_num, " duplicate uploads flagged for removal."))
+      htmltools::h5(paste0(scales::comma(flags$mult_org_num), " duplicate uploads flagged for removal."))
     })
     
     # insertbreak <- function(x, len = 50){
