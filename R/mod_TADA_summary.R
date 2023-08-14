@@ -40,7 +40,7 @@ mod_TADA_summary_ui <- function(id) {
           "dwn_all"
         ))))
       ),
-      shiny::fluidRow(column(2, actionButton(ns("disclaimer"),"DISCLAIMER"))),
+      shiny::fluidRow(column(2, shiny::actionButton(ns("disclaimer"),"DISCLAIMER"))),
       htmltools::br(),
       htmltools::br()
     ),
