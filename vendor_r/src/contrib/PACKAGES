@@ -70,7 +70,7 @@ Imports: plyr, data.table, dplyr, tidyr, grDevices, magrittr, stringr,
 Suggests: rmarkdown, readr, tidyverse, knitr, testthat, testthis,
         usethis, devtools, pkgdown, spelling
 License: CC0
-MD5sum: 0515a68a5db8166b66550e85dd433128
+MD5sum: a6d2484accff2c0aa7cc5170ec51bf56
 NeedsCompilation: no
 
 Package: anytime
@@ -1013,7 +1013,7 @@ Suggests: blob, covr, dplyr (>= 0.8-3), ggplot2, knitr, lwgeom (>=
         tibble (>= 1.4.1), tidyr (>= 1.2.0), tidyselect (>= 1.0.0),
         tmap (>= 2.0), vctrs, wk
 License: GPL-2 | MIT + file LICENSE
-MD5sum: dac79ee4d0103581f4c6bc0adae2a4e8
+MD5sum: 97580a1f288d7cff9eeb456a650b7745
 NeedsCompilation: yes
 
 Package: shinyWidgets
@@ -1059,6 +1059,15 @@ Imports: digest, glue, grDevices, shiny
 Suggests: shinydisconnect, shinyjs
 License: MIT + file LICENSE
 MD5sum: 9ae9922d2f13ad2d59c295bb8cd14d02
+NeedsCompilation: no
+
+Package: shinyjqui
+Version: 0.4.1
+Depends: R (>= 3.2.0)
+Imports: shiny (>= 1.5.0), htmltools, htmlwidgets, jsonlite, rlang
+Suggests: ggplot2, highcharter, knitr, markdown, rmarkdown, plotly
+License: MIT + file LICENSE
+MD5sum: 6a882852a04d031f25113836abe41340
 NeedsCompilation: no
 
 Package: shinyjs
