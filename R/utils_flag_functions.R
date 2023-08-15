@@ -95,6 +95,9 @@ applyFlags <- function(in_table) {
   # Invalid analytical method
   out <- TADA::TADA_FlagMethod(out, clean = FALSE)
   
+  # Single org duplicative uploads
+  out <- TADA::TADA_FindPotentialDuplicatesSingleOrg(out, handling_method = 'pick_one')
+  
   # QAPP Not Approved - this flag isn't looking for a TADA-created flag column,
   # so do not need to run any flag function here. If switched ON, remove all data
   # with QAPPApproved == N or NA.
@@ -109,14 +112,6 @@ applyFlags <- function(in_table) {
   
   # Aggregated continuous data
   out <- TADA::TADA_FindContinuousData(out, clean = FALSE)
-  
-  # True duplicates - not needed, true duplicates automatically removed in
-  # autoclean. "ALMOST" duplicates function still in dev.
-  #out  = out
-  
-  # Activity media name not water - Water media filter is not dependent upon flag
-  # function, so do not need to run any flags on this one
-  #out = out
   
   # Above WQX Upper Threshold
   out <- TADA::TADA_FlagAboveThreshold(out, clean = FALSE)

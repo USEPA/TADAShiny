@@ -115,7 +115,7 @@ mod_censored_data_server <- function(id, tadat){
       # create dataset displayed in table below
       dat = subset(good, good$TADA.CensoredData.Flag%in%c("Non-Detect","Over-Detect"))
       dat = dat[,c("ResultIdentifier","TADA.CharacteristicName","TADA.DetectionQuantitationLimitMeasure.MeasureValue","DetectionQuantitationLimitMeasure.MeasureUnitCode","TADA.ResultMeasureValue", "TADA.ResultMeasure.MeasureUnitCode")]
-      dat = dat%>%dplyr::rename("Estimated Value" = TADA.ResultMeasureValue, "Original Detection Limit Value" = "TADA.DetectionQuantitationLimitMeasure.MeasureValue")
+      dat = dat%>%dplyr::rename("Estimated Detection Limit Value" = TADA.ResultMeasureValue, "Original Detection Limit Value" = TADA.DetectionQuantitationLimitMeasure.MeasureValue, "Original Unit" = DetectionQuantitationLimitMeasure.MeasureUnitCode, "Estimated Unit" = TADA.ResultMeasure.MeasureUnitCode)
       censdat$exdat = dat[1:10,] # just show the first 10 records so user can see what happened to data 
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
     })
@@ -138,7 +138,7 @@ mod_censored_data_server <- function(id, tadat){
     output$see_det = DT::renderDT({
       shiny::req(censdat$exdat)
       DT::datatable(censdat$exdat[1:10,],
-                    options = list(dom='t', pageLength=10,searching = FALSE),
+                    options = list(dom='t', scrollX=TRUE, pageLength=10,searching = FALSE),
                     selection = 'none', rownames=FALSE)
       })
     

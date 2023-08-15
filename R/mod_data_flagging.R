@@ -26,6 +26,16 @@ mod_data_flagging_ui <- function(id) {
     htmltools::div(style = "margin-bottom:10px"),
     DT::DTOutput(ns('flagTable')),
     htmltools::br(),
+    htmltools::h3("Flag duplicative results uploaded by multiple organizations"),
+    htmltools::HTML("Sometimes organizations unintentionally upload the same dataset multiple times to the WQP. For example, USGS will collect data at the request of state agencies. The USGS 'copy' of the results is uploaded to NWIS and made available in the portal, and the state agency's 'copy' of the results is uploaded to WQX. This step flags these duplicative uploads based on date, characteristic and result value/unit, and monitoring locations within 100 meters of one another to flag and select one representative result. Use the ordering widget to create a hierarchy of organizations used to select the representative result. For example, if the state agency's organization name is at the top of the list, its result will be selected over the USGS upload of the sample, and the USGS version will be flagged for removal."),
+    htmltools::br(),
+    htmltools::br(),
+    shiny::fluidRow(column(8, shiny::uiOutput(ns("org_order")))),
+    htmltools::br(),
+    shiny::fluidRow(column(2, shiny::actionButton(ns("run_dups"), "Flag duplicate uploads", style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"))),
+    htmltools::br(),
+    shiny::uiOutput(ns("dup_nums")),
+    htmltools::br(),
     htmltools::h3("Convert depth units (Optional)"),
     htmltools::HTML("Depth units in the dataset are automatically converted to <B>meters</B> upon data retrieval. Click the radio buttons below to convert depth units to feet, inches, or back to meters."),
     shiny::fluidRow(column(6, shiny::radioButtons(ns('m2f'), label = "", choices = c("feet","inches","meters"), selected = character(0), inline = TRUE)))
@@ -35,6 +45,8 @@ mod_data_flagging_ui <- function(id) {
 mod_data_flagging_server <- function(id, tadat) {
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
+    
+    flags <- shiny::reactiveValues()
     
     flagSwitch = function(len) {
       inputs = character(len)
@@ -74,7 +86,7 @@ mod_data_flagging_server <- function(id, tadat) {
       shinybusy::show_modal_spinner(
         spin = "double-bounce",
         color = "#0071bc",
-        text = "Running TADA flagging functions...",
+        text = "Running flagging functions...",
         session = shiny::getDefaultReactiveDomain()
       )
       
@@ -181,5 +193,59 @@ mod_data_flagging_server <- function(id, tadat) {
       }
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
     })
+    
+    # This widget creates the interactive ordering list
+    output$org_order <- shiny::renderUI({
+      shiny::req(tadat$raw)
+        labels = data.frame(unique(tadat$raw[,c("OrganizationFormalName","OrganizationIdentifier")]))
+        labels$label = substr(labels$OrganizationFormalName,1,70)
+        labels$label = ifelse(nchar(labels$OrganizationFormalName)>70,paste0(labels$label, "..."),labels$OrganizationFormalName)
+        flags$labels = labels
+        shiny::isolate(
+          shinyjqui::orderInput(ns("org_order"), label = "Drag and drop organization names in preferential order",
+                                items = labels$label,
+                                class = "btn-group-vertical")
+        )
+    })
+    
+    # Runs when the run button is pushed - runs the find potential duplicates between multiple orgs function
+    shiny::observeEvent(input$run_dups,{
+      shinybusy::show_modal_spinner(
+        spin = "double-bounce",
+        color = "#0071bc",
+        text = "Finding and flagging duplicate uploads...",
+        session = shiny::getDefaultReactiveDomain()
+      )
+      # get to the org identifier from the input label ordering
+      order = input$org_order
+      flags$labels = flags$labels[match(order, flags$labels$label),]
+      orgs = flags$labels$OrganizationIdentifier
+      # run the duplicates function with the selected org hierarchy
+      tadat$raw = TADA::TADA_FindPotentialDuplicatesMultipleOrgs(tadat$raw, org_hierarchy = orgs)
+      # create a one-column dataframe with the results from the duplicates function to be added to tadat$removals
+      multorgs = tadat$raw$TADA.ResultSelectedMultipleOrgs
+      multorgs = ifelse(multorgs=="N", as.logical(TRUE), as.logical(FALSE))
+      # manually add to tadat$removals - EDH couldn't come up with a simpler, straightforward way to include this in the flagging table in a way that wouldn't confuse users 
+      label = "Flag: Metadata indicates duplicative uploads of the same results from multiple organizations"
+      tadat$removals[label] = multorgs
+      # tadat$raw = tadat$raw %>% dplyr::select(-TADA.ResultSelectedMultipleOrgs)
+      shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+      flags$mult_org_num = length(multorgs[multorgs==TRUE])
+    })
+    
+    output$dup_nums <- shiny::renderUI({
+      shiny::req(flags$mult_org_num)
+      htmltools::h5(paste0(scales::comma(flags$mult_org_num), " duplicate uploads flagged for removal."))
+    })
+    
+    # insertbreak <- function(x, len = 50){
+    #   y = unlist(gregexpr(' ', x))
+    #   y = y[y>len][1]
+    #   z = y+1
+    #   stringi::stri_sub(x, z, y) <- "\n "
+    #   return(x)
+    # }
+    
+    
   })
 }
