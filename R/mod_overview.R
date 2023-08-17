@@ -18,13 +18,17 @@ mod_overview_ui <- function(id){
     shiny::fluidRow(column(3, shiny::actionButton(ns("refresh_overview"),"Refresh",shiny::icon("arrows-rotate"),style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))),
     htmltools::hr(),
     shiny::fluidRow(column(12, shiny::wellPanel(shiny::htmlOutput(ns("overview_totals"))))),
+    htmltools::HTML("<B>Your dataset, mapped:</B> Zoom in and click on sites of interest. A pop up will appear that shows the number of measurements, characteristics, and visits at each site."),
     htmltools::br(),
-    shiny::fluidRow(column(6,shinycssloaders::withSpinner(leaflet::leafletOutput(ns("overview_map"), height = "500px"))),# "Larger point sizes represent more samples collected at a site; darker points represent more characteristics collected at a site. Click on a point to see the site ID, name, and sample/visit/parameter counts.",
-             column(6,DT::DTOutput(ns("overview_orgtable"), height = "500px"))),#"Hover over a piece of the pie chart to see the characteristic name, count, and its percentage of the dataset. The pie shows the top ten characteristics as their own slices; all other characteristics fit into the 'ALL OTHERS' group.",
+    shiny::fluidRow(column(12, shinycssloaders::withSpinner(leaflet::leafletOutput(ns("overview_map"), height = "500px")))),# "Larger point sizes represent more samples collected at a site; darker points represent more characteristics collected at a site. Click on a point to see the site ID, name, and sample/visit/parameter counts."
     htmltools::br(),
     shiny::fluidRow(column(6,shiny::plotOutput(ns("overview_hist"), height="500px")),#"This histogram shows sample collection frequency for all sites over the time period queried.",
-             column(6, shiny::plotOutput(ns("overview_barchar"), height="615px")))
-  )
+             column(6, shiny::plotOutput(ns("overview_barchar"), height="600px"))),
+    htmltools::h3("Organizations in dataset"),
+    htmltools::HTML("The table below shows the organizations that collected data in your dataset and the number of measurements collected by each. Notice the third column, 'Rank'. This editable column is present because sometimes organizations unintentionally upload the same dataset multiple times to the WQP. For example, USGS will collect data at the request of state agencies. The USGS 'copy' of the results is uploaded to NWIS and made available in the portal, and the state agency's 'copy' of the results is uploaded to WQX. This rank provides the necessary info needed to flag and select one representative result from groups of duplicative uploads based on date, characteristic and result value/unit, and proximity to other sites. Double click in a cell in the 'Rank' column to edit the hierarchy of organizations and Ctrl-Enter to save those changes in the table: the default ranks organizations by the number of measurements in the dataset. Using the state vs USGS data example, if the state agency's organization name has a lower rank (ex. ranked #1) than USGS (ex. ranked #2), its result will be selected over the USGS upload of the sample, and the USGS version will be flagged for removal."),
+    htmltools::div(style="margin-bottom:10px"),
+    shiny::fluidRow(column(12, DT::DTOutput(ns("overview_orgtable"), height = "500px"))))
+
 }
 
 #' overview Server Functions
@@ -43,7 +47,8 @@ mod_overview_server <- function(id, tadat){
       # create gray text tile info
       mapdat$text = tadat$raw%>%dplyr::filter(TADA.Remove==FALSE)%>%dplyr::select(ResultIdentifier,MonitoringLocationIdentifier,OrganizationFormalName,ActivityStartDate)
       # create summary info and binning for map
-      mapdat$orgs = tadat$raw%>%dplyr::filter(TADA.Remove==FALSE)%>%dplyr::group_by(OrganizationFormalName)%>%dplyr::summarise("Result_Count" = length(unique(ResultIdentifier)))
+      orgs = tadat$raw%>%dplyr::filter(TADA.Remove==FALSE)%>%dplyr::group_by(OrganizationFormalName, OrganizationIdentifier)%>%dplyr::summarise("Result_Count" = length(unique(ResultIdentifier))) %>% dplyr::ungroup()
+      mapdat$orgs = orgs %>% dplyr::arrange(-Result_Count) %>% dplyr::mutate("Rank" = 1:length(Result_Count))
       # get top 10 characteristics by result number in the dataset and place the rest in a group called "all others"
       chars = tadat$raw%>%dplyr::filter(TADA.Remove==FALSE)%>%dplyr::group_by(TADA.CharacteristicName)%>%dplyr::summarise("Result_Count" = length(unique(ResultIdentifier)))
       topslice = chars%>%dplyr::slice_max(order_by = Result_Count, n = 10)
@@ -53,8 +58,10 @@ mod_overview_server <- function(id, tadat){
       chars$TADA.Chars = ifelse(nchar(chars$TADA.CharacteristicName)>22,paste0(chars$TADA.Chars, "..."),chars$TADA.Chars)
       chars = chars%>%dplyr::mutate(TADA.Chars = forcats::fct_reorder(TADA.Chars, Result_Count, .desc=TRUE))
       mapdat$chars = chars
-      
       tadat$ovgo = NULL
+      if(is.null(tadat$orgs)){
+        tadat$orgs = mapdat$orgs$OrganizationIdentifier
+      }
       })
     
     # this widget produces the text at the top of the page describing record, site, and org numbers in dataset
@@ -75,12 +82,20 @@ mod_overview_server <- function(id, tadat){
       ggplot2::ggplot(data = mapdat$text, ggplot2::aes(x = as.Date(ActivityStartDate, format = "%Y-%m-%d")))+ggplot2::geom_histogram(color = "black", fill = "#005ea2", binwidth = 7)+ggplot2::labs(title="Results collected per week over date range queried",x="Time", y = "Result Count")+ggplot2::theme_classic(base_size = 16)
     })
     
-    # organization numbers table
-    output$overview_orgtable = DT::renderDT({
-      DT::datatable(data.frame(mapdat$orgs),
-      options = list(pageLength=10, colnames = c("Organization Name","Results Count"), searching = FALSE),
+    # organization numbers table, the editable part allows user to change only the third column (rankings)
+    # https://yihui.shinyapps.io/DT-edit/
+    output$overview_orgtable = DT::renderDT(
+      mapdat$orgs[,!names(mapdat$orgs)%in%c("OrganizationIdentifier")],
+      editable = list(target = "column", disable = list(columns = c(0, 1))),
+      colnames = c("Organization Name","Results Count","Rank - Double Click to Edit, Ctrl-Enter to Save"),
+      options = list(pageLength=10, searching = FALSE),
       rownames= FALSE,
-      selection = 'none')
+      selection = 'none'
+    )
+    
+    observeEvent(input$overview_orgtable_cell_edit, {
+      org_rank = data.frame(OrganizationIdentifier = mapdat$orgs$OrganizationIdentifier, Rank = as.numeric(input$overview_orgtable_cell_edit$value)) %>% dplyr::arrange(Rank)
+      tadat$orgs = org_rank$OrganizationIdentifier
     })
     
     # characteristics bar chart showing top characteristics by result number in dataset

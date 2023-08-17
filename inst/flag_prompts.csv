@@ -7,9 +7,10 @@ Order,Level,Prompt,flagType
 6,Recommended,Invalid units for a given characteristic and media combination,Invalid units for a given characteristic and media combination
 7,Recommended,"Measurement activity type code indicates it is a QC replicate, duplicate, or blank","Measurement activity type code indicates it is a QC replicate, duplicate, or blank"
 8,Optional,Metadata indicates duplicative uploads of the same results within a single organization,Metadata indicates duplicative uploads of the same results within a single organization
-9,Optional,Uncommon analytical methods,Uncommon analytical methods
-10,Optional,"QAPP approval column is ""N"" (indicating not approved) or NA","QAPP approval column is ""N"" (indicating not approved) or NA"
-11,Optional,Quality Assurance Project Plan URL is missing,Quality Assurance Project Plan URL is missing
-12,Optional,"Metadata indicates result(s) are aggregate, high-frequency continuous sensor results, not discrete samples","Metadata indicates result(s) are aggregate, high-frequency continuous sensor results, not discrete samples"
-13,Optional,"Result value(s) outside of the national upper range for a given characteristic, possibly indicating non-sensical value(s)","Result value(s) outside of the national upper range for a given characteristic, possibly indicating non-sensical value(s)"
-14,Optional,"Result value(s) outside of the national lower range for a given characteristic, possibly indicating non-sensical value(s)","Result value(s) outside of the national lower range for a given characteristic, possibly indicating non-sensical value(s)"
+9,Optional,Metadata indicates duplicative uploads of the same results by multiple organizations,Metadata indicates duplicative uploads of the same results by multiple organizations
+10,Optional,Uncommon analytical methods,Uncommon analytical methods
+11,Optional,"QAPP approval column is ""N"" (indicating not approved) or NA","QAPP approval column is ""N"" (indicating not approved) or NA"
+12,Optional,Quality Assurance Project Plan URL is missing,Quality Assurance Project Plan URL is missing
+13,Optional,"Metadata indicates result(s) are aggregate, high-frequency continuous sensor results, not discrete samples","Metadata indicates result(s) are aggregate, high-frequency continuous sensor results, not discrete samples"
+14,Optional,"Result value(s) outside of the national upper range for a given characteristic, possibly indicating non-sensical value(s)","Result value(s) outside of the national upper range for a given characteristic, possibly indicating non-sensical value(s)"
+15,Optional,"Result value(s) outside of the national lower range for a given characteristic, possibly indicating non-sensical value(s)","Result value(s) outside of the national lower range for a given characteristic, possibly indicating non-sensical value(s)"
