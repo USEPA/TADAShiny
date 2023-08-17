@@ -184,7 +184,6 @@ mod_data_flagging_server <- function(id, tadat) {
       }
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
     })
- 
-    
+
   })
 }
