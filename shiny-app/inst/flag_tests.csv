@@ -52,3 +52,4 @@ Invalid units for a given characteristic and media combination,TADA.ResultUnit.F
 "Measurement activity type code indicates it is a QC replicate, duplicate, or blank",TADA.ActivityType.Flag,QC_blank,0,1
 "Measurement activity type code indicates it is a QC replicate, duplicate, or blank",TADA.ActivityType.Flag,QC_other,0,1
 Metadata indicates duplicative uploads of the same results within a single organization,TADA.ResultSelectedSingleOrg,N,0,1
+Metadata indicates duplicative uploads of the same results by multiple organizations,TADA.ResultSelectedMultipleOrgs,N,0,1

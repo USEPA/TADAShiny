@@ -78,7 +78,7 @@ getCounts <- function(sites, removed_records){
   return(summaryTable)
 }
 # Settings for each flag function in flag page mock up
-applyFlags <- function(in_table) {
+applyFlags <- function(in_table, orgs) {
   
   # Invalid Speciation
   out <- TADA::TADA_FlagSpeciation(in_table, clean = "none")
@@ -97,6 +97,10 @@ applyFlags <- function(in_table) {
   
   # Single org duplicative uploads
   out <- TADA::TADA_FindPotentialDuplicatesSingleOrg(out, handling_method = 'pick_one')
+  
+  # multiple org duplicative uploads
+  ## NOTE: THIS FUNCTION USES A REACTIVE OBJECT AS AN INPUT
+  out <- TADA::TADA_FindPotentialDuplicatesMultipleOrgs(out, org_hierarchy = orgs)
   
   # QAPP Not Approved - this flag isn't looking for a TADA-created flag column,
   # so do not need to run any flag function here. If switched ON, remove all data

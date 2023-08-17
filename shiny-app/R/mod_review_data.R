@@ -72,6 +72,7 @@ mod_review_data_server <- function(id, tadat){
       shiny::req(review_things$rem_reas)
       dat = review_things$rem_reas
       dat$Legend = paste0(dat$Reason, " - ", dat$Count, " results")
+      dat = dat %>% dplyr::rowwise() %>% dplyr::mutate(Legend = TADA::TADA_InsertBreaks(Legend, len = 100))
       
       # define number of colors required for pie chart
       colorCount <- length(unique(dat$Legend))
