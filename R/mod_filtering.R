@@ -95,7 +95,7 @@ mod_filtering_server <- function(id, tadat) {
           "<h3>Filter by '",
           values$selected_field,
           "'</h3>
-               <p>In this table, you may either exclude selected values, or ONLY include selected values and exclude all other non-selected values. Use the buttons at the bottom of this table to make your decisions. Note that once you select a filtering type (Exclude or Include), the other filtering type button is disabled for that field.</p>"
+               <p>In this table, you may either exclude selected values, or ONLY include selected values and exclude all other non-selected values. Use the buttons at the bottom of this table to make your decisions. Note that once you select a filtering type (Exclude or Include), the other filtering type button is disabled for that field. <b>Note:</b> If any results are NA, they will be represented by a blank (empty) row in this table.</p>"
         )
       ))
       shinyjs::show("addOnlys")
@@ -271,7 +271,7 @@ mod_filtering_server <- function(id, tadat) {
     })
     
     getValues <- function(.data, field) {
-      counts = table(.data[[field]])
+      counts = table(.data[[field]], useNA = "ifany")
       if (length(rownames(counts) > 0)) {
         value_table = data.frame(Value = names(counts), Count = as.vector(counts))
       } else {

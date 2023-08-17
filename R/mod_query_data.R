@@ -41,11 +41,11 @@ mod_query_data_ui <- function(id){
           shiny::fluidRow(column(4,shiny::selectizeInput(ns("state"),"State", choices = NULL)),
                           column(4,shiny::selectizeInput(ns("county"), "County (pick state first)", choices = NULL)),
                           column(4,shiny::textInput(ns("huc"),"Hydrologic Unit", placeholder = "e.g. 020700100103"))),
-          shiny::fluidRow(column(4, shiny::selectizeInput(ns("siteid"), "Monitoring Location ID(s)", choices = NULL,multiple = TRUE))),
+          shiny::fluidRow(column(4, shiny::selectizeInput(ns("siteid"), "Monitoring Location ID(s)", choices = NULL, multiple = TRUE))),
           htmltools::h4("Metadata Filters"),
           shiny::fluidRow(column(4, shiny::selectizeInput(ns("org"),"Organization(s)", choices = NULL, multiple = TRUE)),
                           column(4, shiny::selectizeInput(ns("proj"),"Project(s)", choices = NULL, multiple = TRUE)),
-                          column(4, shiny::selectizeInput(ns("type"), "Site Type(s)", choices = c("",sitetype), multiple = TRUE))),
+                          column(4, shiny::selectizeInput(ns("type"), "Site Type(s)", choices = c(sitetype), multiple = TRUE))),
           shiny::fluidRow(column(4, shiny::selectizeInput(ns("media"), tags$span("Sample Media", 
             tags$i(
               class = "glyphicon glyphicon-info-sign", 
@@ -102,17 +102,23 @@ mod_query_data_server <- function(id, tadat){
     })
 
     # this section has widget update commands for the selectizeinputs that have a lot of possible selections - shiny suggested hosting the choices server-side rather than ui-side
-    shiny::updateSelectizeInput(session,"state",choices = c("",unique(statecodes_df$STUSAB)),  server = TRUE)
-    shiny::updateSelectizeInput(session,"org",choices = c("",orgs), server = TRUE)
-    shiny::updateSelectizeInput(session,"chargroup",choices = c("",chargroup), server = TRUE)
-    shiny::updateSelectizeInput(session,"characteristic",choices = c("",chars), server = TRUE)
-    shiny::updateSelectizeInput(session,"proj", choices = c("",projects), server = TRUE)
-    shiny::updateSelectizeInput(session,"siteid", choices = c("",mlids), server = TRUE)
+    shiny::updateSelectizeInput(session,"state",choices = c(unique(statecodes_df$STUSAB)), selected = character(0),
+                                options = list(placeholder = "Select state", maxItems = 1), server = TRUE)
+    shiny::updateSelectizeInput(session,"org",choices = c(orgs), server = TRUE)
+    shiny::updateSelectizeInput(session,"chargroup",choices = c(chargroup), selected = character(0),
+                                options = list(placeholder = ""), server = TRUE)
+    shiny::updateSelectizeInput(session,"characteristic",choices = c(chars), server = TRUE)
+    shiny::updateSelectizeInput(session,"proj", choices = c(projects), server = TRUE)
+    shiny::updateSelectizeInput(session,"siteid", choices = c(mlids), 
+                                options = list(placeholder = "Start typing or use drop down menu"), server = TRUE)
 
     # this observes when the user inputs a state into the drop down and subsets the choices for counties to only those counties within that state.
     shiny::observeEvent(input$state,{
       state_counties = subset(county, county$STUSAB==input$state)
-      shiny::updateSelectizeInput(session,"county",choices = c("",unique(state_counties$COUNTY_NAME)), server = TRUE)
+      shiny::updateSelectizeInput(session,"county",choices = c(unique(state_counties$COUNTY_NAME)), selected = character(0),
+                                  options = list(
+                                    placeholder = "Select county",
+                                    maxItems = 1), server = TRUE)
     })
 
     # this event observer is triggered when the user hits the "Query Now" button, and then runs the TADAdataRetrieval function
@@ -210,6 +216,7 @@ initializeTable <- function(tadat, raw){
     shinyjs::enable(selector = '.nav li a[data-value="Flag"]')
     shinyjs::enable(selector = '.nav li a[data-value="Filter"]')
     shinyjs::enable(selector = '.nav li a[data-value="Censored"]')
+    shinyjs::enable(selector = '.nav li a[data-value="Harmonize"]')
     shinyjs::enable(selector = '.nav li a[data-value="Review"]')
   } else {
     tadat$new = TRUE # this is used to determine if the app should go to the overview page first - only for datasets that are new to TADAShiny
