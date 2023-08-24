@@ -31,11 +31,15 @@ mod_figures_ui <- function(id){
     shiny::tabsetPanel(
       shiny::tabPanel("Single Characteristic Figures",
                       htmltools::br(),
-                      htmltools::HTML("<B>NOTE:</B> When only one characteristic group is selected, the Two-Characteristic Scatterplot will not be available for viewing. This plot is only relevant when the user has selected two characteristic groups."),
+                      htmltools::HTML("Benchmark values will appear as horizontal lines on the single-characteristic scatterplot figure."),
+                      htmltools::br(),
+                      shiny::uiOutput(ns("baselines")),
                       # htmltools::HTML("The boxplot, histogram, and scatterplot below "),
-                      shiny::fluidRow(plotly::plotlyOutput(ns("boxplot"))),
+                      shiny::fluidRow(plotly::plotlyOutput(ns("scatter"))),
+                      htmltools::br(),
                       shiny::fluidRow(plotly::plotlyOutput(ns("histogram"))),
-                      shiny::fluidRow(plotly::plotlyOutput(ns("scatter")))
+                      htmltools::br(),
+                      shiny::fluidRow(plotly::plotlyOutput(ns("boxplot")))
     ),
     shiny::tabPanel("Two-Characteristic Scatterplot",
                     shiny::fluidRow(plotly::plotlyOutput(ns("scatter2")))
@@ -208,6 +212,13 @@ mod_figures_server <- function(id, tadat){
       }else{
         react$plotdata = react$plotdata %>% dplyr::filter(MonitoringLocationIdentifier%in%input$selsites1)
       }
+    })
+    
+    # baseline widgets
+    output$baselines <- shiny::renderUI({
+      shiny::req(react$plotdata)
+      shiny::fluidRow(column(3, shiny::numericInput(ns("baseline1"),"Apply benchmark line 1", value = 0)),
+                      column(3, shiny::numericInput(ns("baseline2"),"Apply benchmark line 2", value = 0)))
     })
     
     # plotly boxplot

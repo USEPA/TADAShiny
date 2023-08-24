@@ -27,7 +27,8 @@ mod_overview_ui <- function(id){
     htmltools::h3("Organizations in dataset"),
     htmltools::HTML("The table below shows the organizations that collected data in your dataset and the number of measurements collected by each. Notice the third column, 'Rank'. This editable column is present because sometimes organizations unintentionally upload the same dataset multiple times to the WQP. For example, USGS will collect data at the request of state agencies. The USGS 'copy' of the results is uploaded to NWIS and made available in the portal, and the state agency's 'copy' of the results is uploaded to WQX. This rank provides the necessary info needed to flag and select one representative result from groups of duplicative uploads based on date, characteristic and result value/unit, and proximity to other sites. Double click in a cell in the 'Rank' column to edit the hierarchy of organizations and Ctrl-Enter to save those changes in the table: the default ranks organizations by the number of measurements in the dataset. Using the state vs USGS data example, if the state agency's organization name has a lower rank (ex. ranked #1) than USGS (ex. ranked #2), its result will be selected over the USGS upload of the sample, and the USGS version will be flagged for removal."),
     htmltools::div(style="margin-bottom:10px"),
-    shiny::fluidRow(column(12, DT::DTOutput(ns("overview_orgtable"), height = "500px"))))
+    shiny::fluidRow(column(12, DT::DTOutput(ns("overview_orgtable"), height = "500px")))
+    )
 
 }
 
@@ -95,6 +96,8 @@ mod_overview_server <- function(id, tadat){
     
     observeEvent(input$overview_orgtable_cell_edit, {
       org_rank = data.frame(OrganizationIdentifier = mapdat$orgs$OrganizationIdentifier, Rank = as.numeric(input$overview_orgtable_cell_edit$value)) %>% dplyr::arrange(Rank)
+      mapdat$orgs = mapdat$orgs %>% dplyr::select(-Rank) %>% dplyr::left_join(org_rank) %>% dplyr::arrange(Rank)
+      # mapdat$orgs = orgs %>% dplyr::arrange(-Result_Count) %>% dplyr::mutate("Rank" = 1:length(Result_Count))
       tadat$orgs = org_rank$OrganizationIdentifier
     })
     
