@@ -227,6 +227,7 @@ mod_harmonize_np_server <- function(id, tadat){
         title = "Success! Calculations Complete.",
         paste0(scales::comma(nitrolen), " Total Nitrogen results calculated and ", scales::comma(phoslen), " Total Phosphorus results calculated.")
       ))
+      shinyjs::disable("sum_apply")
     })
     
  
