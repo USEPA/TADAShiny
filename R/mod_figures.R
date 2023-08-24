@@ -31,10 +31,12 @@ mod_figures_ui <- function(id){
     shiny::tabsetPanel(
       shiny::tabPanel("Single Characteristic Figures",
                       htmltools::br(),
-                      htmltools::HTML("Benchmark values will appear as horizontal lines on the single-characteristic scatterplot figure."),
+                      htmltools::HTML("Benchmark values appear as horizontal lines on the single-characteristic scatterplot figure, below. Benchmarks may reflect established or proposed water quality criteria, important physical/chemical/biological thresholds, or any other values relevant to your use case."),
                       htmltools::br(),
-                      shiny::uiOutput(ns("baselines")),
-                      # htmltools::HTML("The boxplot, histogram, and scatterplot below "),
+                      shiny::uiOutput(ns("benchmarks")),
+                      htmltools::br(),
+                      shiny::uiOutput(ns("benchmarktext")),
+                      htmltools::br(),
                       shiny::fluidRow(plotly::plotlyOutput(ns("scatter"))),
                       htmltools::br(),
                       shiny::fluidRow(plotly::plotlyOutput(ns("histogram"))),
@@ -214,11 +216,43 @@ mod_figures_server <- function(id, tadat){
       }
     })
     
-    # baseline widgets
-    output$baselines <- shiny::renderUI({
+    # benchmark widgets
+    output$benchmarks <- shiny::renderUI({
       shiny::req(react$plotdata)
-      shiny::fluidRow(column(3, shiny::numericInput(ns("baseline1"),"Apply benchmark line 1", value = 0)),
-                      column(3, shiny::numericInput(ns("baseline2"),"Apply benchmark line 2", value = 0)))
+      shiny::fluidRow(column(3, shiny::numericInput(ns("benchmark1"),"Benchmark 1", value = 0)),
+                      column(3, shiny::numericInput(ns("benchmark2"),"Benchmark 2", value = 0)))
+    })
+    
+    output$benchmarktext <- shiny::renderUI({
+      shiny::req(input$benchmark1)
+      vals = subset(react$plotdata, react$plotdata$groupname==react$groups[1])$TADA.ResultMeasureValue
+      exc1 = length(vals[vals>input$benchmark1])
+      exc2 = length(vals[vals>input$benchmark2])
+      tot = length(vals)
+      shiny::wellPanel(htmltools::strong(paste0(exc1, " out of ",tot, " measurements (", round(exc1/tot*100, digits = 1), "%) exceed benchmark 1, while ",exc2, " out of ",tot, " measurements (", round(exc2/tot*100, digits = 1), "%) exceed benchmark 2.")))
+      
+    })
+    
+    # for plotting benchmarks
+    hline <- function(y = 0, color = "black") {
+      list(
+        type = "line",
+        x0 = 0,
+        x1 = 1,
+        xref = "paper",
+        y0 = y,
+        y1 = y,
+        line = list(color = color)
+      )
+    }
+    
+    # plotly scatter plot
+    output$scatter <- plotly::renderPlotly({
+      shiny::req(react$plotdata)
+          suppressWarnings(TADA::TADA_Scatterplot(subset(react$plotdata, react$plotdata$groupname==react$groups[1]), id_cols = "group")) %>% 
+            plotly::layout(shapes = list(hline(y=input$benchmark1, color = "red"),
+                                         hline(y=input$benchmark2, color = "orange")))
+    
     })
     
     # plotly boxplot
@@ -231,12 +265,6 @@ mod_figures_server <- function(id, tadat){
     output$histogram <- plotly::renderPlotly({
       shiny::req(react$plotdata)
       suppressWarnings(TADA::TADA_Histogram(subset(react$plotdata, react$plotdata$groupname==react$groups[1]), id_cols = "group"))
-    })
-    
-    # plotly scatter plot
-    output$scatter <- plotly::renderPlotly({
-      shiny::req(react$plotdata)
-      suppressWarnings(TADA::TADA_Scatterplot(subset(react$plotdata, react$plotdata$groupname==react$groups[1]), id_cols = "group"))
     })
     
     # dynamically show/hide two-char scatter
