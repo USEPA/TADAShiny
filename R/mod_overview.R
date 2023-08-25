@@ -89,12 +89,17 @@ mod_overview_server <- function(id, tadat){
       mapdat$orgs[,!names(mapdat$orgs)%in%c("OrganizationIdentifier")],
       editable = list(target = "column", disable = list(columns = c(0, 1))),
       colnames = c("Organization Name","Results Count","Rank - Double Click to Edit, Ctrl-Enter to Save"),
-      options = list(pageLength=10, searching = FALSE),
+      options = list(pageLength=length(unique(mapdat$orgs$OrganizationFormalName)), searching = FALSE, scrollY = TRUE),
       rownames= FALSE,
       selection = 'none'
     )
     
-    observeEvent(input$overview_orgtable_cell_edit, {
+    # observe({
+    #   print("What did the two raindrops say to the third one? Two is company, but three is a cloud.")
+    #   print(input$overview_orgtable_cell_edit)
+    # })
+    
+    shiny::observeEvent(input$overview_orgtable_cell_edit, {
       org_rank = data.frame(OrganizationIdentifier = mapdat$orgs$OrganizationIdentifier, Rank = as.numeric(input$overview_orgtable_cell_edit$value)) %>% dplyr::arrange(Rank)
       mapdat$orgs = mapdat$orgs %>% dplyr::select(-Rank) %>% dplyr::left_join(org_rank) %>% dplyr::arrange(Rank)
       # mapdat$orgs = orgs %>% dplyr::arrange(-Result_Count) %>% dplyr::mutate("Rank" = 1:length(Result_Count))
