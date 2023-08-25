@@ -105,12 +105,17 @@ mod_figures_server <- function(id, tadat){
           htmltools::br(),
           htmltools::br(),# the object choices, created above, is used as the vector of choices in this final select input
           column(6, # column containing drop down menu for all grouping column combinations
-                   shiny::selectizeInput(ns("mapplotgroup"),"Select up to TWO groups",choices = choices, selected = choices[1], multiple = TRUE, options = list(maxItems = 2), width = "100%")),
+                   shiny::selectizeInput(ns("mapplotgroup"),"Select up to TWO groups",choices = NULL, multiple = TRUE, options = list(maxItems = 2), width = "100%")),
           column(1,
                  shiny::actionButton(ns("mapplotgroupgo"),"Generate Map", shiny::icon("wand-sparkles"),
                                                    style="color: #fff; background-color: #337ab7; border-color: #2e6da4; margin-top:30px"))) # the object choices, created above, is used as the vector of choices in this final select input
       }
       
+    })
+    
+    shiny::observe({
+      shiny::req(react$dat)
+      shiny::updateSelectizeInput(session,"mapplotgroup",choices = unique(react$dat$groupname), selected = unique(react$dat$groupname)[1], server = TRUE)
     })
     
     # event observer that creates all reactive objects needed for map and plots following button push

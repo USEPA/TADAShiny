@@ -12,6 +12,7 @@
 
 load("inst/extdata/statecodes_df.Rdata")
 load("inst/extdata/query_choices.Rdata")
+# Last run by EDH on 08/25/23
 # county = readr::read_tsv(url("https://www2.census.gov/geo/docs/reference/codes/files/national_county.txt"), col_names = FALSE)
 # county = county%>%tidyr::separate(X1,into = c("STUSAB","STATE","COUNTY","COUNTY_NAME","COUNTY_ID"), sep=",")
 # orgs = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/Organization.CSV"))$ID)
@@ -22,7 +23,7 @@ load("inst/extdata/query_choices.Rdata")
 # sitetype = c("Aggregate groundwater use","Aggregate surface-water-use","Aggregate water-use establishment","Atmosphere","Estuary","Facility","Glacier","Lake, Reservoir, Impoundment","Land","Not Assigned","Ocean","Spring","Stream","Subsurface","Well","Wetland")
 # projects = unique(data.table::fread("https://www.waterqualitydata.us/data/Project/search?mimeType=csv&zip=no&providers=NWIS&providers=STEWARDS&providers=STORET")$ProjectIdentifier)
 # mlids = unique(data.table::fread("https://www.waterqualitydata.us/data/Station/search?mimeType=csv&zip=no&providers=NWIS&providers=STEWARDS&providers=STORET")$MonitoringLocationIdentifier)
-# save(orgs, chars, chargroup, media, county, sitetype, projects, mlids, file = "query_choices.Rdata")
+# save(orgs, chars, chargroup, media, county, sitetype, projects, mlids, file = "inst/extdata/query_choices.Rdata")
 
 mod_query_data_ui <- function(id){
   ns <- NS(id)
@@ -224,7 +225,7 @@ initializeTable <- function(tadat, raw){
     tadat$ovgo = TRUE # load data into overview page
     shinyjs::enable(selector = '.nav li a[data-value="Overview"]')
     shinyjs::enable(selector = '.nav li a[data-value="Flag"]')
-    shinyjs::enable(selector = '.nav li a[data-value="Figures"]')
+    # shinyjs::enable(selector = '.nav li a[data-value="Figures"]')
     # Set flagging column to FALSE
     raw$TADA.Remove = FALSE
   }
