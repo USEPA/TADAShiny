@@ -70,7 +70,7 @@ Imports: plyr, data.table, dplyr, tidyr, grDevices, magrittr, stringr,
 Suggests: rmarkdown, readr, tidyverse, knitr, testthat, testthis,
         usethis, devtools, pkgdown, spelling
 License: CC0
-MD5sum: 61097af94f3639ae651905a02fc4afa4
+MD5sum: f97d420e84db45721b5109ae7c1eb75d
 NeedsCompilation: no
 
 Package: anytime
@@ -378,13 +378,13 @@ MD5sum: 05e1f0d4aa4cf36369b730612d0a23f5
 NeedsCompilation: yes
 
 Package: fontawesome
-Version: 0.5.1
+Version: 0.5.2
 Depends: R (>= 3.3.0)
 Imports: rlang (>= 1.0.6), htmltools (>= 0.5.1.1)
 Suggests: covr, dplyr (>= 1.0.8), knitr (>= 1.31), testthat (>= 3.0.0),
         rsvg
 License: MIT + file LICENSE
-MD5sum: 19edadaa0faac598a05298cb82c9c5de
+MD5sum: ea0f097719f6f270df2fd215b27318d7
 NeedsCompilation: no
 
 Package: forcats
@@ -467,12 +467,12 @@ MD5sum: 7a8bc3de6690fe3de25fccaaa03070af
 NeedsCompilation: no
 
 Package: gtable
-Version: 0.3.3
+Version: 0.3.4
 Depends: R (>= 3.5)
 Imports: cli, glue, grid, lifecycle, rlang (>= 1.1.0)
 Suggests: covr, ggplot2, knitr, profvis, rmarkdown, testthat (>= 3.0.0)
 License: MIT + file LICENSE
-MD5sum: 7c3c92fba8c6cda7fc663dc40d94a37e
+MD5sum: a995802509aec94eb4e39b79c824ec21
 NeedsCompilation: no
 
 Package: here
@@ -669,12 +669,12 @@ MD5sum: f2fa7adefdfcdb2d28694c91add3c243
 NeedsCompilation: yes
 
 Package: markdown
-Version: 1.7
+Version: 1.8
 Depends: R (>= 2.11.1)
 Imports: utils, commonmark (>= 1.9.0), xfun (>= 0.38)
 Suggests: knitr, rmarkdown (>= 2.18), yaml, RCurl
 License: MIT + file LICENSE
-MD5sum: 5dfd5b35da3dac8aa1c58061dbabcaa6
+MD5sum: a3ec16f79740ba72811e88645cc2a37d
 NeedsCompilation: no
 
 Package: memoise
@@ -974,7 +974,7 @@ Imports: Rcpp, wk (>= 0.6.0)
 LinkingTo: Rcpp, wk
 Suggests: bit64, testthat (>= 3.0.0), vctrs
 License: Apache License (== 2.0)
-MD5sum: 6397fceb8a729db3168de5757324d7ac
+MD5sum: ae8a8177b2606c97bf3524de4a092f57
 NeedsCompilation: yes
 
 Package: sass
@@ -1013,7 +1013,7 @@ Suggests: blob, covr, dplyr (>= 0.8-3), ggplot2, knitr, lwgeom (>=
         tibble (>= 1.4.1), tidyr (>= 1.2.0), tidyselect (>= 1.0.0),
         tmap (>= 2.0), vctrs, wk
 License: GPL-2 | MIT + file LICENSE
-MD5sum: 216e0e355551bc14cb0d25052d9f8bbf
+MD5sum: 94911a4d44a5d95d40d716c87a9f6855
 NeedsCompilation: yes
 
 Package: shinyWidgets
@@ -1311,11 +1311,11 @@ MD5sum: c79ba40b8e9cee85764cec30c37ad57d
 NeedsCompilation: no
 
 Package: wk
-Version: 0.7.3
+Version: 0.8.0
 Depends: R (>= 2.10)
 Suggests: testthat (>= 3.0.0), vctrs (>= 0.3.0), sf, tibble, readr
 License: MIT + file LICENSE
-MD5sum: 14332bd4ee81b7eeef6f9f613a4f2cdd
+MD5sum: 124c40b1dfb991102bf0f9a774e8d5a1
 NeedsCompilation: yes
 
 Package: writexl
