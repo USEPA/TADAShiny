@@ -44,12 +44,13 @@ Imports:
     shinybusy, 
     dplyr, 
     plyr,
+    tidyr,
     scales,
     forcats,
     RColorBrewer,
     grDevices,
-    stringi,
-    shinyjqui
+    lubridate,
+    plotly
 Remotes: 
     github::USEPA/TADA
 Suggests: 

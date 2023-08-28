@@ -149,6 +149,7 @@ mod_data_flagging_server <- function(id, tadat) {
       shinyjs::enable(selector = '.nav li a[data-value="Filter"]')
       shinyjs::enable(selector = '.nav li a[data-value="Censored"]')
       shinyjs::enable(selector = '.nav li a[data-value="Harmonize"]')
+      shinyjs::enable(selector = '.nav li a[data-value="Figures"]')
       shinyjs::enable(selector = '.nav li a[data-value="Review"]')
     })
     
@@ -183,7 +184,6 @@ mod_data_flagging_server <- function(id, tadat) {
       }
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
     })
- 
-    
+
   })
 }

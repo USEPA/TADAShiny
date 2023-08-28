@@ -47,6 +47,7 @@ Invalid units for a given characteristic and media combination,TADA.ResultUnit.F
 Invalid units for a given characteristic and media combination,TADA.ResultUnit.Flag,Nonstandardized,0,0
 Invalid units for a given characteristic and media combination,TADA.ResultUnit.Flag,Invalid,0,1
 "Measurement activity type code indicates it is a QC replicate, duplicate, or blank",TADA.ActivityType.Flag,Non_QC,0,0
+"Measurement activity type code indicates it is a QC replicate, duplicate, or blank",TADA.ActivityType.Flag,QC_replicate,0,1
 "Measurement activity type code indicates it is a QC replicate, duplicate, or blank",TADA.ActivityType.Flag,QC_duplicate,0,1
 "Measurement activity type code indicates it is a QC replicate, duplicate, or blank",TADA.ActivityType.Flag,QC_calibration,0,1
 "Measurement activity type code indicates it is a QC replicate, duplicate, or blank",TADA.ActivityType.Flag,QC_blank,0,1
