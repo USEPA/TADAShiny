@@ -38,8 +38,7 @@ mod_harmonize_np_server <- function(id, tadat){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     # columns needed for harmonization table
-    cols = c("TADA.ActivityMediaName",                   
-             "TADA.CharacteristicName",               
+    cols = c("TADA.CharacteristicName",               
              "Target.TADA.CharacteristicName",          
              "TADA.CharacteristicNameAssumptions",      
              "TADA.ResultSampleFractionText",        
@@ -62,8 +61,7 @@ mod_harmonize_np_server <- function(id, tadat){
       ref = TADA::TADA_GetSynonymRef(tadat$raw[tadat$raw$TADA.Remove==FALSE,])
       ref = ref %>% dplyr::arrange(Target.TADA.CharacteristicName, Target.TADA.ResultSampleFractionText, Target.TADA.MethodSpecificationName)
       colns = names(ref)
-      harm$colns = colns %>% dplyr::recode(TADA.ActivityMediaName = "Media",
-                                           TADA.CharacteristicName = "Characteristic",
+      harm$colns = colns %>% dplyr::recode(TADA.CharacteristicName = "Characteristic",
                                            Target.TADA.CharacteristicName = "Target Characteristic",
                                            TADA.CharacteristicNameAssumptions = "Characteristic Assumptions",
                                            TADA.ResultSampleFractionText = "Fraction",
@@ -108,8 +106,7 @@ mod_harmonize_np_server <- function(id, tadat){
       if(all(cols%in%names(ref))&dim(ref)[1]>0){
         ref = ref %>% dplyr::arrange(Target.TADA.CharacteristicName, Target.TADA.ResultSampleFractionText, Target.TADA.MethodSpecificationName)
         colns = names(ref)
-        harm$colns = colns %>% dplyr::recode(TADA.ActivityMediaName = "Media",
-                                             TADA.CharacteristicName = "Characteristic",
+        harm$colns = colns %>% dplyr::recode(TADA.CharacteristicName = "Characteristic",
                                              Target.TADA.CharacteristicName = "Target Characteristic",
                                              TADA.CharacteristicNameAssumptions = "Characteristic Assumptions",
                                              TADA.ResultSampleFractionText = "Fraction",
@@ -150,7 +147,7 @@ mod_harmonize_np_server <- function(id, tadat){
                                    pageLength=5),
                     selection = 'none', rownames=FALSE) %>% 
         DT::formatStyle(columns = names(harm$ref), `font-size` = "12px") %>%
-        DT::formatStyle(columns = c("TADA.ActivityMediaName","TADA.CharacteristicName","TADA.ResultSampleFractionText","TADA.MethodSpecificationName","TADA.ResultMeasure.MeasureUnitCode"), backgroundColor = "#2e6da4", color = "white")
+        DT::formatStyle(columns = c("TADA.CharacteristicName","TADA.ResultSampleFractionText","TADA.MethodSpecificationName","TADA.ResultMeasure.MeasureUnitCode"), backgroundColor = "#2e6da4", color = "white")
     })
     
     # apply synonym ref to data when button is pushed
