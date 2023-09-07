@@ -33,6 +33,7 @@
 		tags$link(rel = "canonical", href = "https://www.epa.gov/themes/epa_theme/pattern-lab/?p=pages-standalone-template"),
 		tags$link(rel = "shortlink", href = "https://www.epa.gov/themes/epa_theme/pattern-lab/?p=pages-standalone-template"),
 		tags$meta(property = "og:url", content = "https://www.epa.gov/themes/epa_theme/pattern-lab/?p=pages-standalone-template"),
+		# jpg
 		tags$meta(property = "og:image", content = "https://www.epa.gov/sites/all/themes/epa/img/epa-standard-og.jpg"),
     tags$meta(property = "og:image:width", content = "1200"),
     tags$meta(property = "og:image:height", content = "630"),
@@ -100,7 +101,7 @@
 		# tags$link(rel = "stylesheet", media = "all", href = "https://www.epa.gov/themes/epa_theme/css/styles.css?r6lsex"),
     tags$link(rel = "stylesheet", media = "all", href = "https://www.epa.gov/themes/epa_theme/css-lib/colorbox.min.css?r6lsex"),
     
-		# this is a beta file
+		# this is a beta file, may have issues
 		tags$script(src = 'https://cdnjs.cloudflare.com/ajax/libs/uswds/3.0.0-beta.3/js/uswds-init.min.js'),
     
 		# fix container-fluid that boostrap RShiny uses
