@@ -80,7 +80,11 @@ jobs:
     - name: Install R dependencies
       uses: r-lib/actions/setup-r-dependencies@v2
       with:
-        extra-packages: any::stringr, any::devtools, any::rlist, any::sf, local::.
+        packages: |
+          stringr
+          devtools
+          rlist
+          sf
 
     - name: List R dependencies
       run: |

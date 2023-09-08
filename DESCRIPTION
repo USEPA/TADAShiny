@@ -63,9 +63,7 @@ Suggests:
     sf,
     shinyjs,
     stringr,
-    utils,
-    devtools,
-    rlist
+    utils
 Depends: 
     R (>= 3.5.0)
 Encoding: UTF-8
