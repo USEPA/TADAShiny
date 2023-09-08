@@ -2,8 +2,6 @@ library(stringr)
 
 args <- commandArgs(trailingOnly = TRUE)
 
-install.packages(c("MASS", "class", "lattice"), repos = "https://cloud.r-project.org")
-
 options(repos =
     "https://packagemanager.rstudio.com/cran/__linux__/jammy/latest")
 
@@ -33,7 +31,7 @@ options(HTTPUserAgent = sprintf("R/%s R (%s)", getRversion(), plfrm))
 github_packages_list <- list(c("TADA", "USEPA/TADA"))
 
 # Packages not available as binary from Posit
-packages_needing_to_be_built <- c("sf", "class", "MASS", "lattice")
+packages_needing_to_be_built <- c("sf")
 
 # Get packages deps function to get the packages and dependencies
 get_package_deps <- function(packs, github, to_build_cran) {
@@ -70,6 +68,8 @@ message(paste("Downloading the packages and dependencies to",
     args[1], sep = " "))
 download.packages(packages["ref"][packages["require_build"] == FALSE],
     destdir = args[1])
+download.packages(c("MASS", "class", "lattice"),
+    destdir = args[1], repos = "https://cloud.r-project.org")
 
 message(paste("Github packages needed are:",
     packages["ref"][packages["type"] == "github"], sep = " "))
