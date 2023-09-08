@@ -31,7 +31,7 @@ options(HTTPUserAgent = sprintf("R/%s R (%s)", getRversion(), plfrm))
 github_packages_list <- list(c("TADA", "USEPA/TADA"))
 
 # Packages not available as binary from Posit
-packages_needing_to_be_built <- c("sf")
+packages_needing_to_be_built <- c("sf", "class", "MASS", "lattice")
 
 # Get packages deps function to get the packages and dependencies
 get_package_deps <- function(packs, github, to_build_cran) {
