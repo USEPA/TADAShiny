@@ -43,6 +43,7 @@ get_package_deps <- function(packs, github, to_build_cran) {
         }
     }
     message("Getting the package dependencies")
+    message(paste(refs, sep = ", ")
     deps <- pak::pkg_deps(refs)
     deps["cran_build"] <- c(FALSE, TRUE)[mapply(`%in%`, deps["package"],
         to_build_cran) + 1]
