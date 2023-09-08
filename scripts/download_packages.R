@@ -45,8 +45,15 @@ get_package_deps <- function(packs, github, to_build_cran) {
     message("Getting the package dependencies for: ")
     message(paste(refs, sep = ", "))
     deps <- pak::pkg_deps(refs)
-    deps["cran_build"] <- c(FALSE, TRUE)[mapply(`%in%`, deps["package"],
-        to_build_cran) + 1]
+    deps["cran_build"] <- FALSE
+    cran_deps <- mapply(`%in%`, deps["package"], to_build_cran)
+    for (row in 1:nrow(cran_deps)) {
+        if (any(cran_deps[row, ])) {
+            deps[row, "cran_build"] <- TRUE
+        }
+    }
+    # deps["cran_build"] <- c(FALSE, TRUE)[mapply(`%in%`, deps["package"],
+    #     to_build_cran) + 1]
     deps["require_build"] <- deps["type"] == "github" |
         deps["cran_build"] == TRUE
     deps
