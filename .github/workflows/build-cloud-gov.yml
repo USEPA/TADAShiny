@@ -88,6 +88,9 @@ jobs:
           devtools
           rlist
           sf
+          MASS
+          lattice
+          class
 
     - name: List R dependencies
       run: |
