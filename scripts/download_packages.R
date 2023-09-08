@@ -2,6 +2,8 @@ library(stringr)
 
 args <- commandArgs(trailingOnly = TRUE)
 
+install.packages(c("MASS", "class", "lattice"), repos = "https://cloud.r-project.org")
+
 options(repos =
     "https://packagemanager.rstudio.com/cran/__linux__/jammy/latest")
 
