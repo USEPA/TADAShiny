@@ -35,14 +35,14 @@ packages_needing_to_be_built <- c("sf")
 
 # Get packages deps function to get the packages and dependencies
 get_package_deps <- function(packs, github, to_build_cran) {
-    refs <- packs
+    refs <- strsplit(packs, split = ",")[[1]]
     message("Replacing names for items that should be pulled from GitHub")
     for (p in github) {
         if (p[1] %in% refs){
             refs[match(p[1], refs)] <- p[2]
         }
     }
-    message("Getting the package dependencies")
+    message("Getting the package dependencies for: ")
     message(paste(refs, sep = ", "))
     deps <- pak::pkg_deps(refs)
     deps["cran_build"] <- c(FALSE, TRUE)[mapply(`%in%`, deps["package"],
