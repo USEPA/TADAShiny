@@ -17,6 +17,16 @@ License: Unlimited
 MD5sum: 3202a73550f40efa0e679c49de8514f1
 NeedsCompilation: yes
 
+Package: MASS
+Version: 7.3-60
+Priority: recommended
+Depends: R (>= 4.0), grDevices, graphics, stats, utils
+Imports: methods
+Suggests: lattice, nlme, nnet, survival
+License: GPL-2 | GPL-3
+MD5sum: 24ac97ba3e4446708f9bb9b8911eb920
+NeedsCompilation: yes
+
 Package: Matrix
 Version: 1.6-1
 Priority: recommended
@@ -60,7 +70,7 @@ Imports: plyr, data.table, dplyr, tidyr, grDevices, magrittr, stringr,
 Suggests: rmarkdown, readr, tidyverse, knitr, testthat, testthis,
         usethis, devtools, pkgdown, spelling
 License: CC0
-MD5sum: 934fa440ba9f6f5e314e77cb0a952bfe
+MD5sum: 9273cfabac14ff7227ffc676a5a422b3
 NeedsCompilation: no
 
 Package: askpass
@@ -123,6 +133,15 @@ Imports: grDevices, stats, graphics, e1071, class, KernSmooth
 Suggests: spData (>= 0.2.6.2), units, knitr, rmarkdown, tinytest
 License: GPL (>= 2)
 MD5sum: c0018a424bf3c49a1e1d1c28f94be2dc
+NeedsCompilation: yes
+
+Package: class
+Version: 7.3-22
+Priority: recommended
+Depends: R (>= 3.0.0), stats, utils
+Imports: MASS
+License: GPL-2 | GPL-3
+MD5sum: 8b205d2ef6196c1c637b9d62ee026551
 NeedsCompilation: yes
 
 Package: cli
@@ -457,6 +476,17 @@ License: MIT + file LICENSE
 MD5sum: a8d32542173a6ac9500fbf8eca8a9adf
 NeedsCompilation: yes
 
+Package: lattice
+Version: 0.21-8
+Priority: recommended
+Depends: R (>= 4.0.0)
+Imports: grid, grDevices, graphics, stats, utils
+Suggests: KernSmooth, MASS, latticeExtra, colorspace
+Enhances: chron
+License: GPL (>= 2)
+MD5sum: d9bc82810e0daa36984e695cb3970d92
+NeedsCompilation: yes
+
 Package: lazyeval
 Version: 0.2.2
 Depends: R (>= 3.1.0)
@@ -768,7 +798,7 @@ Suggests: blob, covr, dplyr (>= 0.8-3), ggplot2, knitr, lwgeom (>=
         tibble (>= 1.4.1), tidyr (>= 1.2.0), tidyselect (>= 1.0.0),
         tmap (>= 2.0), vctrs, wk
 License: GPL-2 | MIT + file LICENSE
-MD5sum: 696894e9cd53b5e4746d0cc4d61f918c
+MD5sum: 948dbad0733cfa169b18c68477329c64
 NeedsCompilation: yes
 
 Package: sp
