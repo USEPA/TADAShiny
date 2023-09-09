@@ -202,7 +202,7 @@ mod_figures_server <- function(id, tadat){
       sites = c("All sites", unique(react$mapdata$MonitoringLocationIdentifier))
       shiny::fluidRow(
         htmltools::h3("3. Select Specific Sites (Optional)"),
-        htmltools::HTML("Use the drop down to pick the sites you'd like to include in the plots below and then click 'Generate Plots'. Defaults to all sites in the dataset."),
+        htmltools::HTML(paste0("Use the drop down to pick the sites you'd like to include in the plots below and then click 'Generate Plots'. Defaults to all sites in the dataset. <B>NOTE:</B> Currently, the single-characteristic scatterplot, histogram, and boxplot show the first characteristic from the drop down above the map: <B>", react$groups[1],"</B>.")),
         htmltools::br(),
         column(6, # column containing drop down menu for all grouping column combinations
                  shiny::selectizeInput(ns("selsites1"),"Select sites",choices = sites, selected = sites[1], multiple = TRUE, width = "100%")),
@@ -217,7 +217,7 @@ mod_figures_server <- function(id, tadat){
       if(all(input$selsites1=="All sites")){
         react$plotdata = subset(react$dat, react$dat$groupname%in%c(react$groups))
       }else{
-        react$plotdata = react$plotdata %>% dplyr::filter(MonitoringLocationIdentifier%in%input$selsites1)
+        react$plotdata = react$dat %>% dplyr::filter(MonitoringLocationIdentifier%in%input$selsites1)
       }
     })
     
