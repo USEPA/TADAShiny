@@ -122,7 +122,7 @@ mod_figures_server <- function(id, tadat){
     shiny::observeEvent(input$mapplotgroupgo,{
       react$groups = input$mapplotgroup
       groupdata = subset(react$dat, react$dat$groupname%in%c(react$groups))
-      react$plotdata = groupdata
+      react$plotdataset = groupdata
       react$mapdata = groupdata %>%
         dplyr::group_by(OrganizationFormalName, MonitoringLocationIdentifier, MonitoringLocationName, MonitoringLocationTypeName, TADA.LatitudeMeasure, TADA.LongitudeMeasure) %>% 
         dplyr::summarise(Ncount = length(ResultIdentifier), MeanV = mean(TADA.ResultMeasureValue), GroupID = paste0(unique(sort(groupname)), collapse = ";"), DateRange = paste0(min(lubridate::year(as.Date(ActivityStartDate, "%Y-%m-%d")))," - ", max(lubridate::year(as.Date(ActivityStartDate, "%Y-%m-%d")))))
@@ -215,9 +215,9 @@ mod_figures_server <- function(id, tadat){
     # when the Go button is pushed to generate plots, this ensure the plot data is filtered to the selected sites (or all sites)
     shiny::observeEvent(input$selsitesgo,{
       if(all(input$selsites1=="All sites")){
-        react$plotdata = subset(react$dat, react$dat$groupname%in%c(react$groups))
+        react$plotdata = react$plotdataset
       }else{
-        plotdata = react$dat %>% dplyr::filter(MonitoringLocationIdentifier%in%input$selsites1)
+        plotdata = react$plotdataset %>% dplyr::filter(MonitoringLocationIdentifier%in%input$selsites1)
         if(!react$groups[1]%in%plotdata$groupname){
             shiny::showModal(shiny::modalDialog(
               title = "Whoops!",
@@ -294,7 +294,7 @@ mod_figures_server <- function(id, tadat){
     output$scatter2 <- plotly::renderPlotly({
       shiny::req(react$plotdata)
       if(length(unique(react$plotdata$groupname))>1){
-        suppressWarnings(TADA::TADA_TwoCharacteristicScatterplot(react$plotdata, id_col = "group", groups = unique(react$plotdata$group)))
+        suppressWarnings(TADA::TADA_TwoCharacteristicScatterplot(react$plotdata, id_col = "groupname", groups = unique(react$plotdata$groupname)))
       }
     })
     
