@@ -83,7 +83,7 @@ mod_figures_server <- function(id, tadat){
       # this line adds a new column to the dataset of concatenated values of all of the columns selected by the user in the drop down above.
       depthcols = names(tadat$raw)[grepl("DepthHeightMeasure",names(tadat$raw))]
       depthcols = depthcols[grepl("TADA.",depthcols)]
-      selcols = c("OrganizationFormalName", "ResultIdentifier", "group", "groupname", "MonitoringLocationIdentifier", "MonitoringLocationName", "MonitoringLocationTypeName", "TADA.LatitudeMeasure", "TADA.LongitudeMeasure", "TADA.ResultMeasureValue", "TADA.ResultMeasure.MeasureUnitCode", "ActivityRelativeDepthName", "ActivityStartDate", "ActivityStartDateTime", depthcols)
+      selcols = c("OrganizationFormalName", "ResultIdentifier", "groupname", "MonitoringLocationIdentifier", "MonitoringLocationName", "MonitoringLocationTypeName", "TADA.LatitudeMeasure", "TADA.LongitudeMeasure", "TADA.ResultMeasureValue", "TADA.ResultMeasure.MeasureUnitCode", "ActivityRelativeDepthName", "ActivityStartDate", "ActivityStartDateTime", depthcols)
       
       react$dat = tadat$raw %>% 
         dplyr::filter(TADA.Remove == FALSE, !is.na(TADA.ResultMeasureValue)) %>% 
@@ -97,7 +97,7 @@ mod_figures_server <- function(id, tadat){
     output$mapplotgroup <- shiny::renderUI({ # this companion to the uiOutput in the UI appears when react$done exists
       # req(react$done) 
       # this line gets all the unique concatenated group values from react$dat
-      if("group"%in%names(react$dat)){
+      if("groupname"%in%names(react$dat)){
         choices <- unique(react$dat$groupname)
         shiny::fluidRow(
           htmltools::h3("2. Pick Groups to Map and Plot"),
@@ -262,7 +262,7 @@ mod_figures_server <- function(id, tadat){
     # plotly scatter plot
     output$scatter <- plotly::renderPlotly({
       shiny::req(react$plotdata)
-          suppressWarnings(TADA::TADA_Scatterplot(subset(react$plotdata, react$plotdata$groupname==react$groups[1]), id_cols = "group")) %>% 
+          suppressWarnings(TADA::TADA_Scatterplot(subset(react$plotdata, react$plotdata$groupname==react$groups[1]), id_cols = "groupname")) %>% 
             plotly::layout(shapes = list(hline(y=input$benchmark1, color = "red"),
                                          hline(y=input$benchmark2, color = "orange")))
     
@@ -271,13 +271,13 @@ mod_figures_server <- function(id, tadat){
     # plotly boxplot
     output$boxplot <- plotly::renderPlotly({
       shiny::req(react$plotdata)
-      suppressWarnings(TADA::TADA_Boxplot(subset(react$plotdata, react$plotdata$groupname==react$groups[1]), id_cols = "group"))
+      suppressWarnings(TADA::TADA_Boxplot(subset(react$plotdata, react$plotdata$groupname==react$groups[1]), id_cols = "groupname"))
     })
     
     # plotly histogram
     output$histogram <- plotly::renderPlotly({
       shiny::req(react$plotdata)
-      suppressWarnings(TADA::TADA_Histogram(subset(react$plotdata, react$plotdata$groupname==react$groups[1]), id_cols = "group"))
+      suppressWarnings(TADA::TADA_Histogram(subset(react$plotdata, react$plotdata$groupname==react$groups[1]), id_cols = "groupname"))
     })
     
     # dynamically show/hide two-char scatter
