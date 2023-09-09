@@ -217,8 +217,16 @@ mod_figures_server <- function(id, tadat){
       if(all(input$selsites1=="All sites")){
         react$plotdata = subset(react$dat, react$dat$groupname%in%c(react$groups))
       }else{
-        react$plotdata = react$dat %>% dplyr::filter(MonitoringLocationIdentifier%in%input$selsites1)
-      }
+        plotdata = react$dat %>% dplyr::filter(MonitoringLocationIdentifier%in%input$selsites1)
+        if(!react$groups[1]%in%plotdata$groupname){
+            shiny::showModal(shiny::modalDialog(
+              title = "Whoops!",
+              paste0("You selected a site/sites where ", react$groups[1], " was not sampled. Please use the legend in the map above to select site(s) where ", react$groups[1], "was sampled.")
+            ))
+        }else{
+          react$plotdata = plotdata
+        }
+        }
     })
     
     # benchmark widgets
