@@ -83,7 +83,7 @@ mod_figures_server <- function(id, tadat){
       # this line adds a new column to the dataset of concatenated values of all of the columns selected by the user in the drop down above.
       depthcols = names(tadat$raw)[grepl("DepthHeightMeasure",names(tadat$raw))]
       depthcols = depthcols[grepl("TADA.",depthcols)]
-      selcols = c("OrganizationFormalName", "ResultIdentifier", "group", "groupname", "MonitoringLocationIdentifier", "MonitoringLocationName", "MonitoringLocationTypeName", "TADA.LatitudeMeasure", "TADA.LongitudeMeasure", "TADA.ResultMeasureValue", "TADA.ResultMeasure.MeasureUnitCode", "ActivityRelativeDepthName", "ActivityStartDate", "ActivityStartDateTime", depthcols)
+      selcols = c("OrganizationFormalName", "ResultIdentifier", "groupname", "MonitoringLocationIdentifier", "MonitoringLocationName", "MonitoringLocationTypeName", "TADA.LatitudeMeasure", "TADA.LongitudeMeasure", "TADA.ResultMeasureValue", "TADA.ResultMeasure.MeasureUnitCode", "ActivityRelativeDepthName", "ActivityStartDate", "ActivityStartDateTime", depthcols)
       
       react$dat = tadat$raw %>% 
         dplyr::filter(TADA.Remove == FALSE, !is.na(TADA.ResultMeasureValue)) %>% 
@@ -97,7 +97,7 @@ mod_figures_server <- function(id, tadat){
     output$mapplotgroup <- shiny::renderUI({ # this companion to the uiOutput in the UI appears when react$done exists
       # req(react$done) 
       # this line gets all the unique concatenated group values from react$dat
-      if("group"%in%names(react$dat)){
+      if("groupname"%in%names(react$dat)){
         choices <- unique(react$dat$groupname)
         shiny::fluidRow(
           htmltools::h3("2. Pick Groups to Map and Plot"),
@@ -122,7 +122,7 @@ mod_figures_server <- function(id, tadat){
     shiny::observeEvent(input$mapplotgroupgo,{
       react$groups = input$mapplotgroup
       groupdata = subset(react$dat, react$dat$groupname%in%c(react$groups))
-      react$plotdata = groupdata
+      react$plotdataset = groupdata
       react$mapdata = groupdata %>%
         dplyr::group_by(OrganizationFormalName, MonitoringLocationIdentifier, MonitoringLocationName, MonitoringLocationTypeName, TADA.LatitudeMeasure, TADA.LongitudeMeasure) %>% 
         dplyr::summarise(Ncount = length(ResultIdentifier), MeanV = mean(TADA.ResultMeasureValue), GroupID = paste0(unique(sort(groupname)), collapse = ";"), DateRange = paste0(min(lubridate::year(as.Date(ActivityStartDate, "%Y-%m-%d")))," - ", max(lubridate::year(as.Date(ActivityStartDate, "%Y-%m-%d")))))
@@ -202,7 +202,7 @@ mod_figures_server <- function(id, tadat){
       sites = c("All sites", unique(react$mapdata$MonitoringLocationIdentifier))
       shiny::fluidRow(
         htmltools::h3("3. Select Specific Sites (Optional)"),
-        htmltools::HTML("Use the drop down to pick the sites you'd like to include in the plots below and then click 'Generate Plots'. Defaults to all sites in the dataset."),
+        htmltools::HTML(paste0("Use the drop down to pick the sites you'd like to include in the plots below and then click 'Generate Plots'. Defaults to all sites in the dataset. <B>NOTE:</B> Currently, the single-characteristic scatterplot, histogram, and boxplot show the first characteristic from the drop down above the map: <B>", react$groups[1],"</B>.")),
         htmltools::br(),
         column(6, # column containing drop down menu for all grouping column combinations
                  shiny::selectizeInput(ns("selsites1"),"Select sites",choices = sites, selected = sites[1], multiple = TRUE, width = "100%")),
@@ -215,10 +215,18 @@ mod_figures_server <- function(id, tadat){
     # when the Go button is pushed to generate plots, this ensure the plot data is filtered to the selected sites (or all sites)
     shiny::observeEvent(input$selsitesgo,{
       if(all(input$selsites1=="All sites")){
-        react$plotdata = subset(react$dat, react$dat$groupname%in%c(react$groups))
+        react$plotdata = react$plotdataset
       }else{
-        react$plotdata = react$plotdata %>% dplyr::filter(MonitoringLocationIdentifier%in%input$selsites1)
-      }
+        plotdata = react$plotdataset %>% dplyr::filter(MonitoringLocationIdentifier%in%input$selsites1)
+        if(!react$groups[1]%in%plotdata$groupname){
+            shiny::showModal(shiny::modalDialog(
+              title = "Whoops!",
+              paste0("You selected a site/sites where ", react$groups[1], " was not sampled. Please use the legend in the map above to select site(s) where ", react$groups[1], "was sampled.")
+            ))
+        }else{
+          react$plotdata = plotdata
+        }
+        }
     })
     
     # benchmark widgets
@@ -254,7 +262,7 @@ mod_figures_server <- function(id, tadat){
     # plotly scatter plot
     output$scatter <- plotly::renderPlotly({
       shiny::req(react$plotdata)
-          suppressWarnings(TADA::TADA_Scatterplot(subset(react$plotdata, react$plotdata$groupname==react$groups[1]), id_cols = "group")) %>% 
+          suppressWarnings(TADA::TADA_Scatterplot(subset(react$plotdata, react$plotdata$groupname==react$groups[1]), id_cols = "groupname")) %>% 
             plotly::layout(shapes = list(hline(y=input$benchmark1, color = "red"),
                                          hline(y=input$benchmark2, color = "orange")))
     
@@ -263,13 +271,13 @@ mod_figures_server <- function(id, tadat){
     # plotly boxplot
     output$boxplot <- plotly::renderPlotly({
       shiny::req(react$plotdata)
-      suppressWarnings(TADA::TADA_Boxplot(subset(react$plotdata, react$plotdata$groupname==react$groups[1]), id_cols = "group"))
+      suppressWarnings(TADA::TADA_Boxplot(subset(react$plotdata, react$plotdata$groupname==react$groups[1]), id_cols = "groupname"))
     })
     
     # plotly histogram
     output$histogram <- plotly::renderPlotly({
       shiny::req(react$plotdata)
-      suppressWarnings(TADA::TADA_Histogram(subset(react$plotdata, react$plotdata$groupname==react$groups[1]), id_cols = "group"))
+      suppressWarnings(TADA::TADA_Histogram(subset(react$plotdata, react$plotdata$groupname==react$groups[1]), id_cols = "groupname"))
     })
     
     # dynamically show/hide two-char scatter
@@ -286,7 +294,7 @@ mod_figures_server <- function(id, tadat){
     output$scatter2 <- plotly::renderPlotly({
       shiny::req(react$plotdata)
       if(length(unique(react$plotdata$groupname))>1){
-        suppressWarnings(TADA::TADA_TwoCharacteristicScatterplot(react$plotdata, id_col = "group", groups = unique(react$plotdata$group)))
+        suppressWarnings(TADA::TADA_TwoCharacteristicScatterplot(react$plotdata, id_col = "groupname", groups = unique(react$plotdata$groupname)))
       }
     })
     
