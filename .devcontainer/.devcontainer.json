@@ -1,14 +1,17 @@
 {
-    "name": "R Environment for Debugging",
-    "build": { 
-        "dockerfile": "Dockerfile",
-        "args": { 
-            "VARIANT": "4.3.1"
-        } 
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+        "ghcr.io/rocker-org/devcontainer-features/rstudio-server": {}
     },
-    "settings": {
-        "r.rterm.linux": "/bin/local/bin/radian"
+    "postAttachCommand": {
+        "rstudio-start": "rserver"
     },
-    "postCreateCommand": "sudo rstudio-server start"
+    "forwardPorts": [
+        8787
+    ],
+    "portsAttributes": {
+        "8787": {
+            "label": "RStudio IDE"
+        }
+    }
 }
-  
