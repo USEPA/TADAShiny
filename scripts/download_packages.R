@@ -66,8 +66,12 @@ packages <- get_package_deps(input_packs, github_packages_list,
     packages_needing_to_be_built)
 
 library(rjson)
-jsonData <- toJSON(packages)
-write(jsonData, "Packages_to_pull.json")
+dir.create("debug-outputs", recursive = TRUE)
+json_data <- toJSON(packages)
+write(json_data, "debug-outputs/Packages_to_pull.json")
+writeLines(input_packs, "debug-outputs/Inputs.txt")
+writeLines(github_packages_list, "debug-outputs/Github_packages.txt")
+writeLines(packages_needing_to_be_built, "debug-outputs/To_build_cran.txt")
 
 # Download the packages from the Posit repository
 message(paste("Downloading the packages and dependencies to",
