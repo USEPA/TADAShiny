@@ -3,10 +3,11 @@ library(rjson)
 library(dplyr)
 
 args <- commandArgs(trailingOnly = TRUE)
+
+# For debugging:
 # args <- c()
 # args[1] = "vendor_r/src/contrib"
-# args[2] = "TADA,config,golem,magrittr,htmltools,readxl,writexl,shiny,leaflet,shinyWidgets,shinycssloaders,DT,ggplot2,shinybusy,dplyr,plyr,scales,forcats,testthat,remotes,covr,rmarkdown,knitr,
-#     spelling,sf,shinyjs,stringr,shinyjqui"
+# args[2] = "TADA,config,golem,magrittr,htmltools,readxl,writexl,shiny,leaflet,shinyWidgets,shinycssloaders,DT,ggplot2,shinybusy,dplyr,plyr,scales,forcats,testthat,remotes,covr,rmarkdown,knitr,spelling,sf,shinyjs,stringr,shinyjqui"
 
 options(repos =
     "https://packagemanager.rstudio.com/cran/__linux__/jammy/latest")
@@ -31,8 +32,6 @@ message(paste(input_packs), sep = " ")
 plfrm <- paste(getRversion(), R.version["platform"],
     R.version["arch"], R.version["os"])
 
-# options(HTTPUserAgent = sprintf("R/%s R (%s)", "4.3.1", paste("4.3.1","x86_64-pc-linux-gnu", "x86_64","linux-gnu")))
-
 options(HTTPUserAgent = sprintf("R/%s R (%s)", getRversion(), plfrm))
 
 # Packages that should be pulled from GitHub
@@ -44,7 +43,7 @@ packages_needing_to_be_built <- c("sf")
 # Get packages deps function to get the packages and dependencies
 get_package_deps <- function(packs, github, to_build_cran) {
     # refs <- strsplit(packs, split = ",")[[1]]
-    refs <- input_packs
+    refs <- packs
     message("Replacing names for items that should be pulled from GitHub")
     for (p in github) {
         if (p[1] %in% refs){
@@ -68,8 +67,6 @@ get_package_deps <- function(packs, github, to_build_cran) {
             deps[row, "cran_build"] <- TRUE
         }
     }
-    # deps["cran_build"] <- c(FALSE, TRUE)[mapply(`%in%`, deps["package"],
-    #     to_build_cran) + 1]
     deps["require_build"] <- deps["type"] == "github" |
         deps["cran_build"] == TRUE
     deps
@@ -94,15 +91,6 @@ sink()
 message(paste("Downloading the packages and dependencies to",
     args[1], sep = " "))
 no_build <- subset(packages, (require_build == FALSE))
-# for (row in 1:nrow(no_build)) {
-#     # URL format: https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/shinyjqui_0.4.1.tar.gz?r_version=4.3&arch=x86_64
-#     base_url <- "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/"
-#     filename <- paste(no_build[row, "package"], "_",
-#         no_build[row, "version"], ".tar.gz", sep = "")
-#     url <- paste(base_url, filename, "?r_version=",
-#         getRversion(), "&arch=", R.version["arch"], sep = "")
-#     download.file(url, paste(args[1], filename, sep = "/"), method = "libcurl")
-# }
 download.packages(no_build$package, destdir = args[1])
 
 message(paste("Github packages needed are:",
