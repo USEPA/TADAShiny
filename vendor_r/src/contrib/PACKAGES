@@ -24,7 +24,7 @@ Depends: R (>= 4.0), grDevices, graphics, stats, utils
 Imports: methods
 Suggests: lattice, nlme, nnet, survival
 License: GPL-2 | GPL-3
-MD5sum: 24ac97ba3e4446708f9bb9b8911eb920
+MD5sum: 2bceb434966cb5bd2bb6e6f3b6d6296d
 NeedsCompilation: yes
 
 Package: Matrix
@@ -70,7 +70,7 @@ Imports: plyr, data.table, dplyr, tidyr, grDevices, magrittr, stringr,
 Suggests: rmarkdown, readr, tidyverse, knitr, testthat, testthis,
         usethis, devtools, pkgdown, spelling
 License: CC0
-MD5sum: 4bfa864794b0a49ea9ac309cc861fabc
+MD5sum: 28f234c6a9b3415346d401506a01f16e
 NeedsCompilation: no
 
 Package: askpass
@@ -141,7 +141,7 @@ Priority: recommended
 Depends: R (>= 3.0.0), stats, utils
 Imports: MASS
 License: GPL-2 | GPL-3
-MD5sum: 8b205d2ef6196c1c637b9d62ee026551
+MD5sum: 5fa34a7aeed2a55dbbc59f6836b2a175
 NeedsCompilation: yes
 
 Package: cli
@@ -484,7 +484,7 @@ Imports: grid, grDevices, graphics, stats, utils
 Suggests: KernSmooth, MASS, latticeExtra, colorspace
 Enhances: chron
 License: GPL (>= 2)
-MD5sum: d9bc82810e0daa36984e695cb3970d92
+MD5sum: 469ca6228f2a2fd5116828755e7db9ba
 NeedsCompilation: yes
 
 Package: lazyeval
@@ -798,7 +798,7 @@ Suggests: blob, covr, dplyr (>= 0.8-3), ggplot2, knitr, lwgeom (>=
         tibble (>= 1.4.1), tidyr (>= 1.2.0), tidyselect (>= 1.0.0),
         tmap (>= 2.0), vctrs, wk
 License: GPL-2 | MIT + file LICENSE
-MD5sum: 9edb5c456f41a34101a1169be5aac003
+MD5sum: da70a7e3401485a911f822d473dbd75b
 NeedsCompilation: yes
 
 Package: sp
