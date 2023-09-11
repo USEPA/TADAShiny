@@ -69,7 +69,6 @@ get_package_deps <- function(packs, github, to_build_cran) {
         deps["cran_build"] == TRUE
     deps
 }
-install.packages("pak", update(TRUE))
 
 # Get the package dependencies
 packages <- get_package_deps(input_packs, github_packages_list,
