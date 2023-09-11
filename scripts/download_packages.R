@@ -98,7 +98,7 @@ no_build <- subset(packages, (require_build == FALSE))
 #         getRversion(), "&arch=", R.version["arch"], sep = "")
 #     download.file(url, paste(args[1], filename, sep = "/"), method = "libcurl")
 # }
-download.packages(no_build, destdir = args[1])
+download.packages(no_build$package, destdir = args[1])
 # download.packages(c("MASS", "class", "lattice"),
 #     destdir = args[1], repos = "https://cloud.r-project.org")
 
