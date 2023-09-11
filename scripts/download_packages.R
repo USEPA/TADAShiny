@@ -68,7 +68,7 @@ packages <- get_package_deps(input_packs, github_packages_list,
 # Download the packages from the Posit repository
 message(paste("Downloading the packages and dependencies to",
     args[1], sep = " "))
-no_build <- subset(deps, (require_build == FALSE))
+no_build <- subset(packages, (require_build == FALSE))
 for (row in 1:nrow(no_build)) {
     # URL format: https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/shinyjqui_0.4.1.tar.gz?r_version=4.3&arch=x86_64
     base_url <- "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/"
