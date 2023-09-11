@@ -65,7 +65,9 @@ get_package_deps <- function(packs, github, to_build_cran) {
 packages <- get_package_deps(input_packs, github_packages_list,
     packages_needing_to_be_built)
 
-write.csv(packages, "Packages_to_pull.csv", row.names = TRUE)
+library(rjson)
+jsonData <- toJSON(packages)
+write(jsonData, "Packages_to_pull.json")
 
 # Download the packages from the Posit repository
 message(paste("Downloading the packages and dependencies to",
