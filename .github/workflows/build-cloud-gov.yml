@@ -145,11 +145,11 @@ jobs:
           git add shiny.R
         fi
       
-    - name: Upload "Packages_to_pull.csv" artifact
+    - name: Upload folder debug-outputs to an artifact
       uses: actions/upload-artifact@v3
       with:
-        name: Packages_to_pull.json
-        path: Packages_to_pull.json
+        name: debug-outputs
+        path: debug-outputs
 
 
     - name: Commit & Push
