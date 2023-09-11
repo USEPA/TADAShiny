@@ -25,6 +25,8 @@ message(paste(input_packs), sep = " ")
 plfrm <- paste(getRversion(), R.version["platform"],
     R.version["arch"], R.version["os"])
 
+# options(HTTPUserAgent = sprintf("R/%s R (%s)", "4.3.1", paste("4.3.1","x86_64-pc-linux-gnu", "x86_64","linux-gnu")))
+
 options(HTTPUserAgent = sprintf("R/%s R (%s)", getRversion(), plfrm))
 
 # Packages that should be pulled from GitHub
@@ -66,10 +68,20 @@ packages <- get_package_deps(input_packs, github_packages_list,
 # Download the packages from the Posit repository
 message(paste("Downloading the packages and dependencies to",
     args[1], sep = " "))
-download.packages(packages["ref"][packages["require_build"] == FALSE],
-    destdir = args[1])
-download.packages(c("MASS", "class", "lattice"),
-    destdir = args[1], repos = "https://cloud.r-project.org")
+no_build <- subset(deps, (require_build == FALSE))
+for (row in 1:nrow(no_build)) {
+    # URL format: https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/shinyjqui_0.4.1.tar.gz?r_version=4.3&arch=x86_64
+    base_url <- "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/"
+    filename <- paste(no_build[row, "package"], "_",
+        no_build[row, "version"], ".tar.gz", sep = "")
+    url <- paste(base_url, filename, "?r_version=",
+        getRversion(), "&arch=", R.version["arch"], sep = "")
+    download.file(url, paste(args[1], filename, sep = "/"), method = "libcurl")
+}
+# download.packages(packages["ref"][packages["require_build"] == FALSE],
+#     destdir = args[1])
+# download.packages(c("MASS", "class", "lattice"),
+#     destdir = args[1], repos = "https://cloud.r-project.org")
 
 message(paste("Github packages needed are:",
     packages["ref"][packages["type"] == "github"], sep = " "))
