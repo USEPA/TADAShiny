@@ -54,7 +54,7 @@ get_package_deps <- function(packs, github, to_build_cran) {
     for (row in length(refs)) {
         deps <- rbind(deps, pak::pkg_deps(refs[row]))
     }
-    # distinct(deps, ref, .keep_all = TRUE)
+    deps <- distinct(deps, package, .keep_all = TRUE)
 
     deps["cran_build"] <- FALSE
     cran_deps <- mapply(`%in%`, deps["package"], to_build_cran)
@@ -90,17 +90,16 @@ sink()
 message(paste("Downloading the packages and dependencies to",
     args[1], sep = " "))
 no_build <- subset(packages, (require_build == FALSE))
-for (row in 1:nrow(no_build)) {
-    # URL format: https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/shinyjqui_0.4.1.tar.gz?r_version=4.3&arch=x86_64
-    base_url <- "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/"
-    filename <- paste(no_build[row, "package"], "_",
-        no_build[row, "version"], ".tar.gz", sep = "")
-    url <- paste(base_url, filename, "?r_version=",
-        getRversion(), "&arch=", R.version["arch"], sep = "")
-    download.file(url, paste(args[1], filename, sep = "/"), method = "libcurl")
-}
-# download.packages(packages["ref"][packages["require_build"] == FALSE],
-#     destdir = args[1])
+# for (row in 1:nrow(no_build)) {
+#     # URL format: https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/shinyjqui_0.4.1.tar.gz?r_version=4.3&arch=x86_64
+#     base_url <- "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/"
+#     filename <- paste(no_build[row, "package"], "_",
+#         no_build[row, "version"], ".tar.gz", sep = "")
+#     url <- paste(base_url, filename, "?r_version=",
+#         getRversion(), "&arch=", R.version["arch"], sep = "")
+#     download.file(url, paste(args[1], filename, sep = "/"), method = "libcurl")
+# }
+download.packages(no_build, destdir = args[1])
 # download.packages(c("MASS", "class", "lattice"),
 #     destdir = args[1], repos = "https://cloud.r-project.org")
 
