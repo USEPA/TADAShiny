@@ -55,7 +55,7 @@ get_package_deps <- function(packs, github, to_build_cran) {
 
     # Pulls pkg_deps for each of refs
     deps <- pak::pkg_deps(refs[1])
-    for (row in length(refs)) {
+    for (row in 2:length(refs)) {
         deps <- rbind(deps, pak::pkg_deps(refs[row]))
     }
     deps <- distinct(deps, package, .keep_all = TRUE)
