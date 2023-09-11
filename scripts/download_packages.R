@@ -1,4 +1,6 @@
 library(stringr)
+library(rjson)
+library(dplyr)
 
 args <- commandArgs(trailingOnly = TRUE)
 
@@ -46,7 +48,14 @@ get_package_deps <- function(packs, github, to_build_cran) {
     }
     message("Getting the package dependencies for: ")
     message(paste(refs, sep = ", "))
-    deps <- pak::pkg_deps(refs)
+
+    # Pulls pkg_deps for each of refs
+    deps <- pak::pkg_deps(refs[1])
+    for (row in length(refs)) {
+        deps <- rbind(deps, pak::pkg_deps(refs[row]))
+    }
+    # distinct(deps, ref, .keep_all = TRUE)
+
     deps["cran_build"] <- FALSE
     cran_deps <- mapply(`%in%`, deps["package"], to_build_cran)
     for (row in 1:nrow(cran_deps)) {
@@ -60,12 +69,12 @@ get_package_deps <- function(packs, github, to_build_cran) {
         deps["cran_build"] == TRUE
     deps
 }
+install.packages("pak", update(TRUE))
 
 # Get the package dependencies
 packages <- get_package_deps(input_packs, github_packages_list,
     packages_needing_to_be_built)
 
-library(rjson)
 dir.create("debug-outputs", recursive = TRUE)
 json_data <- toJSON(packages)
 write(json_data, "debug-outputs/Packages_to_pull.json")
