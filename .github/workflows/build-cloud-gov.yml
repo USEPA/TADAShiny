@@ -141,6 +141,13 @@ jobs:
           mv scripts/include/shiny.R .
           git add shiny.R
         fi
+      
+    - name: Upload "Packages_to_pull.csv" artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: Packages_to_pull.csv
+        path: Packages_to_pull.csv
+
 
     - name: Commit & Push
       if: ${{ success() }}
