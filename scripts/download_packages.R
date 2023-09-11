@@ -99,8 +99,6 @@ no_build <- subset(packages, (require_build == FALSE))
 #     download.file(url, paste(args[1], filename, sep = "/"), method = "libcurl")
 # }
 download.packages(no_build$package, destdir = args[1])
-# download.packages(c("MASS", "class", "lattice"),
-#     destdir = args[1], repos = "https://cloud.r-project.org")
 
 message(paste("Github packages needed are:",
     packages["ref"][packages["type"] == "github"], sep = " "))
