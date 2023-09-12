@@ -2,34 +2,37 @@
 	"name": "R Studio Server and Jupyter",
 	"image": "ghcr.io/rocker-org/devcontainer/geospatial:4",
 	"features": {
-		"ghcr.io/rocker-org/devcontainer-features/r-rig:1": {
-			"installJupyterlab": true,
-			"version": "release",
-			"pakVersion": "stable",
-			"vscodeRSupport": "full",
-			"pandocVersion": "latest"
-		},
+		// "ghcr.io/rocker-org/devcontainer-features/r-rig:1": {
+		// 	"installJupyterlab": true,
+		// 	"version": "release",
+		// 	"pakVersion": "stable",
+		// 	"vscodeRSupport": "full",
+		// 	"pandocVersion": "latest"
+		// },
         "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
-            "packages": "github::USEPA/TADA,config,golem,readxl,writexl,leaflet,shiny,shinyWidgets,shinycssloaders,DT,ggplot2,shinybusy,dplyr,plyr,tidyr,scales,forcats,RColorBrewer,lubridate,plotly"
-        },
-		"ghcr.io/rocker-org/devcontainer-features/rstudio-server:0": {
-			"version": "stable",
-            "singleUser": true
-		}
+            "packages": "github::USEPA/TADA,config,golem,readxl,writexl,leaflet,shiny,shinyjs,shinyWidgets,shinycssloaders,DT,ggplot2,shinybusy,dplyr,plyr,tidyr,scales,forcats,RColorBrewer,lubridate,plotly"
+        }
+        // ,
+		// "ghcr.io/rocker-org/devcontainer-features/rstudio-server:0": {
+		// 	"version": "stable",
+        //     "singleUser": true
+		// }
 	},
     "postAttachCommand": {
         "rstudio-start": "rserver"
     },
     "forwardPorts": [
-        8787,
-        8888
+        8787
+        // ,
+        // 8888
     ],
     "portsAttributes": {
         "8787": {
             "label": "RStudio IDE"
-        },
-        "8888": {
-            "label": "Jupyter Lab"
         }
+        // ,
+        // "8888": {
+        //     "label": "Jupyter Lab"
+        // }
     }
 }
