@@ -14,7 +14,7 @@
         },
 		"ghcr.io/rocker-org/devcontainer-features/rstudio-server:0": {
 			"version": "stable",
-            "singleUser": false
+            "singleUser": true
 		}
 	},
     "postAttachCommand": {
