@@ -92,6 +92,9 @@ applyFlags <- function(in_table, orgs) {
   # QC rep/blank
   out <- TADA::TADA_FindQCActivities(out, clean = FALSE)
   
+  # Result is flagged as suspect by data submitter
+  out <- TADA::TADA_FlagMeasureQualifierCode(out, clean = FALSE)
+  
   # Invalid analytical method
   out <- TADA::TADA_FlagMethod(out, clean = FALSE)
   
@@ -126,11 +129,13 @@ applyFlags <- function(in_table, orgs) {
   # Convert depth height units - THIS ONE ONLY GETS RUN WHEN USER RUNS THE CLEANING
   # FILTER AFTER MAKING ALL DECISIONS, AND SUMMARY COUNTS BASED ON UNIQUE UNITS IN
   # DEPTH HEIGHT COLUMNS
+  # CM - this is already done via TADA autoclean 9/12/23, simply add note somewhere for users?
   # out <-
   #   TADA::TADA_ConvertDepthUnits(out, unit = 'ft', transform = TRUE) # input$depthunit is dummy variable that would connect to the drop down
 
   # Convert time zones - no flag function to run beforehand. This one might be
   # tricky to implement - acts on ActivityStartTime.Time?
+  # CM - this is already done via dataRetrieval 9/12/23, simply add note somewhere for users?
   #out = out
   
   # Invalid coordinates - not included in mock up page?
