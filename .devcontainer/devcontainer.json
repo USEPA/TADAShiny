@@ -10,7 +10,7 @@
 			"pandocVersion": "latest"
 		},
         "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
-            "packages": "github::USEPA/TADA,config,golem,writexl,leaflet,shiny,shinyWidgets,shinycssloaders,DT,ggplot2,shinybusy,dplyr,plyr,tidyr,scales,forcats,RColorBrewer,lubridate,plotly"
+            "packages": "github::USEPA/TADA,config,golem,readxl,writexl,leaflet,shiny,shinyWidgets,shinycssloaders,DT,ggplot2,shinybusy,dplyr,plyr,tidyr,scales,forcats,RColorBrewer,lubridate,plotly"
         },
 		"ghcr.io/rocker-org/devcontainer-features/rstudio-server:0": {
 			"version": "stable",
