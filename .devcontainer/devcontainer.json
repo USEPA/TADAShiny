@@ -1,20 +1,17 @@
 {
-    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "image": "ghcr.io/rocker-org/devcontainer/geospatial",
     "features": {
-        "ghcr.io/rocker-org/devcontainer-features/r-rig:latest": {
-            "installJupyterlab": true,
-            "vscodeRSupport": true,
+        "ghcr.io/rocker-org/devcontainer-features/r-apt:0": {
+            "vscodeRSupport": "full",
+            "installDevTools": true,
+            "installRMarkdown": true,
             "installRadian": true,
-            "installVscDebugger": true
-        },
-        "ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
-            "packages": "make,gcc,g++,libudunits2-dev,libgdal-dev,libgeos-dev,libproj-dev"
+            "installVscDebugger": true,
+            "installBspm": true,
+            "installJupyterlab": true
         },
         "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
             "packages": "github::USEPA/TADA,config,golem,writexl,leaflet,shiny,shinyWidgets,shinycssloaders,DT,ggplot2,shinybusy,dplyr,plyr,tidyr,scales,forcats,RColorBrewer,lubridate,plotly"
-        },        
-        "ghcr.io/rocker-org/devcontainer-features/rstudio-server": {
-            "singleUser": false
         }
     },
     "postAttachCommand": {
