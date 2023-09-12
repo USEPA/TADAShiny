@@ -1,6 +1,6 @@
 {
 	"name": "R Studio Server and Jupyter",
-	"image": "mcr.microsoft.com/devcontainers/base:alpine",
+	"image": "mcr.microsoft.com/devcontainers/base:ubuntu",
 	"features": {
 		"ghcr.io/rocker-org/devcontainer-features/r-rig:1": {
 			"installJupyterlab": true,
