@@ -6,7 +6,7 @@
             "packages": "make,gcc,g++"
         },
         "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
-            "packages": "github::USEPA/TADA"
+            "packages": "github::USEPA/TADA,config,golem,writexl,leaflet,shinyWidgets,shinycssloaders,DT,ggplot2,shinybusy,dplyr,plyr,tidyr,scales,forcats,RColorBrewer,lubridate,plotly"
         },        
         "ghcr.io/rocker-org/devcontainer-features/rstudio-server": {
             "singleUser": false
