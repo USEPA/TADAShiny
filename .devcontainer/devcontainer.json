@@ -1,0 +1,17 @@
+{
+    "image": "ghcr.io/rocker-org/devcontainer/r-ver:4",
+    "features": {
+        "ghcr.io/rocker-org/devcontainer-features/rstudio-server": {}
+    },
+    "postAttachCommand": {
+        "rstudio-start": "rserver"
+    },
+    "forwardPorts": [
+        8787
+    ],
+    "portsAttributes": {
+        "8787": {
+            "label": "RStudio IDE"
+        }
+    }
+}
