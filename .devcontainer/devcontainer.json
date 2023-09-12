@@ -1,7 +1,16 @@
 {
-    "image": "ghcr.io/rocker-org/devcontainer/r-ver:4",
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
     "features": {
-        "ghcr.io/rocker-org/devcontainer-features/rstudio-server": {}
+        "ghcr.io/rocker-org/devcontainer-features/r-apt:latest": {},
+        "ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
+            "packages": "make,gcc,g++"
+        },
+        "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
+            "packages": "github::USEPA/TADA"
+        },        
+        "ghcr.io/rocker-org/devcontainer-features/rstudio-server": {
+            "singleUser": false
+        }
     },
     "postAttachCommand": {
         "rstudio-start": "rserver"
