@@ -37,9 +37,9 @@ RUN install2.r --error --skipinstalled -r 'https://packagemanager.posit.co/cran/
 RUN Rscript -e "devtools::install_github('USEPA/TADA')"
 
 # allow permission
-RUN sudo chown -R shiny:shiny /workspaces/TADAShiny
+RUN sudo chown -R shiny:shiny /shiny-app
 
 USER shiny
 
 # run app on container start
-CMD ["R", "-e", "shiny::runApp('/workspaces/TADAShiny', host = '0.0.0.0', port = 3838)"]
+CMD ["R", "-e", "shiny::runApp('/shiny-app', host = '0.0.0.0', port = 3838)"]
