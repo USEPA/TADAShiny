@@ -5,7 +5,7 @@ RUN /rocker_scripts/install_shiny_server.sh
 
 # install R packages required
 # (change it depending on the packages you need)
-RUN install2.r --error --skipinstalled -r 'https://cloud.r-project.org' \
+RUN install2.r --error --skipinstalled -r 'https://packagemanager.posit.co/cran/__linux__/jammy/latest' \
     devtools \
     config \
     golem \
@@ -38,8 +38,8 @@ RUN Rscript -e "devtools::install_github('USEPA/TADA')"
 
 # Copy all files and folders from the project root except .github and .devcontainer into a new app folder
 RUN mkdir ./app
-RUN for f in $(ls -A | grep -v -E ".github|.devcontainer|CONTRIBUTING.md|README.md|.Rbuildignore"); do && \
-    cp -r $f ./app; && \
+RUN for f in $(ls -A | grep -v -E ".github|.devcontainer|CONTRIBUTING.md|README.md|.Rbuildignore"); do \
+    cp -r $f ./app; \
 done
 
 # allow permission
