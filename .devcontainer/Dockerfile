@@ -36,6 +36,8 @@ RUN install2.r --error --skipinstalled -r 'https://packagemanager.posit.co/cran/
 
 RUN Rscript -e "devtools::install_github('USEPA/TADA')"
 
+RUN mkdir /shiny-app
+
 # allow permission
 RUN sudo chown -R shiny:shiny /shiny-app
 
