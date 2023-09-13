@@ -36,16 +36,10 @@ RUN install2.r --error --skipinstalled -r 'https://packagemanager.posit.co/cran/
 
 RUN Rscript -e "devtools::install_github('USEPA/TADA')"
 
-# Copy all files and folders from the project root except .github and .devcontainer into a new app folder
-RUN mkdir ./app
-RUN for f in $(ls -A | grep -v -E ".github|.devcontainer|CONTRIBUTING.md|README.md|.Rbuildignore"); do \
-    cp -r $f ./app; \
-done
-
 # allow permission
-RUN sudo chown -R shiny:shiny /app
+RUN sudo chown -R shiny:shiny /workspaces/TADAShiny
 
 USER shiny
 
 # run app on container start
-CMD ["R", "-e", "shiny::runApp('/app', host = '0.0.0.0', port = 3838)"]
+CMD ["R", "-e", "shiny::runApp('/workspaces/TADAShiny', host = '0.0.0.0', port = 3838)"]
