@@ -39,9 +39,11 @@ RUN Rscript -e "devtools::install_github('USEPA/TADA')"
 RUN mkdir /shiny-app
 
 # allow permission
-RUN sudo chown -R shiny:shiny /shiny-app
+RUN chown shiny:shiny -R /shiny-app
 
 USER shiny
+
+EXPOSE 3838
 
 # run app on container start
 CMD ["R", "-e", "shiny::runApp('/shiny-app', host = '0.0.0.0', port = 3838)"]

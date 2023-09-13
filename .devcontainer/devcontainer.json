@@ -15,6 +15,6 @@
             "onAutoForward": "notify"
         }
     },
-    "workspaceMount": "source=${localWorkspaceFolder}/sub-folder,target=/shiny-app,type=bind,consistency=cached", 
+    "workspaceMount": "source=${localWorkspaceFolder},target=/shiny-app,type=bind", 
     "workspaceFolder": "/shiny-app"
 }
