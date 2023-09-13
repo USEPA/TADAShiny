@@ -34,12 +34,12 @@ RUN install2.r --error --skipinstalled -r 'https://cloud.r-project.org' \
     stringr \
     shinyjqui
 
-R -e "devtools::install_github('USEPA/TADA')"
+RUN Rscript -e "devtools::install_github('USEPA/TADA')"
 
 # Copy all files and folders from the project root except .github and .devcontainer into a new app folder
-mkdir ./app
-for f in $(ls -A | grep -v -E ".github|.devcontainer|CONTRIBUTING.md|README.md|.Rbuildignore"); do 
-    cp -r $f ./app; 
+RUN mkdir ./app
+RUN for f in $(ls -A | grep -v -E ".github|.devcontainer|CONTRIBUTING.md|README.md|.Rbuildignore"); do && \
+    cp -r $f ./app; && \
 done
 
 # allow permission
