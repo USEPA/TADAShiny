@@ -12,9 +12,11 @@
     "portsAttributes": {
         "3838":{
             "label": "Shiny Server",
-            "onAutoForward": "notify"
+			"requireLocalPort": true,
+			"onAutoForward": "ignore"
         }
     },
     "workspaceMount": "source=${localWorkspaceFolder},target=/shiny-app,type=bind", 
-    "workspaceFolder": "/shiny-app"
+    "workspaceFolder": "/shiny-app",
+    "postAttachCommand": "R -e shiny::runApp('/shiny-app', host = '0.0.0.0', port = 3838)"
 }
