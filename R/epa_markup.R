@@ -99,11 +99,13 @@
     tags$link(rel = "stylesheet", media = "all", href = "https://www.epa.gov/core/themes/stable/css/system/components/tree-child.module.css?r6lsex"),
 		
 		#################
-		# BELOW (https://www.epa.gov/themes/epa_theme/css/styles.css?r6lsex) CAUSES ISSUES WITH PLOTLY
+		# BELOW (https://www.epa.gov/themes/epa_theme/css/styles.css?r6lsex) CAUSES ISSUES WITH PLOTLY AND LEAFLET
 		# tags$link(rel = "stylesheet", media = "all", href = "https://www.epa.gov/themes/epa_theme/css/styles.css?r6lsex"),
 		# try referencing locally using file shared by Garrett (styles.css in www folder), not sure if this is the same
-		tags$link(rel = "stylesheet", type = "text/css", href = "styles.css"),
+		# this file doesnt look right but doesnt cause the PLOTLY or LEAFLET issues
+		# tags$link(rel = "stylesheet", type = "text/css", href = "styles.css"),
 		# try copying https://www.epa.gov/themes/epa_theme/css/styles.css?r6lsex into css file and reference that locally (see styles2.css in www folder)
+		# doing this doesnt look right AND still causes the PLOTLY and LEAFLET issues
 		# tags$link(rel = "stylesheet", type = "text/css", href = "styles2.css"),
 		#################
 		
