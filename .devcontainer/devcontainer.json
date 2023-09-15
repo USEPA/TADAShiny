@@ -1,22 +1,33 @@
 {
-	"name": "Shiny Server",
-    "build": {
-        "dockerfile": "Dockerfile",
-        "args": {
-            "VARIANT": "latest"
+	"name": "R Studio Server and Jupyter Lab",
+    "image": "ghcr.io/rocker-org/devcontainer/geospatial:latest",
+	"features": {
+		"ghcr.io/rocker-org/devcontainer-features/r-rig:1": {
+			"version": "none",
+			"installJupyterlab": true
+		},
+        "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
+            "packages": "github::USEPA/TADA,config,golem,readxl,writexl,leaflet,shiny,shinyWidgets,shinyjs,shinycssloaders,DT,ggplot2,shinybusy,dplyr,plyr,tidyr,scales,forcats,RColorBrewer,lubridate,plotly"
         }
-    },
+	},
     "forwardPorts": [
-        3838
+        8787,
+        8888
     ],
     "portsAttributes": {
-        "3838":{
-            "label": "Shiny Server",
+        "8787":{
+            "label": "R Studio Server",
+			"requireLocalPort": true,
+			"onAutoForward": "ignore"
+        },
+        "8888":{
+            "label": "Jupyter Lab",
 			"requireLocalPort": true,
 			"onAutoForward": "ignore"
         }
     },
-    "workspaceMount": "source=${localWorkspaceFolder},target=/shiny-app,type=bind", 
-    "workspaceFolder": "/shiny-app",
-    "postAttachCommand": "R -e shiny::runApp('/shiny-app', host = '0.0.0.0', port = 3838)"
+    "postAttachCommand": {
+        "rstudio-start": "rserver",
+        "jupyter-start": "jupyter lab"
+    }
 }
