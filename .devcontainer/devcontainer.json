@@ -18,6 +18,6 @@
         }
     },
     "postAttachCommand": {
-        "rstudio-start": "sudo rstudio-rserver start"
+        "rstudio-start": "sudo rstudio-server start"
     }
 }
