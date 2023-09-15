@@ -24,16 +24,16 @@
       crossorigin = "anonymous",
       referrerpolicy = "no-referrer"
     ),
-    # use updated EPA template provided by Brad instead?
-    #tags$meta(property = "og:url", content = "https://www.epa.gov/themes/epa_theme/pattern-lab/.markup-only.html"),
-    #tags$link(rel = "canonical", href = "https://www.epa.gov/themes/epa_theme/pattern-lab/.markup-only.html"),
-    #tags$link(rel = "shortlink", href = "https://www.epa.gov/themes/epa_theme/pattern-lab/.markup-only.html"),
-    #tags$meta(property = "og:url", content = "https://www.epa.gov/themes/epa_theme/pattern-lab/.markup-only.html"),
-		tags$meta(property = "og:url", content = "https://www.epa.gov/themes/epa_theme/pattern-lab/?p=pages-standalone-template"),
-		tags$link(rel = "canonical", href = "https://www.epa.gov/themes/epa_theme/pattern-lab/?p=pages-standalone-template"),
-		tags$link(rel = "shortlink", href = "https://www.epa.gov/themes/epa_theme/pattern-lab/?p=pages-standalone-template"),
-		tags$meta(property = "og:url", content = "https://www.epa.gov/themes/epa_theme/pattern-lab/?p=pages-standalone-template"),
-		# jpg
+    # use updated EPA template (https://www.epa.gov/themes/epa_theme/pattern-lab/?p=pages-standalone-template) provided by Brad instead?
+    tags$meta(property = "og:url", content = "https://www.epa.gov/themes/epa_theme/pattern-lab/.markup-only.html"),
+    tags$link(rel = "canonical", href = "https://www.epa.gov/themes/epa_theme/pattern-lab/.markup-only.html"),
+    tags$link(rel = "shortlink", href = "https://www.epa.gov/themes/epa_theme/pattern-lab/.markup-only.html"),
+    tags$meta(property = "og:url", content = "https://www.epa.gov/themes/epa_theme/pattern-lab/.markup-only.html"),
+		#tags$meta(property = "og:url", content = "https://www.epa.gov/themes/epa_theme/pattern-lab/?p=pages-standalone-template"),
+		#tags$link(rel = "canonical", href = "https://www.epa.gov/themes/epa_theme/pattern-lab/?p=pages-standalone-template"),
+		#tags$link(rel = "shortlink", href = "https://www.epa.gov/themes/epa_theme/pattern-lab/?p=pages-standalone-template"),
+		#tags$meta(property = "og:url", content = "https://www.epa.gov/themes/epa_theme/pattern-lab/?p=pages-standalone-template"),
+		# jpg below
 		tags$meta(property = "og:image", content = "https://www.epa.gov/sites/all/themes/epa/img/epa-standard-og.jpg"),
     tags$meta(property = "og:image:width", content = "1200"),
     tags$meta(property = "og:image:height", content = "630"),
@@ -98,20 +98,19 @@
     tags$link(rel = "stylesheet", media = "all", href = "https://www.epa.gov/core/themes/stable/css/system/components/tablesort.module.css?r6lsex"),
     tags$link(rel = "stylesheet", media = "all", href = "https://www.epa.gov/core/themes/stable/css/system/components/tree-child.module.css?r6lsex"),
 		
-		# BELOW CAUSES ISSUES WITH PLOTLY
-		# commenting out because of plotly conflicts. for future debugging, note that js files also tend to cause issues - Hui discussion)
+		#################
+		# BELOW (https://www.epa.gov/themes/epa_theme/css/styles.css?r6lsex) CAUSES ISSUES WITH PLOTLY
 		# tags$link(rel = "stylesheet", media = "all", href = "https://www.epa.gov/themes/epa_theme/css/styles.css?r6lsex"),
-		# try referencing locally using file shared by Garrett (style.css)
-		#tags$link(rel = "stylesheet", type = "text/css", href = "style.css"),
-		# try copying https://www.epa.gov/themes/epa_theme/css/styles.css?r6lsex into css file and reference that locally (see style2.css in www folder)
-		tags$link(rel = "stylesheet", type = "text/css", href = "style2.css"),
+		# try referencing locally using file shared by Garrett (styles.css in www folder), not sure if this is the same
+		tags$link(rel = "stylesheet", type = "text/css", href = "styles.css"),
+		# try copying https://www.epa.gov/themes/epa_theme/css/styles.css?r6lsex into css file and reference that locally (see styles2.css in www folder)
+		# tags$link(rel = "stylesheet", type = "text/css", href = "styles2.css"),
+		#################
 		
 		tags$link(rel = "stylesheet", media = "all", href = "https://www.epa.gov/themes/epa_theme/css-lib/colorbox.min.css?r6lsex"),
-
-		# this is a beta file, may have issues
+		# this is a beta file, may have issues, js files tend to have issues
 		tags$script(src = 'https://cdnjs.cloudflare.com/ajax/libs/uswds/3.0.0-beta.3/js/uswds-init.min.js'),
-    
-		# fix container-fluid that boostrap RShiny uses
+    # fix container-fluid that boostrap RShiny uses
     tags$style(
       HTML(
         '.container-fluid {
