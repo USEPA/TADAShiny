@@ -26,7 +26,7 @@ app_ui <- function(request) {
       for <strong>development</strong> and/or <strong>testing</strong> purposes
       only.</div>"),
       epa_header,
-      shiny::includeHTML(app_sys("app/www/header.html")),
+      #shiny::includeHTML(app_sys("app/www/header.html")),
       shinyjs::useShinyjs(),
       shinyjs::inlineCSS(css),
       htmltools::br(),
@@ -68,7 +68,7 @@ app_ui <- function(request) {
       ),
       htmltools::hr(),
       mod_TADA_summary_ui("TADA_summary_1"),
-      shiny::includeHTML(app_sys("app/www/footer.html"))
+      #shiny::includeHTML(app_sys("app/www/footer.html"))
     )
   )
 }
