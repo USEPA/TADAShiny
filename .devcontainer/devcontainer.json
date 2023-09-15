@@ -1,34 +1,23 @@
 {
-	"name": "R Studio Server and Jupyter Lab",
+	"name": "R Studio Server",
     "image": "ghcr.io/rocker-org/devcontainer/geospatial:4",
 	"features": {
-		"ghcr.io/rocker-org/devcontainer-features/r-rig:1": {
-			"version": "none",
-			"installJupyterlab": true
-		},
         "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
             "packages": "github::USEPA/TADA,config,golem,readxl,writexl,leaflet,shiny,shinyWidgets,shinyjs,shinycssloaders,DT,ggplot2,shinybusy,dplyr,plyr,tidyr,scales,forcats,RColorBrewer,lubridate,plotly",
             "installSystemRequirements": true
         }
 	},
     "forwardPorts": [
-        8787,
-        8888
+        8787
     ],
     "portsAttributes": {
         "8787":{
             "label": "R Studio Server",
 			"requireLocalPort": true,
 			"onAutoForward": "ignore"
-        },
-        "8888":{
-            "label": "Jupyter Lab",
-			"requireLocalPort": true,
-			"onAutoForward": "ignore"
         }
     },
     "postAttachCommand": {
-        "rstudio-start": "sudo rstudio-rserver start",
-        "jupyter-start": "jupyter lab"
+        "rstudio-start": "sudo rstudio-rserver start"
     }
 }
