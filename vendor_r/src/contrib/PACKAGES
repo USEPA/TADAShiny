@@ -80,7 +80,7 @@ Imports: plyr, data.table, dplyr, tidyr, grDevices, magrittr, stringr,
 Suggests: rmarkdown, readr, tidyverse, knitr, testthat, testthis,
         usethis, devtools, pkgdown, spelling
 License: CC0
-MD5sum: 223abd2758d512a0d7c07b8ecd60347c
+MD5sum: 447336d6f268993c489909f1b705981f
 NeedsCompilation: no
 
 Package: anytime
@@ -1034,7 +1034,7 @@ Suggests: blob, covr, dplyr (>= 0.8-3), ggplot2, knitr, lwgeom (>=
         tibble (>= 1.4.1), tidyr (>= 1.2.0), tidyselect (>= 1.0.0),
         tmap (>= 2.0), vctrs, wk
 License: GPL-2 | MIT + file LICENSE
-MD5sum: 306aa044d95652d9e4d1c449107d32b8
+MD5sum: b0fc31fb5f3b2f24a6202bd63fe44b27
 NeedsCompilation: yes
 
 Package: shinyWidgets
