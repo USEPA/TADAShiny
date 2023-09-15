@@ -1,6 +1,6 @@
 {
 	"name": "R Studio Server and Jupyter Lab",
-    "image": "ghcr.io/rocker-org/devcontainer/geospatial:latest",
+    "image": "ghcr.io/rocker-org/devcontainer/geospatial:4",
 	"features": {
 		"ghcr.io/rocker-org/devcontainer-features/r-rig:1": {
 			"version": "none",
@@ -27,7 +27,7 @@
         }
     },
     "postAttachCommand": {
-        "rstudio-start": "rserver",
+        "rstudio-start": "sudo rstudio-rserver start",
         "jupyter-start": "jupyter lab"
     }
 }
