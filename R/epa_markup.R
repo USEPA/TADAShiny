@@ -106,7 +106,7 @@
 		# tags$link(rel = "stylesheet", type = "text/css", href = "styles.css"),
 		# try copying https://www.epa.gov/themes/epa_theme/css/styles.css?r6lsex into css file and reference that locally (see styles2.css in www folder)
 		# doing this doesnt look right AND still causes the PLOTLY and LEAFLET issues
-		# tags$link(rel = "stylesheet", type = "text/css", href = "styles2.css"),
+		tags$link(rel = "stylesheet", type = "text/css", href = "styles2.css"),
 		#################
 		
 		tags$link(rel = "stylesheet", media = "all", href = "https://www.epa.gov/themes/epa_theme/css-lib/colorbox.min.css?r6lsex"),
