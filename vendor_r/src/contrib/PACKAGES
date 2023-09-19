@@ -38,14 +38,14 @@ MD5sum: 2bceb434966cb5bd2bb6e6f3b6d6296d
 NeedsCompilation: yes
 
 Package: Matrix
-Version: 1.6-1
+Version: 1.6-1.1
 Priority: recommended
 Depends: R (>= 3.5.0), methods
 Imports: grDevices, graphics, grid, lattice, stats, utils
 Suggests: MASS, datasets, sfsmisc
 Enhances: SparseM, graph
 License: GPL (>= 2) | file LICENCE
-MD5sum: f4da49b0ab10c1609d72070235a42f9e
+MD5sum: dda7b44caa688481756f027c89a7c547
 NeedsCompilation: yes
 
 Package: R6
@@ -80,7 +80,7 @@ Imports: plyr, data.table, dplyr, tidyr, grDevices, magrittr, stringr,
 Suggests: rmarkdown, readr, tidyverse, knitr, testthat, testthis,
         usethis, devtools, pkgdown, spelling
 License: CC0
-MD5sum: 6e6b34f2497590242ce36b3e5d2f4d76
+MD5sum: c56371de0c4dd8183b73da5d50a29dc7
 NeedsCompilation: no
 
 Package: anytime
@@ -966,7 +966,7 @@ MD5sum: 53828c99bc3b00b0163bf8884221c0b9
 NeedsCompilation: yes
 
 Package: rmarkdown
-Version: 2.24
+Version: 2.25
 Depends: R (>= 3.0)
 Imports: bslib (>= 0.2.5.1), evaluate (>= 0.13), fontawesome (>=
         0.5.0), htmltools (>= 0.5.1), jquerylib, jsonlite, knitr (>=
@@ -976,7 +976,7 @@ Suggests: digest, dygraphs, fs, rsconnect, downlit (>= 0.4.0), katex
         (>= 1.4.0), sass (>= 0.4.0), shiny (>= 1.6.0), testthat (>=
         3.0.3), tibble, vctrs, cleanrmd, withr (>= 2.4.2)
 License: GPL-3
-MD5sum: 1787c542f36f03ccf70827ef682d42b2
+MD5sum: 06e223326afc4bc81688292aa5ca419a
 NeedsCompilation: no
 
 Package: rprojroot
@@ -1034,7 +1034,7 @@ Suggests: blob, covr, dplyr (>= 0.8-3), ggplot2, knitr, lwgeom (>=
         tibble (>= 1.4.1), tidyr (>= 1.2.0), tidyselect (>= 1.0.0),
         tmap (>= 2.0), vctrs, wk
 License: GPL-2 | MIT + file LICENSE
-MD5sum: b6362359d7c242f1dc62926f7b187c51
+MD5sum: 363c86bf72404d61a1a3f229c17ee593
 NeedsCompilation: yes
 
 Package: shinyWidgets
