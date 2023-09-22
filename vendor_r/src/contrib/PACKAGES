@@ -80,7 +80,7 @@ Imports: plyr, data.table, dplyr, tidyr, grDevices, magrittr, stringr,
 Suggests: rmarkdown, readr, tidyverse, knitr, testthat, testthis,
         usethis, devtools, pkgdown, spelling
 License: CC0
-MD5sum: c56371de0c4dd8183b73da5d50a29dc7
+MD5sum: 0d4d95fe491e6d3329c439c7310813c8
 NeedsCompilation: no
 
 Package: anytime
@@ -763,6 +763,17 @@ License: MIT + file LICENSE
 MD5sum: 0135ded34d8080d3cb6d40672e2000f9
 NeedsCompilation: no
 
+Package: pkgbuild
+Version: 1.4.2
+Depends: R (>= 3.4)
+Imports: callr (>= 3.2.0), cli (>= 3.4.0), crayon, desc, prettyunits,
+        processx, R6, rprojroot
+Suggests: covr, cpp11, knitr, mockery, Rcpp, rmarkdown, testthat (>=
+        3.0.0), withr (>= 2.3.0)
+License: MIT + file LICENSE
+MD5sum: 559942c5b8274cc480b5783dee77fd91
+NeedsCompilation: no
+
 Package: pkgconfig
 Version: 2.0.3
 Imports: utils
@@ -822,6 +833,13 @@ Version: 1.0.0
 Suggests: testthat
 License: MIT + file LICENSE
 MD5sum: f9c8b346b31b46468653347cfc16d1ad
+NeedsCompilation: no
+
+Package: prettyunits
+Version: 1.1.1
+Suggests: codetools, covr, testthat
+License: MIT + file LICENSE
+MD5sum: e354f79d586809338355fb8fe2fafefc
 NeedsCompilation: no
 
 Package: processx
@@ -1034,7 +1052,7 @@ Suggests: blob, covr, dplyr (>= 0.8-3), ggplot2, knitr, lwgeom (>=
         tibble (>= 1.4.1), tidyr (>= 1.2.0), tidyselect (>= 1.0.0),
         tmap (>= 2.0), vctrs, wk
 License: GPL-2 | MIT + file LICENSE
-MD5sum: 363c86bf72404d61a1a3f229c17ee593
+MD5sum: 1acf6ee2d0161588cd8119fea7f4d4e6
 NeedsCompilation: yes
 
 Package: shinyWidgets
