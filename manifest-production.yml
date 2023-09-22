@@ -2,7 +2,7 @@
 applications:
 - name: tada
   memory: 2800M
-  disk_quota: 2G
+  disk_quota: 4G
   routes:
     - route: tada.app.cloud.gov
   buildpacks:
