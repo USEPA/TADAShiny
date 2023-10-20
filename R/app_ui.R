@@ -25,8 +25,7 @@ app_ui <- function(request) {
       content on this page is not production ready. This site is being used
       for <strong>development</strong> and/or <strong>testing</strong> purposes
       only.</div>"),
-      epa_header,
-      #shiny::includeHTML(app_sys("app/www/header.html")),
+      shiny::includeHTML(app_sys("app/www/header.html")),
       shinyjs::useShinyjs(),
       shinyjs::inlineCSS(css),
       htmltools::br(),
@@ -40,8 +39,6 @@ app_ui <- function(request) {
         shiny::tabPanel("2. Overview", value = "Overview",
                  htmltools::br(),
                  mod_overview_ui("overview_1")),
-                 # htmltools::hr()),
-                 # mod_summary_ui("summary_1")),
         shiny::tabPanel("3. Flag", value = "Flag",
                         htmltools::br(),
                  mod_data_flagging_ui("data_flagging_1")),
@@ -61,14 +58,12 @@ app_ui <- function(request) {
                 mod_figures_ui("figures_1")),
         shiny::tabPanel("8. Review", value = "Review",
                         htmltools::br(),
-                        mod_review_data_ui("review_data_1"))#,
-        # shiny::tabPanel("Explore"),
-        # shiny::tabPanel("User Guide")
+                        mod_review_data_ui("review_data_1"))
 
       ),
       htmltools::hr(),
       mod_TADA_summary_ui("TADA_summary_1"),
-      #shiny::includeHTML(app_sys("app/www/footer.html"))
+      shiny::includeHTML(app_sys("app/www/footer.html"))
     )
   )
 }
