@@ -93,7 +93,7 @@ mod_figures_server <- function(id, tadat) {
       # this line adds a new column to the dataset of concatenated values of all of the columns selected by the user in the drop down above.
       depthcols <- names(tadat$raw)[grepl("DepthHeightMeasure", names(tadat$raw))]
       depthcols <- depthcols[grepl("TADA.", depthcols)]
-      selcols <- c("OrganizationFormalName", "ResultIdentifier", "groupname", "MonitoringLocationIdentifier", "MonitoringLocationName", "MonitoringLocationTypeName", "TADA.LatitudeMeasure", "TADA.LongitudeMeasure", "TADA.ResultMeasureValue", "TADA.ResultMeasure.MeasureUnitCode", "ActivityRelativeDepthName", "ActivityStartDate", "ActivityStartDateTime", depthcols)
+      selcols <- c("OrganizationFormalName", "ResultIdentifier", "groupname", "MonitoringLocationIdentifier", "MonitoringLocationName", "MonitoringLocationTypeName", "TADA.LatitudeMeasure", "TADA.LongitudeMeasure", "TADA.ResultMeasureValue", "TADA.ResultMeasure.MeasureUnitCode", "ActivityRelativeDepthName", "ActivityStartDate", "ActivityStartDateTime", "TADA.ActivityMediaName", "ActivityMediaSubdivisionName", depthcols)
 
       react$dat <- tadat$raw %>%
         dplyr::filter(TADA.Remove == FALSE, !is.na(TADA.ResultMeasureValue)) %>%
