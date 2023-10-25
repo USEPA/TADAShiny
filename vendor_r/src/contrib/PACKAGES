@@ -80,7 +80,7 @@ Imports: plyr, data.table, dplyr, tidyr, grDevices, magrittr, stringr,
 Suggests: rmarkdown, readr, tidyverse, knitr, testthat, testthis,
         usethis, devtools, pkgdown, spelling
 License: CC0
-MD5sum: 6bb2c54da25a6127cab569170eb13277
+MD5sum: deb22b231b8819bf29e956517a0c0f89
 NeedsCompilation: no
 
 Package: anytime
@@ -630,14 +630,14 @@ MD5sum: a8d32542173a6ac9500fbf8eca8a9adf
 NeedsCompilation: yes
 
 Package: lattice
-Version: 0.22-4
+Version: 0.22-5
 Priority: recommended
 Depends: R (>= 4.0.0)
 Imports: grid, grDevices, graphics, stats, utils
 Suggests: KernSmooth, MASS, latticeExtra, colorspace
 Enhances: chron, zoo
 License: GPL (>= 2)
-MD5sum: b99e2eed807ac48b17dbe79773dc49b2
+MD5sum: 52670d8b95b1f2ee50b9242abd8f3156
 NeedsCompilation: yes
 
 Package: lazyeval
@@ -1053,7 +1053,7 @@ Suggests: blob, covr, dplyr (>= 0.8-3), ggplot2, knitr, lwgeom (>=
         tibble (>= 1.4.1), tidyr (>= 1.2.0), tidyselect (>= 1.0.0),
         tmap (>= 2.0), vctrs, wk
 License: GPL-2 | MIT + file LICENSE
-MD5sum: 9aec2ce888a6f499531da1d402af0f84
+MD5sum: 8a94ca50ca4205dc069c063e52da474e
 NeedsCompilation: yes
 
 Package: shinyWidgets
