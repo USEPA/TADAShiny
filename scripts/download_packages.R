@@ -4,13 +4,8 @@ library(dplyr)
 
 args <- commandArgs(trailingOnly = TRUE)
 
-# For debugging:
-# args <- c()
-# args[1] = "vendor_r/src/contrib"
-# args[2] = "TADA,config,golem,magrittr,htmltools,readxl,writexl,shiny,leaflet,shinyWidgets,shinycssloaders,DT,ggplot2,shinybusy,dplyr,plyr,scales,forcats,testthat,remotes,covr,rmarkdown,knitr,spelling,sf,shinyjs,stringr,shinyjqui"
-
 options(repos =
-    "https://packagemanager.rstudio.com/cran/__linux__/jammy/latest")
+    "https://packagemanager.posit.co/cran/__linux__/jammy/latest")
 
 # Test if a package destination directory was passed as an argument
 if (length(args) == 0) {
@@ -42,7 +37,6 @@ packages_needing_to_be_built <- c("sf")
 
 # Get packages deps function to get the packages and dependencies
 get_package_deps <- function(packs, github, to_build_cran) {
-    # refs <- strsplit(packs, split = ",")[[1]]
     refs <- packs
     message("Replacing names for items that should be pulled from GitHub")
     for (p in github) {

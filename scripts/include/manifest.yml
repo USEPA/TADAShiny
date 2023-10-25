@@ -1,9 +1,0 @@
----
-applications:
-- name: YOUR_APP_NAME_HERE
-  memory: 256M
-  routes:
-    - route: YOUR_APP_ROUTE_HERE.app.cloud.gov
-  buildpacks:
-     - r_buildpack
-  command: R -f shiny.R

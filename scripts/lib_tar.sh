@@ -34,7 +34,7 @@ cd $TEMP_DIR
 
 tar czvf $FILE_NAME *
 
-cp $FILE_NAME ../r-lib
+cp $FILE_NAME ../lib
 cd -
 
 rm -rf $TEMP_DIR
