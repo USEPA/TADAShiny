@@ -3,7 +3,7 @@ name: Triggers build-cloud-gov workflow
 on:
   push:
     branches:
-      - update-build-workflows
+      - develop
 
 jobs:
   trigger-build:
@@ -11,7 +11,7 @@ jobs:
     name: Triggers build on push with desired defaults
 
     steps:
-    - name: Trigger cloud.gov build with descired inputs
+    - name: Trigger cloud.gov build with desired inputs
       uses: actions/github-script@v6
       with:
         script: |
@@ -19,7 +19,7 @@ jobs:
             owner: 'USEPA',
             repo: 'TADAShiny',
             workflow_id: 'build-cloud-gov.yml',
-            ref: 'update-build-workflows',
+            ref: 'develop',
             inputs: {
               "build_deps": true,
               "build_bins": false,
