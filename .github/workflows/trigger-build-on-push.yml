@@ -1,0 +1,27 @@
+name: Triggers build-cloud-gov workflow
+
+on:
+  push:
+    branches:
+      - update-build-workflows
+
+jobs:
+  trigger-build:
+    runs-on: ubuntu-latest
+    name: Triggers build on push with desired defaults
+
+    steps:
+    - name: Trigger cloud.gov build with descired inputs
+      uses: actions/github-script@v6
+      with:
+        script: |
+          github.rest.actions.createWorkflowDispatch({
+            owner: 'USEPA',
+            repo: 'TADAShiny',
+            workflow_id: 'build-cloud-gov.yml',
+            ref: 'update-build-workflows',
+            inputs: {
+              "build_deps": true,
+              "build_bins": false,
+            }
+          })
