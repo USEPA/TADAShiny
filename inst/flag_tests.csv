@@ -33,7 +33,7 @@ Spatial Flags,TADA.InvalidCoordinates.Flag,Imprecise_Longincludes999,0,0
 Spatial Flags,TADA.InvalidCoordinates.Flag,Imprecise_lessthan3decimaldigits,0,0
 Spatial Flags,TADA.InvalidCoordinates.Flag,OK,0,0
 Result value is not numeric or result value is NA and no detection limit value is provided,TADA.ResultMeasureValueDataTypes.Flag,Non-ASCII Character(s),0,1
-Result value is not numeric or result value is NA and no detection limit value is provided,TADA.ResultMeasureValueDataTypes.Flag,ND or NA,0,1
+Result value is not numeric or result value is NA and no detection limit value is provided,TADA.ResultMeasureValueDataTypes.Flag,Blank,0,1
 Result value is not numeric or result value is NA and no detection limit value is provided,TADA.ResultMeasureValueDataTypes.Flag,Coerced to NA,0,1
 Result value is not numeric or result value is NA and no detection limit value is provided,TADA.ResultMeasureValueDataTypes.Flag,Numeric,0,0
 Result value is not numeric or result value is NA and no detection limit value is provided,TADA.ResultMeasureValueDataTypes.Flag,Less Than,0,0
