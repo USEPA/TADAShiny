@@ -17,6 +17,9 @@ css <- "
 app_ui <- function(request) {
   tagList(
     # Leave this function for adding external resources
+    # This function automatically incorporates the epa styles.css file included 
+    # in the www folder. Downloaded from https://www.epa.gov/web-policies-and-procedures/web-standards-look-and-feel-template
+    # styles.css hosted locally in this app includes a fix (for compatibility with leaflet and plotly)
     golem_add_external_resources(),
     # Your application UI logic
     shiny::fluidPage(
@@ -25,6 +28,7 @@ app_ui <- function(request) {
       content on this page is not production ready. This site is being used
       for <strong>development</strong> and/or <strong>testing</strong> purposes
       only.</div>"),
+      # adds epa header html from here: https://www.epa.gov/themes/epa_theme/pattern-lab/patterns/pages-standalone-template/pages-standalone-template.rendered.html
       shiny::includeHTML(app_sys("app/www/header.html")),
       shinyjs::useShinyjs(),
       shinyjs::inlineCSS(css),
@@ -53,7 +57,6 @@ app_ui <- function(request) {
           htmltools::br(),
           mod_filtering_ui("filtering_1")
         ),
-        # shiny::tabPanel("Harmonize"),
         shiny::tabPanel("5. Censored Data",
           value = "Censored",
           htmltools::br(),
@@ -77,6 +80,7 @@ app_ui <- function(request) {
       ),
       htmltools::hr(),
       mod_TADA_summary_ui("TADA_summary_1"),
+      # adds epa footer html 
       shiny::includeHTML(app_sys("app/www/footer.html"))
     )
   )
