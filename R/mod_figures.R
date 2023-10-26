@@ -93,7 +93,7 @@ mod_figures_server <- function(id, tadat) {
       # this line adds a new column to the dataset of concatenated values of all of the columns selected by the user in the drop down above.
       depthcols <- names(tadat$raw)[grepl("DepthHeightMeasure", names(tadat$raw))]
       depthcols <- depthcols[grepl("TADA.", depthcols)]
-      selcols <- c("OrganizationFormalName", "ResultIdentifier", "groupname", "MonitoringLocationIdentifier", "MonitoringLocationName", "MonitoringLocationTypeName", "TADA.LatitudeMeasure", "TADA.LongitudeMeasure", "TADA.ResultMeasureValue", "TADA.ResultMeasure.MeasureUnitCode", "ActivityRelativeDepthName", "ActivityStartDate", "ActivityStartDateTime", depthcols)
+      selcols <- c("OrganizationFormalName", "ResultIdentifier", "groupname", "MonitoringLocationIdentifier", "MonitoringLocationName", "MonitoringLocationTypeName", "TADA.LatitudeMeasure", "TADA.LongitudeMeasure", "TADA.ResultMeasureValue", "TADA.ResultMeasure.MeasureUnitCode", "ActivityRelativeDepthName", "ActivityStartDate", "ActivityStartDateTime", "TADA.ActivityMediaName", "ActivityMediaSubdivisionName", depthcols)
 
       react$dat <- tadat$raw %>%
         dplyr::filter(TADA.Remove == FALSE, !is.na(TADA.ResultMeasureValue)) %>%
@@ -239,7 +239,7 @@ mod_figures_server <- function(id, tadat) {
       )
     })
 
-    # when the Go button is pushed to generate plots, this ensure the plot data is filtered to the selected sites (or all sites)
+    # when the Go button is pushed to generate plots, this ensures the plot data is filtered to the selected sites (or all sites)
     shiny::observeEvent(input$selsitesgo, {
       if (all(input$selsites1 == "All sites")) {
         react$plotdata <- react$plotdataset
@@ -323,7 +323,7 @@ mod_figures_server <- function(id, tadat) {
     output$scatter2 <- plotly::renderPlotly({
       shiny::req(react$plotdata)
       if (length(unique(react$plotdata$groupname)) > 1) {
-        suppressWarnings(TADA::TADA_TwoCharacteristicScatterplot(react$plotdata, id_col = "groupname", groups = unique(react$plotdata$groupname)))
+        suppressWarnings(TADA::TADA_TwoCharacteristicScatterplot(react$plotdata, id_cols = "groupname", groups = unique(react$plotdata$groupname)))
       }
     })
   })
