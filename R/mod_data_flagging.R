@@ -45,15 +45,19 @@ mod_data_flagging_server <- function(id, tadat) {
       inputs <- character(len)
       for (i in seq_len(len)) {
         switch_name <- paste0("switch_", i)
-        inputs[i] <- as.character(
-          shinyWidgets::prettySwitch(
-            ns(switch_name),
-            label = NULL,
-            value = switch_defaults[i],
-            status = "primary",
-            fill = TRUE
+        if (!(i %in% which(unlist(switch_disabled)))) {
+          inputs[i] <- as.character(
+            shinyWidgets::prettySwitch(
+              ns(switch_name),
+              label = NULL,
+              value = switch_defaults[i],
+              status = "primary",
+              fill = TRUE
+            )
           )
-        )
+        } else {
+          inputs[i] = "n/a"
+        }
       }
       inputs
     }
