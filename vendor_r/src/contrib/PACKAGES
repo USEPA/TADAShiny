@@ -80,7 +80,7 @@ Imports: plyr, data.table, dplyr, tidyr, grDevices, magrittr, stringr,
 Suggests: rmarkdown, readr, tidyverse, knitr, testthat, testthis,
         usethis, devtools, pkgdown, spelling
 License: CC0
-MD5sum: 92057d4f852991eb064a6f3bddefa230
+MD5sum: 985f8a4e7aecd4ceb724d19fb08b5a7f
 NeedsCompilation: no
 
 Package: anytime
@@ -598,7 +598,7 @@ MD5sum: 8982c45bc585ad0e8b892ad5c5e3d0c8
 NeedsCompilation: yes
 
 Package: knitr
-Version: 1.44
+Version: 1.45
 Depends: R (>= 3.3.0)
 Imports: evaluate (>= 0.15), highr, methods, tools, xfun (>= 0.39),
         yaml (>= 2.1.19)
@@ -610,7 +610,7 @@ Suggests: bslib, codetools, DBI (>= 0.4-1), digest, formatR, gifski,
         tikzDevice (>= 0.10), tinytex (>= 0.46), webshot, rstudioapi,
         svglite, xml2 (>= 1.2.0)
 License: GPL
-MD5sum: 4d7fce1f36516cb6afeb6ac31ab3376d
+MD5sum: 0ce223b04ab1d941c464aae647d15e3b
 NeedsCompilation: no
 
 Package: labeling
@@ -1053,7 +1053,7 @@ Suggests: blob, covr, dplyr (>= 0.8-3), ggplot2, knitr, lwgeom (>=
         tibble (>= 1.4.1), tidyr (>= 1.2.0), tidyselect (>= 1.0.0),
         tmap (>= 2.0), vctrs, wk
 License: GPL-2 | MIT + file LICENSE
-MD5sum: 3bf272735e8a8e155cab4d0c4a200c17
+MD5sum: a5ff42ae36ebeb3e5f5aaaf129f349ab
 NeedsCompilation: yes
 
 Package: shinyWidgets
@@ -1341,13 +1341,13 @@ MD5sum: 099ddedf48b0a762f302d4ac3eeafee6
 NeedsCompilation: no
 
 Package: withr
-Version: 2.5.1
+Version: 2.5.2
 Depends: R (>= 3.2.0)
 Imports: graphics, grDevices, stats
 Suggests: callr, covr, DBI, knitr, lattice, methods, rlang, rmarkdown
         (>= 2.12), RSQLite, testthat (>= 3.0.0)
 License: MIT + file LICENSE
-MD5sum: a7d00b6b502740c8436fdada8f2db6f0
+MD5sum: c5b282c8ecce9f1ece9637e5683cda7c
 NeedsCompilation: no
 
 Package: wk
