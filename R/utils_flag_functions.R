@@ -98,7 +98,7 @@ applyFlags <- function(in_table, orgs) {
   out <- TADA::TADA_FlagMethod(out, clean = FALSE)
 
   # Single org duplicative uploads
-  out <- TADA::TADA_FindPotentialDuplicatesSingleOrg(out, handling_method = "pick_one")
+  out <- TADA::TADA_FindPotentialDuplicatesSingleOrg(out)
 
   # multiple org duplicative uploads
   ## NOTE: THIS FUNCTION USES A REACTIVE OBJECT AS AN INPUT
