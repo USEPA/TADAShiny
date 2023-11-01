@@ -12,8 +12,8 @@ Conflict between detection condition text and detection limit type or detection 
 Conflict between detection condition text and detection limit type or detection limit type is not in WQX domain tables (likely USGS/NWIS-specific) ,TADA.CensoredData.Flag,Non-Detect,0,0
 Conflict between detection condition text and detection limit type or detection limit type is not in WQX domain tables (likely USGS/NWIS-specific) ,TADA.CensoredData.Flag,Over-Detect,0,0
 Conflict between detection condition text and detection limit type or detection limit type is not in WQX domain tables (likely USGS/NWIS-specific) ,TADA.CensoredData.Flag,Other Condition/Limit Populated,0,0
-"Metadata indicates result(s) are aggregate, high-frequency continuous sensor results, not discrete samples",TADA.AggregatedContinuousData.Flag,Unknown,0,0
-"Metadata indicates result(s) are aggregate, high-frequency continuous sensor results, not discrete samples",TADA.AggregatedContinuousData.Flag,Y,0,1
+"Metadata indicates result(s) are aggregate, high-frequency continuous sensor results, not discrete samples",TADA.AggregatedContinuousData.Flag,Discrete,0,0
+"Metadata indicates result(s) are aggregate, high-frequency continuous sensor results, not discrete samples",TADA.AggregatedContinuousData.Flag,Continuous,0,1
 Sample media is not water,TADA.ActivityMediaName,WATER,1,1
 Invalid speciation for associated characteristic,TADA.MethodSpeciation.Flag,Valid,0,0
 Invalid speciation for associated characteristic,TADA.MethodSpeciation.Flag,Invalid,0,1
@@ -28,8 +28,6 @@ Invalid characteristic and fraction combination,TADA.SampleFraction.Flag,Invalid
 Invalid characteristic and fraction combination,TADA.SampleFraction.Flag,Not Reviewed,0,0
 Spatial Flags,TADA.InvalidCoordinates.Flag,LAT_OutsideUSA,0,1
 Spatial Flags,TADA.InvalidCoordinates.Flag,LONG_OutsideUSA,0,1
-Spatial Flags,TADA.InvalidCoordinates.Flag,Imprecise_Latincludes999,0,0
-Spatial Flags,TADA.InvalidCoordinates.Flag,Imprecise_Longincludes999,0,0
 Spatial Flags,TADA.InvalidCoordinates.Flag,Imprecise_lessthan3decimaldigits,0,0
 Spatial Flags,TADA.InvalidCoordinates.Flag,OK,0,0
 Result value is not numeric or result value is NA and no detection limit value is provided,TADA.ResultMeasureValueDataTypes.Flag,Non-ASCII Character(s),0,1
@@ -54,10 +52,11 @@ Invalid units for a given characteristic and media combination,TADA.ResultUnit.F
 "Measurement activity type code indicates it is a QC replicate, duplicate, or blank",TADA.ActivityType.Flag,QC_calibration,0,1
 "Measurement activity type code indicates it is a QC replicate, duplicate, or blank",TADA.ActivityType.Flag,QC_blank,0,1
 "Measurement activity type code indicates it is a QC replicate, duplicate, or blank",TADA.ActivityType.Flag,QC_other,0,1
-Metadata indicates duplicative uploads of the same results within a single organization,TADA.ResultSelectedSingleOrg,N,0,1
+Metadata indicates duplicative uploads of the same results within a single organization,TADA.SingleOrgDup.Flag,Duplicate,0,1
 Metadata indicates duplicative uploads of the same results by multiple organizations,TADA.ResultSelectedMultipleOrgs,N,0,1
 MeasureQualifierCode indicates result value is suspect,TADA.MeasureQualifierCode.Flag,Non-Detect,0,0
 MeasureQualifierCode indicates result value is suspect,TADA.MeasureQualifierCode.Flag,Pass,0,0
 MeasureQualifierCode indicates result value is suspect,TADA.MeasureQualifierCode.Flag,Suspect,0,1
 MeasureQualifierCode indicates result value is suspect,TADA.MeasureQualifierCode.Flag,Over-Detect,0,0
 MeasureQualifierCode indicates result value is suspect,TADA.MeasureQualifierCode.Flag,Not Reviewed,0,0
+Metadata indicates duplicative uploads of the same results within a single organization,TADA.SingleOrgDup.Flag,Unique,0,0
