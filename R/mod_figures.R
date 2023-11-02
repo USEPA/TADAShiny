@@ -339,7 +339,12 @@ mod_figures_server <- function(id, tadat) {
     output$scatter2 <- plotly::renderPlotly({
       shiny::req(react$plotdata)
       if (length(unique(react$plotdata$groupname)) > 1) {
-      suppressWarnings(TADA::TADA_TwoCharacteristicScatterplot(react$plotdata, id_cols = "groupname", groups = c(react$plotdata$groupname == react$groups[1]$TADA.ComparableDataIdentifier, react$plotdata$groupname == react$groups[2]$TADA.ComparableDataIdentifier)))
+      suppressWarnings(TADA::TADA_TwoCharacteristicScatterplot
+                       (react$plotdata, 
+                         id_cols = "groupname", 
+                         groups = c(react$plotdata,
+                                    id_cols = "groupname",
+                                    groups = unique(react$plotdata$groupname))))
       }
     })
   })
