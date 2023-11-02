@@ -94,7 +94,8 @@ mod_figures_server <- function(id, tadat) {
       depthcols <- names(tadat$raw)[grepl("DepthHeightMeasure", names(tadat$raw))]
       depthcols <- depthcols[grepl("TADA.", depthcols)]
       # This must include all columns needed for plots, include those only needed for the hover features
-      selcols <- c("OrganizationFormalName",
+      selcols <- c("TADA.ComparableDataIdentifier",
+                   "OrganizationFormalName",
                    "ResultIdentifier",
                    "groupname",
                    "MonitoringLocationIdentifier",
@@ -341,10 +342,17 @@ mod_figures_server <- function(id, tadat) {
       if (length(unique(react$plotdata$groupname)) > 1) {
       suppressWarnings(TADA::TADA_TwoCharacteristicScatterplot
                        (react$plotdata, 
-                         id_cols = "groupname", 
-                         groups = c(react$plotdata,
-                                    id_cols = "groupname",
-                                    groups = unique(react$plotdata$groupname))))
+                        id_cols = "groupname", 
+                        # original 
+                        groups = unique(react$plotdata$groupname)))
+                        # groups = c((unique(subset(react$plotdata, react$plotdata$groupname == react$groups[1]))),
+                        #           (unique(subset(react$plotdata, react$plotdata$groupname == react$groups[2]))))))
+                        # groups = c(react$plotdata$groupname == react$groups[1],
+                        #            react$plotdata$groupname == react$groups[2])))
+                        # groups = c(react$plotdata,
+                        #             id_cols = "groupname",
+                        #             groups = c(react$plotdata$TADA.ComparableDataIdentifier[1], 
+                        #                        react$plotdata$TADA.ComparableDataIdentifier[2]))))
       }
     })
   })
