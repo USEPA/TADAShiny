@@ -38,7 +38,20 @@ mod_TADA_summary_ui <- function(id) {
         )))),
         shiny::fluidRow(column(6, shiny::uiOutput(ns(
           "dwn_all"
-        ))))
+        )))),
+        shiny::fluidRow(column(6, shiny::uiOutput(ns(
+          "dwn_ts"
+        )))),
+        shiny::fluidRow(column(
+          6,
+          shiny::fileInput(
+            ns("up_ts"),
+            "",
+            multiple = TRUE,
+            accept = ".Rdata",
+            width = "100%"
+          )
+        ))
       ),
       shiny::fluidRow(column(2, shiny::actionButton(ns("disclaimer"), "DISCLAIMER"))),
       htmltools::br(),
@@ -60,8 +73,21 @@ mod_TADA_summary_server <- function(id, tadat) {
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
     # reactive list to hold reactive objects specific to this module
+<<<<<<< HEAD
     summary_things <- shiny::reactiveValues()
 
+=======
+    summary_things = shiny::reactiveValues()
+    
+    # Read the tada file
+    shiny::observe({
+      shiny::req(input$up_ts)
+      # user uploaded data
+      readFile(tadat, input$up_ts$datapath)
+    })
+    
+    
+>>>>>>> 75ec81b89342ca80ab74a83c1b5c3be20b399873
     # calculate the stats needed to fill the summary box
     shiny::observe({
       shiny::req(tadat$raw)
@@ -173,7 +199,28 @@ mod_TADA_summary_server <- function(id, tadat) {
         writexl::write_xlsx(TADA::TADA_OrderCols(tadat$raw), path = file)
       }
     )
+<<<<<<< HEAD
 
+=======
+    
+    # Download TADA progress file
+    output$dwn_ts = shiny::renderUI({
+      shiny::req(tadat$raw)
+      shiny::downloadButton(ns("download_ts_file"),
+                            "Download Progress File (.Rdata)",
+                            style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
+    })
+    
+    output$download_ts_file = shiny::downloadHandler(
+      filename = function() {
+        paste0(tadat$job_id, '.Rdata')
+      },
+      content = function(file) {
+        writeFile(tadat, file)
+      }
+    )
+    
+>>>>>>> 75ec81b89342ca80ab74a83c1b5c3be20b399873
     shiny::observeEvent(input$disclaimer, {
       shiny::showModal(shiny::modalDialog(
         title = "Disclaimer",

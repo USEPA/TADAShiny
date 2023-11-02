@@ -30,8 +30,24 @@ mod_data_flagging_ui <- function(id) {
     DT::DTOutput(ns("flagTable")),
     htmltools::br(),
     htmltools::h3("Convert depth units (Optional)"),
+<<<<<<< HEAD
     htmltools::HTML("Depth units in the dataset are automatically converted to <B>meters</B> upon data retrieval. Click the radio buttons below to convert depth units to feet, inches, or back to meters."),
     shiny::fluidRow(column(6, shiny::radioButtons(ns("m2f"), label = "", choices = c("feet", "inches", "meters"), selected = character(0), inline = TRUE)))
+=======
+    htmltools::HTML(
+      "Depth units in the dataset are automatically converted to <B>meters</B> upon data retrieval. Click the radio buttons below to convert depth units to feet, inches, or back to meters."
+    ),
+    shiny::fluidRow(column(
+      6,
+      shiny::radioButtons(
+        ns('m2f'),
+        label = "",
+        choices = c("feet", "inches", "meters"),
+        selected = character(0),
+        inline = TRUE
+      )
+    ))
+>>>>>>> 75ec81b89342ca80ab74a83c1b5c3be20b399873
   )
 }
 
@@ -75,10 +91,18 @@ mod_data_flagging_server <- function(id, tadat) {
 
     # Create a separate column in the raw data to indicate whether records
     # were excluded during the first step
+<<<<<<< HEAD
     values <- shiny::reactiveValues()
     values$n_fails <- integer(length(n_switches))
     values$selected_flags <- character()
 
+=======
+    values = shiny::reactiveValues()
+    values$init = FALSE
+    values$n_fails = integer(length(n_switches))
+    tadat$selected_flags = character()
+    
+>>>>>>> 75ec81b89342ca80ab74a83c1b5c3be20b399873
     # Runs when the flag button is clicked
     shiny::observeEvent(input$runFlags, {
       shinybusy::show_modal_spinner(
@@ -89,10 +113,17 @@ mod_data_flagging_server <- function(id, tadat) {
       )
 
       # Add flagging columns to raw table
+<<<<<<< HEAD
       tadat$raw <- applyFlags(tadat$raw, tadat$orgs)
       # write.csv(tadat$raw, "flagged.csv")
       # tadat$raw = utils::read.csv("flagged.csv") # THIS IS TRIPS WORKING FILE FOR TESTING, COMMENT OUT WHEN COMMITTING TO DEVELOP
 
+=======
+      #tadat$raw = applyFlags(tadat$raw)
+      #write.csv(tadat$raw, "flagged.csv")
+      tadat$raw = utils::read.csv("flagged.csv")
+      
+>>>>>>> 75ec81b89342ca80ab74a83c1b5c3be20b399873
       # A table (raw rows, flags) indicating whether each record passes each test
       values$testResults <- flagCensus(tadat$raw)
 
@@ -105,19 +136,47 @@ mod_data_flagging_server <- function(id, tadat) {
 
       # Runs when any of the flag switches are changed
       shiny::observe({
+<<<<<<< HEAD
         switch_id <- "switch_"
         values$selected_flags <- flag_types[shinyValue(switch_id, n_switches)]
+=======
+        switch_id = "switch_"
+        tadat$selected_flags = flag_types[shinyValue(switch_id, n_switches)]
+>>>>>>> 75ec81b89342ca80ab74a83c1b5c3be20b399873
         for (i in which(switch_disabled)) {
           shinyjs::disable(paste0(switch_id, i))
         }
       })
+<<<<<<< HEAD
 
       shiny::observeEvent(values$selected_flags, {
         prefix <- "Flag: "
         tadat$removals <- dplyr::select(tadat$removals, -(dplyr::starts_with(prefix)))
         for (flag in values$selected_flags) {
+=======
+      
+      # Runs whenever selected flags are changed
+      shiny::observeEvent(tadat$selected_flags, {
+        prefix = "Flag: "
+        tadat$removals = dplyr::select(tadat$removals,-(dplyr::starts_with(prefix)))
+        # Loop through the flags
+        for (flag in tadat$selected_flags) {
+          # If not all the values are NA, add the test results to removals
+>>>>>>> 75ec81b89342ca80ab74a83c1b5c3be20b399873
           if (!all(is.na(values$testResults[flag]))) {
             tadat$removals[paste0(prefix, flag)] <- values$testResults[flag]
+          }
+          # If the switch corresponding to this flag isn't on, switch it on
+          if (!is.null(input[["switch_1"]])) {
+            pos = match(flag, prompts)
+            switch_name = paste0("switch_", pos)
+            if (is.na(pos)) {
+              invalidFile("flagging")
+            } else if (!isTRUE(input[[switch_name]])) {
+              # Turn the switch on
+              shinyWidgets::updatePrettySwitch(inputId = switch_name,
+                                               value = TRUE)
+            }
           }
         }
       })
@@ -160,7 +219,11 @@ mod_data_flagging_server <- function(id, tadat) {
       shinyjs::enable(selector = '.nav li a[data-value="Figures"]')
       shinyjs::enable(selector = '.nav li a[data-value="Review"]')
     })
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 75ec81b89342ca80ab74a83c1b5c3be20b399873
     shiny::observeEvent(input$m2f, {
       shiny::req(tadat$raw)
       if (input$m2f == "feet") {
