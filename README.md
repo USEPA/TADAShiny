@@ -26,6 +26,14 @@ remotes::install_github("USEPA/TADAShiny", ref = "develop", dependencies = TRUE)
 TADAShiny::run_app()
 ```
 
+## R Shiny Learning Resources
+
+Please visit the North American Lake Management Society (NALMS) Shiny Apps site to access other R Shiny applications that you may find useful (https://nalms.shinyapps.io/NALMS_Shiny_Home/), and for information on how to develop R Shiny Applications (https://nalms.shinyapps.io/Shiny_for_Water_Resources/). 
+
+This site has been created to be a resource for both those who are interested in learning how to create Shiny apps and those who are already experienced with making apps but want to see what other people are doing and what tools and packages are available for the community to use. It was created as a companion to the 2023 National Monitoring Conference, with the goal that it be used beyond that event and be useful to anyone who is interested in this topic.
+
+The NALMS shinyapps.io service also provides a place for the water resources community to make their Shiny Apps readily available to the public. It is free for anyone to use. If you would like to submit a Shiny App for deployment of the NALMS shinyapp.io service, please follow the directions on the "Submit a Shiny App" page.
+
 ## Open-Source Code Policy
 
 Effective August 8, 2016, the [OMB Mandate: M-16-21; Federal Source Code Policy: Achieving Efficiency, Transparency, and Innovation through Reusable and Open Source Software](https://obamawhitehouse.archives.gov/sites/default/files/omb/memoranda/2016/m_16_21.pdf) applies to new custom-developed code created or procured by EPA consistent with the scope and applicability requirements of Office of Management and Budget's (OMB's) Federal Source Code Policy. In general, it states that all new custom-developed code by Federal Agencies should be made available and reusable as open-source code.
