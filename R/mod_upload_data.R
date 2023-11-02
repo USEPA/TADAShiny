@@ -7,34 +7,33 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_upload_data_ui <- function(id) {
+mod_upload_data_ui <- function(id){
   ns <- NS(id)
   tagList(
-    shiny::fluidRow(
-      htmltools::h3("Upload dataset..."),
-      "Select a pre-existing file from your computer. Currently supports .xls and .xlsx only. You can find the WQX profile templates ",
-      tags$a(href = "https://www.epa.gov/waterdata/water-quality-exchange-web-template-files", "here."),
-      # widget to upload WQP profile or WQX formatted spreadsheet
-      shiny::fileInput(ns("file"), "",
-        multiple = TRUE,
-        accept = c(".xlsx", ".xls"),
-        width = "100%"
-      )
-    )
-  )
+    shiny::fluidRow(htmltools::h3("Upload dataset..."),
+             "Select a pre-existing file from your computer. Currently supports .xls and .xlsx only. You can find the WQX profile templates ",
+             tags$a(href="https://www.epa.gov/waterdata/water-quality-exchange-web-template-files", "here."),
+                             # widget to upload WQP profile or WQX formatted spreadsheet
+             shiny::fileInput(ns("file"), "",
+                       multiple = TRUE,
+                       accept = c(".xlsx", ".xls"),
+                       width = "100%"
+                             )
+  ))
 }
 
 #' upload_data Server Functions
 #'
 #' @noRd
-mod_upload_data_server <- function(id, tadat) {
-  shiny::moduleServer(id, function(input, output, session) {
+mod_upload_data_server <- function(id, tadat){
+  shiny::moduleServer( id, function(input, output, session){
     ns <- session$ns
     shiny::observe({
       shiny::req(input$file)
       # user uploaded data
       tadat$raw <- suppressWarnings(readxl::read_excel(input$file$datapath, sheet = 1))
     })
+
   })
 }
 
