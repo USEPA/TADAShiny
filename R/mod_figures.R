@@ -110,6 +110,9 @@ mod_figures_server <- function(id, tadat) {
                    "ActivityStartDateTime", 
                    "TADA.ActivityMediaName", 
                    "ActivityMediaSubdivisionName", 
+                   "TADA.ResultSampleFractionText",
+                   "TADA.MethodSpecificationName",
+                   "TADA.CharacteristicName",
                    depthcols)
 
       react$dat <- tadat$raw %>%
@@ -343,16 +346,7 @@ mod_figures_server <- function(id, tadat) {
       suppressWarnings(TADA::TADA_TwoCharacteristicScatterplot
                        (react$plotdata, 
                         id_cols = "groupname", 
-                        # original 
                         groups = unique(react$plotdata$groupname)))
-                        # groups = c((unique(subset(react$plotdata, react$plotdata$groupname == react$groups[1]))),
-                        #           (unique(subset(react$plotdata, react$plotdata$groupname == react$groups[2]))))))
-                        # groups = c(react$plotdata$groupname == react$groups[1],
-                        #            react$plotdata$groupname == react$groups[2])))
-                        # groups = c(react$plotdata,
-                        #             id_cols = "groupname",
-                        #             groups = c(react$plotdata$TADA.ComparableDataIdentifier[1], 
-                        #                        react$plotdata$TADA.ComparableDataIdentifier[2]))))
       }
     })
   })
