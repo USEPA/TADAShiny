@@ -105,20 +105,35 @@ mod_data_flagging_server <- function(id, tadat) {
 
       # Runs when any of the flag switches are changed
       shiny::observe({
-        switch_id <- "switch_"
-        values$selected_flags <- flag_types[shinyValue(switch_id, n_switches)]
+        switch_id = "switch_"
+        tadat$selected_flags = flag_types[shinyValue(switch_id, n_switches)]
         for (i in which(switch_disabled)) {
           shinyjs::disable(paste0(switch_id, i))
         }
       })
-
-      shiny::observeEvent(values$selected_flags, {
-        prefix <- "Flag: "
-        tadat$removals <- dplyr::select(tadat$removals, -(dplyr::starts_with(prefix)))
-        for (flag in values$selected_flags) {
+      
+      # Runs whenever selected flags are changed
+      shiny::observeEvent(tadat$selected_flags, {
+        prefix = "Flag: "
+        tadat$removals = dplyr::select(tadat$removals,-(dplyr::starts_with(prefix)))
+        # Loop through the flags
+        for (flag in tadat$selected_flags) {
+          # If not all the values are NA, add the test results to removals
           if (!all(is.na(values$testResults[flag]))) {
-            tadat$removals[paste0(prefix, flag)] <- values$testResults[flag]
+            tadat$removals[paste0(prefix, flag)] = values$testResults[flag]
           }
+          # If the switch corresponding to this flag isn't on, switch it on
+          if (!is.null(input[["switch_1"]])) {
+            pos = match(flag, prompts)
+            switch_name = paste0("switch_", pos)
+            if (is.na(pos)) {
+              invalidFile("flagging")
+            } else if (!isTRUE(input[[switch_name]])) {
+              # Turn the switch on
+              shinyWidgets::updatePrettySwitch(inputId = switch_name,
+                                               value = TRUE)
+            }
+         }
         }
       })
 
