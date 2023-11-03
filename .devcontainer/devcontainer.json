@@ -1,5 +1,5 @@
 {
-	"name": "R Studio Server",
+    "name": "R Studio Server",
     "image": "ghcr.io/rocker-org/devcontainer/geospatial:4",
 	"features": {
         "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
@@ -15,9 +15,15 @@
             "label": "R Studio Server",
 			"requireLocalPort": true,
 			"onAutoForward": "ignore"
+        },
+	"37376":{
+            "label": "Shiny app",
+			"requireLocalPort": true,
+			"onAutoForward": "ignore"
         }
     },
     "postAttachCommand": {
-        "rstudio-start": "sudo rstudio-server start"
+        "rstudio-start": "sudo rstudio-server start",
+	"run-shiny-app": "R -e shiny::runApp(appDir = ${localWorkspaceFolder}, port = '37376')"
     }
 }
