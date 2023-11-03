@@ -1,23 +1,30 @@
 {
-	"name": "R Studio Server",
+    "name": "R Studio Server and Shiny app",
     "image": "ghcr.io/rocker-org/devcontainer/geospatial:4",
-	"features": {
+    "features": {
         "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
             "packages": "github::USEPA/TADA,config,golem,readxl,writexl,leaflet,shiny,shinyWidgets,shinyjs,shinycssloaders,DT,ggplot2,shinybusy,dplyr,plyr,tidyr,scales,forcats,RColorBrewer,lubridate,plotly",
             "installSystemRequirements": true
         }
-	},
+    },
     "forwardPorts": [
-        8787
+        8787,
+        37376
     ],
     "portsAttributes": {
-        "8787":{
+        "8787": {
             "label": "R Studio Server",
-			"requireLocalPort": true,
-			"onAutoForward": "ignore"
+            "requireLocalPort": true,
+            "onAutoForward": "ignore"
+        },
+        "37376": {
+            "label": "Shiny app",
+            "requireLocalPort": true,
+            "onAutoForward": "ignore"
         }
     },
     "postAttachCommand": {
-        "rstudio-start": "sudo rstudio-server start"
+        "rstudio-start": "sudo rstudio-server start",
+        "run-shiny-app": "R -e 'shiny::runApp(port = 37376)'"
     }
 }
