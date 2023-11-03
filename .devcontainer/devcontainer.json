@@ -1,5 +1,5 @@
 {
-    "name": "R Studio Server",
+    "name": "R Studio Server and Shiny app",
     "image": "ghcr.io/rocker-org/devcontainer/geospatial:4",
     "features": {
         "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
@@ -19,7 +19,7 @@
         },
         "37376": {
             "label": "Shiny app",
-            "requireLocalPort": false,
+            "requireLocalPort": true,
             "onAutoForward": "ignore"
         }
     },
