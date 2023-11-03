@@ -8,7 +8,8 @@
         }
     },
     "forwardPorts": [
-        8787
+        8787,
+        37376
     ],
     "portsAttributes": {
         "8787": {
