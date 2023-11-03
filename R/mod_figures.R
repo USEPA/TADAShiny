@@ -93,7 +93,27 @@ mod_figures_server <- function(id, tadat) {
       # this line adds a new column to the dataset of concatenated values of all of the columns selected by the user in the drop down above.
       depthcols <- names(tadat$raw)[grepl("DepthHeightMeasure", names(tadat$raw))]
       depthcols <- depthcols[grepl("TADA.", depthcols)]
-      selcols <- c("OrganizationFormalName", "ResultIdentifier", "groupname", "MonitoringLocationIdentifier", "MonitoringLocationName", "MonitoringLocationTypeName", "TADA.LatitudeMeasure", "TADA.LongitudeMeasure", "TADA.ResultMeasureValue", "TADA.ResultMeasure.MeasureUnitCode", "ActivityRelativeDepthName", "ActivityStartDate", "ActivityStartDateTime", "TADA.ActivityMediaName", "ActivityMediaSubdivisionName", depthcols)
+      # This must include all columns needed for plots, include those only needed for the hover features
+      selcols <- c("TADA.ComparableDataIdentifier",
+                   "OrganizationFormalName",
+                   "ResultIdentifier",
+                   "groupname",
+                   "MonitoringLocationIdentifier",
+                   "MonitoringLocationName",
+                   "MonitoringLocationTypeName", 
+                   "TADA.LatitudeMeasure", 
+                   "TADA.LongitudeMeasure",
+                   "TADA.ResultMeasureValue", 
+                   "TADA.ResultMeasure.MeasureUnitCode",
+                   "ActivityRelativeDepthName", 
+                   "ActivityStartDate",
+                   "ActivityStartDateTime", 
+                   "TADA.ActivityMediaName", 
+                   "ActivityMediaSubdivisionName", 
+                   "TADA.ResultSampleFractionText",
+                   "TADA.MethodSpecificationName",
+                   "TADA.CharacteristicName",
+                   depthcols)
 
       react$dat <- tadat$raw %>%
         dplyr::filter(TADA.Remove == FALSE, !is.na(TADA.ResultMeasureValue)) %>%
@@ -323,7 +343,10 @@ mod_figures_server <- function(id, tadat) {
     output$scatter2 <- plotly::renderPlotly({
       shiny::req(react$plotdata)
       if (length(unique(react$plotdata$groupname)) > 1) {
-        suppressWarnings(TADA::TADA_TwoCharacteristicScatterplot(react$plotdata, id_cols = "groupname", groups = unique(react$plotdata$groupname)))
+      suppressWarnings(TADA::TADA_TwoCharacteristicScatterplot
+                       (react$plotdata, 
+                        id_cols = "groupname", 
+                        groups = unique(react$plotdata$groupname)))
       }
     })
   })
