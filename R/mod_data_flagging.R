@@ -77,7 +77,7 @@ mod_data_flagging_server <- function(id, tadat) {
     # were excluded during the first step
     values <- shiny::reactiveValues()
     values$n_fails <- integer(length(n_switches))
-    values$selected_flags <- character()
+    tadat$selected_flags <- character()
 
     # Runs when the flag button is clicked
     shiny::observeEvent(input$runFlags, {
@@ -176,7 +176,13 @@ mod_data_flagging_server <- function(id, tadat) {
       shinyjs::enable(selector = '.nav li a[data-value="Review"]')
     })
 
+    shiny::observeEvent(tadat$m2f, {
+      print("tadat$m2f changed")
+      updateRadioButtons(session, "m2f", selected=tadat$m2f)
+    })
+    
     shiny::observeEvent(input$m2f, {
+      tadat$m2f <- input$m2f
       shiny::req(tadat$raw)
       if (input$m2f == "feet") {
         shinybusy::show_modal_spinner(

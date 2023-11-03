@@ -230,6 +230,7 @@ with_red_star <- function(text) {
 #' @examples
 #' rep_br(5)
 #' @importFrom shiny HTML
+
 rep_br <- function(times = 1) {
   HTML(rep("<br/>", times = times))
 }

@@ -32,6 +32,9 @@ app_server <- function(input, output, session) {
   shinyjs::disable(selector = '.nav li a[data-value="Figures"]')
   shinyjs::disable(selector = '.nav li a[data-value="Review"]')
 
+  # switch that indicates when a file is being loaded
+  tadat$load_file = NA
+  
   # switch to overview tab when tadat$new changes and provide user with window letting them know how many records were automatically flagged for removal upon upload
   # move this to query_data?
   shiny::observeEvent(tadat$new, {
