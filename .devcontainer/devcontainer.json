@@ -26,4 +26,4 @@
         "rstudio-start": "sudo rstudio-server start",
 	"run-shiny-app": "R -e 'shiny::runApp(port = 37376)'"
     }
-}'
+}
