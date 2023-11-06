@@ -44,7 +44,8 @@ jobs:
       if: ${{ success() }}
       run: |
         mkdir shiny-app
-        find main-branch/* -maxdepth 0 ! -name ".git*" -print0 | xargs -0 cp -r -t shiny-app
+        find main-branch/* -maxdepth 0 ! -name ".git*" -print0 ! -name ".devcontainer" -print0 | xargs -0 cp -r -t shiny-app
+        cp main-branch/.gitignore shiny-app/.gitignore 
         git config user.name github-actions
         git config user.email github-actions@github.com
         git add shiny-app
