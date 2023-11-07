@@ -32,7 +32,7 @@ This repository also has devcontainers to allow it to run in GitHub codespaces. 
 - In the "Code" button on the upper right of your browser, within the Codespaces tab click on the three dots and choose "New with Options", then you will have the choices:
     - R Studio Server (the default useful for coding)
     - Shiny apps for demos (useful for training or demoing)
-- To stop or delete your codesapce when you are done: go to [GitHub Codespaces](https://github.com/codespaces)
+- To stop or delete your codespace when you are done: go to [GitHub Codespaces](https://github.com/codespaces)
 
 ## R Shiny Learning Resources
 
