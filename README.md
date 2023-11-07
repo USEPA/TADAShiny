@@ -29,8 +29,10 @@ TADAShiny::run_app()
 ### Run in GitHub Codespaces
 This repository also has devcontainers to allow it to run in GitHub codespaces. To use those:
 - Fork the repository to your account
-- You will need to set up a password for R Studio Server as a secret in your repository named "RSTUDIO_PASSWORD" (Note: the user name will be "rstudio")
-- Go to [GitHub Codespaces](https://github.com/codespaces) and create a codespace from this repository and branch. You will have the option of R Studio Server (for coding) or Shiny apps (for demoing)
+- In the "Code" button on the upper right of your browser, within the Codespaces tab click on the three dots and choose "New with Options", then you will have the choices:
+    - R Studio Server (the default useful for coding)
+    - Shiny apps for demos (useful for training or demoing)
+- To stop or delete your codesapce when you are done: go to [GitHub Codespaces](https://github.com/codespaces)
 
 ## R Shiny Learning Resources
 
