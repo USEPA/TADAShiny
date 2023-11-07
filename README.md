@@ -26,6 +26,12 @@ remotes::install_github("USEPA/TADAShiny", ref = "develop", dependencies = TRUE)
 TADAShiny::run_app()
 ```
 
+### Run in GitHub Codespaces
+This repository also has devcontainers to allow it to run in GitHub codespaces. To use those:
+- Fork the repository to your account
+- You will need to set up a password for R Studio Server as a secret in your repository named "RSTUDIO_PASSWORD" (Note: the user name will be "rstudio")
+- From the Code button in your browser, Create Codespace. You will have the option of R Studio Server (for coding) or Shiny apps (for demoing)
+
 ## R Shiny Learning Resources
 
 Please visit the North American Lake Management Society (NALMS) Shiny Apps site to access other R Shiny applications that you may find useful (https://nalms.shinyapps.io/NALMS_Shiny_Home/), and for information on how to develop R Shiny Applications (https://nalms.shinyapps.io/Shiny_for_Water_Resources/). 
