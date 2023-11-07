@@ -23,6 +23,6 @@
         }
     },
     "postAttachCommand": {
-        "rstudio-start": "echo \"rstudio:$RSTUDIO_PASSWORD\" | sudo chpasswd && sudo rstudio-server start"
+        "rstudio-start": "if [[ ! -z \"$RSTUDIO_PASSWORD\" ]]; then echo \"rstudio:$RSTUDIO_PASSWORD\" | sudo chpasswd; fi && sudo rstudio-server start"
     }
 }
