@@ -1,4 +1,9 @@
 {
+    "secrets": {
+        "RSTUDIO_PASSWORD": {
+            "description": "Password for R Studio Server (username will be rstudio)"
+        }
+    },
     "name": "R Studio Server",
     "image": "ghcr.io/rocker-org/devcontainer/geospatial:4",
     "features": {
