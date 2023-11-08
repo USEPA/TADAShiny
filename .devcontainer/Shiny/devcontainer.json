@@ -1,0 +1,51 @@
+{
+    "name": "Shiny apps for demos",
+    "image": "ghcr.io/rocker-org/devcontainer/geospatial:4",
+    "features": {
+        "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
+            "packages": "github::USEPA/TADA,config,golem,readxl,writexl,leaflet,shiny,shinyWidgets,shinyjs,shinycssloaders,DT,ggplot2,shinybusy,dplyr,plyr,tidyr,scales,forcats,RColorBrewer,lubridate,plotly",
+            "installSystemRequirements": true
+        }
+    },
+    "forwardPorts": [
+        37375,
+        37376,
+        37377,
+        37378,
+        37379
+    ],
+    "portsAttributes": {
+        "37375": {
+            "label": "Shiny app 1",
+            "requireLocalPort": true,
+            "onAutoForward": "ignore"
+        },
+        "37376": {
+            "label": "Shiny app 2",
+            "requireLocalPort": true,
+            "onAutoForward": "ignore"
+        },
+        "37377": {
+            "label": "Shiny app 3",
+            "requireLocalPort": true,
+            "onAutoForward": "ignore"
+        },
+        "37378": {
+            "label": "Shiny app 4",
+            "requireLocalPort": true,
+            "onAutoForward": "ignore"
+        },
+        "37379": {
+            "label": "Shiny app 5",
+            "requireLocalPort": true,
+            "onAutoForward": "ignore"
+        }
+    },
+    "postAttachCommand": {
+        "run-shiny-app-1": "R -e 'shiny::runApp(port = 37375)'",
+        "run-shiny-app-2": "R -e 'shiny::runApp(port = 37376)'",
+        "run-shiny-app-3": "R -e 'shiny::runApp(port = 37377)'",
+        "run-shiny-app-4": "R -e 'shiny::runApp(port = 37378)'",
+        "run-shiny-app-5": "R -e 'shiny::runApp(port = 37379)'"
+    }
+}

@@ -1,5 +1,10 @@
 {
-    "name": "R Studio Server and Shiny app",
+    "secrets": {
+        "RSTUDIO_PASSWORD": {
+            "description": "Password for R Studio Server (username will be rstudio)"
+        }
+    },
+    "name": "R Studio Server",
     "image": "ghcr.io/rocker-org/devcontainer/geospatial:4",
     "features": {
         "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
@@ -8,23 +13,16 @@
         }
     },
     "forwardPorts": [
-        8787,
-        37376
+        8787
     ],
     "portsAttributes": {
         "8787": {
             "label": "R Studio Server",
             "requireLocalPort": true,
             "onAutoForward": "ignore"
-        },
-        "37376": {
-            "label": "Shiny app",
-            "requireLocalPort": true,
-            "onAutoForward": "ignore"
         }
     },
     "postAttachCommand": {
-        "rstudio-start": "sudo rstudio-server start",
-        "run-shiny-app": "R -e 'shiny::runApp(port = 37376)'"
+        "rstudio-start": "if [[ ! -z \"$RSTUDIO_PASSWORD\" ]]; then echo \"rstudio:$RSTUDIO_PASSWORD\" | sudo chpasswd; fi && sudo rstudio-server start"
     }
 }
