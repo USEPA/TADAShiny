@@ -9,8 +9,6 @@ levs <- prompt_table$Level
 n_switches <- length(prompts)
 flag_types <- prompt_table$flagType
 
-switch_defaults <- prompt_table$Level != "Optional"
-switch_disabled <- prompt_table$Level == "Required"
 
 
 flagCensus <- function(raw) {
@@ -148,4 +146,20 @@ applyFlags <- function(in_table, orgs) {
 
 
   return(out)
+}
+
+checkFlagColumns <- function(dataset){
+  # Flags that, as of 11/16/23, aren't being used
+  flags_not_required = c("TADA.InvalidCoordinates.Flag", "TADA.SingleOrgDup.Flag")
+  flag_cols = setdiff(unique(test_table$columnName), flags_not_required)
+  dataset_cols = names(dataset)
+  found = intersect(flag_cols, dataset_cols)
+  if (length(flag_cols) == length(found)){
+    return(TRUE)
+  } else {
+    
+    return(FALSE)
+  }
+
+
 }

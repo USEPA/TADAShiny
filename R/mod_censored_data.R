@@ -36,22 +36,25 @@ mod_censored_data_ui <- function(id) {
     shiny::fluidRow(
       column(
         3,
-        shiny::selectInput(
+        shiny::selectizeInput(
           ns("nd_method"),
           "Non-Detect Handling Method",
           choices = nd_method_options,
-          multiple = FALSE
+          selected = nd_method_options[1],
+          multiple = TRUE,
+          options = list(maxItems = 1)
         )
       ),
       column(3, shiny::uiOutput(ns("nd_mult"))),
       column(
         3,
-        shiny::selectInput(
+        shiny::selectizeInput(
           ns("od_method"),
           "Over-Detect Handling Method",
           choices = od_method_options,
-          selected = "No change",
-          multiple = FALSE
+          selected = od_method_options[2],
+          multiple = TRUE,
+          options = list(maxItems = 1)
         )
       ),
       column(3, shiny::uiOutput(ns("od_mult")))
@@ -147,21 +150,30 @@ mod_censored_data_server <- function(id, tadat) {
     
     
     # this adds the multiplier numeric input next to the method selection if the nd method selected is to mult det limit by x
+    
     output$nd_mult <- shiny::renderUI({
-      if (input$nd_method == "Multiply detection limit by x") {
+      init_val = tadat$nd_mult
+      if (is.null(init_val)){
+        init_val = 0.5
+      }
+      if (input$nd_method == nd_method_options[1]) {
         shiny::numericInput(ns("nd_mult"),
                             "Multiplier (x)",
-                            value = 0.5,
+                            value = init_val,
                             min = 0)
       }
     })
     
     # this adds the multiplier numeric input next to the method selection if the od method selected is to mult det limit by x
     output$od_mult <- shiny::renderUI({
-      if (input$od_method == "Multiply detection limit by x") {
+      init_val = tadat$od_mult
+      if (is.null(init_val)){
+        init_val = 0.5
+      }
+      if (input$od_method == od_method_options[1]) {
         shiny::numericInput(ns("od_mult"),
                             "Multiplier (x)",
-                            value = 1,
+                            value = init_val,
                             min = 0)
       }
     })
@@ -170,46 +182,39 @@ mod_censored_data_server <- function(id, tadat) {
     # initialize global variables for saving/loading
     
     tadat$censor_applied = FALSE
-    shiny::observe({
-      print("Something changed")
-      checkStatus("Before")
-      tadat$nd_method = input$nd_method
-      tadat$od_method = input$od_method
-      tadat$nd_mult = input$nd_mult
-      tadat$od_mult = input$od_mult
-      checkStatus("After")
-
-    })
     
-    shiny::observeEvent(tadat$load_file, {
-      if (!is.na(tadat$load_file)) {
-        print("Loading from progress file")
-        checkStatus("Before")
-        shiny::updateSelectInput(session,
-                                 "nd_method",
-                                 choices = nd_method_options,
-                                 selected = tadat$nd_method)
-        shiny::updateSelectInput(session,
-                                 "od_method",
-                                 choices = nd_method_options,
-                                 selected = tadat$od_method)
+    shiny::observeEvent(tadat$load_progress_file, {
+      if (!is.na(tadat$load_progress_file)) {
+        shiny::updateSelectizeInput(session,
+                                    "nd_method",
+                                    choices = nd_method_options,
+                                    selected = tadat$nd_method)
+        shiny::updateSelectizeInput(session,
+                                    "od_method",
+                                    choices = od_method_options,
+                                    selected = tadat$od_method)
         shiny::updateNumericInput(session, "nd_mult", value = tadat$nd_mult)
         shiny::updateNumericInput(session, "od_mult", value = tadat$od_mult)
-        checkStatus("After")
       }
     })
     
-    checkStatus <- function(label){
-      print(paste0(label, " status:"))
-      print(paste0("tadat$nd_method: ", tadat$nd_method))
-      print(paste0("input$nd_method: ", input$nd_method))
-      print(paste0("tadat$od_method: ", tadat$od_method))
-      print(paste0("input$od_method: ", input$od_method))
-      print(paste0("tadat$nd_mult: ", tadat$nd_mult))
-      print(paste0("input$nd_mult: ", input$nd_mult))
-      print(paste0("tadat$od_mult: ", tadat$od_mult))
-      print(paste0("input$od_mult: ", input$od_mult))
-    }
+    # Make this part more concise?
+    shiny::observeEvent(input$nd_method, {
+      tadat$nd_method = input$nd_method
+    })
+    
+    shiny::observeEvent(input$nd_mult, {
+      tadat$nd_mult = input$nd_mult
+    })
+    
+    shiny::observeEvent(input$od_method, {
+      tadat$od_method = input$od_method
+    })
+    
+    shiny::observeEvent(input$od_mult, {
+      tadat$od_mult = input$od_mult
+      })
+    
     
     # Button to apply the simple methods to the nd and od results in the dataset.
     shiny::observeEvent(input$apply_methods, {
@@ -225,11 +230,7 @@ mod_censored_data_server <- function(id, tadat) {
         subset(tadat$raw, tadat$raw$TADA.Remove == FALSE) # keep the "goods" that will be run through the simpleCensoredMethods function
       trans <-
         data.frame(
-          input = c(
-            "Multiply detection limit by x",
-            "Random number between 0 and detection limit",
-            "No change"
-          ),
+          input = nd_method_options,
           actual = c("multiplier", "randombelowlimit", "as-is")
         )
       if (is.null(input$nd_mult)) {

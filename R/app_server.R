@@ -33,7 +33,11 @@ app_server <- function(input, output, session) {
   shinyjs::disable(selector = '.nav li a[data-value="Review"]')
 
   # switch that indicates when a file is being loaded
-  tadat$load_file = NA
+  tadat$load_progress_file = NA
+  tadat$save_progress_file = NA
+  job_id = paste0("ts", format(Sys.time(), "%y%m%d%H%M%S"))
+  tadat$default_outfile = paste0("tada_output_", job_id)
+  tadat$job_id = job_id
   
   # switch to overview tab when tadat$new changes and provide user with window letting them know how many records were automatically flagged for removal upon upload
   # move this to query_data?
@@ -53,6 +57,12 @@ app_server <- function(input, output, session) {
     }
   })
 
+  # Update the default switches if a progress file is uploaded.
+  shiny::observeEvent(tadat$selected_flags, {
+    switch_defaults = tadat$selected_flags
+    })
+
+  
   # this observes when the user switches tabs and adds the current tab they're on as a column to their dataset.
   shiny::observe({
     shiny::req(tadat$raw)
