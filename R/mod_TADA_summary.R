@@ -191,7 +191,7 @@ mod_TADA_summary_server <- function(id, tadat) {
           list(Data = TADA::TADA_OrderCols(tadat$raw), Parameterization = desc)
         writeFile(tadat, progress_file_name)
         writexl::write_xlsx(dfs, path = datafile_name)
-        zip(zipfile = fname,
+        utils::zip(zipfile = fname,
             files = c(datafile_name, progress_file_name))
       },
       contentType = "application/zip"

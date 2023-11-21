@@ -44,7 +44,7 @@ app_server <- function(input, output, session) {
   shiny::observeEvent(tadat$new, {
     shiny::showModal(shiny::modalDialog(
       title = "Data Loaded",
-      "Your data were successfully loaded into the app and are displayed on the Overview tab. See summary information about your dataset in the gray box at the bottom of the app."
+      "Your data were successfully loaded into the app and are displayed on the Overview tab. The following data wrangling and cleaning steps were performed automatically when data was loaded: 1) created TADA versions of columns in dataset for editing (original columns are retained for transparency), 2) removed exact duplicates, 3) addressed special characters, 4) identified detection limit data, 5) copied detection limit value to result value if result value was blank, 6) harmonized result and depth units to TADA defaults, and 7) replaced retired characteristic names with new names. See summary information about your dataset in the gray box at the bottom of the app."
     ))
     shiny::updateTabsetPanel(session = session, inputId = "tabbar", selected = "Overview")
     tadat$new <- NULL
