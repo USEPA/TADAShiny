@@ -130,8 +130,9 @@ mod_data_flagging_server <- function(id, tadat) {
         session = shiny::getDefaultReactiveDomain()
       )
 
-      # Add flagging columns to raw table
-      # tadat$raw <- applyFlags(tadat$raw, tadat$orgs)
+      # Add flagging columns to raw table, make sure line below is 
+      # not commented out once done with testing
+      tadat$raw <- applyFlags(tadat$raw, tadat$orgs)
       # write.csv(tadat$raw, "flagged.csv")
       # tadat$raw = utils::read.csv("flagged.csv") # THIS IS TRIPS WORKING FILE FOR TESTING, COMMENT OUT WHEN COMMITTING TO DEVELOP
       

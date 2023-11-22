@@ -168,11 +168,11 @@ mod_TADA_summary_server <- function(id, tadat) {
       }
     })
     
-    # download dataset button - only appears if there exists data in the app already
+    # download dataset button - only appears if there data exists in the app already
     output$dwn_all <- shiny::renderUI({
       shiny::req(tadat$raw)
       shiny::downloadButton(ns("download_all"),
-                            "Download Working Dataset (.xlsx)",
+                            "Download Working Dataset (.zip)",
                             style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
     })
     
