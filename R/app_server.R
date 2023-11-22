@@ -32,12 +32,19 @@ app_server <- function(input, output, session) {
   shinyjs::disable(selector = '.nav li a[data-value="Figures"]')
   shinyjs::disable(selector = '.nav li a[data-value="Review"]')
 
+  # switch that indicates when a file is being loaded
+  tadat$load_progress_file = NA
+  tadat$save_progress_file = NA
+  job_id = paste0("ts", format(Sys.time(), "%y%m%d%H%M%S"))
+  tadat$default_outfile = paste0("tada_output_", job_id)
+  tadat$job_id = job_id
+  
   # switch to overview tab when tadat$new changes and provide user with window letting them know how many records were automatically flagged for removal upon upload
   # move this to query_data?
   shiny::observeEvent(tadat$new, {
     shiny::showModal(shiny::modalDialog(
       title = "Data Loaded",
-      "Your data were successfully loaded into the app and are displayed on the Overview tab. See summary information about your dataset in the gray box at the bottom of the app."
+      "Your data were successfully loaded into the app and are displayed on the Overview tab. The following data wrangling steps were performed automatically when data was loaded: 1) created TADA versions of a subset of columns for editing (originals are retained), 2) removed exact duplicates, 3) handled/flagged special characters and text in result values and units, 4) identified detection limit data and copied limit value to result value if blank, 5) harmonized result and depth units to TADA defaults, and 6) replaced retired characteristic names with current names. See summary information about your dataset in the gray box at the bottom of the app."
     ))
     shiny::updateTabsetPanel(session = session, inputId = "tabbar", selected = "Overview")
     tadat$new <- NULL
@@ -50,6 +57,12 @@ app_server <- function(input, output, session) {
     }
   })
 
+  # Update the default switches if a progress file is uploaded.
+  shiny::observeEvent(tadat$selected_flags, {
+    switch_defaults = tadat$selected_flags
+    })
+
+  
   # this observes when the user switches tabs and adds the current tab they're on as a column to their dataset.
   shiny::observe({
     shiny::req(tadat$raw)

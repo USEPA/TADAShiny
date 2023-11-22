@@ -16,5 +16,11 @@ utils::globalVariables(c(
   "Target.TADA.CharacteristicName",
   "Target.TADA.MethodSpecificationName",
   "write.csv", "read.csv", "downloadHandler",
-  "Rank", "Target.TADA.ResultSampleFractionText"
+  "Rank", "Target.TADA.ResultSampleFractionText", 
+  "Field", "characteristicName", "characteristicType",
+  "countycode", "endDate", "example_data", "huc", "m2f",
+  "nd_method", "nd_mult", "od_method", "org_table",
+  "organization", "original_source", "proj", "sampleMedia",
+  "selected_filters", "selected_flags", "siteType",
+  "siteid", "startDate", "statecode"
 ))
