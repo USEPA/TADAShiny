@@ -38,14 +38,14 @@ MD5sum: 2bceb434966cb5bd2bb6e6f3b6d6296d
 NeedsCompilation: yes
 
 Package: Matrix
-Version: 1.6-2
+Version: 1.6-3
 Priority: recommended
 Depends: R (>= 3.5.0), methods
 Imports: grDevices, graphics, grid, lattice, stats, utils
 Suggests: MASS, datasets, sfsmisc, tools
 Enhances: SparseM, graph
 License: GPL (>= 2) | file LICENCE
-MD5sum: ab39261ab82d5e065685bf94ae2f0a5e
+MD5sum: e659de7dcd2845f9ec2be11dc18ed352
 NeedsCompilation: yes
 
 Package: R6
@@ -80,7 +80,7 @@ Imports: plyr, data.table, dplyr, tidyr, grDevices, magrittr, stringr,
 Suggests: rmarkdown, readr, tidyverse, knitr, testthat, testthis,
         usethis, devtools, pkgdown, spelling
 License: CC0
-MD5sum: 51282e74d57972773f47912ee3310488
+MD5sum: 40ca03e9e6e90ad5ee3847ecf231ae9e
 NeedsCompilation: no
 
 Package: anytime
@@ -332,18 +332,18 @@ MD5sum: 584792b00dfd113a0315646058324196
 NeedsCompilation: yes
 
 Package: dplyr
-Version: 1.1.3
+Version: 1.1.4
 Depends: R (>= 3.5.0)
 Imports: cli (>= 3.4.0), generics, glue (>= 1.3.2), lifecycle (>=
         1.0.3), magrittr (>= 1.5), methods, pillar (>= 1.9.0), R6,
         rlang (>= 1.1.0), tibble (>= 3.2.0), tidyselect (>= 1.2.0),
-        utils, vctrs (>= 0.6.0)
+        utils, vctrs (>= 0.6.4)
 Suggests: bench, broom, callr, covr, DBI, dbplyr (>= 2.2.1), ggplot2,
         knitr, Lahman, lobstr, microbenchmark, nycflights13, purrr,
         rmarkdown, RMySQL, RPostgreSQL, RSQLite, stringi (>= 1.7.6),
         testthat (>= 3.1.5), tidyr (>= 1.3.0), withr
 License: MIT + file LICENSE
-MD5sum: 43f91fd2c2904f042541fc070d09a529
+MD5sum: 8a08ce7423d3565ad45bdae417eba875
 NeedsCompilation: yes
 
 Package: e1071
@@ -667,16 +667,16 @@ MD5sum: 015f482a518d00a1a80277988dddf418
 NeedsCompilation: no
 
 Package: leaflet
-Version: 2.2.0
+Version: 2.2.1
 Depends: R (>= 3.1.0)
 Imports: crosstalk, htmltools, htmlwidgets (>= 1.5.4), jquerylib,
-        leaflet.providers (>= 1.8.0), magrittr, methods, png, raster
+        leaflet.providers (>= 2.0.0), magrittr, methods, png, raster
         (>= 3.6.3), RColorBrewer, scales (>= 1.0.0), sp, stats, viridis
         (>= 0.5.1), xfun
 Suggests: knitr, maps, purrr, R6, RJSONIO, s2, sf (>= 0.9-6), shiny,
         terra, testthat (>= 3.0.0)
 License: GPL-3
-MD5sum: edaf4509267fa1792de9af30f5ca3093
+MD5sum: 4d004853db91213289d364dfe5a858ab
 NeedsCompilation: no
 
 Package: lifecycle
@@ -1062,7 +1062,7 @@ Suggests: blob, covr, dplyr (>= 0.8-3), ggplot2, knitr, lwgeom (>=
         tibble (>= 1.4.1), tidyr (>= 1.2.0), tidyselect (>= 1.0.0),
         tmap (>= 2.0), vctrs, wk
 License: GPL-2 | MIT + file LICENSE
-MD5sum: 36ed8da33f3bacf5133ac5154bea08cb
+MD5sum: 3ac7e65f3a09df98b6b56d42e07bf48c
 NeedsCompilation: yes
 
 Package: shinyWidgets
@@ -1077,7 +1077,7 @@ MD5sum: 2f81354d042ce76ca4b58b2fcf34c9b3
 NeedsCompilation: no
 
 Package: shiny
-Version: 1.7.5.1
+Version: 1.8.0
 Depends: R (>= 3.0.2), methods
 Imports: utils, grDevices, httpuv (>= 1.5.2), mime (>= 0.3), jsonlite
         (>= 0.9.16), xtable, fontawesome (>= 0.4.0), htmltools (>=
@@ -1089,7 +1089,7 @@ Suggests: datasets, Cairo (>= 1.5-5), testthat (>= 3.0.0), knitr (>=
         1.6), markdown, rmarkdown, ggplot2, reactlog (>= 1.0.0),
         magrittr, yaml, future, dygraphs, ragg, showtext, sass
 License: GPL-3 | file LICENSE
-MD5sum: d4d73354465c1234994ce82105c639ad
+MD5sum: 71a63c714fc6e2275f149b6ef713a983
 NeedsCompilation: no
 
 Package: shinybusy
@@ -1155,23 +1155,23 @@ MD5sum: 6be8bd1a0bea7763f5b6cee9e79c9d8f
 NeedsCompilation: no
 
 Package: stringi
-Version: 1.7.12
-Depends: R (>= 3.1)
+Version: 1.8.1
+Depends: R (>= 3.4)
 Imports: tools, utils, stats
 License: file LICENSE
 License_is_FOSS: yes
-MD5sum: abb50f015cecbb8d5a26c8e2718edf23
+MD5sum: 010b23dbe4fa71d59a7d8a1fc3691064
 NeedsCompilation: yes
 
 Package: stringr
-Version: 1.5.0
-Depends: R (>= 3.3)
+Version: 1.5.1
+Depends: R (>= 3.6)
 Imports: cli, glue (>= 1.6.1), lifecycle (>= 1.0.3), magrittr, rlang
-        (>= 1.0.0), stringi (>= 1.5.3), vctrs
-Suggests: covr, htmltools, htmlwidgets, knitr, rmarkdown, testthat (>=
-        3.0.0)
+        (>= 1.0.0), stringi (>= 1.5.3), vctrs (>= 0.4.0)
+Suggests: covr, dplyr, gt, htmltools, htmlwidgets, knitr, rmarkdown,
+        testthat (>= 3.0.0), tibble
 License: MIT + file LICENSE
-MD5sum: 0f4b9395788b19fbefc7248bd480ab6b
+MD5sum: 64b0f14744e8d66669fca4829b99eab7
 NeedsCompilation: no
 
 Package: sys
