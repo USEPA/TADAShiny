@@ -96,7 +96,7 @@ mod_review_data_server <- function(id, tadat) {
       if (nrow(rem_reas) > 0) {
         review_things$rem_reas <- rem_reas
       } else{
-        review_things$rem_reas <- data.frame(Reason="No Removals", Count=1)
+        review_things$rem_reas <- data.frame(Reason = "No Removals", Count = 1)
       }
     })
     
@@ -125,7 +125,11 @@ mod_review_data_server <- function(id, tadat) {
     output$reason_pie <- shiny::renderPlot({
       shiny::req(review_things$rem_reas)
       dat <- review_things$rem_reas
-      dat$Legend <- paste0(dat$Reason, " - ", dat$Count, " results")
+      if (nrow(review_things$rem_reas) > 1) {
+        dat$Legend <- paste0(dat$Reason, " - ", dat$Count, " results")
+      } else{
+        dat$Legend <- paste0(dat$Reason)
+      }
       dat <- dat %>%
         dplyr::rowwise() %>%
         dplyr::mutate(Legend = TADA::TADA_InsertBreaks(Legend, len = 100))
