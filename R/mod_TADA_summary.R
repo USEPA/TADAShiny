@@ -189,7 +189,7 @@ mod_TADA_summary_server <- function(id, tadat) {
         desc <- writeNarrativeDataFrame(tadat)
         dfs <-
           list(Data = TADA::TADA_OrderCols(tadat$raw), Parameterization = desc)
-        writeFile(tadat, progress_file_name)
+        writeProgressFile(tadat, progress_file_name)
         writexl::write_xlsx(dfs, path = datafile_name)
         utils::zip(zipfile = fname,
             files = c(datafile_name, progress_file_name))
@@ -210,7 +210,7 @@ mod_TADA_summary_server <- function(id, tadat) {
     #     paste0(tadat$job_id, '.Rdata')
     #   },
     #   content = function(file) {
-    #     writeFile(tadat, file)
+    #     writeProgressFile(tadat, file)
     #   }
     # )
     
