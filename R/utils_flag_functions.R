@@ -110,9 +110,8 @@ applyFlags <- function(in_table, orgs) {
   if ("ProjectFileUrl" %in% names(out)) {
     out <- TADA::TADA_FindQAPPDoc(out, clean = FALSE)
   }
-  # Dataset includes depth profile data - no function for this? How is this one
-  # supposed to work?
-  out <- out
+  # Dataset includes depth profile data - no function for this yet
+  # out <- out
 
   # Aggregated continuous data
   out <- TADA::TADA_FindContinuousData(out, clean = FALSE)
@@ -123,26 +122,14 @@ applyFlags <- function(in_table, orgs) {
   # Below WQX Lower Threshold
   out <- TADA::TADA_FlagBelowThreshold(out, clean = FALSE)
 
-  # Convert depth height units - THIS ONE ONLY GETS RUN WHEN USER RUNS THE CLEANING
-  # FILTER AFTER MAKING ALL DECISIONS, AND SUMMARY COUNTS BASED ON UNIQUE UNITS IN
-  # DEPTH HEIGHT COLUMNS
-  # CM - this is already done via TADA autoclean 9/12/23, simply add note somewhere for users?
-  # out <-
-  #   TADA::TADA_ConvertDepthUnits(out, unit = 'ft', transform = TRUE) # input$depthunit is dummy variable that would connect to the drop down
-
-  # Convert time zones - no flag function to run beforehand. This one might be
-  # tricky to implement - acts on ActivityStartTime.Time?
-  # CM - this is already done via dataRetrieval 9/12/23, simply add note somewhere for users?
-  # out = out
-
-  # Invalid coordinates - not included in mock up page?
-  # out <-
-  #   TADA::TADA_FlagCoordinates(
-  #     out,
-  #     clean_outsideUSA = "no",
-  #     clean_imprecise = FALSE,
-  #     errorsonly = FALSE
-  #   )
+  # Invalid coordinates
+  out <-
+    TADA::TADA_FlagCoordinates(
+      out,
+      clean_outsideUSA = "no",
+      clean_imprecise = FALSE,
+      flaggedonly = FALSE
+    )
 
 
   return(out)
