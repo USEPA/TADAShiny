@@ -38,7 +38,7 @@ mod_data_flagging_ui <- function(id) {
         ns("m2f"),
         label = "",
         choices = c("feet", "inches", "meters"),
-        selected = "meters",
+        selected = character(0),
         inline = TRUE
       )
     ))

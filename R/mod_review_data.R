@@ -43,6 +43,8 @@ mod_review_data_server <- function(id, tadat) {
     shiny::observeEvent(input$review_go, {
       removals <- tadat$removals
       sel <- which(removals == TRUE, arr.ind = TRUE)
+      print(length(sel))
+      # Bombing here
       if (length(sel) > 0) {
         removals[sel] <- names(removals)[sel[, "col"]]
         removals[removals == FALSE] <- ""
@@ -94,7 +96,7 @@ mod_review_data_server <- function(id, tadat) {
       if (nrow(rem_reas) > 0) {
         review_things$rem_reas <- rem_reas
       } else{
-        review_things$rem_reas <- data.frame(Reason="No Removals", Count=0)
+        review_things$rem_reas <- data.frame(Reason="No Removals", Count=1)
       }
     })
     

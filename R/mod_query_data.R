@@ -61,7 +61,7 @@ mod_query_data_ui <- function(id) {
     shiny::fluidRow(column(
       4,
       shiny::dateInput(
-        ns("startDate"),
+        ns("startdate"),
         "Start Date",
         format = "yyyy-mm-dd",
         startview = "year"
@@ -70,7 +70,7 @@ mod_query_data_ui <- function(id) {
     column(
       4,
       shiny::dateInput(
-        ns("endDate"),
+        ns("enddate"),
         "End Date",
         format = "yyyy-mm-dd",
         startview = "year"
@@ -233,7 +233,7 @@ mod_query_data_server <- function(id, tadat) {
     shiny::observe({
       shiny::req(input$progress_file)
       # user uploaded data
-      readProgressFile(tadat, input$progress_file$datapath)
+      readFile(tadat, input$progress_file$datapath)
     })
     
     # if user presses example data button, make tadat$raw the nutrients dataset contained within the TADA package.
@@ -347,9 +347,9 @@ mod_query_data_server <- function(id, tadat) {
         tadat$sampleMedia <- input$media
       }
       if (is.null(input$proj)) {
-        tadat$proj <- "null"
+        tadat$project <- "null"
       } else {
-        tadat$proj <- input$proj
+        tadat$project <- input$proj
       }
       if (is.null(input$org)) {
         tadat$organization <- "null"
@@ -362,17 +362,17 @@ mod_query_data_server <- function(id, tadat) {
         tadat$siteid <- input$siteid
         # siteid = stringr::str_trim(unlist(strsplit(input$siteids,",")))
       }
-      if (length(input$endDate) == 0) {
+      if (length(input$enddate) == 0) {
         # ensure if date is empty, the query receives a proper input ("null")
-        tadat$endDate <- "null"
+        tadat$enddate <- "null"
       } else {
-        tadat$endDate <- as.character(input$endDate)
+        tadat$enddate <- as.character(input$enddate)
       }
-      if (length(input$startDate) == 0) {
+      if (length(input$startdate) == 0) {
         # ensure if date is empty, the query receives a proper start date. Might want a warning message instead.
-        tadat$startDate <- "1800-01-01"
+        tadat$startdate <- "1800-01-01"
       } else {
-        tadat$startDate <- as.character(input$startDate)
+        tadat$startdate <- as.character(input$startdate)
       }
       # a modal that pops up showing it's working on querying the portal
       shinybusy::show_modal_spinner(
@@ -392,10 +392,10 @@ mod_query_data_server <- function(id, tadat) {
         characteristicName = tadat$characteristicName,
         characteristicType = tadat$characteristicType,
         sampleMedia = tadat$sampleMedia,
-        proj = tadat$proj,
+        project = tadat$project,
         organization = tadat$organization,
-        startDate = tadat$startDate,
-        endDate = tadat$endDate,
+        startDate = tadat$startdate,
+        endDate = tadat$enddate,
         applyautoclean = TRUE
       )
       
@@ -439,8 +439,8 @@ mod_query_data_server <- function(id, tadat) {
           shiny::updateSelectizeInput(session, "media", selected = tadat$sampleMedia)
           shiny::updateSelectizeInput(session, "proj", selected = tadat$proj)
           shiny::updateSelectizeInput(session, "org", selected = tadat$organization)
-          shiny::updateDateInput(session, "startDate", value = tadat$startDate)
-          shiny::updateDateInput(session, "endDate", value = tadat$endDate)
+          shiny::updateDateInput(session, "startdate", value = tadat$startDate)
+          shiny::updateDateInput(session, "enddate", value = tadat$endDate)
         }
       }
       
