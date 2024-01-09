@@ -11,7 +11,7 @@ writeFile <- function(tadat, filename) {
   characteristicName = tadat$characteristicName
   characteristicType = tadat$characteristicType
   sampleMedia = tadat$sampleMedia
-  proj = tadat$proj
+  project = tadat$project
   organization = tadat$organization
   startDate = tadat$startDate
   endDate = tadat$endDate
@@ -36,7 +36,7 @@ writeFile <- function(tadat, filename) {
     characteristicName,
     characteristicType,
     sampleMedia,
-    proj,
+    project,
     organization,
     startDate,
     endDate,
@@ -88,7 +88,7 @@ readFile <- function(tadat, filename) {
   tadat$characteristicName = characteristicName
   tadat$characteristicType = characteristicType
   tadat$sampleMedia = sampleMedia
-  tadat$proj = proj
+  tadat$project = project
   tadat$organization = organization
   tadat$startDate = startDate
   tadat$endDate = endDate
@@ -109,6 +109,8 @@ invalidFile <- function(trigger) {
 
 
 writeNarrativeDataFrame <- function(tadat) {
+  # sampleMedia needs to be a single string for this part
+  tadat$sampleMedia = paste(tadat$sampleMedia, collapse=" ")
   df <- data.frame(Parameter=character(), Value=character())
   df[nrow(df) + 1, ] = c("TADA Shiny Job ID", tadat$job_id)
   df[nrow(df) + 1, ] = c("Original data source: ", tadat$original_source)
@@ -141,7 +143,7 @@ writeNarrativeDataFrame <- function(tadat) {
         tadat$characteristicName,
         tadat$characteristicType,
         tadat$sampleMedia,
-        tadat$proj,
+        tadat$project,
         tadat$organization,
         tadat$startDate,
         tadat$endDate

@@ -20,7 +20,7 @@ utils::globalVariables(c(
   "Field", "characteristicName", "characteristicType",
   "countycode", "endDate", "example_data", "huc", "m2f",
   "nd_method", "nd_mult", "od_method", "org_table",
-  "organization", "original_source", "proj", "sampleMedia",
+  "organization", "original_source", "project", "sampleMedia",
   "selected_filters", "selected_flags", "siteType",
   "siteid", "startDate", "statecode"
 ))

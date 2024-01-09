@@ -61,7 +61,7 @@ mod_query_data_ui <- function(id) {
     shiny::fluidRow(column(
       4,
       shiny::dateInput(
-        ns("startdate"),
+        ns("startDate"),
         "Start Date",
         format = "yyyy-mm-dd",
         startview = "year"
@@ -70,7 +70,7 @@ mod_query_data_ui <- function(id) {
     column(
       4,
       shiny::dateInput(
-        ns("enddate"),
+        ns("endDate"),
         "End Date",
         format = "yyyy-mm-dd",
         startview = "year"
@@ -111,7 +111,7 @@ mod_query_data_ui <- function(id) {
       column(
         4,
         shiny::selectizeInput(
-          ns("proj"),
+          ns("project"),
           "Project(s)",
           choices = NULL,
           multiple = TRUE
@@ -277,7 +277,7 @@ mod_query_data_server <- function(id, tadat) {
                                 choices = c(chars),
                                 server = TRUE)
     shiny::updateSelectizeInput(session,
-                                "proj",
+                                "project",
                                 choices = c(projects),
                                 server = TRUE)
     shiny::updateSelectizeInput(
@@ -346,10 +346,10 @@ mod_query_data_server <- function(id, tadat) {
       } else {
         tadat$sampleMedia <- input$media
       }
-      if (is.null(input$proj)) {
+      if (is.null(input$project)) {
         tadat$project <- "null"
       } else {
-        tadat$project <- input$proj
+        tadat$project <- input$project
       }
       if (is.null(input$org)) {
         tadat$organization <- "null"
@@ -362,17 +362,17 @@ mod_query_data_server <- function(id, tadat) {
         tadat$siteid <- input$siteid
         # siteid = stringr::str_trim(unlist(strsplit(input$siteids,",")))
       }
-      if (length(input$enddate) == 0) {
+      if (length(input$endDate) == 0) {
         # ensure if date is empty, the query receives a proper input ("null")
-        tadat$enddate <- "null"
+        tadat$endDate <- "null"
       } else {
-        tadat$enddate <- as.character(input$enddate)
+        tadat$endDate <- as.character(input$endDate)
       }
-      if (length(input$startdate) == 0) {
+      if (length(input$startDate) == 0) {
         # ensure if date is empty, the query receives a proper start date. Might want a warning message instead.
-        tadat$startdate <- "1800-01-01"
+        tadat$startDate <- "1800-01-01"
       } else {
-        tadat$startdate <- as.character(input$startdate)
+        tadat$startDate <- as.character(input$startDate)
       }
       # a modal that pops up showing it's working on querying the portal
       shinybusy::show_modal_spinner(
@@ -394,8 +394,8 @@ mod_query_data_server <- function(id, tadat) {
         sampleMedia = tadat$sampleMedia,
         project = tadat$project,
         organization = tadat$organization,
-        startDate = tadat$startdate,
-        endDate = tadat$enddate,
+        startDate = tadat$startDate,
+        endDate = tadat$endDate,
         applyautoclean = TRUE
       )
       
@@ -437,10 +437,10 @@ mod_query_data_server <- function(id, tadat) {
                                       selected = tadat$characteristicName)
           shiny::updateSelectizeInput(session, "chargroup", selected = tadat$characteristicType)
           shiny::updateSelectizeInput(session, "media", selected = tadat$sampleMedia)
-          shiny::updateSelectizeInput(session, "proj", selected = tadat$proj)
+          shiny::updateSelectizeInput(session, "project", selected = tadat$project)
           shiny::updateSelectizeInput(session, "org", selected = tadat$organization)
-          shiny::updateDateInput(session, "startdate", value = tadat$startDate)
-          shiny::updateDateInput(session, "enddate", value = tadat$endDate)
+          shiny::updateDateInput(session, "startDate", value = tadat$startDate)
+          shiny::updateDateInput(session, "endDate", value = tadat$endDate)
         }
       }
       
