@@ -55,7 +55,6 @@ writeFile <- function(tadat, filename) {
 
 readFile <- function(tadat, filename) {
   load(filename, verbose = FALSE)
-  checkFlagColumns(tadat$raw)
   tadat$load_progress_file = filename
 
   # Confirm compatibility
@@ -68,8 +67,6 @@ readFile <- function(tadat, filename) {
   if (!is.null(selected_flags)) {
     tadat$selected_flags = selected_flags
     shinyjs::enable(selector = '.nav li a[data-value="Flag"]')
-  } else {
-    print("No flags selected")
   }
 
   # Enable tabs if certain fields are not null

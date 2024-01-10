@@ -218,8 +218,15 @@ mod_query_data_server <- function(id, tadat) {
     ns <- session$ns
     
     # read in the excel spreadsheet dataset if this input reactive object is populated via fileInput and define as tadat$raw
-    shiny::observe({
-      shiny::req(input$file)
+    shiny::observeEvent(input$file,{
+      # a modal that pops up showing it's working on querying the portal
+      shinybusy::show_modal_spinner(
+        spin = "double-bounce",
+        color = "#0071bc",
+        text = "Uploading dataset...",
+        session = shiny::getDefaultReactiveDomain()
+      )
+      
       # user uploaded data
       raw <-
         suppressWarnings(readxl::read_excel(input$file$datapath, sheet = 1))
@@ -227,6 +234,9 @@ mod_query_data_server <- function(id, tadat) {
       if (!is.null(tadat$original_source)){
         tadat$original_source <- "Upload"
       }
+
+      shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+      
     })
     
     # Read the TADA progress file
@@ -238,6 +248,14 @@ mod_query_data_server <- function(id, tadat) {
     
     # if user presses example data button, make tadat$raw the nutrients dataset contained within the TADA package.
     shiny::observeEvent(input$example_data_go, {
+      # a modal that pops up showing it's working on querying the portal
+      shinybusy::show_modal_spinner(
+        spin = "double-bounce",
+        color = "#0071bc",
+        text = "Loading example data...",
+        session = shiny::getDefaultReactiveDomain()
+      )
+      
       tadat$example_data <- input$example_data
       if (input$example_data == "Shepherdstown (34k results)") {
         raw <- TADA::Data_NCTCShepherdstown_HUC12
@@ -249,6 +267,9 @@ mod_query_data_server <- function(id, tadat) {
         raw <- TADA::Data_Nutrients_UT
       }
       initializeTable(tadat, raw)
+
+      shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+      
     })
     
     # this section has widget update commands for the selectizeinputs that have a lot of possible selections - shiny suggested hosting the choices server-side rather than ui-side

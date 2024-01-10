@@ -35,6 +35,7 @@ app_server <- function(input, output, session) {
   # switch that indicates when a file is being loaded
   tadat$load_progress_file = NA
   tadat$save_progress_file = NA
+  tadat$flags_present = FALSE
   job_id = paste0("ts", format(Sys.time(), "%y%m%d%H%M%S"))
   tadat$default_outfile = paste0("tada_output_", job_id)
   tadat$job_id = job_id

@@ -38,7 +38,7 @@ mod_data_flagging_ui <- function(id) {
         ns("m2f"),
         label = "",
         choices = c("feet", "inches", "meters"),
-        selected = character(0),
+        selected = "meters",
         inline = TRUE
       )
     ))
@@ -54,7 +54,7 @@ mod_data_flagging_server <- function(id, tadat) {
     tadat$selected_flags <- character()
     tadat$switch_defaults <- prompt_table$Level != "Optional"
     switch_disabled <- prompt_table$Level == "Required"
-
+    
     flagSwitch <- function(len) {
       inputs <- character(len)
       for (i in seq_len(len)) {
@@ -80,28 +80,26 @@ mod_data_flagging_server <- function(id, tadat) {
       unlist(lapply(seq_len(len), function(i) {
         value <- input[[paste0(id, i)]]
         if (is.null(value)) {
-          TRUE
+          FALSE
         } else {
           value
         }
       }))
     }
     
-    
-    
-    
     # Runs whenever selected flags are changed
     shiny::observeEvent(tadat$selected_flags, {
-      prefix = "Flag: "
+      print(paste0("Selected flags changed. ", length(tadat$selected_flags), " flags selected"))
+      
       if (!is.null(tadat$removals)) {
-        tadat$removals = dplyr::select(tadat$removals,-(dplyr::starts_with(prefix)))
+        tadat$removals = dplyr::select(tadat$removals, -(dplyr::starts_with(flag_prefix)))
       }
       # Loop through the flags
       for (flag in tadat$selected_flags) {
         # If not all the values are NA, add the test results to removals
         if (!is.null(tadat$removals)) {
           if (!all(is.na(values$testResults[flag]))) {
-            tadat$removals[paste0(prefix, flag)] = values$testResults[flag]
+            tadat$removals[paste0(flag_prefix, flag)] = values$testResults[flag]
           }
         }
         # If the switch corresponding to this flag isn't on, switch it on
@@ -121,6 +119,69 @@ mod_data_flagging_server <- function(id, tadat) {
       }
     })
     
+    # Any time tadat$raw is changed, check to see if the flagging fields are present
+    shiny::observeEvent(tadat$raw, {
+      tadat$flags_present = checkFlagColumns(tadat$raw)
+    })
+    
+    shiny::observeEvent(tadat$flags_present, {
+      if (tadat$flags_present) {
+        # A table (raw rows, flags) indicating whether each record passes each test
+        values$testResults <- flagCensus(tadat$raw)
+        
+        # The number of records failing each test
+        values$n_fails <- colSums(values$testResults)
+        
+        # Runs when any of the flag switches are changed
+        shiny::observe({
+          switch_id = "switch_"
+          tadat$selected_flags = flag_types[shinyValue(switch_id, n_switches)]
+          for (i in which(switch_disabled)) {
+            shinyjs::disable(paste0(switch_id, i))
+          }
+        })
+        
+        switchTable <- shiny::reactive({
+          df <- data.frame(
+            Reason = prompts,
+            Results = values$n_fails,
+            Required = levs,
+            Decision = flagSwitch(n_switches)
+          )
+        })
+        
+        output$flagTable <- DT::renderDT(
+          shiny::isolate(switchTable()),
+          escape = FALSE,
+          selection = "none",
+          colnames = c(
+            "Flag reason",
+            "Results affected",
+            "Required/Optional",
+            "Switch 'on' to flag for removal"
+          ),
+          rownames = FALSE,
+          options = list(
+            dom = "t",
+            paging = FALSE,
+            ordering = FALSE,
+            preDrawCallback = DT::JS(
+              "function() { Shiny.unbindAll(this.api().table().node()); }"
+            ),
+            drawCallback = DT::JS(
+              "function() { Shiny.bindAll(this.api().table().node()); } "
+            )
+          )
+        )
+        
+        shinyjs::enable(selector = '.nav li a[data-value="Filter"]')
+        shinyjs::enable(selector = '.nav li a[data-value="Censored"]')
+        shinyjs::enable(selector = '.nav li a[data-value="Harmonize"]')
+        shinyjs::enable(selector = '.nav li a[data-value="Figures"]')
+        shinyjs::enable(selector = '.nav li a[data-value="Review"]')
+      }
+    })
+    
     # Runs when the flag button is clicked
     shiny::observeEvent(input$runFlags, {
       shinybusy::show_modal_spinner(
@@ -129,68 +190,16 @@ mod_data_flagging_server <- function(id, tadat) {
         text = "Running flagging functions...",
         session = shiny::getDefaultReactiveDomain()
       )
-
-      # Add flagging columns to raw table, make sure line below is 
+      
+      # Add flagging columns to raw table, make sure line below is
       # not commented out once done with testing
-      tadat$raw <- applyFlags(tadat$raw, tadat$orgs)
-      # write.csv(tadat$raw, "flagged.csv")
-      # tadat$raw = utils::read.csv("flagged.csv") # THIS IS TRIPS WORKING FILE FOR TESTING, COMMENT OUT WHEN COMMITTING TO DEVELOP
-      
-      # A table (raw rows, flags) indicating whether each record passes each test
-      values$testResults <- flagCensus(tadat$raw)
-      
-      # The number of records failing each test
-      values$n_fails <- colSums(values$testResults)
+      #tadat$raw <- applyFlags(tadat$raw, tadat$orgs)
+      #write.csv(tadat$raw, "flagged.csv")
+      tadat$raw = utils::read.csv("flagged.csv") # THIS IS TRIPS WORKING FILE FOR TESTING, COMMENT OUT WHEN COMMITTING TO DEVELOP
       
       # Remove progress bar and display instructions
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
       
-      # Runs when any of the flag switches are changed
-      shiny::observe({
-        switch_id = "switch_"
-        tadat$selected_flags = flag_types[shinyValue(switch_id, n_switches)]
-        for (i in which(switch_disabled)) {
-          shinyjs::disable(paste0(switch_id, i))
-        }
-      })
-      
-      switchTable <- shiny::reactive({
-        df <- data.frame(
-          Reason = prompts,
-          Results = values$n_fails,
-          Required = levs,
-          Decision = flagSwitch(n_switches)
-        )
-      })
-      
-      output$flagTable <- DT::renderDT(
-        shiny::isolate(switchTable()),
-        escape = FALSE,
-        selection = "none",
-        colnames = c(
-          "Flag reason",
-          "Results affected",
-          "Required/Optional",
-          "Switch 'on' to flag for removal"
-        ),
-        rownames = FALSE,
-        options = list(
-          dom = "t",
-          paging = FALSE,
-          ordering = FALSE,
-          preDrawCallback = DT::JS(
-            "function() { Shiny.unbindAll(this.api().table().node()); }"
-          ),
-          drawCallback = DT::JS(
-            "function() { Shiny.bindAll(this.api().table().node()); } "
-          )
-        )
-      )
-      shinyjs::enable(selector = '.nav li a[data-value="Filter"]')
-      shinyjs::enable(selector = '.nav li a[data-value="Censored"]')
-      shinyjs::enable(selector = '.nav li a[data-value="Harmonize"]')
-      shinyjs::enable(selector = '.nav li a[data-value="Figures"]')
-      shinyjs::enable(selector = '.nav li a[data-value="Review"]')
     })
     
     shiny::observeEvent(tadat$m2f, {
