@@ -230,11 +230,12 @@ mod_query_data_server <- function(id, tadat) {
       # user uploaded data
       raw <-
         suppressWarnings(readxl::read_excel(input$file$datapath, sheet = 1))
+      raw$TADA.Remove <- NULL
       initializeTable(tadat, raw)
       if (!is.null(tadat$original_source)){
         tadat$original_source <- "Upload"
       }
-
+      
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
       
     })
@@ -496,8 +497,10 @@ initializeTable <- function(tadat, raw) {
   removals <- data.frame(matrix(nrow = nrow(raw), ncol = 0))
   # removals["Media Type"] = ifelse(!raw$TADA.ActivityMediaName%in%c("WATER"),TRUE,raw$Removed)
   # removals["Special Characters"] = ifelse(raw$TADA.ResultMeasureValueDataTypes.Flag%in%c("ND or NA","Text","Coerced to NA"),TRUE,raw$Removed)
-  
+  print(6789)
+  print(nrow(tadat$raw))
   tadat$raw <- raw
+  print(nrow(tadat$raw))
   tadat$removals <- removals
 }
 

@@ -8,7 +8,7 @@
 # Below increases the max data upload size from the Shiny default of 5MB per file
 # to 30MB for file
 options(shiny.maxRequestSize = 30 * 1024^2)
-
+options(warn = 2)
 app_server <- function(input, output, session) {
   # Your application server logic
   tadat <- shiny::reactiveValues() # create a list object that holds reactive values passed between modules
@@ -53,32 +53,34 @@ app_server <- function(input, output, session) {
 
   # update the master 'Remove' column anytime data is added to the 'remove' table
   shiny::observeEvent(tadat$removals, {
+    print("Removals changed")
+    print(dim(tadat$removals))
+    print(sum(tadat$raw$TADA.Remove))
     if (dim(tadat$removals)[2] > 0) {
+      print("Updating remove col")
       tadat$raw$TADA.Remove <- apply(tadat$removals, 1, any)
     }
+    print(sum(tadat$raw$TADA.Remove))
   })
 
-  # Update the default switches if a progress file is uploaded.
-  shiny::observeEvent(tadat$selected_flags, {
-    switch_defaults = tadat$selected_flags
-    })
-
-  
-  # this observes when the user switches tabs and adds the current tab they're on as a column to their dataset.
   shiny::observe({
-    shiny::req(tadat$raw)
+    # JCH - is this necessary?
+    #shiny::req(tadat$raw)
     tadat$raw$TADAShiny.tab <- input$tabbar
     tadat$tab <- input$tabbar
   })
 
+  # JCH - disabling this for now. I think progress files provide this functionality
+  # this observes when the user switches tabs and adds the current tab they're on as a column to their dataset.
+  
   # switch to tab user left off on when tadat$reup changes, which only happens when someone uploads a workbook with the column "Removed" in it
-  shiny::observeEvent(tadat$reup, {
-    shiny::showModal(shiny::modalDialog(
-      title = "Data Loaded",
-      "Your working dataset has been uploaded and the app switched to the tab where you left off."
-    ))
-    # the switch tab command
-    shiny::updateTabsetPanel(session = session, inputId = "tabbar", selected = unique(tadat$raw$tab))
-    tadat$reup <- NULL
-  })
+  #shiny::observeEvent(tadat$reup, {
+  #  shiny::showModal(shiny::modalDialog(
+  #    title = "Data Loaded",
+  #    "Your working dataset has been uploaded and the app switched to the tab where you left off."
+  #  ))
+  #  # the switch tab command
+  #  shiny::updateTabsetPanel(session = session, inputId = "tabbar", selected = unique(tadat$raw$tab))
+  #  tadat$reup <- NULL
+  #})
 }

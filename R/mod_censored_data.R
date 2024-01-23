@@ -299,7 +299,10 @@ mod_censored_data_server <- function(id, tadat) {
         ) # reset to detection quantitation limit value
       tadat$raw$TADA.ResultMeasureValueDataTypes.Flag[tadat$raw$TADA.ResultMeasureValueDataTypes.Flag == "Result Value/Unit Estimated from Detection Limit"] <-
         "Result Value/Unit Copied from Detection Limit" # reset data types flag to what it was before simpleCensoredMethods function run
+      print(1234)
+      print(nrow(tadat$raw))
       tadat$raw <- tadat$raw %>% dplyr::select(-TADA.CensoredMethod)
+      print(nrow(tadat$raw))
       tadat$censor_applied = FALSE
     })
     

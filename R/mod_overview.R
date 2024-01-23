@@ -87,6 +87,7 @@ mod_overview_server <- function(id, tadat) {
         dplyr::group_by(OrganizationFormalName, OrganizationIdentifier) %>%
         dplyr::summarise("Result_Count" = length(unique(ResultIdentifier))) %>%
         dplyr::ungroup()
+
       tadat$org_table <- orgs %>%
         dplyr::arrange(-Result_Count) %>%
         dplyr::mutate("Rank" = 1:length(Result_Count))

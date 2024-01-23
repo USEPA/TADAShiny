@@ -61,14 +61,17 @@ mod_filtering_server <- function(id, tadat) {
     shinyjs::hide("addExcludes")
     
     # make sure dataset being used to create filters is only REMOVE = FALSE
-    shiny::observe({
-      shiny::req(tadat$tab)
+    shiny::observeEvent(tadat$tab, {
       if (tadat$tab == "Filter") {
+        print("Filter tab selected")
         # only show unique values from data that have not been flagged for removal
+        print(tadat$raw$TADA.Remove)
         tables$dat <-
           subset(tadat$raw, tadat$raw$TADA.Remove == FALSE)
         tables$filter_fields <-
           TADA::TADA_FieldCounts(tables$dat, display = "key")
+      } else {
+        print(paste0(tadat$tab, " tab selected"))
       }
     })
     
@@ -253,6 +256,7 @@ mod_filtering_server <- function(id, tadat) {
       values$locked = field_filters$Filter
       names(values$locked) <- field_filters$Field
       prefix = "Filter: "
+      
       # Remove all the filter columns from the removals table (start fresh)
       if (!is.null(tadat$removals)) {
         tadat$removals <-
