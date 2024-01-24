@@ -71,7 +71,7 @@ mod_overview_server <- function(id, tadat) {
     
     # create dataset for map and histogram using raw data
     shiny::observeEvent(tadat$ovgo, {
-      req(tadat$raw)
+      shiny::req(tadat$raw)
       # create gray text tile info
       mapdat$text <- tadat$raw %>%
         dplyr::filter(TADA.Remove == FALSE) %>%
