@@ -183,7 +183,8 @@ mod_TADA_summary_server <- function(id, tadat) {
       content = function(fname) {
         fs <- c()
         tmpdir <- tempdir()
-        setwd(tempdir())
+        # setwd(tempdir())
+        setwd(tmpdir)
         datafile_name = paste0(tadat$default_outfile, ".xlsx")
         progress_file_name = paste0(tadat$default_outfile, "_prog.RData")
         desc <- writeNarrativeDataFrame(tadat)

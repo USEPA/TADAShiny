@@ -12,6 +12,7 @@ writeFile <- function(tadat, filename) {
   characteristicType = tadat$characteristicType
   sampleMedia = tadat$sampleMedia
   proj = tadat$proj
+  # proj = tadat@project
   organization = tadat$organization
   startDate = tadat$startDate
   endDate = tadat$endDate
@@ -88,7 +89,8 @@ readFile <- function(tadat, filename) {
   tadat$characteristicName = characteristicName
   tadat$characteristicType = characteristicType
   tadat$sampleMedia = sampleMedia
-  tadat$proj = proj
+  # tadat$proj = proj
+  tadat@project = proj
   tadat$organization = organization
   tadat$startDate = startDate
   tadat$endDate = endDate
@@ -113,10 +115,26 @@ writeNarrativeDataFrame <- function(tadat) {
   df[nrow(df) + 1, ] = c("TADA Shiny Job ID", tadat$job_id)
   df[nrow(df) + 1, ] = c("Original data source: ", tadat$original_source)
   
+  # print(tadat)
+  
   # Data Query Tab
   if (tadat$original_source == "Example") {
     df[nrow(df) + 1, ] = c("Example data file", tadat$example_data)
   } else if (tadat$original_source == "Query") {
+    
+    print(paste0('tadat$statecode = ',tadat$statecode))
+    print(paste0('tadat$countycode = ',tadat$countycode))
+    print(paste0('tadat$huc = ',tadat$huc))
+    print(paste0('tadat$siteid = ',tadat$siteid))
+    print(paste0('tadat$siteType = ',tadat$siteType))
+    print(paste0('tadat$characteristicName = ',tadat$characteristicName))
+    print(paste0('tadat$characteristicType = ',tadat$characteristicType))
+    print(paste0('tadat$sampleMedia = ',tadat$sampleMedia))
+    print(paste0('tadat$project = ',tadat$project))
+    print(paste0('tadat$organization = ',tadat$organization))
+    print(paste0('tadat$startdate = ',tadat$startdate))
+    print(paste0('tadat$enddate = ',tadat$enddate))
+    
     query_params = data.frame(
       param = c(
         "State Code",
@@ -140,13 +158,18 @@ writeNarrativeDataFrame <- function(tadat) {
         tadat$siteType,
         tadat$characteristicName,
         tadat$characteristicType,
-        tadat$sampleMedia,
-        tadat$proj,
+        # tadat$sampleMedia,
+        'Water',
+        tadat$project,
+        # tadat$proj,
         tadat$organization,
-        tadat$startDate,
-        tadat$endDate
+        # tadat$startDate,
+        # tadat$endDate
+        tadat$startdate,
+        tadat$enddate
       )
     )
+    print(query_params)
     for (i in seq_len(nrow(query_params))) {
       if (!is.null(query_params[i, "value"])) {
         df[nrow(df) + 1, ] = query_params[i,]
