@@ -65,7 +65,6 @@ mod_filtering_server <- function(id, tadat) {
       if (tadat$tab == "Filter") {
         print("Filter tab selected")
         # only show unique values from data that have not been flagged for removal
-        print(tadat$raw$TADA.Remove)
         tables$dat <-
           subset(tadat$raw, tadat$raw$TADA.Remove == FALSE)
         tables$filter_fields <-

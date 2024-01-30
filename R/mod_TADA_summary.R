@@ -81,8 +81,6 @@ mod_TADA_summary_server <- function(id, tadat) {
     # calculate the stats needed to fill the summary box
     shiny::observe({
       shiny::req(tadat$raw)
-      print("tadat$raw has been changed (i think?)")
-      print(nrow(tadat$raw))
       summary_things$rem_rec <-
         length(tadat$raw$ResultIdentifier[tadat$raw$TADA.Remove ==
                                             TRUE])
@@ -97,7 +95,6 @@ mod_TADA_summary_server <- function(id, tadat) {
         length(unique(tadat$raw$MonitoringLocationIdentifier[!tadat$raw$MonitoringLocationIdentifier %in%
                                                                clean_sites]))
       summary_things$removals <- sort_removals(tadat$removals)
-      print(nrow(tadat$raw))
     })
     summary_things$removals <- data.frame(matrix(
       ncol = 2,
@@ -121,8 +118,6 @@ mod_TADA_summary_server <- function(id, tadat) {
       if (is.null(tadat$raw)) {
         "Total Results in Dataset: 0"
       } else {
-        print("Updating result count")
-        print(nrow(tadat$raw))
         paste0("Total Results in Dataset: ", scales::comma(length(tadat$raw$ResultIdentifier)))
       }
     })

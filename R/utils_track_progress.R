@@ -56,13 +56,11 @@ writeFile <- function(tadat, filename) {
 readFile <- function(tadat, filename) {
   load(filename, verbose = FALSE)
   tadat$load_progress_file = filename
-  print("loading progress file")
-  print(nrow(tadat$raw))
   # Confirm compatibility
   job_id = job_id
-  #if (!is.null(m2f)) {
-  #  tadat$m2f = m2f
-  #}
+  if (!is.null(m2f)) {
+    tadat$m2f = m2f
+  }
 
   
   if (!is.null(selected_flags)) {
@@ -96,8 +94,6 @@ readFile <- function(tadat, filename) {
   tadat$od_method = od_method
   tadat$nd_mult = nd_mult
   tadat$od_mult
-  print("Progress file loaded")
-  print(nrow(tadat$raw))
 }
 
 

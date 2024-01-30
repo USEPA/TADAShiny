@@ -173,11 +173,9 @@ mod_harmonize_np_server <- function(id, tadat) {
       dat <- subset(tadat$raw, tadat$raw$TADA.Remove == FALSE)
       rem <- subset(tadat$raw, tadat$raw$TADA.Remove == TRUE)
       dat <- TADA::TADA_HarmonizeSynonyms(dat, ref = harm$ref)
-      print(4567)
-      print(nrow(tadat$raw))
       tadat$raw <- plyr::rbind.fill(dat, rem)
       tadat$raw <- TADA::TADA_OrderCols(tadat$raw)
-      print(nrow(tadat$raw))
+
       # remove the modal once the dataset has been harmonized
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
 
@@ -224,11 +222,8 @@ mod_harmonize_np_server <- function(id, tadat) {
       new_df <- as.data.frame(matrix(FALSE, ncol = ncols, nrow = nrows))
       names(new_df) <- names(tadat$removals)
       tadat$removals <- plyr::rbind.fill(tadat$removals, new_df)
-      print(5678)
-      print(nrow(tadat$raw))
       tadat$raw <- plyr::rbind.fill(dat, rem)
       tadat$raw <- TADA::TADA_OrderCols(tadat$raw)
-      print(nrow(tadat$raw))
       nitrolen <- length(dat$TADA.NutrientSummation.Flag[dat$TADA.NutrientSummation.Flag %in% c("Nutrient summation from one or more subspecies.")])
       phoslen <- length(dat$TADA.NutrientSummation.Flag[dat$TADA.NutrientSummation.Flag %in% c("Nutrient summation from one subspecies.")])
       # remove the modal once the dataset has been harmonized
