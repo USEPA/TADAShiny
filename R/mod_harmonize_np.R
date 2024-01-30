@@ -38,7 +38,7 @@ mod_harmonize_np_ui <- function(id) {
 #'
 #' @noRd
 mod_harmonize_np_server <- function(id, tadat) {
-  moduleServer(id, function(input, output, session) {
+  shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
     # columns needed for harmonization table
     cols <- c(
@@ -186,7 +186,7 @@ mod_harmonize_np_server <- function(id, tadat) {
       ))
     })
 
-    output$sum_dwn <- downloadHandler(
+    output$sum_dwn <- shiny::downloadHandler(
       filename = function() {
         "TADA_NPSummationKey.csv"
       },
