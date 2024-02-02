@@ -56,7 +56,7 @@ writeFile <- function(tadat, filename) {
 readFile <- function(tadat, filename) {
   load(filename, verbose = FALSE)
   tadat$load_progress_file = filename
-  print("loading progress file")
+  print("Loading progress file")
   print(nrow(tadat$raw))
   # Confirm compatibility
   job_id = job_id

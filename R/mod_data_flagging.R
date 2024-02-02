@@ -192,12 +192,12 @@ mod_data_flagging_server <- function(id, tadat) {
       
       # Add flagging columns to raw table, make sure line below is
       # not commented out once done with testing
-      print(2345)
+      # print(2345)
       print(nrow(tadat$raw))
       tadat$raw <- applyFlags(tadat$raw, tadat$orgs)
       print(nrow(tadat$raw))
-      #write.csv(tadat$raw, "flagged.csv")
-      #tadat$raw = utils::read.csv("flagged.csv") # THIS IS TRIPS WORKING FILE FOR TESTING, COMMENT OUT WHEN COMMITTING TO DEVELOP
+      # write.csv(tadat$raw, "flagged.csv")
+      # tadat$raw = utils::read.csv("flagged.csv") # THIS IS TRIPS WORKING FILE FOR TESTING, COMMENT OUT WHEN COMMITTING TO DEVELOP
       
       # Remove progress bar and display instructions
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
@@ -221,7 +221,7 @@ mod_data_flagging_server <- function(id, tadat) {
         tadat$raw <-
           TADA::TADA_ConvertDepthUnits(tadat$raw, unit = "ft")
       }
-      print(3456)
+      # print(3456)
       print(nrow(tadat$raw))
       if (input$m2f == "inches") {
         shinybusy::show_modal_spinner(

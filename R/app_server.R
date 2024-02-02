@@ -53,11 +53,11 @@ app_server <- function(input, output, session) {
 
   # update the master 'Remove' column anytime data is added to the 'remove' table
   shiny::observeEvent(tadat$removals, {
-    print("Removals changed")
+    print("Updating removals column")
     print(dim(tadat$removals))
     print(sum(tadat$raw$TADA.Remove))
     if (dim(tadat$removals)[2] > 0) {
-      print("Updating remove col")
+      print("Updating removals column")
       tadat$raw$TADA.Remove <- apply(tadat$removals, 1, any)
     }
     print(sum(tadat$raw$TADA.Remove))

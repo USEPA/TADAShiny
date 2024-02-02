@@ -81,7 +81,7 @@ mod_TADA_summary_server <- function(id, tadat) {
     # calculate the stats needed to fill the summary box
     shiny::observe({
       shiny::req(tadat$raw)
-      print("tadat$raw has been changed (i think?)")
+      print("Updating summary stats")
       print(nrow(tadat$raw))
       summary_things$rem_rec <-
         length(tadat$raw$ResultIdentifier[tadat$raw$TADA.Remove ==
