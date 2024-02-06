@@ -56,11 +56,7 @@ writeFile <- function(tadat, filename) {
 readFile <- function(tadat, filename) {
   load(filename, verbose = FALSE)
   tadat$load_progress_file = filename
-<<<<<<< HEAD
-=======
-  print("Loading progress file")
-  print(nrow(tadat$raw))
->>>>>>> a5e2c871b534920ebc52df213410dd6a135a9828
+  
   # Confirm compatibility
   job_id = job_id
   if (!is.null(m2f)) {

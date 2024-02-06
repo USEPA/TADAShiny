@@ -173,11 +173,6 @@ mod_harmonize_np_server <- function(id, tadat) {
       dat <- subset(tadat$raw, tadat$raw$TADA.Remove == FALSE)
       rem <- subset(tadat$raw, tadat$raw$TADA.Remove == TRUE)
       dat <- TADA::TADA_HarmonizeSynonyms(dat, ref = harm$ref)
-<<<<<<< HEAD
-=======
-      # print(4567)
-      print(nrow(tadat$raw))
->>>>>>> a5e2c871b534920ebc52df213410dd6a135a9828
       tadat$raw <- plyr::rbind.fill(dat, rem)
       tadat$raw <- TADA::TADA_OrderCols(tadat$raw)
 
@@ -227,11 +222,6 @@ mod_harmonize_np_server <- function(id, tadat) {
       new_df <- as.data.frame(matrix(FALSE, ncol = ncols, nrow = nrows))
       names(new_df) <- names(tadat$removals)
       tadat$removals <- plyr::rbind.fill(tadat$removals, new_df)
-<<<<<<< HEAD
-=======
-      # print(5678)
-      print(nrow(tadat$raw))
->>>>>>> a5e2c871b534920ebc52df213410dd6a135a9828
       tadat$raw <- plyr::rbind.fill(dat, rem)
       tadat$raw <- TADA::TADA_OrderCols(tadat$raw)
       nitrolen <- length(dat$TADA.NutrientSummation.Flag[dat$TADA.NutrientSummation.Flag %in% c("Nutrient summation from one or more subspecies.")])

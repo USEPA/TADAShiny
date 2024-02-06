@@ -37,10 +37,10 @@ mod_TADA_summary_ui <- function(id) {
           "site_clean"
         )))),
         shiny::fluidRow(column(6, shiny::uiOutput(ns(
-          "dwn_all"
+          "dwn_working"
         )))),
         shiny::fluidRow(column(6, shiny::uiOutput(ns(
-          "dwn_ts"
+          "dwn_final"
         ))))#,
         # shiny::fluidRow(column(
         #   6,
@@ -81,11 +81,6 @@ mod_TADA_summary_server <- function(id, tadat) {
     # calculate the stats needed to fill the summary box
     shiny::observe({
       shiny::req(tadat$raw)
-<<<<<<< HEAD
-=======
-      print("Updating summary stats")
-      print(nrow(tadat$raw))
->>>>>>> a5e2c871b534920ebc52df213410dd6a135a9828
       summary_things$rem_rec <-
         length(tadat$raw$ResultIdentifier[tadat$raw$TADA.Remove ==
                                             TRUE])
@@ -174,7 +169,7 @@ mod_TADA_summary_server <- function(id, tadat) {
     })
     
     # download dataset button - only appears if there data exists in the app already
-    output$dwn_all <- shiny::renderUI({
+    output$dwn_working <- shiny::renderUI({
       shiny::req(tadat$raw)
       shiny::downloadButton(ns("download_working"),
                             "Download Working Dataset (.zip)",
@@ -182,7 +177,7 @@ mod_TADA_summary_server <- function(id, tadat) {
                             contentType = "application/zip")
     })
     
-    output$dwn_ts <- shiny::renderUI({
+    output$dwn_final <- shiny::renderUI({
       shiny::req(tadat$raw)
       shiny::downloadButton(ns("download_final"),
                             "Download Final Dataset (.zip)",
@@ -201,7 +196,6 @@ mod_TADA_summary_server <- function(id, tadat) {
         datafile_name = paste0(tadat$default_outfile, ".xlsx")
         progress_file_name = paste0(tadat$default_outfile, "_prog.RData")
         desc <- writeNarrativeDataFrame(tadat)
-        out_data = TADA::TADA_OrderCols(tadat$raw[tadat$raw])
         dfs <-
           list(Data = TADA::TADA_OrderCols(tadat$raw), Parameterization = desc)
         writeFile(tadat, progress_file_name)
@@ -223,8 +217,10 @@ mod_TADA_summary_server <- function(id, tadat) {
         datafile_name = paste0(tadat$default_outfile, ".xlsx")
         progress_file_name = paste0(tadat$default_outfile, "_prog.RData")
         desc <- writeNarrativeDataFrame(tadat)
+        
+        # Remove all rows flagged for removal
         dfs <-
-          list(Data = TADA::TADA_OrderCols(tadat$raw), Parameterization = desc)
+          list(Data = TADA::TADA_OrderCols(tadat$raw[!tadat$raw$TADA.Remove,]), Parameterization = desc)
         writeFile(tadat, progress_file_name)
         writexl::write_xlsx(dfs, path = datafile_name)
         utils::zip(zipfile = fname,

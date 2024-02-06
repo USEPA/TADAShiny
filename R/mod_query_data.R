@@ -497,11 +497,6 @@ initializeTable <- function(tadat, raw) {
   removals <- data.frame(matrix(nrow = nrow(raw), ncol = 0))
   # removals["Media Type"] = ifelse(!raw$TADA.ActivityMediaName%in%c("WATER"),TRUE,raw$Removed)
   # removals["Special Characters"] = ifelse(raw$TADA.ResultMeasureValueDataTypes.Flag%in%c("ND or NA","Text","Coerced to NA"),TRUE,raw$Removed)
-<<<<<<< HEAD
-=======
-  # print(6789)
-  print(nrow(tadat$raw))
->>>>>>> a5e2c871b534920ebc52df213410dd6a135a9828
   tadat$raw <- raw
   tadat$removals <- removals
 }
