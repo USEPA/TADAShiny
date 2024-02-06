@@ -99,7 +99,7 @@ readFile <- function(tadat, filename) {
 
 
 invalidFile <- function(trigger) {
-  print("Failure")
+  print("Failure: Invalid File")
   print(trigger)
 }
 

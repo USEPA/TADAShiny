@@ -92,10 +92,10 @@ applyFlags <- function(in_table, orgs) {
   out <- TADA::TADA_FindQCActivities(out, clean = FALSE)
   
   # Result is flagged as suspect by data submitter
-  out <- TADA::TADA_FlagMeasureQualifierCode(out, clean = FALSE)
+  out <- TADA::TADA_FlagMeasureQualifierCode(out, clean = FALSE, define = TRUE)
   
   # Invalid analytical method
-  out <- TADA::TADA_FlagMethod(out, clean = FALSE, define = TRUE)
+  out <- TADA::TADA_FlagMethod(out, clean = FALSE)
   
   # Single org duplicative uploads
   out <- TADA::TADA_FindPotentialDuplicatesSingleOrg(out)
