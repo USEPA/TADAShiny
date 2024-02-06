@@ -241,7 +241,6 @@ mod_data_flagging_server <- function(id, tadat) {
         tadat$raw <-
           TADA::TADA_ConvertDepthUnits(tadat$raw, unit = "m")
       }
-      print(nrow(tadat$raw))
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
     })
   })

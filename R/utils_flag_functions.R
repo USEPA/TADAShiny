@@ -95,7 +95,7 @@ applyFlags <- function(in_table, orgs) {
   out <- TADA::TADA_FlagMeasureQualifierCode(out, clean = FALSE)
   
   # Invalid analytical method
-  out <- TADA::TADA_FlagMethod(out, clean = FALSE)
+  out <- TADA::TADA_FlagMethod(out, clean = FALSE, define = TRUE)
   
   # Single org duplicative uploads
   out <- TADA::TADA_FindPotentialDuplicatesSingleOrg(out)

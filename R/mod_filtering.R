@@ -63,14 +63,11 @@ mod_filtering_server <- function(id, tadat) {
     # make sure dataset being used to create filters is only REMOVE = FALSE
     shiny::observeEvent(tadat$tab, {
       if (tadat$tab == "Filter") {
-        print("Filter tab selected")
         # only show unique values from data that have not been flagged for removal
         tables$dat <-
           subset(tadat$raw, tadat$raw$TADA.Remove == FALSE)
         tables$filter_fields <-
           TADA::TADA_FieldCounts(tables$dat, display = "key")
-      } else {
-        print(paste0(tadat$tab, " tab selected"))
       }
     })
     
