@@ -141,7 +141,9 @@ applyFlags <- function(in_table, orgs) {
 checkFlagColumns <- function(dataset) {
   missing <- setdiff(active_flags, names(dataset))
   found = setdiff(active_flags, missing)
-  if (length(missing) > 0) {
+  print(missing)
+  print(found)
+  if (length(missing) > length(found)) {
     return(FALSE)
   } else {
     return(TRUE)
