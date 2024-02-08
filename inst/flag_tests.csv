@@ -55,11 +55,11 @@ Invalid units for a given characteristic and media combination,TADA.ResultUnit.F
 "Result value(s) above the national upper threshold for a given characteristic, possibly indicating non-sensical value(s)",TADA.ResultValueAboveUpperThreshold.Flag,Suspect,0,1
 "Result value(s) above the national upper threshold for a given characteristic, possibly indicating non-sensical value(s)",TADA.ResultValueAboveUpperThreshold.Flag,Pass,0,0
 "Result value(s) above the national upper threshold for a given characteristic, possibly indicating non-sensical value(s)",TADA.ResultValueAboveUpperThreshold.Flag,Not Reviewed,0,0
-"Result value(s) above the national upper threshold for a given characteristic, possibly indicating non-sensical value(s)",TADA.ResultValueAboveUpperThreshold.Flag,NA,0,0
+"Result value(s) above the national upper threshold for a given characteristic, possibly indicating non-sensical value(s)",TADA.ResultValueAboveUpperThreshold.Flag,NA - Not Available,0,0
 "Result value(s) below the national lower threshold for a given characteristic, possibly indicating non-sensical value(s)",TADA.ResultValueBelowLowerThreshold.Flag,Suspect,0,1
 "Result value(s) below the national lower threshold for a given characteristic, possibly indicating non-sensical value(s)",TADA.ResultValueBelowLowerThreshold.Flag,Pass,0,0
 "Result value(s) below the national lower threshold for a given characteristic, possibly indicating non-sensical value(s)",TADA.ResultValueBelowLowerThreshold.Flag,Not Reviewed,0,0
-"Result value(s) below the national lower threshold for a given characteristic, possibly indicating non-sensical value(s)",TADA.ResultValueBelowLowerThreshold.Flag,NA,0,0
+"Result value(s) below the national lower threshold for a given characteristic, possibly indicating non-sensical value(s)",TADA.ResultValueBelowLowerThreshold.Flag,NA - Not Available,0,0
 Invalid characteristic and fraction combination,TADA.SampleFraction.Flag,Valid,0,0
 Invalid characteristic and fraction combination,TADA.SampleFraction.Flag,NonStandardized,0,0
 Invalid characteristic and fraction combination,TADA.SampleFraction.Flag,Invalid,0,1
