@@ -92,7 +92,7 @@ applyFlags <- function(in_table, orgs) {
   out <- TADA::TADA_FindQCActivities(out, clean = FALSE)
   
   # Result is flagged as suspect by data submitter
-  out <- TADA::TADA_FlagMeasureQualifierCode(out, clean = FALSE, define = TRUE)
+  out <- TADA::TADA_FlagMeasureQualifierCode(out, clean = FALSE) # define = TRUE is the default
   
   # Invalid analytical method
   out <- TADA::TADA_FlagMethod(out, clean = FALSE)
@@ -126,14 +126,14 @@ applyFlags <- function(in_table, orgs) {
   # Below WQX Lower Threshold
   out <- TADA::TADA_FlagBelowThreshold(out, clean = FALSE)
 
-  # Invalid coordinates
-  out <-
-    TADA::TADA_FlagCoordinates(
-      out,
-      clean_outsideUSA = "no",
-      clean_imprecise = FALSE,
-      flaggedonly = FALSE
-    )
+  # # Invalid coordinates
+  # out <-
+  #   TADA::TADA_FlagCoordinates(
+  #     out,
+  #     clean_outsideUSA = "no",
+  #     clean_imprecise = FALSE,
+  #     flaggedonly = FALSE
+  #   )
 
   return(out)
 }

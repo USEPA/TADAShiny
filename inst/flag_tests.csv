@@ -20,10 +20,6 @@ Conflict between detection condition text and detection limit type or detection 
 Conflict between detection condition text and detection limit type or detection limit type is not in WQX domain tables (likely USGS/NWIS-specific) ,TADA.CensoredData.Flag,Non-Detect,0,0
 Conflict between detection condition text and detection limit type or detection limit type is not in WQX domain tables (likely USGS/NWIS-specific) ,TADA.CensoredData.Flag,Over-Detect,0,0
 Conflict between detection condition text and detection limit type or detection limit type is not in WQX domain tables (likely USGS/NWIS-specific) ,TADA.CensoredData.Flag,Other Condition/Limit Populated,0,0
-Spatial Flags,TADA.InvalidCoordinates.Flag,LAT_OutsideUSA,0,1
-Spatial Flags,TADA.InvalidCoordinates.Flag,LONG_OutsideUSA,0,1
-Spatial Flags,TADA.InvalidCoordinates.Flag,Imprecise_lessthan3decimaldigits,0,0
-Spatial Flags,TADA.InvalidCoordinates.Flag,OK,0,0
 MeasureQualifierCode indicates result value is suspect,TADA.MeasureQualifierCode.Flag,NA - Not Available,0,0
 MeasureQualifierCode indicates result value is suspect,TADA.MeasureQualifierCode.Flag,Non-Detect,0,0
 MeasureQualifierCode indicates result value is suspect,TADA.MeasureQualifierCode.Flag,Pass,0,0

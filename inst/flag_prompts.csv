@@ -15,4 +15,3 @@ Order,Level,Prompt,flagType
 14,Optional,"Metadata indicates result(s) are aggregate, high-frequency continuous sensor results, not discrete samples","Metadata indicates result(s) are aggregate, high-frequency continuous sensor results, not discrete samples"
 15,Optional,"Result value(s) outside of the national upper range for a given characteristic, possibly indicating non-sensical value(s)","Result value(s) outside of the national upper range for a given characteristic, possibly indicating non-sensical value(s)"
 16,Optional,"Result value(s) outside of the national lower range for a given characteristic, possibly indicating non-sensical value(s)","Result value(s) outside of the national lower range for a given characteristic, possibly indicating non-sensical value(s)"
-17,Optional,Coordinates are outside of the United States,TADA.InvalidCoordinates.Flag
