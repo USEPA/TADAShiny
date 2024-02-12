@@ -8,6 +8,7 @@
 # Below increases the max data upload size from the Shiny default of 5MB per file
 # to 30MB for file
 options(shiny.maxRequestSize = 30 * 1024^2)
+options(warn = 2)
 app_server <- function(input, output, session) {
   # Your application server logic
   tadat <- shiny::reactiveValues() # create a list object that holds reactive values passed between modules

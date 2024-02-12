@@ -1,6 +1,16 @@
 mod_filtering_ui <- function(id) {
   ns <- NS(id)
   tagList(
+    shiny::fluidRow(column(
+      6,
+      shiny::radioButtons(
+        ns("field_sel"),
+        label = "",
+        choices = c("key", "most", "all"),
+        selected = "key",
+        inline = TRUE
+      )
+    )),
     htmltools::HTML("<h3>Select field to filter on:</h3>"),
     htmltools::HTML(
       "Key columns are listed in the table below, along with the number of unique values present in that field. These counts do not include unique values from results flagged for removal. Click on a field name and a new table will appear below showing the counts associated with each unique value in the selected field."
@@ -167,6 +177,11 @@ mod_filtering_server <- function(id, tadat) {
       } else {
         selectFilters("Exclude")
       }
+    })
+    
+    
+    shiny::observeEvent(tadat$field_sel, {
+      shiny::updateRadioButtons(session, "field_sel", selected = tadat$field_sel)
     })
     
     # reset all filters in bottom table

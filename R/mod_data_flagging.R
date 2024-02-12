@@ -90,13 +90,14 @@ mod_data_flagging_server <- function(id, tadat) {
     # Runs whenever selected flags are changed
     shiny::observeEvent(tadat$selected_flags, {
       if (!is.null(tadat$removals)) {
-        tadat$removals = dplyr::select(tadat$removals, -(dplyr::starts_with(flag_prefix)))
+        tadat$removals = dplyr::select(tadat$removals,-(dplyr::starts_with(flag_prefix)))
       }
       # Loop through the flags
       for (flag in tadat$selected_flags) {
         # If not all the values are NA, add the test results to removals
         if (!is.null(tadat$removals)) {
           if (!all(is.na(values$testResults[flag]))) {
+            # Problem here?
             tadat$removals[paste0(flag_prefix, flag)] = values$testResults[flag]
           }
         }
@@ -124,7 +125,6 @@ mod_data_flagging_server <- function(id, tadat) {
     
     shiny::observeEvent(tadat$flags_present, {
       if (tadat$flags_present) {
-        
         # A table (raw rows, flags) indicating whether each record passes each test
         values$testResults <- flagCensus(tadat$raw)
         
@@ -193,7 +193,7 @@ mod_data_flagging_server <- function(id, tadat) {
       # Add flagging columns to raw table, make sure line below is
       # not commented out once done with testing
       tadat$raw <- applyFlags(tadat$raw, tadat$orgs)
-
+      
       #write.csv(tadat$raw, "flagged.csv")
       #tadat$raw = utils::read.csv("flagged.csv") # THIS IS TRIPS WORKING FILE FOR TESTING, COMMENT OUT WHEN COMMITTING TO DEVELOP
       
@@ -226,11 +226,11 @@ mod_data_flagging_server <- function(id, tadat) {
           text = "Converting depth units to inches...",
           session = shiny::getDefaultReactiveDomain()
         )
-
+        
         tadat$raw <-
           TADA::TADA_ConvertDepthUnits(tadat$raw, unit = "in")
-
-        }
+        
+      }
       if (input$m2f == "meters") {
         shinybusy::show_modal_spinner(
           spin = "double-bounce",
