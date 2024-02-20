@@ -168,7 +168,7 @@ mod_query_data_ui <- function(id) {
     shiny::fluidRow(
       htmltools::h3("Option C: Upload dataset"),
       htmltools::HTML((
-        "Select a file from your computer. This upload feature currently only accepts data in .xls and .xlsx formats.
+        "Upload a dataset from your computer. This upload feature only accepts data in .xls and .xlsx formats.
                                     The file can be a <B>fresh</B> TADA dataset or a <B>working</B> TADA dataset that you are returning to the
                                     app to iterate on. Data must also be formatted in the EPA Water Quality eXchange (WQX) schema to leverage
                                     this tool. You may reach out to the WQX helpdesk at WQX@epa.gov for assistance preparing and submitting your data
@@ -190,9 +190,15 @@ mod_query_data_ui <- function(id) {
     
     htmltools::hr(),
     shiny::fluidRow(
-      htmltools::h3("Upload Progress File"),
+      htmltools::h3("Optional: Upload Progress File"),
       htmltools::HTML((
-        "Upload a progress file. These files can be used to automatically parameterize the TADA Shiny app."
+        "Upload a progress file from your computer. This upload feature only accepts data in the .RData format.
+        The TADA Shiny application keeps track of all user selections, and makes a .RData file 
+        available for download at any time. If you saved a progress file you generated during a
+        previous use of the TADA Shiny application, then it can be uploaded here and used
+        to automatically parameterize the TADA Shiny app with the same selections. This file can 
+        be used to regenerate a dataset with the same decisions as before, or can be used 
+        to apply the same user selctions to a new dataset"
       )
       ),
       # widget to upload WQP profile or WQX formatted spreadsheet
