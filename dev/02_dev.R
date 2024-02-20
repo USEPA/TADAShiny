@@ -42,19 +42,19 @@ usethis::use_package("combinat")
 
 ## Add modules ----
 ## Create a module infrastructure in R/
-##golem::add_module( name = "name_of_module1" ) # Name of the module
-## golem::add_module( name = "import" ) # Name of the import module
-# golem::add_module(name = "query_data", with_test = TRUE) # Name of the module
-# golem::add_module(name = "overview", with_test = TRUE) # Name of the module
-# golem::add_module(name = "upload_data", with_test = TRUE) # Name of the module
-# golem::add_module(name = "summary", with_test = TRUE) # Name of the module
-# golem::add_module(name = "TADA_summary") # Name of the module
-# golem::add_module(name = "censored_data")
+golem::add_module( name = "name_of_module1" ) # Name of the module
+golem::add_module( name = "import" ) # Name of the import module
+golem::add_module(name = "query_data", with_test = TRUE) # Name of the module
+golem::add_module(name = "overview", with_test = TRUE) # Name of the module
+golem::add_module(name = "upload_data", with_test = TRUE) # Name of the module
+golem::add_module(name = "summary", with_test = TRUE) # Name of the module
+golem::add_module(name = "TADA_summary") # Name of the module
+golem::add_module(name = "censored_data")
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*
-##golem::add_fct( "helpers" )
-##golem::add_utils( "helpers" )
+golem::add_fct( "helpers" )
+golem::add_utils( "helpers" )
 
 
 ## External resources
@@ -80,11 +80,6 @@ devtools::build_vignettes()
 ## Code Coverage----
 ## Set the code coverage service ("codecov" or "coveralls")
 usethis::use_coverage()
-
-# Create a summary readme for the testthat subdirectory
-# Not available on CRAN
-# remotes::install_github('yonicd/covrpage')
-# covrpage::covrpage()
 
 ## CI ----
 ## Use this part of the script if you need to set up a CI
