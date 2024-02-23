@@ -86,7 +86,6 @@ applyFlags <- function(in_table, orgs) {
 
   # Invalid result unit
   out <- TADA::TADA_FlagResultUnit(out, clean = "none")
-  print(paste0("Step 5: ", nrow(out)))
   
   # QC rep/blank
   out <- TADA::TADA_FindQCActivities(out, clean = FALSE)

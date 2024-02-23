@@ -23,6 +23,7 @@ writeFile <- function(tadat, filename) {
   od_method <- tadat$od_method
   nd_mult <- tadat$nd_mult
   od_mult <- tadat$od_mult
+  field_sel <- tadat$field_sel
   
   save(
     original_source,
@@ -48,6 +49,7 @@ writeFile <- function(tadat, filename) {
     od_method,
     nd_mult,
     od_mult,
+    field_sel,
     file = filename
   )
   
@@ -94,7 +96,8 @@ readFile <- function(tadat, filename) {
   tadat$nd_method = nd_method
   tadat$od_method = od_method
   tadat$nd_mult = nd_mult
-  tadat$od_mult
+  tadat$od_mult = od_mult
+  tadat$field_sel = field_sel
 }
 
 
