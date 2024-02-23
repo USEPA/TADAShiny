@@ -14,7 +14,7 @@ utils::globalVariables(c(
   "group", "groupname", "MonitoringLocationTypeName",
   "quantile", "median", "moduleServer",
   "Target.TADA.CharacteristicName",
-  "Target.TADA.MethodSpecificationName",
+  "Target.TADA.MethodSpeciationName",
   "write.csv", "read.csv", "downloadHandler",
   "Rank", "Target.TADA.ResultSampleFractionText", 
   "Field", "characteristicName", "characteristicType",

@@ -111,7 +111,7 @@ mod_figures_server <- function(id, tadat) {
                    "TADA.ActivityMediaName", 
                    "ActivityMediaSubdivisionName", 
                    "TADA.ResultSampleFractionText",
-                   "TADA.MethodSpecificationName",
+                   "TADA.MethodSpeciationName",
                    "TADA.CharacteristicName",
                    depthcols)
 

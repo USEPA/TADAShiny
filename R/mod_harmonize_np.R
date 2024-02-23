@@ -48,8 +48,8 @@ mod_harmonize_np_server <- function(id, tadat) {
       "TADA.ResultSampleFractionText",
       "Target.TADA.ResultSampleFractionText",
       "TADA.FractionAssumptions",
-      "TADA.MethodSpecificationName",
-      "Target.TADA.MethodSpecificationName",
+      "TADA.MethodSpeciationName",
+      "Target.TADA.MethodSpeciationName",
       "TADA.SpeciationAssumptions",
       "Target.TADA.SpeciationConversionFactor",
       "TADA.ResultMeasure.MeasureUnitCode",
@@ -64,7 +64,7 @@ mod_harmonize_np_server <- function(id, tadat) {
     # when user hits harm go button, runs TADA_GetSynonymRef and makes friendly column names for table.
     shiny::observeEvent(input$harm_go, {
       ref <- TADA::TADA_GetSynonymRef(tadat$raw[tadat$raw$TADA.Remove == FALSE, ])
-      ref <- ref %>% dplyr::arrange(Target.TADA.CharacteristicName, Target.TADA.ResultSampleFractionText, Target.TADA.MethodSpecificationName)
+      ref <- ref %>% dplyr::arrange(Target.TADA.CharacteristicName, Target.TADA.ResultSampleFractionText, Target.TADA.MethodSpeciationName)
       colns <- names(ref)
       harm$colns <- colns %>% dplyr::recode(
         TADA.CharacteristicName = "Characteristic",
@@ -73,8 +73,8 @@ mod_harmonize_np_server <- function(id, tadat) {
         TADA.ResultSampleFractionText = "Fraction",
         Target.TADA.ResultSampleFractionText = "Target Fraction",
         TADA.FractionAssumptions = "Fraction Assumptions",
-        TADA.MethodSpecificationName = "Speciation",
-        Target.TADA.MethodSpecificationName = "Target Speciation",
+        TADA.MethodSpeciationName = "Speciation",
+        Target.TADA.MethodSpeciationName = "Target Speciation",
         TADA.SpeciationAssumptions = "Speciation Assumptions",
         Target.TADA.SpeciationConversionFactor = "Speciation Conversion Factor (to AS N or AS P)",
         TADA.ResultMeasure.MeasureUnitCode = "Unit",
@@ -110,7 +110,7 @@ mod_harmonize_np_server <- function(id, tadat) {
       # user uploaded data
       ref <- suppressWarnings(read.csv(input$harm_file$datapath))
       if (all(cols %in% names(ref)) & dim(ref)[1] > 0) {
-        ref <- ref %>% dplyr::arrange(Target.TADA.CharacteristicName, Target.TADA.ResultSampleFractionText, Target.TADA.MethodSpecificationName)
+        ref <- ref %>% dplyr::arrange(Target.TADA.CharacteristicName, Target.TADA.ResultSampleFractionText, Target.TADA.MethodSpeciationName)
         colns <- names(ref)
         harm$colns <- colns %>% dplyr::recode(
           TADA.CharacteristicName = "Characteristic",
@@ -119,8 +119,8 @@ mod_harmonize_np_server <- function(id, tadat) {
           TADA.ResultSampleFractionText = "Fraction",
           Target.TADA.ResultSampleFractionText = "Target Fraction",
           TADA.FractionAssumptions = "Fraction Assumptions",
-          TADA.MethodSpecificationName = "Speciation",
-          Target.TADA.MethodSpecificationName = "Target Speciation",
+          TADA.MethodSpeciationName = "Speciation",
+          Target.TADA.MethodSpeciationName = "Target Speciation",
           TADA.SpeciationAssumptions = "Speciation Assumptions",
           Target.TADA.SpeciationConversionFactor = "Speciation Conversion Factor (to AS N or AS P)",
           TADA.ResultMeasure.MeasureUnitCode = "Unit",
@@ -157,7 +157,7 @@ mod_harmonize_np_server <- function(id, tadat) {
         selection = "none", rownames = FALSE
       ) %>%
         DT::formatStyle(columns = names(harm$ref), `font-size` = "12px") %>%
-        DT::formatStyle(columns = c("TADA.CharacteristicName", "TADA.ResultSampleFractionText", "TADA.MethodSpecificationName", "TADA.ResultMeasure.MeasureUnitCode"), backgroundColor = "#2e6da4", color = "white")
+        DT::formatStyle(columns = c("TADA.CharacteristicName", "TADA.ResultSampleFractionText", "TADA.MethodSpeciationName", "TADA.ResultMeasure.MeasureUnitCode"), backgroundColor = "#2e6da4", color = "white")
     })
 
     # apply synonym ref to data when button is pushed
