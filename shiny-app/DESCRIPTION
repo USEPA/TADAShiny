@@ -1,36 +1,37 @@
 Package: TADAShiny
 Type: Package
-Title: WQP Data Discovery and Cleaning: First R Shiny App in the TADA (Tools for Automated Data Analysis) Series
+Title: Water Quality Portal Data Discovery and Cleaning: First R Shiny App in the TADA (Tools for Automated Data Analysis) Series
 Version: 0.0.0.9000
-Organization: U.S. Environmental Protection Agency
-Authors@R: 
-  c(person(given = "Cristina",
-           family = "Mullin",
-           role = c("aut", "cre"),
-           email = "mullin.cristina@epa.gov",
-           comment = c(ORCID = "0000-0002-0615-6087")),
-    person(given = "Trip",
-           family = "Hook",
-           role = "aut"),
-    person(given = "Elise",
-           family = "Hinman",
-           role = c("aut"),
-           email = "hinman.elise@epa.gov"),
-    person(given = "Hui",
-           family = "Zhou",
-           role = c("aut"),
-           email = "zhou.hui@epa.gov"),
-    person(given = "Shelly",
-           family = "Thawley",
-           role = "aut"))
-Description: Assists data partners in retrieving, wrangling, quality checking, and preparing data from the Water Quality Portal for subsequent analyses.
+Authors@R: c(
+  person(given = "U.S. Environmental Protection Agency", role = "aut"),
+  person(given = "Cristina",
+  family = "Mullin",
+  role = c("aut", "cre"),
+  email = "mullin.cristina@epa.gov",
+  comment = c(ORCID = "0000-0002-0615-6087")),
+  person(given = "Trip",
+  family = "Hook",
+  role = "aut"),
+  person(given = "Elise",
+  family = "Hinman",
+  role = "aut"),
+  person(given = "Hillary",
+  family = "Marler",
+  role = "aut"),
+  person(given = "Shelly",
+  family = "Thawley",
+  role = "aut"),
+  person(given = "Hui",
+  family = "Zhou",
+  role = "aut")
+  )
+Description: Assists data partners in retrieving, wrangling, quality checking, and harmonizing data from the Water Quality Portal for subsequent analyses.
 License: CC0
 Copyright: This software is in the public domain because it contains materials
     that originally came from the U.S. Environmental Protection Agency.
 Imports: 
-    config,
-    golem,
     magrittr,
+    golem,
     htmltools,
     readxl,
     writexl,
@@ -54,6 +55,7 @@ Imports:
 Remotes: 
     github::USEPA/TADA
 Suggests: 
+    config,
     testthat,
     remotes,
     covr,
@@ -73,6 +75,5 @@ Config/testthat/load-all: list(export_all = FALSE, helpers = FALSE)
 LazyData: true
 URL: https://github.com/USEPA/TADAShiny
 BugReports: https://github.com/USEPA/TADAShiny/issues
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Roxygen: list(markdown = TRUE)
-VignetteBuilder: knitr, rmarkdown

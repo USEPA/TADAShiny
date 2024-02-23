@@ -37,10 +37,10 @@ mod_TADA_summary_ui <- function(id) {
           "site_clean"
         )))),
         shiny::fluidRow(column(6, shiny::uiOutput(ns(
-          "dwn_all"
+          "dwn_working"
         )))),
         shiny::fluidRow(column(6, shiny::uiOutput(ns(
-          "dwn_ts"
+          "dwn_final"
         ))))#,
         # shiny::fluidRow(column(
         #   6,
@@ -169,16 +169,25 @@ mod_TADA_summary_server <- function(id, tadat) {
     })
     
     # download dataset button - only appears if there data exists in the app already
-    output$dwn_all <- shiny::renderUI({
+    output$dwn_working <- shiny::renderUI({
       shiny::req(tadat$raw)
-      shiny::downloadButton(ns("download_all"),
+      shiny::downloadButton(ns("download_working"),
                             "Download Working Dataset (.zip)",
-                            style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
+                            style = "color: #fff; background-color: #337ab7; border-color: #2e6da4",
+                            contentType = "application/zip")
     })
     
-    output$download_all <- shiny::downloadHandler(
+    output$dwn_final <- shiny::renderUI({
+      shiny::req(tadat$raw)
+      shiny::downloadButton(ns("download_final"),
+                            "Download Final Dataset (.zip)",
+                            style = "color: #fff; background-color: #337ab7; border-color: #2e6da4",
+                            contentType = "application/zip")
+    })
+    
+    output$download_working <- shiny::downloadHandler(
       filename = function() {
-        paste0(tadat$default_outfile, ".zip")
+        paste0(tadat$default_outfile, "_working.zip")
       },
       content = function(fname) {
         fs <- c()
@@ -197,22 +206,28 @@ mod_TADA_summary_server <- function(id, tadat) {
       contentType = "application/zip"
     )
     
-    # # Download TADA progress file
-    # output$dwn_ts = shiny::renderUI({
-    #   shiny::req(tadat$raw)
-    #   shiny::downloadButton(ns("download_ts_file"),
-    #                         "Download Progress File (.Rdata)",
-    #                         style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
-    # })
-    
-    # output$download_ts_file = shiny::downloadHandler(
-    #   filename = function() {
-    #     paste0(tadat$job_id, '.Rdata')
-    #   },
-    #   content = function(file) {
-    #     writeFile(tadat, file)
-    #   }
-    # )
+    output$download_final <- shiny::downloadHandler(
+      filename = function() {
+        paste0(tadat$default_outfile, "_final.zip")
+      },
+      content = function(fname) {
+        fs <- c()
+        tmpdir <- tempdir()
+        setwd(tempdir())
+        datafile_name = paste0(tadat$default_outfile, ".xlsx")
+        progress_file_name = paste0(tadat$default_outfile, "_prog.RData")
+        desc <- writeNarrativeDataFrame(tadat)
+        
+        # Remove all rows flagged for removal
+        dfs <-
+          list(Data = TADA::TADA_OrderCols(tadat$raw[!tadat$raw$TADA.Remove,]), Parameterization = desc)
+        writeFile(tadat, progress_file_name)
+        writexl::write_xlsx(dfs, path = datafile_name)
+        utils::zip(zipfile = fname,
+                   files = c(datafile_name, progress_file_name))
+      },
+      contentType = "application/zip"
+    )
     
     shiny::observeEvent(input$disclaimer, {
       shiny::showModal(

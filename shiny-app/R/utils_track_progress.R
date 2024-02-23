@@ -11,7 +11,7 @@ writeFile <- function(tadat, filename) {
   characteristicName = tadat$characteristicName
   characteristicType = tadat$characteristicType
   sampleMedia = tadat$sampleMedia
-  proj = tadat$proj
+  project = tadat$project
   organization = tadat$organization
   startDate = tadat$startDate
   endDate = tadat$endDate
@@ -23,6 +23,7 @@ writeFile <- function(tadat, filename) {
   od_method <- tadat$od_method
   nd_mult <- tadat$nd_mult
   od_mult <- tadat$od_mult
+  field_sel <- tadat$field_sel
   
   save(
     original_source,
@@ -36,7 +37,7 @@ writeFile <- function(tadat, filename) {
     characteristicName,
     characteristicType,
     sampleMedia,
-    proj,
+    project,
     organization,
     startDate,
     endDate,
@@ -48,6 +49,7 @@ writeFile <- function(tadat, filename) {
     od_method,
     nd_mult,
     od_mult,
+    field_sel,
     file = filename
   )
   
@@ -55,9 +57,8 @@ writeFile <- function(tadat, filename) {
 
 readFile <- function(tadat, filename) {
   load(filename, verbose = FALSE)
-  checkFlagColumns(tadat$raw)
   tadat$load_progress_file = filename
-
+  
   # Confirm compatibility
   job_id = job_id
   if (!is.null(m2f)) {
@@ -68,8 +69,6 @@ readFile <- function(tadat, filename) {
   if (!is.null(selected_flags)) {
     tadat$selected_flags = selected_flags
     shinyjs::enable(selector = '.nav li a[data-value="Flag"]')
-  } else {
-    print("No flags selected")
   }
 
   # Enable tabs if certain fields are not null
@@ -88,27 +87,29 @@ readFile <- function(tadat, filename) {
   tadat$characteristicName = characteristicName
   tadat$characteristicType = characteristicType
   tadat$sampleMedia = sampleMedia
-  tadat$proj = proj
+  tadat$project = project
   tadat$organization = organization
   tadat$startDate = startDate
   tadat$endDate = endDate
   tadat$org_table = org_table
-  tadat$m2f = m2f
   tadat$selected_filters =  selected_filters
   tadat$nd_method = nd_method
   tadat$od_method = od_method
   tadat$nd_mult = nd_mult
-  tadat$od_mult
+  tadat$od_mult = od_mult
+  tadat$field_sel = field_sel
 }
 
 
 invalidFile <- function(trigger) {
-  print("Failure")
+  print("Failure: Invalid File")
   print(trigger)
 }
 
 
 writeNarrativeDataFrame <- function(tadat) {
+  # sampleMedia needs to be a single string for this part
+  tadat$sampleMedia = paste(tadat$sampleMedia, collapse=" ")
   df <- data.frame(Parameter=character(), Value=character())
   df[nrow(df) + 1, ] = c("TADA Shiny Job ID", tadat$job_id)
   df[nrow(df) + 1, ] = c("Original data source: ", tadat$original_source)
@@ -141,7 +142,7 @@ writeNarrativeDataFrame <- function(tadat) {
         tadat$characteristicName,
         tadat$characteristicType,
         tadat$sampleMedia,
-        tadat$proj,
+        tadat$project,
         tadat$organization,
         tadat$startDate,
         tadat$endDate

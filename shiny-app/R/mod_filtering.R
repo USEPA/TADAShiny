@@ -3,7 +3,14 @@ mod_filtering_ui <- function(id) {
   tagList(
     htmltools::HTML("<h3>Select field to filter on:</h3>"),
     htmltools::HTML(
-      "Key columns are listed in the table below, along with the number of unique values present in that field. These counts do not include unique values from results flagged for removal. Click on a field name and a new table will appear below showing the counts associated with each unique value in the selected field."
+      "Fields are listed in the table below, along with the number of unique values present in that field. These counts do not include unique values from results flagged for removal. Click on a field name and a new table will appear below showing the counts associated with each unique value in the selected field."
+    ),
+    shiny::radioButtons(
+      ns("field_sel"),
+      label = "Fields to select from: ",
+      choices = c("key", "most", "all"),
+      selected = "key",
+      inline = TRUE
     ),
     DT::dataTableOutput(ns("filterStep1")),
     htmltools::br(),
@@ -61,8 +68,7 @@ mod_filtering_server <- function(id, tadat) {
     shinyjs::hide("addExcludes")
     
     # make sure dataset being used to create filters is only REMOVE = FALSE
-    shiny::observe({
-      shiny::req(tadat$tab)
+    shiny::observeEvent(tadat$tab, {
       if (tadat$tab == "Filter") {
         # only show unique values from data that have not been flagged for removal
         tables$dat <-
@@ -170,6 +176,18 @@ mod_filtering_server <- function(id, tadat) {
       }
     })
     
+    shiny::observeEvent(input$field_sel, {
+      tadat$field_sel <- input$field_sel
+    })
+    
+    shiny::observeEvent(tadat$field_sel, {
+      shiny::updateRadioButtons(session, "field_sel", selected = tadat$field_sel)
+      if (!is.null(tables$dat)) {
+        tables$filter_fields <-
+          TADA::TADA_FieldCounts(tables$dat, display = tadat$field_sel)
+      }
+    })
+    
     # reset all filters in bottom table
     shiny::observeEvent(input$resetFilters, {
       # empty selected table on open
@@ -253,6 +271,7 @@ mod_filtering_server <- function(id, tadat) {
       values$locked = field_filters$Filter
       names(values$locked) <- field_filters$Field
       prefix = "Filter: "
+      
       # Remove all the filter columns from the removals table (start fresh)
       if (!is.null(tadat$removals)) {
         tadat$removals <-
@@ -287,13 +306,14 @@ mod_filtering_server <- function(id, tadat) {
           tadat$removals[label] <- as.logical(results)
         }
       }
-
+      
       # Get counts for the filters
       if (!is.null(tables$dat) & nrow(tadat$selected_filters > 0)) {
         # Refresh the 'count' field
         new_selected_filters <- tadat$selected_filters
         new_selected_filters$Count <- NULL
-        new_selected_filters <- cbind(new_selected_filters, Count=0)
+        new_selected_filters <-
+          cbind(new_selected_filters, Count = 0)
         for (i in 1:nrow(new_selected_filters)) {
           row = new_selected_filters[i, ]
           values = getValues(tables$dat,  row$Field)
@@ -304,7 +324,7 @@ mod_filtering_server <- function(id, tadat) {
       }
     })
     
-
+    
     getValues <- function(.data, field) {
       counts <- table(.data[[field]], useNA = "ifany")
       if (length(rownames(counts) > 0)) {
@@ -317,5 +337,3 @@ mod_filtering_server <- function(id, tadat) {
     }
   })
 }
-
-

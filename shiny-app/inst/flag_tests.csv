@@ -20,10 +20,10 @@ Conflict between detection condition text and detection limit type or detection 
 Conflict between detection condition text and detection limit type or detection limit type is not in WQX domain tables (likely USGS/NWIS-specific) ,TADA.CensoredData.Flag,Non-Detect,0,0
 Conflict between detection condition text and detection limit type or detection limit type is not in WQX domain tables (likely USGS/NWIS-specific) ,TADA.CensoredData.Flag,Over-Detect,0,0
 Conflict between detection condition text and detection limit type or detection limit type is not in WQX domain tables (likely USGS/NWIS-specific) ,TADA.CensoredData.Flag,Other Condition/Limit Populated,0,0
-Spatial Flags,TADA.InvalidCoordinates.Flag,LAT_OutsideUSA,0,1
-Spatial Flags,TADA.InvalidCoordinates.Flag,LONG_OutsideUSA,0,1
-Spatial Flags,TADA.InvalidCoordinates.Flag,Imprecise_lessthan3decimaldigits,0,0
-Spatial Flags,TADA.InvalidCoordinates.Flag,OK,0,0
+Coordinates are outside of the United States and/or imprecise (less than three decimal digits),TADA.InvalidCoordinates.Flag,LAT_OutsideUSA,0,1
+Coordinates are outside of the United States and/or imprecise (less than three decimal digits),TADA.InvalidCoordinates.Flag,LONG_OutsideUSA,0,1
+Coordinates are outside of the United States and/or imprecise (less than three decimal digits),TADA.InvalidCoordinates.Flag,Imprecise_lessthan3decimaldigits,0,0
+Coordinates are outside of the United States and/or imprecise (less than three decimal digits),TADA.InvalidCoordinates.Flag,OK,0,0
 MeasureQualifierCode indicates result value is suspect,TADA.MeasureQualifierCode.Flag,NA - Not Available,0,0
 MeasureQualifierCode indicates result value is suspect,TADA.MeasureQualifierCode.Flag,Non-Detect,0,0
 MeasureQualifierCode indicates result value is suspect,TADA.MeasureQualifierCode.Flag,Pass,0,0
@@ -52,12 +52,14 @@ Invalid units for a given characteristic and media combination,TADA.ResultUnit.F
 Invalid units for a given characteristic and media combination,TADA.ResultUnit.Flag,NonStandardized,0,0
 Invalid units for a given characteristic and media combination,TADA.ResultUnit.Flag,Invalid,0,1
 Invalid units for a given characteristic and media combination,TADA.ResultUnit.Flag,Not Reviewed,0,0
-"Result value(s) outside of the national upper range for a given characteristic, possibly indicating non-sensical value(s)",TADA.ResultValueAboveUpperThreshold.Flag,Y,0,1
-"Result value(s) outside of the national upper range for a given characteristic, possibly indicating non-sensical value(s)",TADA.ResultValueAboveUpperThreshold.Flag,N,0,0
-"Result value(s) outside of the national upper range for a given characteristic, possibly indicating non-sensical value(s)",TADA.ResultValueAboveUpperThreshold.Flag,Not Reviewed,0,0
-"Result value(s) outside of the national lower range for a given characteristic, possibly indicating non-sensical value(s)",TADA.ResultValueBelowLowerThreshold.Flag,Y,0,1
-"Result value(s) outside of the national lower range for a given characteristic, possibly indicating non-sensical value(s)",TADA.ResultValueBelowLowerThreshold.Flag,N,0,0
-"Result value(s) outside of the national lower range for a given characteristic, possibly indicating non-sensical value(s)",TADA.ResultValueBelowLowerThreshold.Flag,Not Reviewed,0,0
+"Result value(s) above the national upper threshold for a given characteristic, possibly indicating non-sensical value(s)",TADA.ResultValueAboveUpperThreshold.Flag,Suspect,0,1
+"Result value(s) above the national upper threshold for a given characteristic, possibly indicating non-sensical value(s)",TADA.ResultValueAboveUpperThreshold.Flag,Pass,0,0
+"Result value(s) above the national upper threshold for a given characteristic, possibly indicating non-sensical value(s)",TADA.ResultValueAboveUpperThreshold.Flag,Not Reviewed,0,0
+"Result value(s) above the national upper threshold for a given characteristic, possibly indicating non-sensical value(s)",TADA.ResultValueAboveUpperThreshold.Flag,NA - Not Available,0,0
+"Result value(s) below the national lower threshold for a given characteristic, possibly indicating non-sensical value(s)",TADA.ResultValueBelowLowerThreshold.Flag,Suspect,0,1
+"Result value(s) below the national lower threshold for a given characteristic, possibly indicating non-sensical value(s)",TADA.ResultValueBelowLowerThreshold.Flag,Pass,0,0
+"Result value(s) below the national lower threshold for a given characteristic, possibly indicating non-sensical value(s)",TADA.ResultValueBelowLowerThreshold.Flag,Not Reviewed,0,0
+"Result value(s) below the national lower threshold for a given characteristic, possibly indicating non-sensical value(s)",TADA.ResultValueBelowLowerThreshold.Flag,NA - Not Available,0,0
 Invalid characteristic and fraction combination,TADA.SampleFraction.Flag,Valid,0,0
 Invalid characteristic and fraction combination,TADA.SampleFraction.Flag,NonStandardized,0,0
 Invalid characteristic and fraction combination,TADA.SampleFraction.Flag,Invalid,0,1
