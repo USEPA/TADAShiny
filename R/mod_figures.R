@@ -111,7 +111,7 @@ mod_figures_server <- function(id, tadat) {
                    "TADA.ActivityMediaName", 
                    "ActivityMediaSubdivisionName", 
                    "TADA.ResultSampleFractionText",
-                   "TADA.MethodSpecificationName",
+                   "TADA.MethodSpeciationName",
                    "TADA.CharacteristicName",
                    depthcols)
 
@@ -240,7 +240,7 @@ mod_figures_server <- function(id, tadat) {
 
     # select sites whose data to display in plots
     output$selsites <- shiny::renderUI({ # this companion to the uiOutput in the UI appears when react$done exists
-      req(react$mapdata)
+      shiny::req(react$mapdata)
       sites <- c("All sites", unique(react$mapdata$MonitoringLocationIdentifier))
       shiny::fluidRow(
         htmltools::h3("3. Select Specific Sites (Optional)"),

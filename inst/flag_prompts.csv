@@ -13,6 +13,6 @@ Order,Level,Prompt,flagType
 12,Optional,"QAPP approval column is ""N"" (indicating not approved) or NA","QAPP approval column is ""N"" (indicating not approved) or NA"
 13,Optional,Quality Assurance Project Plan URL is missing,Quality Assurance Project Plan URL is missing
 14,Optional,"Metadata indicates result(s) are aggregate, high-frequency continuous sensor results, not discrete samples","Metadata indicates result(s) are aggregate, high-frequency continuous sensor results, not discrete samples"
-15,Optional,"Result value(s) outside of the national upper range for a given characteristic, possibly indicating non-sensical value(s)","Result value(s) outside of the national upper range for a given characteristic, possibly indicating non-sensical value(s)"
-16,Optional,"Result value(s) outside of the national lower range for a given characteristic, possibly indicating non-sensical value(s)","Result value(s) outside of the national lower range for a given characteristic, possibly indicating non-sensical value(s)"
-17,Optional,Coordinates are outside of the United States,TADA.InvalidCoordinates.Flag
+15,Optional,"Result value(s) above the national threshold for a given characteristic, possibly indicating non-sensical value(s)","Result value(s) above the national upper threshold for a given characteristic, possibly indicating non-sensical value(s)"
+16,Optional,"Result value(s) below the national threshold for a given characteristic, possibly indicating non-sensical value(s)","Result value(s) below the national lower threshold for a given characteristic, possibly indicating non-sensical value(s)"
+17,Optional,Coordinates are outside of the United States and/or imprecise (less than three decimal digits),Coordinates are outside of the United States and/or imprecise (less than three decimal digits)

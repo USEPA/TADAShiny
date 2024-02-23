@@ -71,7 +71,7 @@ mod_overview_server <- function(id, tadat) {
     
     # create dataset for map and histogram using raw data
     shiny::observeEvent(tadat$ovgo, {
-      req(tadat$raw)
+      shiny::req(tadat$raw)
       # create gray text tile info
       mapdat$text <- tadat$raw %>%
         dplyr::filter(TADA.Remove == FALSE) %>%
@@ -87,6 +87,7 @@ mod_overview_server <- function(id, tadat) {
         dplyr::group_by(OrganizationFormalName, OrganizationIdentifier) %>%
         dplyr::summarise("Result_Count" = length(unique(ResultIdentifier))) %>%
         dplyr::ungroup()
+
       tadat$org_table <- orgs %>%
         dplyr::arrange(-Result_Count) %>%
         dplyr::mutate("Rank" = 1:length(Result_Count))

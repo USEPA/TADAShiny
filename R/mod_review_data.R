@@ -43,7 +43,6 @@ mod_review_data_server <- function(id, tadat) {
     shiny::observeEvent(input$review_go, {
       removals <- tadat$removals
       sel <- which(removals == TRUE, arr.ind = TRUE)
-      print(length(sel))
       # Bombing here
       if (length(sel) > 0) {
         removals[sel] <- names(removals)[sel[, "col"]]

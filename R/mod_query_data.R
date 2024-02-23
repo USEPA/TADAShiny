@@ -61,7 +61,7 @@ mod_query_data_ui <- function(id) {
     shiny::fluidRow(column(
       4,
       shiny::dateInput(
-        ns("startdate"),
+        ns("startDate"),
         "Start Date",
         format = "yyyy-mm-dd",
         startview = "year"
@@ -70,7 +70,7 @@ mod_query_data_ui <- function(id) {
     column(
       4,
       shiny::dateInput(
-        ns("enddate"),
+        ns("endDate"),
         "End Date",
         format = "yyyy-mm-dd",
         startview = "year"
@@ -111,7 +111,7 @@ mod_query_data_ui <- function(id) {
       column(
         4,
         shiny::selectizeInput(
-          ns("proj"),
+          ns("project"),
           "Project(s)",
           choices = NULL,
           multiple = TRUE
@@ -168,7 +168,7 @@ mod_query_data_ui <- function(id) {
     shiny::fluidRow(
       htmltools::h3("Option C: Upload dataset"),
       htmltools::HTML((
-        "Select a file from your computer. This upload feature currently only accepts data in .xls and .xlsx formats.
+        "Upload a dataset from your computer. This upload feature only accepts data in .xls and .xlsx formats.
                                     The file can be a <B>fresh</B> TADA dataset or a <B>working</B> TADA dataset that you are returning to the
                                     app to iterate on. Data must also be formatted in the EPA Water Quality eXchange (WQX) schema to leverage
                                     this tool. You may reach out to the WQX helpdesk at WQX@epa.gov for assistance preparing and submitting your data
@@ -190,9 +190,15 @@ mod_query_data_ui <- function(id) {
     
     htmltools::hr(),
     shiny::fluidRow(
-      htmltools::h3("Upload Progress File"),
+      htmltools::h3("Optional: Upload Progress File"),
       htmltools::HTML((
-        "Upload a progress file. These files can be used to automatically parameterize the TADA Shiny app."
+        "Upload a progress file from your computer. This upload feature only accepts data in the .RData format.
+        The TADA Shiny application keeps track of all user selections, and makes a .RData file 
+        available for download at any time. If you saved a progress file you generated during a
+        previous use of the TADA Shiny application, then it can be uploaded here and used
+        to automatically parameterize the TADA Shiny app with the same selections. This file can 
+        be used to regenerate a dataset with the same decisions as before, or can be used 
+        to apply the same user selctions to a new dataset"
       )
       ),
       # widget to upload WQP profile or WQX formatted spreadsheet
@@ -218,15 +224,26 @@ mod_query_data_server <- function(id, tadat) {
     ns <- session$ns
     
     # read in the excel spreadsheet dataset if this input reactive object is populated via fileInput and define as tadat$raw
-    shiny::observe({
-      shiny::req(input$file)
+    shiny::observeEvent(input$file,{
+      # a modal that pops up showing it's working on querying the portal
+      shinybusy::show_modal_spinner(
+        spin = "double-bounce",
+        color = "#0071bc",
+        text = "Uploading dataset...",
+        session = shiny::getDefaultReactiveDomain()
+      )
+      
       # user uploaded data
       raw <-
         suppressWarnings(readxl::read_excel(input$file$datapath, sheet = 1))
+      raw$TADA.Remove <- NULL
       initializeTable(tadat, raw)
       if (!is.null(tadat$original_source)){
         tadat$original_source <- "Upload"
       }
+      
+      shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+      
     })
     
     # Read the TADA progress file
@@ -238,6 +255,14 @@ mod_query_data_server <- function(id, tadat) {
     
     # if user presses example data button, make tadat$raw the nutrients dataset contained within the TADA package.
     shiny::observeEvent(input$example_data_go, {
+      # a modal that pops up showing it's working on querying the portal
+      shinybusy::show_modal_spinner(
+        spin = "double-bounce",
+        color = "#0071bc",
+        text = "Loading example data...",
+        session = shiny::getDefaultReactiveDomain()
+      )
+      
       tadat$example_data <- input$example_data
       if (input$example_data == "Shepherdstown (34k results)") {
         raw <- TADA::Data_NCTCShepherdstown_HUC12
@@ -249,6 +274,9 @@ mod_query_data_server <- function(id, tadat) {
         raw <- TADA::Data_Nutrients_UT
       }
       initializeTable(tadat, raw)
+
+      shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+      
     })
     
     # this section has widget update commands for the selectizeinputs that have a lot of possible selections - shiny suggested hosting the choices server-side rather than ui-side
@@ -277,7 +305,7 @@ mod_query_data_server <- function(id, tadat) {
                                 choices = c(chars),
                                 server = TRUE)
     shiny::updateSelectizeInput(session,
-                                "proj",
+                                "project",
                                 choices = c(projects),
                                 server = TRUE)
     shiny::updateSelectizeInput(
@@ -346,10 +374,10 @@ mod_query_data_server <- function(id, tadat) {
       } else {
         tadat$sampleMedia <- input$media
       }
-      if (is.null(input$proj)) {
+      if (is.null(input$project)) {
         tadat$project <- "null"
       } else {
-        tadat$project <- input$proj
+        tadat$project <- input$project
       }
       if (is.null(input$org)) {
         tadat$organization <- "null"
@@ -362,17 +390,17 @@ mod_query_data_server <- function(id, tadat) {
         tadat$siteid <- input$siteid
         # siteid = stringr::str_trim(unlist(strsplit(input$siteids,",")))
       }
-      if (length(input$enddate) == 0) {
+      if (length(input$endDate) == 0) {
         # ensure if date is empty, the query receives a proper input ("null")
-        tadat$enddate <- "null"
+        tadat$endDate <- "null"
       } else {
-        tadat$enddate <- as.character(input$enddate)
+        tadat$endDate <- as.character(input$endDate)
       }
-      if (length(input$startdate) == 0) {
+      if (length(input$startDate) == 0) {
         # ensure if date is empty, the query receives a proper start date. Might want a warning message instead.
-        tadat$startdate <- "1800-01-01"
+        tadat$startDate <- "1800-01-01"
       } else {
-        tadat$startdate <- as.character(input$startdate)
+        tadat$startDate <- as.character(input$startDate)
       }
       # a modal that pops up showing it's working on querying the portal
       shinybusy::show_modal_spinner(
@@ -394,8 +422,8 @@ mod_query_data_server <- function(id, tadat) {
         sampleMedia = tadat$sampleMedia,
         project = tadat$project,
         organization = tadat$organization,
-        startDate = tadat$startdate,
-        endDate = tadat$enddate,
+        startDate = tadat$startDate,
+        endDate = tadat$endDate,
         applyautoclean = TRUE
       )
       
@@ -437,10 +465,10 @@ mod_query_data_server <- function(id, tadat) {
                                       selected = tadat$characteristicName)
           shiny::updateSelectizeInput(session, "chargroup", selected = tadat$characteristicType)
           shiny::updateSelectizeInput(session, "media", selected = tadat$sampleMedia)
-          shiny::updateSelectizeInput(session, "proj", selected = tadat$proj)
+          shiny::updateSelectizeInput(session, "project", selected = tadat$project)
           shiny::updateSelectizeInput(session, "org", selected = tadat$organization)
-          shiny::updateDateInput(session, "startdate", value = tadat$startDate)
-          shiny::updateDateInput(session, "enddate", value = tadat$endDate)
+          shiny::updateDateInput(session, "startDate", value = tadat$startDate)
+          shiny::updateDateInput(session, "endDate", value = tadat$endDate)
         }
       }
       
@@ -475,7 +503,6 @@ initializeTable <- function(tadat, raw) {
   removals <- data.frame(matrix(nrow = nrow(raw), ncol = 0))
   # removals["Media Type"] = ifelse(!raw$TADA.ActivityMediaName%in%c("WATER"),TRUE,raw$Removed)
   # removals["Special Characters"] = ifelse(raw$TADA.ResultMeasureValueDataTypes.Flag%in%c("ND or NA","Text","Coerced to NA"),TRUE,raw$Removed)
-  
   tadat$raw <- raw
   tadat$removals <- removals
 }
