@@ -82,7 +82,7 @@ Imports: plyr, data.table, dplyr, tidyr, purrr, grDevices, magrittr,
 Suggests: rmarkdown, readr, tidyverse, knitr, testthat, testthis,
         usethis, devtools, pkgdown, spelling
 License: CC0
-MD5sum: ba50648a1f80573568d789737a0b6f08
+MD5sum: ba5d50dc1334acf17cd8b9f05c45218c
 NeedsCompilation: no
 
 Package: anytime
@@ -440,18 +440,18 @@ MD5sum: 5834c2a13ae42bda5a5afd3bbdd76f65
 NeedsCompilation: no
 
 Package: ggplot2
-Version: 3.4.4
-Depends: R (>= 3.3)
+Version: 3.5.0
+Depends: R (>= 3.5)
 Imports: cli, glue, grDevices, grid, gtable (>= 0.1.1), isoband,
         lifecycle (> 1.0.1), MASS, mgcv, rlang (>= 1.1.0), scales (>=
-        1.2.0), stats, tibble, vctrs (>= 0.5.0), withr (>= 2.5.0)
-Suggests: covr, dplyr, ggplot2movies, hexbin, Hmisc, knitr, lattice,
-        mapproj, maps, multcomp, munsell, nlme, profvis, quantreg,
-        ragg, RColorBrewer, rmarkdown, rpart, sf (>= 0.7-3), svglite
-        (>= 1.2.0.9001), testthat (>= 3.1.2), vdiffr (>= 1.0.0), xml2
+        1.3.0), stats, tibble, vctrs (>= 0.5.0), withr (>= 2.5.0)
+Suggests: covr, dplyr, ggplot2movies, hexbin, Hmisc, knitr, mapproj,
+        maps, multcomp, munsell, nlme, profvis, quantreg, ragg (>=
+        1.2.6), RColorBrewer, rmarkdown, rpart, sf (>= 0.7-3), svglite
+        (>= 2.1.2), testthat (>= 3.1.2), vdiffr (>= 1.0.6), xml2
 Enhances: sp
 License: MIT + file LICENSE
-MD5sum: 943cd5ce6765426f6acc314ad5cd0c4f
+MD5sum: ce2cebe979f20c24272f9b7a62a053a9
 NeedsCompilation: no
 
 Package: glue
@@ -1056,7 +1056,7 @@ Suggests: blob, nanoarrow, covr, dplyr (>= 0.8-3), ggplot2, knitr,
         tibble (>= 1.4.1), tidyr (>= 1.2.0), tidyselect (>= 1.0.0),
         tmap (>= 2.0), vctrs, wk (>= 0.9.0)
 License: GPL-2 | MIT + file LICENSE
-MD5sum: d1c7b3d2265cb7bca6cba4fda9536e58
+MD5sum: 6256998994241a6b5eb20de4e7449758
 NeedsCompilation: yes
 
 Package: shinyWidgets
