@@ -137,10 +137,8 @@ jobs:
       if: ${{ env.needs_pandoc == 'true' && inputs.build_bins }}
       run: |
         if [ -d "bin" ]; then rm -fr bin; fi
-        mkdir temp_bin
-        cp /usr/bin/pandoc temp_bin
         mkdir bin
-        tar -czvf bin/pandoc.tar.gz
+        tar -czvf bin/pandoc.tar.gz /usr/bin/pandoc
         git add bin
         
     - name: Add additional files to repo if not already there
