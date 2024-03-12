@@ -59,9 +59,9 @@ jobs:
     needs: copy_code_to_cloud-gov
     runs-on: ubuntu-latest
     name: Compile and vendor R dependencies for cloud.gov
-    defaults:
-      run:
-        working-directory: /workspace
+    # defaults:
+    #   run:
+    #     working-directory: /workspace
     # container:
     #   image: cloudfoundry/cflinuxfs4
     #   volumes: 
