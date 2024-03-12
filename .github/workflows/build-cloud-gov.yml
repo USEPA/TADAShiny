@@ -62,10 +62,10 @@ jobs:
     defaults:
       run:
         working-directory: /workspace
-    container:
-      image: cloudfoundry/cflinuxfs4
-      volumes: 
-       - ${{ github.workspace }}:/workspace
+    # container:
+    #   image: cloudfoundry/cflinuxfs4
+    #   volumes: 
+    #    - ${{ github.workspace }}:/workspace
 
     steps:
     - name: Checkout Code
@@ -157,7 +157,7 @@ jobs:
         fi
       
     - name: Upload folder debug-outputs to an artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: debug-outputs
         path: debug-outputs
@@ -178,7 +178,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Workflow to copy for deployment
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.OWSHINY_ACTION }}
           script: |
