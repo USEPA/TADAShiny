@@ -43,16 +43,6 @@ A clear and concise description of what you expected to happen.
 
 If applicable, add screenshots to help explain your problem.
 
-**Session Info**
-
-Please include your session info:
-
-``` r
-sessionInfo()
-#OR preferred:
-devtools::session_info()
-```
-
 **Additional context**
 
 Add any other context about the problem here.
@@ -65,10 +55,4 @@ New features should include all of the following work:
 
 -   [ ] Document all code using comments to describe what is does.
 
--   [ ] Create tests in tests folder.
-
--   [ ] Create help file using roxygen2 above code.
-
--   [ ] Create working examples in help file (via roxygen2).
-
--   [ ] Add to appropriate vignette (or create new one).
+-   [ ] Create tests.
