@@ -22,5 +22,5 @@ utils::globalVariables(c(
   "nd_method", "nd_mult", "od_method", "org_table",
   "organization", "original_source", "project", "sampleMedia",
   "selected_filters", "selected_flags", "siteType",
-  "siteid", "startDate", "statecode"
+  "siteid", "startDate", "statecode", "od_mult", "field_sel"
 ))
