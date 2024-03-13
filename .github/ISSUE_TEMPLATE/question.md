@@ -18,7 +18,7 @@ A clear and concise description of the question.
 Include the Water Quality Portal data query inputs entered on the Load
 data tab:
 
-If possible, narrow down the question to a specific dataset and
+If possible, narrow down the question to a specific data set and
 `TADAShiny`tab or function:
 
 ``` r
@@ -37,16 +37,6 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 
 If applicable, add screenshots to help explain your problem.
-
-**Session Info**
-
-Please include your session info:
-
-``` r
-sessionInfo()
-#OR preferred:
-devtools::session_info()
-```
 
 **Additional context**
 
