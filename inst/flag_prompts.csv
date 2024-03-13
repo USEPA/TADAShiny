@@ -1,18 +1,18 @@
 Order,Level,Prompt,flagType
-1,Required,Result value is not numeric or NA and no detection limit value is provided,Result value is not numeric or NA and no detection limit value is provided
-2,Required,Result value is not numeric or NA and the detection limit value cannot be interpreted because there is a conflict between the detection condition text and detection limit type provided by the data submitter [or the detection limit type is not in WQX domain tables (USGS/NWIS-specific)],Result value is not numeric or NA and the detection limit value cannot be interpreted because there is a conflict between the detection condition text and detection limit type provided by the data submitter [or the detection limit type is not in WQX domain tables (USGS/NWIS-specific)]
-3,Recommended,Suspect characteristic and speciation combination,Suspect characteristic and speciation combination
-4,Recommended,Suspect characteristic and fraction combination,Suspect characteristic and fraction combination
-5,Recommended,Suspect characteristic and unit combination,Suspect characteristic and unit combination
-6,Recommended,"ActivityTypeCode indicates result value is a QC replicate, duplicate, or blank","ActivityTypeCode indicates result value is a QC replicate, duplicate, or blank"
-7,Recommended,MeasureQualifierCode indicates result value is suspect,MeasureQualifierCode indicates result value is suspect
-8,Optional,Metadata indicates duplicative uploads of the same results within a single organization,Metadata indicates duplicative uploads of the same results within a single organization
-9,Optional,Metadata indicates duplicative uploads of the same results by multiple organizations,Metadata indicates duplicative uploads of the same results by multiple organizations
-10,Optional,Uncommon or suspect characteristic and analytical method combination,Uncommon or suspect characteristic and analytical method combination
+1,Required,Result value is not numeric or NA and no detection limit value is provided (see TADA.ResultMeasureValueDataTypes.Flag),Result value is not numeric or NA and no detection limit value is provided
+2,Required,Result value is not numeric or NA and the detection limit value cannot be interpreted because there is a conflict between the detection condition text and detection limit type provided by the data submitter [or the detection limit type is not in WQX domain tables (USGS/NWIS-specific)] (see TADA.CensoredData.Flag),Result value is not numeric or NA and the detection limit value cannot be interpreted because there is a conflict between the detection condition text and detection limit type provided by the data submitter [or the detection limit type is not in WQX domain tables (USGS/NWIS-specific)]
+3,Recommended,Suspect characteristic and speciation combination (see TADA.MethodSpeciation.Flag),Suspect characteristic and speciation combination
+4,Recommended,Suspect characteristic and fraction combination (see TADA.SampleFraction.Flag),Suspect characteristic and fraction combination
+5,Recommended,Suspect characteristic and unit combination (see TADA.ResultUnit.Flag),Suspect characteristic and unit combination
+6,Recommended,"ActivityTypeCode indicates result value is a QC replicate, duplicate, or blank (see TADA.ActivityType.Flag)","ActivityTypeCode indicates result value is a QC replicate, duplicate, or blank"
+7,Recommended,MeasureQualifierCode indicates result value is suspect (see TADA.MeasureQualifierCode.Flag),MeasureQualifierCode indicates result value is suspect
+8,Optional,Metadata indicates duplicative uploads of the same results within a single organization (see TADA.SingleOrgDup.Flag),Metadata indicates duplicative uploads of the same results within a single organization
+9,Optional,Metadata indicates duplicative uploads of the same results by multiple organizations (see TADA.ResultSelectedMultipleOrgs),Metadata indicates duplicative uploads of the same results by multiple organizations
+10,Optional,Uncommon or suspect characteristic and analytical method combination (see TADA.AnalyticalMethod.Flag),Uncommon or suspect characteristic and analytical method combination
 11,Optional,"Quality Assurance Project Plan (QAPPApprovedIndicator) indicates ""N"" (not approved) or NA","Quality Assurance Project Plan (QAPPApprovedIndicator) indicates ""N"" (not approved) or NA"
-12,Optional,Quality Assurance Project Plan (QAPP) document is not available via the ProjectFileUrl,Quality Assurance Project Plan (QAPP) document is not available via the ProjectFileUrl
-13,Optional,"Metadata indicates result(s) are aggregate, high-frequency continuous sensor results, not discrete samples","Metadata indicates result(s) are aggregate, high-frequency continuous sensor results, not discrete samples"
-14,Optional,"Result value(s) above the national threshold for a given characteristic, possibly indicating non-sensical value(s)","Result value(s) above the national upper threshold for a given characteristic, possibly indicating non-sensical value(s)"
-15,Optional,"Result value(s) below the national threshold for a given characteristic, possibly indicating non-sensical value(s)","Result value(s) below the national lower threshold for a given characteristic, possibly indicating non-sensical value(s)"
-16,Optional,Coordinates are outside of the United States,Coordinates are outside of the United States
-17,Optional,Coordinates are imprecise (less than three decimal digits),Coordinates are imprecise (less than three decimal digits)
+12,Optional,Quality Assurance Project Plan (QAPP) document is not available via the ProjectFileUrl (see TADA.QAPPDocAvailable),Quality Assurance Project Plan (QAPP) document is not available via the ProjectFileUrl
+13,Optional,"Metadata indicates result(s) are aggregate, high-frequency continuous sensor results, not discrete samples (see TADA.AggregatedContinuousData.Flag)","Metadata indicates result(s) are aggregate, high-frequency continuous sensor results, not discrete samples"
+14,Optional,"Result value(s) above the national threshold for a given characteristic, possibly indicating non-sensical value(s) (see TADA.ResultValueAboveUpperThreshold.Flag)","Result value(s) above the national upper threshold for a given characteristic, possibly indicating non-sensical value(s)"
+15,Optional,"Result value(s) below the national threshold for a given characteristic, possibly indicating non-sensical value(s) (see TADA.ResultValueBelowLowerThreshold.Flag)","Result value(s) below the national lower threshold for a given characteristic, possibly indicating non-sensical value(s)"
+16,Optional,Coordinates are outside of the United States (see TADA.InvalidCoordinates.Flag),Coordinates are outside of the United States
+17,Optional,Coordinates are imprecise (less than three decimal digits) (see TADA.InvalidCoordinates.Flag),Coordinates are imprecise (less than three decimal digits)
