@@ -1,18 +1,18 @@
 Order,Level,Prompt,flagType
-1,Required,Sample media is not water,Sample media is not water
-2,Required,Result value is not numeric or result value is NA and no detection limit value is provided,Result value is not numeric or result value is NA and no detection limit value is provided
-3,Required,Conflict between detection condition text and detection limit type or detection limit type is not in WQX domain tables (likely USGS/NWIS-specific) ,Conflict between detection condition text and detection limit type or detection limit type is not in WQX domain tables (likely USGS/NWIS-specific) 
-4,Recommended,Invalid speciation for associated characteristic,Invalid speciation for associated characteristic
-5,Recommended,Invalid characteristic and fraction combination,Invalid characteristic and fraction combination
-6,Recommended,Invalid units for a given characteristic and media combination,Invalid units for a given characteristic and media combination
-7,Recommended,"Measurement activity type code indicates it is a QC replicate, duplicate, or blank","Measurement activity type code indicates it is a QC replicate, duplicate, or blank"
-8,Recommended,MeasureQualifierCode indicates result value is suspect,MeasureQualifierCode indicates result value is suspect
-9,Optional,Metadata indicates duplicative uploads of the same results within a single organization,Metadata indicates duplicative uploads of the same results within a single organization
-10,Optional,Metadata indicates duplicative uploads of the same results by multiple organizations,Metadata indicates duplicative uploads of the same results by multiple organizations
-11,Optional,Uncommon analytical methods,Uncommon analytical methods
-12,Optional,"QAPP approval column is ""N"" (indicating not approved) or NA","QAPP approval column is ""N"" (indicating not approved) or NA"
-13,Optional,Quality Assurance Project Plan URL is missing,Quality Assurance Project Plan URL is missing
-14,Optional,"Metadata indicates result(s) are aggregate, high-frequency continuous sensor results, not discrete samples","Metadata indicates result(s) are aggregate, high-frequency continuous sensor results, not discrete samples"
-15,Optional,"Result value(s) above the national threshold for a given characteristic, possibly indicating non-sensical value(s)","Result value(s) above the national upper threshold for a given characteristic, possibly indicating non-sensical value(s)"
-16,Optional,"Result value(s) below the national threshold for a given characteristic, possibly indicating non-sensical value(s)","Result value(s) below the national lower threshold for a given characteristic, possibly indicating non-sensical value(s)"
-17,Optional,Coordinates are outside of the United States and/or imprecise (less than three decimal digits),Coordinates are outside of the United States and/or imprecise (less than three decimal digits)
+1,Required,Result value is not numeric or NA and no detection limit value is provided,Result value is not numeric or NA and no detection limit value is provided
+2,Required,Result value is not numeric or NA and the detection limit value cannot be interpreted because there is a conflict between the detection condition text and detection limit type provided by the data submitter [or the detection limit type is not in WQX domain tables (USGS/NWIS-specific)],Result value is not numeric or NA and the detection limit value cannot be interpreted because there is a conflict between the detection condition text and detection limit type provided by the data submitter [or the detection limit type is not in WQX domain tables (USGS/NWIS-specific)]
+3,Recommended,Suspect characteristic and speciation combination,Suspect characteristic and speciation combination
+4,Recommended,Suspect characteristic and fraction combination,Suspect characteristic and fraction combination
+5,Recommended,Suspect characteristic and unit combination,Suspect characteristic and unit combination
+6,Recommended,"ActivityTypeCode indicates result value is a QC replicate, duplicate, or blank","ActivityTypeCode indicates result value is a QC replicate, duplicate, or blank"
+7,Recommended,MeasureQualifierCode indicates result value is suspect,MeasureQualifierCode indicates result value is suspect
+8,Optional,Metadata indicates duplicative uploads of the same results within a single organization,Metadata indicates duplicative uploads of the same results within a single organization
+9,Optional,Metadata indicates duplicative uploads of the same results by multiple organizations,Metadata indicates duplicative uploads of the same results by multiple organizations
+10,Optional,Uncommon or suspect characteristic and analytical method combination,Uncommon or suspect characteristic and analytical method combination
+11,Optional,"Quality Assurance Project Plan (QAPPApprovedIndicator) indicates ""N"" (not approved) or NA","Quality Assurance Project Plan (QAPPApprovedIndicator) indicates ""N"" (not approved) or NA"
+12,Optional,Quality Assurance Project Plan (QAPP) document is not available via the ProjectFileUrl,Quality Assurance Project Plan (QAPP) document is not available via the ProjectFileUrl
+13,Optional,"Metadata indicates result(s) are aggregate, high-frequency continuous sensor results, not discrete samples","Metadata indicates result(s) are aggregate, high-frequency continuous sensor results, not discrete samples"
+14,Optional,"Result value(s) above the national threshold for a given characteristic, possibly indicating non-sensical value(s)","Result value(s) above the national upper threshold for a given characteristic, possibly indicating non-sensical value(s)"
+15,Optional,"Result value(s) below the national threshold for a given characteristic, possibly indicating non-sensical value(s)","Result value(s) below the national lower threshold for a given characteristic, possibly indicating non-sensical value(s)"
+16,Optional,Coordinates are outside of the United States,Coordinates are outside of the United States
+17,Optional,Coordinates are imprecise (less than three decimal digits),Coordinates are imprecise (less than three decimal digits)
