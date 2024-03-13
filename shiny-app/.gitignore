@@ -21,3 +21,6 @@ _snaps
 .Ruserdata
 .vscode/
 .Rbuildignore
+
+# Trip's testing file
+flagged.csv
