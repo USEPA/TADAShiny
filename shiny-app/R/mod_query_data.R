@@ -137,7 +137,7 @@ mod_query_data_ui <- function(id) {
             tags$i(
               class = "glyphicon glyphicon-info-sign",
               style = "color:#0072B2;",
-              title = "At present, TADA is only designed to work with water sample media"
+              title = "TADA is designed to work with water data"
             )
           ),
           choices = c("", media),
@@ -397,8 +397,8 @@ mod_query_data_server <- function(id, tadat) {
         tadat$endDate <- as.character(input$endDate)
       }
       if (length(input$startDate) == 0) {
-        # ensure if date is empty, the query receives a proper start date. Might want a warning message instead.
-        tadat$startDate <- "1800-01-01"
+        # ensure if date is empty, the query receives a proper input ("null")
+        tadat$startDate <- "null"
       } else {
         tadat$startDate <- as.character(input$startDate)
       }
@@ -436,7 +436,7 @@ mod_query_data_server <- function(id, tadat) {
         shiny::showModal(
           shiny::modalDialog(
             title = "Empty Query",
-            "Your query returned zero results. Please adjust your search inputs and try again."
+            "Your query returned zero results. Please adjust your search inputs and try again. Remember to update the start and end dates."
           )
         )
       } else {
@@ -501,8 +501,6 @@ initializeTable <- function(tadat, raw) {
   }
   
   removals <- data.frame(matrix(nrow = nrow(raw), ncol = 0))
-  # removals["Media Type"] = ifelse(!raw$TADA.ActivityMediaName%in%c("WATER"),TRUE,raw$Removed)
-  # removals["Special Characters"] = ifelse(raw$TADA.ResultMeasureValueDataTypes.Flag%in%c("ND or NA","Text","Coerced to NA"),TRUE,raw$Removed)
   tadat$raw <- raw
   tadat$removals <- removals
 }
