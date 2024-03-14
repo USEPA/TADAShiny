@@ -1043,7 +1043,7 @@ Suggests: blob, nanoarrow, covr, dplyr (>= 0.8-3), ggplot2, knitr,
         tibble (>= 1.4.1), tidyr (>= 1.2.0), tidyselect (>= 1.0.0),
         tmap (>= 2.0), vctrs, wk (>= 0.9.0)
 License: GPL-2 | MIT + file LICENSE
-MD5sum: c410e950b20a79bc51b077f93a0ec310
+MD5sum: 5e9ee58bb79b961632eaa8fae82d2f5f
 NeedsCompilation: yes
 
 Package: shiny
@@ -1172,7 +1172,7 @@ Imports: plyr, data.table, dplyr, tidyr, purrr, grDevices, magrittr,
 Suggests: rmarkdown, readr, tidyverse, knitr, testthat, testthis,
         usethis, devtools, pkgdown, spelling
 License: CC0
-MD5sum: e4e9e7d43b7f3cf90f74e507c31fc7fa
+MD5sum: 4e56633bab1e680aa92f7ff214820629
 NeedsCompilation: no
 
 Package: terra
