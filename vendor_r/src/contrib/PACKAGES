@@ -576,14 +576,14 @@ MD5sum: e2c474361e538c6b4cb9cd8ae799bb4c
 NeedsCompilation: yes
 
 Package: lattice
-Version: 0.22-5
+Version: 0.22-6
 Priority: recommended
 Depends: R (>= 4.0.0)
 Imports: grid, grDevices, graphics, stats, utils
 Suggests: KernSmooth, MASS, latticeExtra, colorspace
 Enhances: chron, zoo
 License: GPL (>= 2)
-MD5sum: 52670d8b95b1f2ee50b9242abd8f3156
+MD5sum: e66233f69de6cd56b4df6dd0fce800b4
 NeedsCompilation: yes
 
 Package: lazyeval
@@ -740,13 +740,13 @@ MD5sum: 0135ded34d8080d3cb6d40672e2000f9
 NeedsCompilation: no
 
 Package: pkgbuild
-Version: 1.4.3
+Version: 1.4.4
 Depends: R (>= 3.5)
 Imports: callr (>= 3.2.0), cli (>= 3.4.0), desc, processx, R6
 Suggests: covr, cpp11, knitr, mockery, Rcpp, rmarkdown, testthat (>=
         3.0.0), withr (>= 2.3.0)
 License: MIT + file LICENSE
-MD5sum: 4cd682bee06ec08d8ce384b7bc6225fa
+MD5sum: 34cf4e6f5c360397888d05259d274878
 NeedsCompilation: no
 
 Package: pkgconfig
@@ -811,14 +811,14 @@ MD5sum: f9c8b346b31b46468653347cfc16d1ad
 NeedsCompilation: no
 
 Package: processx
-Version: 3.8.3
+Version: 3.8.4
 Depends: R (>= 3.4.0)
 Imports: ps (>= 1.2.0), R6, utils
 Suggests: callr (>= 3.7.3), cli (>= 3.3.0), codetools, covr, curl,
         debugme, parallel, rlang (>= 1.0.2), testthat (>= 3.0.0),
         webfakes, withr
 License: MIT + file LICENSE
-MD5sum: 428a10beddf830c6f1bf018649db2471
+MD5sum: fa925e419fd8e5b1e5a3ef62da8979f8
 NeedsCompilation: yes
 
 Package: promises
@@ -943,14 +943,14 @@ MD5sum: 11e48892b5d8c2c5b5675f2830ada05d
 NeedsCompilation: no
 
 Package: remotes
-Version: 2.4.2.1
+Version: 2.5.0
 Depends: R (>= 3.0.0)
 Imports: methods, stats, tools, utils
-Suggests: brew, callr, codetools, curl, covr, git2r (>= 0.23.0), knitr,
-        mockery, pkgbuild (>= 1.0.1), pingr, rmarkdown, rprojroot,
-        testthat, webfakes, withr
+Suggests: brew, callr, codetools, covr, curl, git2r (>= 0.23.0), knitr,
+        mockery, pingr, pkgbuild (>= 1.0.1), rmarkdown, rprojroot,
+        testthat (>= 3.0.0), webfakes, withr
 License: MIT + file LICENSE
-MD5sum: ed5ef291d4b7c1d965293892ab381c80
+MD5sum: 5920ed4cbd5898e010dee3d84bd230d1
 NeedsCompilation: no
 
 Package: rex
@@ -1008,12 +1008,12 @@ MD5sum: 10ce692175a43cf20821ebd7acb61111
 NeedsCompilation: yes
 
 Package: sass
-Version: 0.4.8
+Version: 0.4.9
 Imports: fs (>= 1.2.4), rlang (>= 0.4.10), htmltools (>= 0.5.1), R6,
         rappdirs
 Suggests: testthat, knitr, rmarkdown, withr, shiny, curl
 License: MIT + file LICENSE
-MD5sum: 8eda7d166601e4ffd05514e0d2c721b7
+MD5sum: 7dc91fb3c69b53cdaa2b45246ce52742
 NeedsCompilation: yes
 
 Package: scales
@@ -1043,7 +1043,7 @@ Suggests: blob, nanoarrow, covr, dplyr (>= 0.8-3), ggplot2, knitr,
         tibble (>= 1.4.1), tidyr (>= 1.2.0), tidyselect (>= 1.0.0),
         tmap (>= 2.0), vctrs, wk (>= 0.9.0)
 License: GPL-2 | MIT + file LICENSE
-MD5sum: 5e9ee58bb79b961632eaa8fae82d2f5f
+MD5sum: 0f00ffa64079fe4a93b043b569bc3081
 NeedsCompilation: yes
 
 Package: shiny
@@ -1172,7 +1172,7 @@ Imports: plyr, data.table, dplyr, tidyr, purrr, grDevices, magrittr,
 Suggests: rmarkdown, readr, tidyverse, knitr, testthat, testthis,
         usethis, devtools, pkgdown, spelling
 License: CC0
-MD5sum: 4e56633bab1e680aa92f7ff214820629
+MD5sum: 146f83b338317546b4927e39581e0ed7
 NeedsCompilation: no
 
 Package: terra
@@ -1251,11 +1251,11 @@ MD5sum: 2f6817ebdfc49322691c13e2c6d507f0
 NeedsCompilation: yes
 
 Package: tinytex
-Version: 0.49
+Version: 0.50
 Imports: xfun (>= 0.29)
 Suggests: testit, rstudioapi
 License: MIT + file LICENSE
-MD5sum: e9d2133fc0c4c2f27c656cded1606bbe
+MD5sum: 42c9d7fce5108b7a5b878e20c3bd6df4
 NeedsCompilation: no
 
 Package: tzdb
