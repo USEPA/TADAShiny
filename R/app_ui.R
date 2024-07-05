@@ -52,27 +52,32 @@ app_ui <- function(request) {
           htmltools::br(),
           mod_data_flagging_ui("data_flagging_1")
         ),
-        shiny::tabPanel("4. Filter",
+        shiny::tabPanel("4. Flag Sites",
+                        value = "Flagsites",
+                        htmltools::br(),
+                        mod_flag_sites_ui("flag_sites_1")
+        ),
+        shiny::tabPanel("5. Filter",
           value = "Filter",
           htmltools::br(),
           mod_filtering_ui("filtering_1")
         ),
-        shiny::tabPanel("5. Censored Data",
+        shiny::tabPanel("6. Censored Data",
           value = "Censored",
           htmltools::br(),
           mod_censored_data_ui("censored_data_1")
         ),
-        shiny::tabPanel("6. Harmonize and Calculate",
+        shiny::tabPanel("7. Harmonize and Calculate",
           value = "Harmonize",
           htmltools::br(),
           mod_harmonize_np_ui("harmonize_np_1")
         ),
-        shiny::tabPanel("7. Explore",
+        shiny::tabPanel("8. Explore",
           value = "Figures",
           htmltools::br(),
           mod_figures_ui("figures_1")
         ),
-        shiny::tabPanel("8. Review",
+        shiny::tabPanel("9. Review",
           value = "Review",
           htmltools::br(),
           mod_review_data_ui("review_data_1")

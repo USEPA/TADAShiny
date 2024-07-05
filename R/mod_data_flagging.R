@@ -179,6 +179,7 @@ mod_data_flagging_server <- function(id, tadat) {
         )
 
         shinyjs::enable(selector = '.nav li a[data-value="Filter"]')
+        shinyjs::enable(selector = '.nav li a[data-value="Flagsites"]')
         shinyjs::enable(selector = '.nav li a[data-value="Censored"]')
         shinyjs::enable(selector = '.nav li a[data-value="Harmonize"]')
         shinyjs::enable(selector = '.nav li a[data-value="Figures"]')

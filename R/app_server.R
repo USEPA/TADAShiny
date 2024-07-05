@@ -15,6 +15,7 @@ app_server <- function(input, output, session) {
   mod_filtering_server("filtering_1", tadat)
   mod_query_data_server("query_data_1", tadat) # server call to the module servers with the name of the module and any dependencies (this one uses the tadat reactive values object)
   mod_data_flagging_server("data_flagging_1", tadat)
+  mod_flag_sites_server("flag_sites_1", tadat)
   mod_summary_server("summary_1", tadat)
   mod_overview_server("overview_1", tadat)
   mod_censored_data_server("censored_data_1", tadat)
@@ -26,6 +27,7 @@ app_server <- function(input, output, session) {
   # this ensures all tabs except Upload are disabled upon app start
   shinyjs::disable(selector = '.nav li a[data-value="Overview"]')
   shinyjs::disable(selector = '.nav li a[data-value="Flag"]')
+  shinyjs::disable(selector = '.nav li a[data-value="Flagsites"]')
   shinyjs::disable(selector = '.nav li a[data-value="Filter"]')
   shinyjs::disable(selector = '.nav li a[data-value="Censored"]')
   shinyjs::disable(selector = '.nav li a[data-value="Harmonize"]')
