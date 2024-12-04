@@ -64,7 +64,11 @@ mod_censored_data_ui <- function(id) {
     shiny::fluidRow(
       column(
         3,
-        shiny::actionButton(ns("apply_methods"), "Apply Methods to Dataset", style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
+        shiny::actionButton(
+          ns("apply_methods"), 
+          "Apply Methods to Dataset", 
+          disabled = TRUE,
+          style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
       ),
       column(3, shiny::uiOutput(ns("undo_methods")))
     ),
@@ -99,7 +103,7 @@ mod_censored_data_ui <- function(id) {
 mod_censored_data_server <- function(id, tadat) {
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
-
+    
     # initialize dropdown values
 
     # reactive values specific to this module
@@ -162,9 +166,9 @@ mod_censored_data_server <- function(id, tadat) {
       if (is.null(init_val)) {
         init_val <- 0.5
       }
-      if (input$nd_method == nd_method_options[1]) {
+      if (input$nd_method == "Multiply detection limit by x") {
         shiny::numericInput(ns("nd_mult"),
-          "Multiplier (x)",
+          "Non-Detect Multiplier (x)",
           value = init_val,
           min = 0
         )
@@ -177,9 +181,9 @@ mod_censored_data_server <- function(id, tadat) {
       if (is.null(init_val)) {
         init_val <- 0.5
       }
-      if (input$od_method == od_method_options[1]) {
+      if (input$od_method == "Multiply detection limit by x") {
         shiny::numericInput(ns("od_mult"),
-          "Multiplier (x)",
+          "Over-Detect Multiplier (x)",
           value = init_val,
           min = 0
         )
@@ -211,18 +215,44 @@ mod_censored_data_server <- function(id, tadat) {
     # Make this part more concise?
     shiny::observeEvent(input$nd_method, {
       tadat$nd_method <- input$nd_method
+
+      if ((input$nd_method == "Multiply detection limit by x" && !is.numeric(input$nd_mult))
+          || (input$nd_method == "No change" && input$od_method == "No change" )){ 
+        shinyjs::disable("apply_methods")
+      } else {
+        shinyjs::enable("apply_methods")
+      }
     })
 
     shiny::observeEvent(input$nd_mult, {
       tadat$nd_mult <- input$nd_mult
+      
+      if (input$nd_method == "Multiply detection limit by x" && !is.numeric(input$nd_mult)) { 
+        shinyjs::disable("apply_methods")
+      } else {
+        shinyjs::enable("apply_methods")
+      }      
     })
 
     shiny::observeEvent(input$od_method, {
       tadat$od_method <- input$od_method
+
+      if ((input$od_method == "Multiply detection limit by x" && !is.numeric(input$od_mult))
+          || (input$nd_method == "No change" && input$od_method == "No change" )){ 
+        shinyjs::disable("apply_methods")
+      } else {
+        shinyjs::enable("apply_methods")
+      }
     })
 
     shiny::observeEvent(input$od_mult, {
       tadat$od_mult <- input$od_mult
+      
+      if (input$od_method == "Multiply detection limit by x" && !is.numeric(input$od_mult)) { 
+        shinyjs::disable("apply_methods")
+      } else {
+        shinyjs::enable("apply_methods")
+      }
     })
 
 
