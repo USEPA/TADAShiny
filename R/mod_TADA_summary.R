@@ -205,7 +205,9 @@ mod_TADA_summary_server <- function(id, tadat) {
         setwd(tempdir())
         datafile_name <- paste0(tadat$default_outfile, ".xlsx")
         progress_file_name <- paste0(tadat$default_outfile, "_prog.RData")
+        print(111)
         desc <- writeNarrativeDataFrame(tadat)
+        print(222)
         dfs <-
           list(Data = EPATADA::TADA_OrderCols(tadat$raw), Parameterization = desc)
         writeFile(tadat, progress_file_name)
