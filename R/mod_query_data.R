@@ -222,6 +222,20 @@ mod_query_data_ui <- function(id) {
         )
       )
     ),
+    shiny::fluidRow(
+        htmltools::HTML(
+          "Download a TDATA dataset template in .xlsx format. This download template can be used to prepare datasets for Upload.
+          You may reach out to the WQX helpdesk at WQX@epa.gov for assistance preparing and submitting your data
+          to the WQP through EPA's WQX.<br><br>"
+        ),
+        column(
+        9,
+        shiny::downloadButton(
+          ns("download_template"), 
+          "Download Template", 
+          style = "color: #fff; background-color: #337ab7; border-color: #2e6da4;")
+      )
+    ),
     htmltools::hr(),
     shiny::fluidRow(
       htmltools::h3("Optional: Upload Progress File"),
@@ -256,6 +270,26 @@ mod_query_data_server <- function(id, tadat) {
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
+    
+        # template used for importing data to TADAShiny
+    template_data <- reactive(EPATADA::TADA_GetTemplate())
+    
+    # return an ms excel file with the template columns
+    output$download_template <- shiny::downloadHandler(
+        filename = function() { 
+          paste0("tada_template", ".xlsx")
+        },
+        content = function(file) {
+          # format csv.  contentType = "text/csv"
+          # write.csv(template_data(), file)
+          # browser()
+          # format excel (xlsx)
+          d = template_data()
+          writexl::write_xlsx(d, path = file)
+        },
+        contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+     ) 
+    
     # read in the excel spreadsheet dataset if this input reactive object is populated via fileInput and define as tadat$raw
     shiny::observeEvent(input$file, {
       # a modal that pops up showing it's working on querying the portal
