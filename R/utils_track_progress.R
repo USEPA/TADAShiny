@@ -23,7 +23,7 @@ writeFile <- function(tadat, filename) {
   nd_mult <- tadat$nd_mult
   od_mult <- tadat$od_mult
   field_sel <- tadat$field_sel
-
+  
   save(
     original_source,
     job_id,
@@ -56,24 +56,24 @@ writeFile <- function(tadat, filename) {
 readFile <- function(tadat, filename) {
   load(filename, verbose = FALSE)
   tadat$load_progress_file <- filename
-
+  
   # Confirm compatibility
   job_id <- job_id
   if (!is.null(m2f)) {
     tadat$m2f <- m2f
   }
-
-
+  
+  
   if (!is.null(selected_flags)) {
     tadat$selected_flags <- selected_flags
     shinyjs::enable(selector = '.nav li a[data-value="Flag"]')
   }
-
+  
   # Enable tabs if certain fields are not null
   if (!is.null(selected_filters)) {
     shinyjs::enable(selector = '.nav li a[data-value="Filter"]')
   }
-
+  
   tadat$original_source <- original_source
   tadat$job_id <- job_id
   tadat$example_data <- example_data
@@ -106,12 +106,14 @@ invalidFile <- function(trigger) {
 
 
 writeNarrativeDataFrame <- function(tadat) {
-  # sampleMedia needs to be a single string for this part
+  # sampleMedia and siteType need to be a single string for this part
+  # Others? Automatic check?
   tadat$sampleMedia <- paste(tadat$sampleMedia, collapse = " ")
+  tadat$siteType <- paste(tadat$siteType, collapse = " ")
   df <- data.frame(Parameter = character(), Value = character())
   df[nrow(df) + 1, ] <- c("TADA Shiny Job ID", tadat$job_id)
   df[nrow(df) + 1, ] <- c("Original data source: ", tadat$original_source)
-
+  
   # Data Query Tab
   if (tadat$original_source == "Example") {
     df[nrow(df) + 1, ] <- c("Example data file", tadat$example_data)
@@ -146,6 +148,7 @@ writeNarrativeDataFrame <- function(tadat) {
         tadat$endDate
       )
     )
+
     for (i in seq_len(nrow(query_params))) {
       if (!is.null(query_params[i, "value"])) {
         df[nrow(df) + 1, ] <- query_params[i, ]
@@ -159,32 +162,34 @@ writeNarrativeDataFrame <- function(tadat) {
   }
 
 
+  
   # Flagging Tab
   for (flag in tadat$selected_flags) {
     df[nrow(df) + 1, ] <- c("Selected Flag", flag)
   }
-
-
+  
+  
   if (!is.null(tadat$m2f)) {
     df[nrow(df) + 1, ] <- c("Depth unit conversion", tadat$m2f)
   } else {
     df[nrow(df) + 1, ] <- c("Depth unit conversion", "None")
   }
 
-
   # Filtering tab
-  for (row in 1:nrow(tadat$selected_filters)) {
-    df[nrow(df) + 1, ] <- c(
-      "Selected Filter",
-      paste0(
+  # skips the recording of selected filters in the progress file if the filters haven't been selected yet
+  if (nrow(tadat$selected_filters) > 0) {
+    for (row in 1:nrow(tadat$selected_filters)) {
+      val <-       paste0(
         tadat$selected_filters[row, "Filter"],
         ": ",
         tadat$selected_filters[row, "Field"],
         " = ",
         tadat$selected_filters[row, "Value"]
       )
-    )
-  }
+      new_entry <- c("Selected Filter", val)
+      df[nrow(df) + 1, ] <- new_entry
+    }
+  } 
 
   # Censored Data tab
   if (is.null(tadat$nd_mult)) {
@@ -193,8 +198,10 @@ writeNarrativeDataFrame <- function(tadat) {
   if (is.null(tadat$od_mult)) {
     tadat$od_mult <- "n/a"
   }
-  df[nrow(df) + 1, ] <- c("Non-Detect Handling Method", sub("x", tadat$nd_mult, tadat$nd_method))
-  df[nrow(df) + 1, ] <- c("Over-Detect Handling Method", sub("x", tadat$od_mult, tadat$od_method))
-
+  df[nrow(df) + 1, ] <- c("Non-Detect Handling Method",
+                          sub("x", tadat$nd_mult, tadat$nd_method))
+  df[nrow(df) + 1, ] <- c("Over-Detect Handling Method",
+                          sub("x", tadat$od_mult, tadat$od_method))
+  
   return(df)
 }
