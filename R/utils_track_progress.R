@@ -176,6 +176,7 @@ writeNarrativeDataFrame <- function(tadat) {
   }
 
   # Filtering tab
+  # skips the recording of selected filters in the progress file if the filters haven't been selected yet
   if (nrow(tadat$selected_filters) > 0) {
     for (row in 1:nrow(tadat$selected_filters)) {
       val <-       paste0(
