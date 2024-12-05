@@ -418,7 +418,7 @@ mod_query_data_server <- function(id, tadat) {
       if (input$huc == "") {
         tadat$huc <- "null"
       } else {
-        tadat$huc <- input$huc
+        tadat$huc <- gsub("\\s", "", input$huc)
       }
       if (is.null(input$siteid)) {
         tadat$siteid <- "null"
