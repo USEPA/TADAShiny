@@ -204,11 +204,9 @@ mod_query_data_ui <- function(id) {
     shiny::fluidRow(
       htmltools::h3("Option C: Upload dataset"),
       htmltools::HTML((
-        "Upload a dataset from your computer. This upload feature only accepts data in .xls and .xlsx formats.
-                                    The file can be a <B>fresh</B> TADA dataset or a <B>working</B> TADA dataset that you are returning to the
-                                    app to iterate on. Data must also be formatted in the EPA Water Quality eXchange (WQX) schema to leverage
-                                    this tool. You may reach out to the WQX helpdesk at WQX@epa.gov for assistance preparing and submitting your data
-                                    to the WQP through EPA's WQX."
+        "Upload a compatible dataset from your computer. This upload feature only accepts data in .xls and .xlsx formats. Data must be formatted in the EPA Water Quality eXchange (WQX) schema (and include all columns required for this TADA R Shiny application) to run
+                                    this tool. The file can be a <B>fresh</B> dataset you created using the TADA template below or a <B>working</B> dataset that you downloaded from this application using the Download Working Dataset feature, and are now returning to the
+                                    app to iterate on."
       )),
       # widget to upload WQP profile or WQX formatted spreadsheet
       column(
@@ -224,9 +222,9 @@ mod_query_data_ui <- function(id) {
     ),
     shiny::fluidRow(
         htmltools::HTML(
-          "Download a TDATA dataset template in .xlsx format. This download template can be used to prepare datasets for Upload.
-          You may reach out to the WQX helpdesk at WQX@epa.gov for assistance preparing and submitting your data
-          to the WQP through EPA's WQX.<br><br>"
+          "Download a blank TADA data template in .xlsx format. This template is available to assist users that do not have data available in the WQP (and therefore cannot use Option B) prepare their data for upload to this R Shiny application using import Option C.
+          You may reach out to the TADA team through the helpdesk at mywaterway@epa.gov for assistance preparing your data. If your data is not in the WQP yet and you are interested in submitting it, you may reach out to the WQX helpdesk at WQX@epa.gov for assistance preparing and submitting your data
+                                    to the WQP through EPA's WQX.<br><br>"
         ),
         column(
         9,
