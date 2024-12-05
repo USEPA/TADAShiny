@@ -58,6 +58,7 @@ mod_query_data_ui <- function(id) {
         ns("example_data_go"),
         "Load",
         shiny::icon("truck-ramp-box"),
+        disabled = TRUE,
         style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
       )
     )),
@@ -255,6 +256,13 @@ mod_query_data_server <- function(id, tadat) {
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
+    # https://stackoverflow.com/questions/24175997/force-no-default-selection-in-selectinput
+    shiny::observeEvent(input$example_data, {
+      if (!is.na(input$example_data) && nchar(input$example_data) > 1) {
+          shinyjs::enable("example_data_go")
+      } 
+    })
+    
     # read in the excel spreadsheet dataset if this input reactive object is populated via fileInput and define as tadat$raw
     shiny::observeEvent(input$file, {
       # a modal that pops up showing it's working on querying the portal
@@ -409,7 +417,7 @@ mod_query_data_server <- function(id, tadat) {
       if (input$huc == "") {
         tadat$huc <- "null"
       } else {
-        tadat$huc <- input$huc
+        tadat$huc <- gsub("\\s", "", input$huc)
       }
       if (is.null(input$siteid)) {
         tadat$siteid <- "null"
