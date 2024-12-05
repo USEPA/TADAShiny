@@ -189,10 +189,9 @@ mod_query_data_ui <- function(id) {
     shiny::fluidRow(
       column(
              4,
-             shiny::checkboxGroupInput(ns("providers"), 
+             shiny::radioButtons(ns("providers"), 
              "Data Source", 
-             c("NWIS (USGS)" = "NWIS", "WQX (EPA)" = "STORET"), 
-             selected = c("NWIS", "STORET"))
+             c("NWIS (USGS)" = "NWIS", "WQX (EPA)" = "STORET", "Both (NWIS and WQX)" = "all"), selected = "all")
       )
     ),
     shiny::fluidRow(column(
@@ -410,7 +409,7 @@ mod_query_data_server <- function(id, tadat) {
       } else {
         tadat$countrycode <- input$countryocean
       }
-      if (is.null(input$providers)) {
+      if (is.null(input$providers) | input$providers == "all") {
         tadat$providers <- "null"
       } else {
         tadat$providers <- input$providers

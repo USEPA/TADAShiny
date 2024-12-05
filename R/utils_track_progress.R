@@ -106,10 +106,12 @@ invalidFile <- function(trigger) {
 
 
 writeNarrativeDataFrame <- function(tadat) {
-  # sampleMedia and siteType need to be a single string for this part
+  # sampleMedia, siteType, characteristicName, and characteristicType need to be a single string for this part
   # Others? Automatic check?
   tadat$sampleMedia <- paste(tadat$sampleMedia, collapse = " ")
   tadat$siteType <- paste(tadat$siteType, collapse = " ")
+  tadat$characteristicType <- paste(tadat$characteristicType, collapse = " ")
+  tadat$characteristicName <- paste(tadat$characteristicName, collapse = " ")
   df <- data.frame(Parameter = character(), Value = character())
   df[nrow(df) + 1, ] <- c("TADA Shiny Job ID", tadat$job_id)
   df[nrow(df) + 1, ] <- c("Original data source: ", tadat$original_source)
