@@ -267,8 +267,19 @@ mod_query_data_server <- function(id, tadat) {
       )
 
       # user uploaded data
-      raw <-
-        suppressWarnings(readxl::read_excel(input$file$datapath, sheet = 1))
+      raw <- suppressWarnings(readxl::read_excel(input$file$datapath, sheet = 1))
+      
+      # run code included in TADA data retrieval 
+      # need to specify this or throws error when trying to bind rows. Temporary fix for larger
+      # issue where data structure for all columns should be specified.
+      cols <- names(raw)
+      raw <- raw %>% dplyr::mutate_at(cols, as.character)
+      # # check that all TADA template columns are included, commented out for now. 
+      # raw <- EPATADA::TADA_CheckRequiredFields(raw)
+      # run autoclean
+      raw <- EPATADA::TADA_AutoClean(raw)
+      
+      # other steps to prepare data for app
       raw$TADA.Remove <- NULL
       initializeTable(tadat, raw)
       if (!is.null(tadat$original_source)) {
