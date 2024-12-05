@@ -322,6 +322,13 @@ mod_censored_data_server <- function(id, tadat) {
         dat[1:10, ] # just show the first 10 records so user can see what happened to data
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
       tadat$censor_applied <- TRUE
+      
+      # disable the button so the user can not redo the handling
+      shinyjs::disable("apply_methods")
+      shinyjs::disable("nd_mult")
+      shinyjs::disable("nd_method")
+      shinyjs::disable("od_mult")
+      shinyjs::disable("od_method")
     })
 
     # this button appears after someone has applied the OD/ND methods, in case they want to undo and try another method instead
@@ -343,6 +350,13 @@ mod_censored_data_server <- function(id, tadat) {
         "Result Value/Unit Copied from Detection Limit" # reset data types flag to what it was before simpleCensoredMethods function run
       tadat$raw <- tadat$raw %>% dplyr::select(-TADA.CensoredMethod)
       tadat$censor_applied <- FALSE
+      
+      # enable the button so the user can re-apply the handling
+      shinyjs::enable("apply_methods")
+      shinyjs::enable("nd_mult")
+      shinyjs::enable("nd_method")
+      shinyjs::enable("od_mult")
+      shinyjs::enable("od_method")
     })
 
     # creates a nice table showing an example of how censored data were changed.

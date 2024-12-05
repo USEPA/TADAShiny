@@ -181,7 +181,7 @@ mod_TADA_summary_server <- function(id, tadat) {
       shiny::req(tadat$raw)
       shiny::downloadButton(ns("download_working"),
         "Download Working Dataset (.zip)",
-        style = "color: #fff; background-color: #337ab7; border-color: #2e6da4",
+        style = "color: #fff; background-color: #337ab7; border-color: #2e6da4; margin-bottom: 10px;",
         contentType = "application/zip"
       )
     })
