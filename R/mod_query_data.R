@@ -447,7 +447,7 @@ mod_query_data_server <- function(id, tadat) {
       if (is.null(input$project)) {
         tadat$project <- "null"
       } else {
-        tadat$project <- paste(input$project, collapse = ",")
+        tadat$project <- input$project
       }
       if (is.null(input$org)) {
         tadat$organization <- "null"
