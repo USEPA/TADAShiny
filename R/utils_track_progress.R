@@ -112,6 +112,7 @@ writeNarrativeDataFrame <- function(tadat) {
   tadat$siteType <- paste(tadat$siteType, collapse = " ")
   tadat$characteristicType <- paste(tadat$characteristicType, collapse = " ")
   tadat$characteristicName <- paste(tadat$characteristicName, collapse = " ")
+  tadat$project <- paste(tadat$project, collapse = " ")
   df <- data.frame(Parameter = character(), Value = character())
   df[nrow(df) + 1, ] <- c("TADA Shiny Job ID", tadat$job_id)
   df[nrow(df) + 1, ] <- c("Original data source: ", tadat$original_source)
