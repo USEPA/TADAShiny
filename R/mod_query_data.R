@@ -268,9 +268,8 @@ mod_query_data_server <- function(id, tadat) {
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
-    # template used for importing data to TADAShiny
+    ## creates download template button used for importing data to TADAShiny - used in option C
     template_data <- reactive(EPATADA::TADA_GetTemplate())
-    
     # return an ms excel file with the template columns
     output$download_template <- shiny::downloadHandler(
         filename = function() { 
@@ -287,6 +286,7 @@ mod_query_data_server <- function(id, tadat) {
         contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
      ) 
 
+    ## greys out Load button for example data until file has been selected
     # https://stackoverflow.com/questions/24175997/force-no-default-selection-in-selectinput
     shiny::observeEvent(input$example_data, {
       if (!is.na(input$example_data) && nchar(input$example_data) > 1) {
