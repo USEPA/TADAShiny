@@ -269,7 +269,7 @@ mod_query_data_server <- function(id, tadat) {
     ns <- session$ns
     
     ## creates download template button used for importing data to TADAShiny - used in option C
-    template_data <- reactive(EPATADA::TADA_GetTemplate())
+    template_data <- shiny::reactive(EPATADA::TADA_GetTemplate())
     # return an ms excel file with the template columns
     output$download_template <- shiny::downloadHandler(
         filename = function() { 
