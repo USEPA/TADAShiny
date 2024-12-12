@@ -64,7 +64,11 @@ mod_censored_data_ui <- function(id) {
     shiny::fluidRow(
       column(
         3,
-        shiny::actionButton(ns("apply_methods"), "Apply Methods to Dataset", style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
+        shiny::actionButton(
+          ns("apply_methods"), 
+          "Apply Methods to Dataset", 
+          disabled = TRUE,
+          style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
       ),
       column(3, shiny::uiOutput(ns("undo_methods")))
     ),
@@ -99,7 +103,7 @@ mod_censored_data_ui <- function(id) {
 mod_censored_data_server <- function(id, tadat) {
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
-
+    
     # initialize dropdown values
 
     # reactive values specific to this module
@@ -162,9 +166,9 @@ mod_censored_data_server <- function(id, tadat) {
       if (is.null(init_val)) {
         init_val <- 0.5
       }
-      if (input$nd_method == nd_method_options[1]) {
+      if (input$nd_method == "Multiply detection limit by x") {
         shiny::numericInput(ns("nd_mult"),
-          "Multiplier (x)",
+          "Non-Detect Multiplier (x)",
           value = init_val,
           min = 0
         )
@@ -177,9 +181,9 @@ mod_censored_data_server <- function(id, tadat) {
       if (is.null(init_val)) {
         init_val <- 0.5
       }
-      if (input$od_method == od_method_options[1]) {
+      if (input$od_method == "Multiply detection limit by x") {
         shiny::numericInput(ns("od_mult"),
-          "Multiplier (x)",
+          "Over-Detect Multiplier (x)",
           value = init_val,
           min = 0
         )
@@ -211,18 +215,44 @@ mod_censored_data_server <- function(id, tadat) {
     # Make this part more concise?
     shiny::observeEvent(input$nd_method, {
       tadat$nd_method <- input$nd_method
+
+      if ((input$nd_method == "Multiply detection limit by x" && !is.numeric(input$nd_mult))
+          || (input$nd_method == "No change" && input$od_method == "No change" )){ 
+        shinyjs::disable("apply_methods")
+      } else {
+        shinyjs::enable("apply_methods")
+      }
     })
 
     shiny::observeEvent(input$nd_mult, {
       tadat$nd_mult <- input$nd_mult
+      
+      if (input$nd_method == "Multiply detection limit by x" && !is.numeric(input$nd_mult)) { 
+        shinyjs::disable("apply_methods")
+      } else {
+        shinyjs::enable("apply_methods")
+      }      
     })
 
     shiny::observeEvent(input$od_method, {
       tadat$od_method <- input$od_method
+
+      if ((input$od_method == "Multiply detection limit by x" && !is.numeric(input$od_mult))
+          || (input$nd_method == "No change" && input$od_method == "No change" )){ 
+        shinyjs::disable("apply_methods")
+      } else {
+        shinyjs::enable("apply_methods")
+      }
     })
 
     shiny::observeEvent(input$od_mult, {
       tadat$od_mult <- input$od_mult
+      
+      if (input$od_method == "Multiply detection limit by x" && !is.numeric(input$od_mult)) { 
+        shinyjs::disable("apply_methods")
+      } else {
+        shinyjs::enable("apply_methods")
+      }
     })
 
 
@@ -292,6 +322,13 @@ mod_censored_data_server <- function(id, tadat) {
         dat[1:10, ] # just show the first 10 records so user can see what happened to data
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
       tadat$censor_applied <- TRUE
+      
+      # disable the button so the user can not redo the handling
+      shinyjs::disable("apply_methods")
+      shinyjs::disable("nd_mult")
+      shinyjs::disable("nd_method")
+      shinyjs::disable("od_mult")
+      shinyjs::disable("od_method")
     })
 
     # this button appears after someone has applied the OD/ND methods, in case they want to undo and try another method instead
@@ -313,6 +350,13 @@ mod_censored_data_server <- function(id, tadat) {
         "Result Value/Unit Copied from Detection Limit" # reset data types flag to what it was before simpleCensoredMethods function run
       tadat$raw <- tadat$raw %>% dplyr::select(-TADA.CensoredMethod)
       tadat$censor_applied <- FALSE
+      
+      # enable the button so the user can re-apply the handling
+      shinyjs::enable("apply_methods")
+      shinyjs::enable("nd_mult")
+      shinyjs::enable("nd_method")
+      shinyjs::enable("od_mult")
+      shinyjs::enable("od_method")
     })
 
     # creates a nice table showing an example of how censored data were changed.
