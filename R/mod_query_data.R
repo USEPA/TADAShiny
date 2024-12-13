@@ -269,7 +269,7 @@ mod_query_data_server <- function(id, tadat) {
     ns <- session$ns
     
     ## creates download template button used for importing data to TADAShiny - used in option C
-    template_data <- reactive(EPATADA::TADA_GetTemplate())
+    template_data <- shiny::reactive(EPATADA::TADA_GetTemplate())
     # return an ms excel file with the template columns
     output$download_template <- shiny::downloadHandler(
         filename = function() { 
@@ -312,8 +312,8 @@ mod_query_data_server <- function(id, tadat) {
       # issue where data structure for all columns should be specified.
       cols <- names(raw)
       raw <- raw %>% dplyr::mutate_at(cols, as.character)
-      # # check that all TADA template columns are included, commented out for now. 
-      # raw <- EPATADA::TADA_CheckRequiredFields(raw)
+      # check that all TADA template columns are included
+      raw <- EPATADA::TADA_CheckRequiredFields(raw)
       # run autoclean
       raw <- EPATADA::TADA_AutoClean(raw)
       
