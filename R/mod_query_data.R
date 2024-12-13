@@ -204,11 +204,9 @@ mod_query_data_ui <- function(id) {
     shiny::fluidRow(
       htmltools::h3("Option C: Upload dataset"),
       htmltools::HTML((
-        "Upload a dataset from your computer. This upload feature only accepts data in .xls and .xlsx formats.
-                                    The file can be a <B>fresh</B> TADA dataset or a <B>working</B> TADA dataset that you are returning to the
-                                    app to iterate on. Data must also be formatted in the EPA Water Quality eXchange (WQX) schema to leverage
-                                    this tool. You may reach out to the WQX helpdesk at WQX@epa.gov for assistance preparing and submitting your data
-                                    to the WQP through EPA's WQX."
+        "Upload a compatible dataset from your computer. This upload feature only accepts data in .xls and .xlsx formats. Data must be formatted in the EPA Water Quality eXchange (WQX) schema (and include all columns required for this TADA R Shiny application) to run
+                                    this tool. The file can be a <B>fresh</B> dataset you created using the TADA template below or a <B>working</B> dataset that you downloaded from this application using the Download Working Dataset feature, and are now returning to the
+                                    app to iterate on."
       )),
       # widget to upload WQP profile or WQX formatted spreadsheet
       column(
@@ -220,6 +218,20 @@ mod_query_data_ui <- function(id) {
           accept = c(".xlsx", ".xls"),
           width = "100%"
         )
+      )
+    ),
+    shiny::fluidRow(
+        htmltools::HTML(
+          "Download a blank TADA data template in .xlsx format. This template is available to assist users that do not have data available in the WQP (and therefore cannot use Option B) prepare their data for upload to this R Shiny application using import Option C.
+          You may reach out to the TADA team through the helpdesk at mywaterway@epa.gov for assistance preparing your data. If your data is not in the WQP yet and you are interested in submitting it, you may reach out to the WQX helpdesk at WQX@epa.gov for assistance preparing and submitting your data
+                                    to the WQP through EPA's WQX.<br><br>"
+        ),
+        column(
+        9,
+        shiny::downloadButton(
+          ns("download_template"), 
+          "Download Template", 
+          style = "color: #fff; background-color: #337ab7; border-color: #2e6da4;")
       )
     ),
     htmltools::hr(),
@@ -255,14 +267,33 @@ mod_query_data_ui <- function(id) {
 mod_query_data_server <- function(id, tadat) {
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
+    
+    ## creates download template button used for importing data to TADAShiny - used in option C
+    template_data <- shiny::reactive(EPATADA::TADA_GetTemplate())
+    # return an ms excel file with the template columns
+    output$download_template <- shiny::downloadHandler(
+        filename = function() { 
+          paste0("tada_template", ".xlsx")
+        },
+        content = function(file) {
+          # format csv.  contentType = "text/csv"
+          # write.csv(template_data(), file)
+          # browser()
+          # format excel (xlsx)
+          d = template_data()
+          writexl::write_xlsx(d, path = file)
+        },
+        contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+     ) 
 
+    ## greys out Load button for example data until file has been selected
     # https://stackoverflow.com/questions/24175997/force-no-default-selection-in-selectinput
     shiny::observeEvent(input$example_data, {
       if (!is.na(input$example_data) && nchar(input$example_data) > 1) {
           shinyjs::enable("example_data_go")
       } 
     })
-    
+
     # read in the excel spreadsheet dataset if this input reactive object is populated via fileInput and define as tadat$raw
     shiny::observeEvent(input$file, {
       # a modal that pops up showing it's working on querying the portal
