@@ -305,17 +305,17 @@ mod_query_data_server <- function(id, tadat) {
       )
 
       # user uploaded data
-      raw <- suppressWarnings(readxl::read_excel(input$file$datapath, sheet = 1))
+      raw <- readxl::read_excel(input$file$datapath, sheet = 1, col_types = "text")
       
-      # run code included in TADA data retrieval 
-      # need to specify this or throws error when trying to bind rows. Temporary fix for larger
-      # issue where data structure for all columns should be specified.
-      cols <- names(raw)
-      raw <- raw %>% dplyr::mutate_at(cols, as.character)
-      # check that all TADA template columns are included
-      raw <- EPATADA::TADA_CheckRequiredFields(raw)
       # run autoclean
       raw <- EPATADA::TADA_AutoClean(raw)
+      
+      #####
+      # check that all TADA template columns are included (returns TRUE or FALSE)
+      # need to add user message here if FALSE, message should include the 
+      # names of specific columns that are missing but required
+      EPATADA::TADA_CheckRequiredFields(raw)
+      #####
       
       # other steps to prepare data for app
       raw$TADA.Remove <- NULL
