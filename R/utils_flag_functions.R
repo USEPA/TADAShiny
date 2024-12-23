@@ -90,7 +90,7 @@ applyFlags <- function(in_table, orgs) {
   out <- EPATADA::TADA_FlagResultUnit(out, clean = "none")
 
   # QC rep/blank
-  out <- EPATADA::TADA_FindQCActivities(out, clean = FALSE)
+  out <- EPATADA::TADA_FindQCActivities(out, clean = FALSE, flaggedonly = FALSE)
 
   # Result is flagged as suspect by data submitter
   out <- EPATADA::TADA_FlagMeasureQualifierCode(out, clean = FALSE, define = TRUE)
@@ -116,8 +116,7 @@ applyFlags <- function(in_table, orgs) {
 
   # Continuous data
   out <- EPATADA::TADA_FlagContinuousData(out, clean = FALSE, 
-                                          flaggedonly = FALSE, 
-                                          time_difference = 4)
+                                          flaggedonly = FALSE)
 
   # Above WQX Upper Threshold
   out <- EPATADA::TADA_FlagAboveThreshold(out, clean = FALSE)

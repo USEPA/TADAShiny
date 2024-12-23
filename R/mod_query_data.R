@@ -305,8 +305,19 @@ mod_query_data_server <- function(id, tadat) {
       )
 
       # user uploaded data
-      raw <-
-        suppressWarnings(readxl::read_excel(input$file$datapath, sheet = 1))
+      raw <- readxl::read_excel(input$file$datapath, sheet = 1, col_types = "text")
+      
+      # run autoclean
+      raw <- EPATADA::TADA_AutoClean(raw)
+      
+      #####
+      # check that all TADA template columns are included (returns TRUE or FALSE)
+      # if FALSE, returns an error with names of specific columns that are missing but required
+      # this section needs to be updated to handle the error within the shiny app (instead of crashing) & display a message to users
+      EPATADA::TADA_CheckRequiredFields(raw)
+      #####
+      
+      # other steps to prepare data for app
       raw$TADA.Remove <- NULL
       initializeTable(tadat, raw)
       if (!is.null(tadat$original_source)) {
