@@ -306,6 +306,8 @@ mod_censored_data_server <- function(id, tadat) {
         dat[, c(
           "ResultIdentifier",
           "TADA.CharacteristicName",
+          "ResultDetectionConditionText",
+          "DetectionQuantitationLimitTypeName",
           "DetectionQuantitationLimitMeasure.MeasureValue",
           "DetectionQuantitationLimitMeasure.MeasureUnitCode",
           "TADA.ResultMeasureValue",
@@ -318,8 +320,11 @@ mod_censored_data_server <- function(id, tadat) {
           "Estimated Detection Limit Value" = TADA.ResultMeasureValue,
           "Estimated Unit" = TADA.ResultMeasure.MeasureUnitCode
         )
+      
+      # create censored data table
       censdat$exdat <-
         dat[1:10, ] # just show the first 10 records so user can see what happened to data
+
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
       tadat$censor_applied <- TRUE
       
@@ -359,22 +364,28 @@ mod_censored_data_server <- function(id, tadat) {
       shinyjs::enable("od_method")
     })
 
-    # creates a nice table showing an example of how censored data were changed.
+    # renders a nice table showing an example of how censored data were changed.
     output$see_det <- DT::renderDT({
       shiny::req(censdat$exdat)
       DT::datatable(
-        censdat$exdat[1:10, ],
+        censdat$exdat, #[1:10, ], #cm removed on 12/26/24, limits table to 10 results
+        class = "cell-border stripe",
+        filter = "top",
         options = list(
-          dom = "t",
+          dom = "Blftipr", #"t",#cm updated to match harmonization table on 12/26/24
           scrollX = TRUE,
-          pageLength = 10,
-          searching = FALSE
+          pageLength = 10
+          #searching = FALSE #cm updated to TRUE on 12/26/24
         ),
         selection = "none",
         rownames = FALSE
-      )
-    })
-
+      ) %>%
+        DT::formatStyle(columns = names(censdat$exdat), `font-size` = "12px") %>%
+        DT::formatStyle(columns = c("Estimated Detection Limit Value", "Estimated Unit"), 
+                        backgroundColor = "#2e6da4", 
+                        color = "white")
+      })
+    
     # from the clean dataset, get all of the column names someone might want to group by when summarizing their data for use in more advanced censored data methods.
     output$cens_groups <- shiny::renderUI({
       shiny::req(censdat$dat)
