@@ -59,9 +59,6 @@ app_server <- function(input, output, session) {
   })
 
   shiny::observe({
-    # JCH - is this necessary?
-    # shiny::req(tadat$raw)
-    tadat$raw$TADAShiny.tab <- input$tabbar
     tadat$tab <- input$tabbar
   })
 
