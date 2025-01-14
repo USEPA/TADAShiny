@@ -313,6 +313,10 @@ mod_censored_data_server <- function(id, tadat) {
           "TADA.ResultMeasureValue",
           "TADA.ResultMeasure.MeasureUnitCode"
         )]
+      
+      # I want to select just the rows where the detection limit has been changed.  Else they are not really relevant.  Right?
+      dat <- dat %>% filter(DetectionQuantitationLimitMeasure.MeasureValue != TADA.ResultMeasureValue)
+      
       dat <-
         dat %>% dplyr::rename(
           "Original Detection Limit Value" = DetectionQuantitationLimitMeasure.MeasureValue,

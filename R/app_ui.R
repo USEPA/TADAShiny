@@ -4,6 +4,7 @@
 #'     DO NOT REMOVE.
 #' @noRd
 #'
+library(gotop)
 
 # THE BUSINESS STARTS ON line 223 or thereabouts.
 css <- "
@@ -12,7 +13,13 @@ css <- "
   color: #333 !important;
   cursor: not-allowed !important;
   border-color: #F5F5F5 !important;
-}"
+}
+
+.row {
+    margin-right: 0px;
+    margin-left: 0px;
+}
+"
 
 app_ui <- function(request) {
   tagList(
@@ -24,7 +31,13 @@ app_ui <- function(request) {
     # Your application UI logic
     shiny::fluidPage(
       tags$html(class = "no-js", lang = "en"),
-      
+      # standardized Go to Top button appears on lower-right corner when window is scrolled down 100 pixels
+      use_gotop(  # add it inside the ui
+        src = "fas fa-chevron-circle-up", # css class from Font Awesome
+        opacity = 0.8, # transparency
+        width = 60, # size
+        appear = 100 # number of pixels before appearance
+      ), # ), 
       # adds development banner
       # HTML("<div id='eq-disclaimer-banner' class='padding-1 text-center text-white bg-secondary-dark'><strong>EPA development environment:</strong> The
       # content on this page is not production ready. This site is being used
@@ -82,6 +95,7 @@ app_ui <- function(request) {
         )
       ),
       htmltools::hr(),
+      # adds 'TADA Working Summary and download buttons above the app footer
       mod_TADA_summary_ui("TADA_summary_1"),
       # adds epa footer html
       shiny::includeHTML(app_sys("app/www/footer.html"))

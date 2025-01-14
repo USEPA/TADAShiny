@@ -168,7 +168,7 @@ mod_data_flagging_server <- function(id, tadat) {
           options = list(
             dom = "t",
             paging = FALSE,
-            ordering = FALSE,
+            ordering = TRUE,
             preDrawCallback = DT::JS(
               "function() { Shiny.unbindAll(this.api().table().node()); }"
             ),
@@ -186,7 +186,7 @@ mod_data_flagging_server <- function(id, tadat) {
       }
     })
 
-    # Runs when the flag button is clicked
+    # Runs when the flag button (tab 3. Flag, button 'Run Tests') is clicked
     shiny::observeEvent(input$runFlags, {
       shinybusy::show_modal_spinner(
         spin = "double-bounce",
