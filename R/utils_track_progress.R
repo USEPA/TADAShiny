@@ -54,6 +54,14 @@ writeFile <- function(tadat, filename) {
 }
 
 readFile <- function(tadat, filename) {
+  load_attribute <- function(attribute, req=FALSE){
+    if (is.null(attribute) & req){
+      print("Missing a required parameter")
+      critical_missing <- list.append(critical_missing, attribute)
+    }
+    return(attribute)
+  }
+  critical_missing <- list()
   load(filename, verbose = FALSE)
   tadat$load_progress_file <- filename
   
@@ -75,27 +83,27 @@ readFile <- function(tadat, filename) {
   }
   
   tadat$original_source <- original_source
-  tadat$job_id <- job_id
-  tadat$example_data <- example_data
-  tadat$statecode <- statecode
-  tadat$countycode <- countycode
-  tadat$huc <- huc
-  tadat$siteid <- siteid
-  tadat$siteType <- siteType
-  tadat$characteristicName <- characteristicName
-  tadat$characteristicType <- characteristicType
-  tadat$sampleMedia <- sampleMedia
-  tadat$project <- project
-  tadat$organization <- organization
-  tadat$startDate <- startDate
-  tadat$endDate <- endDate
-  tadat$org_table <- org_table
-  tadat$selected_filters <- selected_filters
-  tadat$nd_method <- nd_method
-  tadat$od_method <- od_method
-  tadat$nd_mult <- nd_mult
-  tadat$od_mult <- od_mult
-  tadat$field_sel <- field_sel
+  tadat$job_id <- load_attribute(job_id)
+  tadat$example_data <- load_attribute(example_data)
+  tadat$statecode <- load_attribute(statecode)
+  tadat$countycode <- load_attribute(countycode)
+  tadat$huc <- load_attribute(huc)
+  tadat$siteid <- load_attribute(siteid)
+  tadat$siteType <- load_attribute(siteType)
+  tadat$characteristicName <- load_attribute(characteristicName)
+  tadat$characteristicType <- load_attribute(characteristicType)
+  tadat$sampleMedia <- load_attribute(sampleMedia)
+  tadat$project <- load_attribute(project)
+  tadat$organization <- load_attribute(organization)
+  tadat$startDate <- load_attribute(startDate)
+  tadat$endDate <- load_attribute(endDate)
+  tadat$org_table <- load_attribute(org_table)
+  tadat$selected_filters <- load_attribute(selected_filters)
+  tadat$nd_method <- load_attribute(nd_method)
+  tadat$od_method <- load_attribute(od_method)
+  tadat$nd_mult <- load_attribute(nd_mult)
+  tadat$od_mult <- load_attribute(od_mult)
+  tadat$field_sel <- load_attribute(field_sel)
 }
 
 
@@ -208,3 +216,5 @@ writeNarrativeDataFrame <- function(tadat) {
   
   return(df)
 }
+
+

@@ -53,14 +53,8 @@ mod_TADA_summary_ui <- function(id) {
           )
         ))
       ),
-      shiny::conditionalPanel(
-        "false",
-        downloadButton(ns("dwn_working"), "Download Working")
-      ),
-      shiny::conditionalPanel(
-        "false",
-        downloadButton(ns("dwn_final"), "Download Final")
-      ),
+      shiny::conditionalPanel("false", downloadButton(ns("dwn_working"), "Download Working")),
+      shiny::conditionalPanel("false", downloadButton(ns("dwn_final"), "Download Final")),
       shiny::fluidRow(column(
         2, shiny::actionButton(ns("disclaimer"), "DISCLAIMER")
       )),
@@ -83,6 +77,7 @@ mod_TADA_summary_server <- function(id, tadat) {
     # When data is loaded, enable the download buttons
     shiny::observeEvent(tadat$raw, {
       if (is.null(tadat$raw)) {
+        
       } else {
         shinyjs::enable("download_working_button")
         shinyjs::enable("download_final_button")
@@ -90,28 +85,24 @@ mod_TADA_summary_server <- function(id, tadat) {
     })
     
     observeEvent(input$download_working_button, {
-      # Put all content logic here.
-      # If it fails, showNotification.
-      # If it succeeds, store result and click button.
-      print("Working button clicked")
       tryCatch({
         tmpdir <- tempdir()
         setwd(tempdir())
         datafile_name <- paste0(tadat$default_outfile, ".xlsx")
         progress_file_name <- paste0(tadat$default_outfile, "_prog.RData")
         desc <- writeNarrativeDataFrame(tadat)
-        tmpdir <- tempdir()
-        setwd(tempdir())
-        datafile_name <- paste0(tadat$default_outfile, ".xlsx")
-        progress_file_name <- paste0(tadat$default_outfile, "_prog.RData")
-        desc <- writeNarrativeDataFrame(tadat)
-        # out_data = EPATADA::TADA_OrderCols(tadat$raw[!tadat$raw$TADA.Remove, ])
+        shinybusy::show_modal_spinner(
+          spin = "double-bounce",
+          color = "#0071bc",
+          text = "Preparing files for download...",
+          session = shiny::getDefaultReactiveDomain()
+        )
         out_data = EPATADA::TADA_OrderCols(tadat$raw)
         summary_things$temp_files = c(datafile_name, progress_file_name)
         dfs <- list(Data = out_data, Parameterization = desc)
         writeFile(tadat, progress_file_name)
         writexl::write_xlsx(dfs, path = datafile_name)
-
+        shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
         shinyjs::click("dwn_working")
       }, error = function(e) {
         showNotification("Error writing working files")
@@ -122,20 +113,55 @@ mod_TADA_summary_server <- function(id, tadat) {
       })
     })
     
+    observeEvent(input$download_final_button, {
+      tryCatch({
+        tmpdir <- tempdir()
+        setwd(tempdir())
+        datafile_name <- paste0(tadat$default_outfile, ".xlsx")
+        progress_file_name <- paste0(tadat$default_outfile, "_prog.RData")
+        desc <- writeNarrativeDataFrame(tadat)
+        shinybusy::show_modal_spinner(
+          spin = "double-bounce",
+          color = "#0071bc",
+          text = "Preparing files for download...",
+          session = shiny::getDefaultReactiveDomain()
+        )
+        out_data = EPATADA::TADA_OrderCols(tadat$raw[!tadat$raw$TADA.Remove, ])
+        summary_things$temp_files = c(datafile_name, progress_file_name)
+        dfs <- list(Data = out_data, Parameterization = desc)
+        writeFile(tadat, progress_file_name)
+        writexl::write_xlsx(dfs, path = datafile_name)
+        shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+        shinyjs::click("dwn_final")
+      }, error = function(e) {
+        showNotification("Error writing output files")
+        print(e)
+      }, warning = function(w) {
+        showNotification("Warning writing output files")
+        print(w)
+      })
+    })
+    
     output$dwn_working <- shiny::downloadHandler(
       filename = function() {
         paste0(tadat$default_outfile, "_working.zip")
       },
       content = function(fname) {
-        print("Through to here")
-        print(summary_things$temp_files)
-        utils::zip(
-          zipfile = fname,
-          files = summary_things$temp_files
-        )
+        utils::zip(zipfile = fname, files = summary_things$temp_files)
       },
       contentType = "application/zip"
     )
+    
+    output$dwn_final <- shiny::downloadHandler(
+      filename = function() {
+        paste0(tadat$default_outfile, "_final.zip")
+      },
+      content = function(fname) {
+        utils::zip(zipfile = fname, files = summary_things$temp_files)
+      },
+      contentType = "application/zip"
+    )
+    
     
     
     
@@ -162,7 +188,7 @@ mod_TADA_summary_server <- function(id, tadat) {
       nrow = 0,
       dimnames = list(NULL, c("Reason", "Count"))
     ))
-
+    
     output$rec_tot <- shiny::renderText({
       if (is.null(tadat$raw)) {
         "Total Results in Dataset: 0"
@@ -170,7 +196,7 @@ mod_TADA_summary_server <- function(id, tadat) {
         paste0("Total Results in Dataset: ", scales::comma(length(tadat$raw$ResultIdentifier)))
       }
     })
-
+    
     output$rec_rem <- shiny::renderText({
       if (is.null(tadat$raw)) {
         "Total Results Flagged for Removal: 0"
@@ -179,7 +205,7 @@ mod_TADA_summary_server <- function(id, tadat) {
                scales::comma(summary_things$rem_rec))
       }
     })
-
+    
     output$rec_clean <- shiny::renderText({
       if (is.null(tadat$raw)) {
         "Total Results Retained: 0"
@@ -188,7 +214,7 @@ mod_TADA_summary_server <- function(id, tadat) {
                scales::comma(summary_things$clean_rec))
       }
     })
-
+    
     output$site_tot <- shiny::renderText({
       if (is.null(tadat$raw)) {
         "Total Sites in Dataset: 0"
@@ -198,7 +224,7 @@ mod_TADA_summary_server <- function(id, tadat) {
         )))
       }
     })
-
+    
     output$site_rem <- shiny::renderText({
       if (is.null(tadat$raw)) {
         "Total Sites Flagged for Removal: 0"
@@ -207,7 +233,7 @@ mod_TADA_summary_server <- function(id, tadat) {
                scales::comma(summary_things$rem_site))
       }
     })
-
+    
     output$site_clean <- shiny::renderText({
       if (is.null(tadat$raw)) {
         "Total Sites Retained: 0"
