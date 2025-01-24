@@ -78,12 +78,12 @@ readFile <- function(tadat, filename) {
   
   if (!is.null(selected_flags)) {
     tadat$selected_flags <- selected_flags
-    shinyjs::enable(selector = '.nav li a[data-value="Flag"]')
+    
   }
   
   # Enable tabs if certain fields are not null
   if (!is.null(selected_filters)) {
-    shinyjs::enable(selector = '.nav li a[data-value="Filter"]')
+    
   }
   
   newVals$original_source <- original_source
@@ -115,7 +115,6 @@ readFile <- function(tadat, filename) {
       paste("Unable to load progress file. Missing fields: ", critical_missing
     ))
   } else {
-    print("Updating existing!")
     updateExisting(tadat, newVals)
     showNotification("Successfully loaded progress file")
   }
