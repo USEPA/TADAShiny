@@ -9,4 +9,4 @@
 library(testthat)
 library(TADAShiny)
 
-test_check("TADAShiny")
+testthat::test_check("TADAShiny")
