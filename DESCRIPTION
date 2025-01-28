@@ -52,8 +52,7 @@ Suggests:
     stringr,
     utils
 Depends: 
-    R (>= 3.5.0),
-    R (<= 4.4.1)
+    R (>= 3.5.0)
 Encoding: UTF-8
 Language: en-US
 Config/testthat/edition: 3
