@@ -4,7 +4,6 @@
 #'     DO NOT REMOVE.
 #' @noRd
 #'
-library(gotop)
 
 # THE BUSINESS STARTS ON line 223 or thereabouts.
 css <- "
@@ -32,7 +31,7 @@ app_ui <- function(request) {
     shiny::fluidPage(
       tags$html(class = "no-js", lang = "en"),
       # standardized Go to Top button appears on lower-right corner when window is scrolled down 100 pixels
-      use_gotop(  # add it inside the ui
+      gotop::use_gotop(  # add it inside the ui
         src = "fas fa-chevron-circle-up", # css class from Font Awesome
         opacity = 0.8, # transparency
         width = 60, # size
