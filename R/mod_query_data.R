@@ -14,11 +14,9 @@ load("inst/extdata/statecodes_df.Rdata")
 load("inst/extdata/query_choices.Rdata")
 
 # new (2024-05-23) list for new Country/Ocean(s) Query the Water Quality Portal option. Not included in saved query_choices file
-library(jsonlite)
-library(dplyr)
 countrycode_url <- 'https://www.waterqualitydata.us/Codes/countrycode?mimeType=json'
-countryocean_source <- fromJSON(txt=countrycode_url)
-countryocean_source <- countryocean_source$codes %>% select(-one_of('providers'))
+countryocean_source <- jsonlite::fromJSON(txt=countrycode_url)
+countryocean_source <- countryocean_source$codes %>% dplyr::select(-one_of('providers'))
 countryocean_source <- countryocean_source[order(countryocean_source$desc),]
 countryocean_choices <- countryocean_source$value
 names(countryocean_choices) <- countryocean_source$desc

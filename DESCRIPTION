@@ -37,7 +37,8 @@ Imports:
     shinyjs,
     gotop,
     EPATADA,
-    golem
+    golem,
+    testthat
 Remotes: 
     github::USEPA/EPATADA
 Suggests: 
@@ -51,7 +52,7 @@ Suggests:
     stringr,
     utils
 Depends: 
-    R (>= 3.5.0)
+    R (>= 3.5.0),
     R (<= 4.4.1)
 Encoding: UTF-8
 Language: en-US
