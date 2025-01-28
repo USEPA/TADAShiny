@@ -49,10 +49,10 @@ Suggests:
     spelling,
     sf,
     stringr,
-    utils,
-    testthat (>= 3.5.0)
+    utils
 Depends: 
     R (>= 3.5.0)
+    R (<= 4.4.1)
 Encoding: UTF-8
 Language: en-US
 Config/testthat/edition: 3
