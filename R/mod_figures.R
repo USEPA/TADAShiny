@@ -152,7 +152,11 @@ mod_figures_server <- function(id, tadat) {
 
     shiny::observe({
       shiny::req(react$dat)
-      shiny::updateSelectizeInput(session, "mapplotgroup", choices = unique(react$dat$groupname), selected = unique(react$dat$groupname)[1], server = TRUE)
+      shiny::updateSelectizeInput(session, 
+                                  "mapplotgroup", 
+                                  choices = unique(react$dat$groupname), 
+                                  selected = unique(react$dat$groupname)[1], 
+                                  server = TRUE)
     })
 
     # event observer that creates all reactive objects needed for map and plots following button push
@@ -243,14 +247,24 @@ mod_figures_server <- function(id, tadat) {
     # select sites whose data to display in plots
     output$selsites <- shiny::renderUI({ # this companion to the uiOutput in the UI appears when react$done exists
       shiny::req(react$mapdata)
-      sites <- c("All sites", unique(react$mapdata$MonitoringLocationIdentifier))
+
+      # the list of 'sites' is managed in the server function (below)
       shiny::fluidRow(
         htmltools::h3("3. Select Specific Sites (Optional)"),
-        htmltools::HTML(paste0("Use the drop down to pick the sites you'd like to include in the plots below and then click 'Generate Plots'. Defaults to all sites in the dataset. <B>NOTE:</B> Currently, the single-characteristic scatterplot, histogram, and boxplot show the first characteristic from the drop down above the map: <B>", react$groups[1], "</B>.")),
+        htmltools::HTML(paste0("Use the drop down to pick the sites you'd like to include 
+                               in the plots below and then click 'Generate Plots'. 
+                               Defaults to all sites in the dataset. 
+                               <B>NOTE:</B> Currently, the single-characteristic scatterplot, 
+                               histogram, and boxplot show the first characteristic from the 
+                               drop down above the map: <B>", react$groups[1], "</B>.")),
         htmltools::br(),
         column(
           6, # column containing drop down menu for all grouping column combinations
-          shiny::selectizeInput(ns("selsites1"), "Select sites", choices = sites, selected = sites[1], multiple = TRUE, width = "100%")
+          shiny::selectizeInput(ns("selsites1"), 
+                                "Select sites", 
+                                choices = NULL, 
+                                multiple = TRUE, 
+                                width = "100%")
         ),
         column(
           1,
@@ -261,6 +275,16 @@ mod_figures_server <- function(id, tadat) {
       )
     })
 
+    # this is 'server-side' processing of the options for the 'Select Specific Sites' widget
+    shiny::observe({
+      shiny::req(react$mapdata)
+      shiny::updateSelectizeInput(session, 
+                                  "selsites1", 
+                                  choices = c("All sites", unique(react$mapdata$MonitoringLocationIdentifier)), 
+                                  selected = c("All sites", unique(react$mapdata$MonitoringLocationIdentifier))[1], 
+                                  server = TRUE)
+    })
+    
     # when the Go button is pushed to generate plots, this ensures the plot data is filtered to the selected sites (or all sites)
     shiny::observeEvent(input$selsitesgo, {
       if (all(input$selsites1 == "All sites")) {

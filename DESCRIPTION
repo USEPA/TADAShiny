@@ -15,7 +15,6 @@ Copyright: This software is in the public domain because it contains materials
     that originally came from the U.S. Environmental Protection Agency.
 Imports: 
     magrittr,
-    golem,
     htmltools,
     readxl,
     writexl,
@@ -25,7 +24,6 @@ Imports:
     shinycssloaders,
     DT,
     ggplot2,
-    EPATADA, 
     shinybusy, 
     dplyr, 
     plyr,
@@ -36,12 +34,15 @@ Imports:
     grDevices,
     lubridate,
     plotly, 
-    shinyjs
+    shinyjs,
+    gotop,
+    EPATADA,
+    golem,
+    testthat
 Remotes: 
     github::USEPA/EPATADA
 Suggests: 
     config,
-    testthat,
     remotes,
     covr,
     rmarkdown, 
