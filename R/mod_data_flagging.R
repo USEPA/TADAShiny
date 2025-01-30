@@ -168,7 +168,7 @@ mod_data_flagging_server <- function(id, tadat) {
           options = list(
             dom = "t",
             paging = FALSE,
-            ordering = TRUE,
+            ordering = TRUE, # this adds ordering to the DT
             preDrawCallback = DT::JS(
               "function() { Shiny.unbindAll(this.api().table().node()); }"
             ),

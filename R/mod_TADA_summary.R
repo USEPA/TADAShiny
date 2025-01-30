@@ -180,6 +180,8 @@ mod_TADA_summary_server <- function(id, tadat) {
             style = "color: #fff; background-color: #337ab7; border-color: #2e6da4; margin-bottom: 10px;")
       })
       
+    # Used a spinner to stop the user from hitting download multiple times
+    # Freezes the whole app while the file is downloading
     output$download_working <- shiny::downloadHandler(
       filename = function() {
         paste0(tadat$default_outfile, "_working.zip")
