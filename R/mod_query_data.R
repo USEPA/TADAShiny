@@ -5,11 +5,7 @@
 #' @param id,input,output,session Internal parameters for {shiny}.
 #'
 #' @noRd
-#'
-#' @importFrom shiny NS tagList
-#' @import shinybusy
-#'
-
+#' 
 load("inst/extdata/statecodes_df.Rdata")
 load("inst/extdata/query_choices.Rdata")
 

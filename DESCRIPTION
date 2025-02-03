@@ -50,7 +50,9 @@ Suggests:
     spelling,
     sf,
     stringr,
-    utils
+    utils,
+    devtools,
+    usethis
 Depends: 
     R (>= 3.5.0)
 Encoding: UTF-8

@@ -6,9 +6,6 @@
 #'
 #' @noRd
 #'
-#' @importFrom shiny NS tagList
-#'
-
 mod_data_flagging_ui <- function(id) {
   ns <- NS(id)
   tagList(

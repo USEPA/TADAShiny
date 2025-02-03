@@ -6,36 +6,33 @@
 #'
 #' @noRd
 #'
-#' @importFrom shiny NS tagList
-#'
-
 mod_TADA_summary_ui <- function(id) {
   ns <- NS(id)
   tagList(shiny::fluidRow(
-    column(6, style = "padding-left:20px",
+    shiny::column(6, style = "padding-left:20px",
       shiny::wellPanel(htmltools::h3("TADA Working Summary"),
         
         shiny::fluidRow(
-          column(6, htmltools::h5(shiny::textOutput(ns("rec_tot")))),
-          column(6, htmltools::h5(shiny::textOutput(ns("site_tot"))))
+          shiny::column(6, htmltools::h5(shiny::textOutput(ns("rec_tot")))),
+          shiny::column(6, htmltools::h5(shiny::textOutput(ns("site_tot"))))
         ),
         shiny::fluidRow(
-          column(6, htmltools::h5(shiny::textOutput(ns("rec_rem")))),
-          column(6, htmltools::h5(shiny::textOutput(ns("site_rem"))))
+          shiny::column(6, htmltools::h5(shiny::textOutput(ns("rec_rem")))),
+          shiny::column(6, htmltools::h5(shiny::textOutput(ns("site_rem"))))
         ),
         shiny::fluidRow(
-          column(6, htmltools::h5(shiny::textOutput(ns("rec_clean")))),
-          column(6, htmltools::h5(shiny::textOutput(ns("site_clean"))))
+          shiny::column(6, htmltools::h5(shiny::textOutput(ns("rec_clean")))),
+          shiny::column(6, htmltools::h5(shiny::textOutput(ns("site_clean"))))
         ),
         htmltools::hr(style = "margin-top: 0px !important;"),
         
         # buttons for downloading.
         shiny::fluidRow(
-          column(6, shiny::uiOutput(ns("dwn_working"))),
-          column(6, shiny::uiOutput(ns("dwn_final")))
+          shiny::column(6, shiny::uiOutput(ns("dwn_working"))),
+          shiny::column(6, shiny::uiOutput(ns("dwn_final")))
         ),
         shiny::fluidRow(
-          column(2, shiny::actionButton(ns("disclaimer"), "DISCLAIMER"))
+          shiny::column(2, shiny::actionButton(ns("disclaimer"), "DISCLAIMER"))
         )
       )
   )))
