@@ -9,6 +9,7 @@
 #' @importFrom golem with_golem_options
 #' @importFrom magrittr %>%
 #' @importFrom shiny column
+#' @importFrom shiny HTML
 #' @importFrom shiny NS
 #' @importFrom shiny shinyApp
 #' @importFrom shiny tagAppendAttributes
