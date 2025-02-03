@@ -36,13 +36,13 @@ Imports:
     plotly, 
     shinyjs,
     gotop,
-    EPATADA,
     golem,
-    testthat
+    EPATADA
 Remotes: 
     github::USEPA/EPATADA
 Suggests: 
     config,
+    testthat,
     remotes,
     covr,
     rmarkdown, 

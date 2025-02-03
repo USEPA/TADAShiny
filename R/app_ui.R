@@ -6,6 +6,7 @@
 #'
 
 # THE BUSINESS STARTS ON line 223 or thereabouts.
+# css below addresses https://github.com/USEPA/TADAShiny/issues/198?
 css <- "
 .nav li a.disabled {
   background-color: #F5F5F5 !important;

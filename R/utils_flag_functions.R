@@ -79,7 +79,9 @@ getCounts <- function(sites, removed_records) {
 }
 # Settings for each flag function in flag page mock up
 applyFlags <- function(in_table, orgs) {
+  # Missing metadata for censored results
   out <- EPATADA::TADA_IDCensoredData(in_table)
+  
   # Suspect Speciation
   out <- EPATADA::TADA_FlagSpeciation(out, clean = "none")
 
