@@ -58,7 +58,6 @@ readFile <- function(tadat, filename) {
   critical_missing <- c()
   n_missing <- 0
   load_attribute <- function(attribute, attribute_name, required=TRUE) {
-    print(paste("loading attribute ", attribute_name))
     if (is.null(attribute) & !required) {
       print(paste("Missing required parameter ", attribute))
       n_missing <- n_missing + 1
@@ -108,8 +107,6 @@ readFile <- function(tadat, filename) {
   newVals$nd_mult <- load_attribute(nd_mult, 'nd_mult')
   newVals$od_mult <- load_attribute(od_mult, 'od_mult')
   newVals$field_sel <- load_attribute(field_sel, 'field_sel')
-  print("Done loading. Critical missing?")
-  print(critical_missing)
   if (n_missing > 0) {
     showNotification(
       paste("Unable to load progress file. Missing fields: ", critical_missing
