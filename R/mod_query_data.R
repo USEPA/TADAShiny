@@ -307,7 +307,7 @@ mod_query_data_server <- function(id, tadat) {
       # check that all TADA template columns are included (returns TRUE or FALSE)
       # if FALSE, returns an error with names of specific columns that are missing but required
       # this section needs to be updated to handle the error within the shiny app (instead of crashing) & display a message to users
-      EPATADA::TADA_CheckRequiredFields(raw)
+      # EPATADA::TADA_CheckRequiredFields(raw)
       #####
       
       # other steps to prepare data for app
