@@ -14,11 +14,9 @@ load("inst/extdata/statecodes_df.Rdata")
 load("inst/extdata/query_choices.Rdata")
 
 # new (2024-05-23) list for new Country/Ocean(s) Query the Water Quality Portal option. Not included in saved query_choices file
-library(jsonlite)
-library(dplyr)
 countrycode_url <- 'https://www.waterqualitydata.us/Codes/countrycode?mimeType=json'
-countryocean_source <- fromJSON(txt=countrycode_url)
-countryocean_source <- countryocean_source$codes %>% select(-one_of('providers'))
+countryocean_source <- jsonlite::fromJSON(txt=countrycode_url)
+countryocean_source <- countryocean_source$codes %>% dplyr::select(-one_of('providers'))
 countryocean_source <- countryocean_source[order(countryocean_source$desc),]
 countryocean_choices <- countryocean_source$value
 names(countryocean_choices) <- countryocean_source$desc
@@ -276,10 +274,9 @@ mod_query_data_server <- function(id, tadat) {
           paste0("tada_template", ".xlsx")
         },
         content = function(file) {
-          # format csv.  contentType = "text/csv"
+          ## format csv.  contentType = "text/csv"
           # write.csv(template_data(), file)
-          # browser()
-          # format excel (xlsx)
+          ## format excel (xlsx)
           d = template_data()
           writexl::write_xlsx(d, path = file)
         },
@@ -296,11 +293,11 @@ mod_query_data_server <- function(id, tadat) {
 
     # read in the excel spreadsheet dataset if this input reactive object is populated via fileInput and define as tadat$raw
     shiny::observeEvent(input$file, {
-      # a modal that pops up showing it's working on querying the portal
+      # a modal that pops up showing it's working on uploading the dataset from the users file
       shinybusy::show_modal_spinner(
         spin = "double-bounce",
         color = "#0071bc",
-        text = "Uploading dataset...",
+        text = "Uploading dataset from excel file ...",
         session = shiny::getDefaultReactiveDomain()
       )
 
@@ -320,6 +317,10 @@ mod_query_data_server <- function(id, tadat) {
       # other steps to prepare data for app
       raw$TADA.Remove <- NULL
       initializeTable(tadat, raw)
+      
+      # this needs to run to create additional QA fields
+      tadat$raw <- EPATADA::TADA_AutoClean(tadat$raw)
+      
       if (!is.null(tadat$original_source)) {
         tadat$original_source <- "Upload"
       }
@@ -428,7 +429,6 @@ mod_query_data_server <- function(id, tadat) {
 
     # remove the modal once the dataset has been pulled
     shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
-
 
     # this event observer is triggered when the user hits the "Query Now" button, and then runs the TADAdataRetrieval function
     shiny::observeEvent(input$querynow, {
@@ -540,7 +540,8 @@ mod_query_data_server <- function(id, tadat) {
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
 
       # show a modal dialog box when tadat$raw is empty and the query didn't return any records.
-      # but if tadat$raw isn't empty, perform some initial QC of data that aren't media type water or have NA Resultvalue and no detection limit data
+      # but if tadat$raw isn't empty, perform some initial QC of data that aren't media type water 
+      # or have NA Resultvalue and no detection limit data
       if (dim(raw)[1] < 1) {
         shiny::showModal(
           shiny::modalDialog(
@@ -595,8 +596,7 @@ initializeTable <- function(tadat, raw) {
     shinyjs::enable(selector = '.nav li a[data-value="Figures"]')
     shinyjs::enable(selector = '.nav li a[data-value="Review"]')
   } else {
-    tadat$new <-
-      TRUE # this is used to determine if the app should go to the overview page first - only for datasets that are new to TADAShiny
+    tadat$new <- TRUE # this is used to determine if the app should go to the overview page first - only for datasets that are new to TADAShiny
     tadat$ovgo <- TRUE # load data into overview page
     shinyjs::enable(selector = '.nav li a[data-value="Overview"]')
     shinyjs::enable(selector = '.nav li a[data-value="Flag"]')
@@ -608,6 +608,9 @@ initializeTable <- function(tadat, raw) {
   removals <- data.frame(matrix(nrow = nrow(raw), ncol = 0))
   tadat$raw <- raw
   tadat$removals <- removals
+  
+  # display the download buttons
+  tadat$ready_for_download <- TRUE
 }
 
 

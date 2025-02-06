@@ -313,6 +313,12 @@ mod_censored_data_server <- function(id, tadat) {
           "TADA.ResultMeasureValue",
           "TADA.ResultMeasure.MeasureUnitCode"
         )]
+      
+      # COMMENT out for now to discuss later
+      # this does not work as is... the idea is to select just the rows where 
+      # limit has been changed because others are not really relevant.  Right?
+      # dat <- dat %>% dplyr::filter(DetectionQuantitationLimitMeasure.MeasureValue != TADA.ResultMeasureValue)
+      
       dat <-
         dat %>% dplyr::rename(
           "Original Detection Limit Value" = DetectionQuantitationLimitMeasure.MeasureValue,
@@ -322,8 +328,7 @@ mod_censored_data_server <- function(id, tadat) {
         )
       
       # create censored data table
-      censdat$exdat <-
-        dat[1:10, ] # just show the first 10 records so user can see what happened to data
+      censdat$exdat <- dat # [1:10, ] # just show the first 10 records so user can see what happened to data
 
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
       tadat$censor_applied <- TRUE
@@ -375,7 +380,7 @@ mod_censored_data_server <- function(id, tadat) {
           dom = "Blftipr", #"t",#cm updated to match harmonization table on 12/26/24
           scrollX = TRUE,
           pageLength = 10
-          #searching = FALSE #cm updated to TRUE on 12/26/24
+          #searching = FALSE #cm updated to TRUE (default) on 12/26/24
         ),
         selection = "none",
         rownames = FALSE

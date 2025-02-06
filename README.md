@@ -23,6 +23,8 @@ install.packages("remotes")
 
 remotes::install_github("USEPA/TADAShiny", ref = "develop", dependencies = TRUE)
 
+library(TADAShiny)
+
 TADAShiny::run_app()
 ```
 

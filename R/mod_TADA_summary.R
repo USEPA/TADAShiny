@@ -63,6 +63,7 @@ mod_TADA_summary_ui <- function(id) {
     )
     
   ))
+
 }
 
 #' TADA_summary Server Functions
@@ -182,6 +183,10 @@ mod_TADA_summary_server <- function(id, tadat) {
         length(unique(tadat$raw$MonitoringLocationIdentifier[!tadat$raw$MonitoringLocationIdentifier %in%
                                                                clean_sites]))
       summary_things$removals <- sort_removals(tadat$removals)
+      
+      # enable the Download buttons
+      shinyjs::enable("download_working")
+      shinyjs::enable("download_final")
     })
     summary_things$removals <- data.frame(matrix(
       ncol = 2,
@@ -199,19 +204,23 @@ mod_TADA_summary_server <- function(id, tadat) {
     
     output$rec_rem <- shiny::renderText({
       if (is.null(tadat$raw)) {
-        "Total Results Flagged for Removal: 0"
+        "Results Flagged for Removal: 0"
       } else {
-        paste0("Total Results Flagged for Removal: ",
-               scales::comma(summary_things$rem_rec))
+        paste0(
+          "Results Flagged for Removal: ",
+          scales::comma(summary_things$rem_rec)
+        )
       }
     })
     
     output$rec_clean <- shiny::renderText({
       if (is.null(tadat$raw)) {
-        "Total Results Retained: 0"
+        "Results Retained: 0"
       } else {
-        paste0("Total Results Retained: ",
-               scales::comma(summary_things$clean_rec))
+        paste0(
+          "Results Retained: ",
+          scales::comma(summary_things$clean_rec)
+        )
       }
     })
     
@@ -243,6 +252,7 @@ mod_TADA_summary_server <- function(id, tadat) {
       }
     })
     
+
     shiny::observeEvent(input$disclaimer, {
       shiny::showModal(
         shiny::modalDialog(
