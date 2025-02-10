@@ -6,9 +6,6 @@
 #'
 #' @noRd
 #'
-#' @importFrom shiny NS tagList
-#'
-
 mod_data_flagging_ui <- function(id) {
   ns <- NS(id)
   tagList(
@@ -95,6 +92,9 @@ mod_data_flagging_server <- function(id, tadat) {
       if (!is.null(tadat$removals)) {
         tadat$removals <- dplyr::select(tadat$removals, -(dplyr::starts_with(flag_prefix)))
       }
+      if ((!is.null(tadat$raw)) & (!is.null(tadat$selected_flags))){
+        shinyjs::enable(selector = '.nav li a[data-value="Flag"]')
+      }
       # Loop through the flags
       for (flag in tadat$selected_flags) {
         # If not all the values are NA, add the test results to removals
@@ -106,7 +106,12 @@ mod_data_flagging_server <- function(id, tadat) {
         }
         # If the switch corresponding to this flag isn't on, switch it on
         # Checking a random switch to make sure they've been initialized
-        pos <- match(flag, prompts)
+        pos <- match(flag, flag_types)
+        print(111)
+        print(flag)
+        print(prompts)
+        print(pos)
+        print(tadat$switch_defaults[pos])
         tadat$switch_defaults[pos] <- TRUE
         if (!is.null(input[[paste0("switch_", pos)]])) {
           switch_name <- paste0("switch_", pos)

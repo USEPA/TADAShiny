@@ -6,7 +6,6 @@
 #'
 #' @noRd
 #'
-#' @importFrom shiny NS tagList
 mod_harmonize_np_ui <- function(id) {
   ns <- NS(id)
   tagList(

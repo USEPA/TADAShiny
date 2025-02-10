@@ -6,7 +6,6 @@
 #'
 #' @noRd
 #'
-#' @importFrom shiny NS tagList
 mod_review_data_ui <- function(id) {
   ns <- NS(id)
   tagList(

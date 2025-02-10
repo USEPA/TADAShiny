@@ -14,11 +14,16 @@ License: CC0
 Copyright: This software is in the public domain because it contains materials
     that originally came from the U.S. Environmental Protection Agency.
 Imports: 
-    magrittr,
+    EPATADA,
+    shiny,
+    golem, 
+    magrittr
+Remotes: 
+    github::USEPA/EPATADA
+Suggests: 
     htmltools,
     readxl,
     writexl,
-    shiny,
     leaflet,
     shinyWidgets,
     shinycssloaders,
@@ -36,11 +41,6 @@ Imports:
     plotly, 
     shinyjs,
     gotop,
-    golem,
-    EPATADA
-Remotes: 
-    github::USEPA/EPATADA
-Suggests: 
     config,
     testthat,
     remotes,
@@ -50,7 +50,11 @@ Suggests:
     spelling,
     sf,
     stringr,
-    utils
+    utils,
+    devtools,
+    usethis,
+    rsconnect,
+    roxygen2
 Depends: 
     R (>= 3.5.0)
 Encoding: UTF-8

@@ -5,9 +5,6 @@
 #' @param id,input,output,session Internal parameters for {shiny}.
 #'
 #' @noRd
-#'
-#' @importFrom shiny NS tagList
-
 nd_method_options <-
   c(
     "Multiply detection limit by x",
@@ -24,7 +21,7 @@ mod_censored_data_ui <- function(id) {
       "TADAdataRetrieval assigns each result in your dataset to non-detect, over-detect, other, or uncensored. The pie chart below displays the relative proportions of results in each category. Please note that detection limit data with conflicts or data quality issues are not displayed in this pie chart or handled in the methods below."
     ),
     htmltools::br(),
-    shiny::fluidRow(column(12, shiny::plotOutput(
+    shiny::fluidRow(shiny::column(12, shiny::plotOutput(
       ns("id_censplot")
     ))),
     htmltools::br(),
@@ -36,7 +33,7 @@ mod_censored_data_ui <- function(id) {
     ),
     htmltools::br(),
     shiny::fluidRow(
-      column(
+      shiny::column(
         3,
         shiny::selectizeInput(
           ns("nd_method"),
@@ -47,8 +44,8 @@ mod_censored_data_ui <- function(id) {
           options = list(maxItems = 1)
         )
       ),
-      column(3, shiny::uiOutput(ns("nd_mult"))),
-      column(
+      shiny::column(3, shiny::uiOutput(ns("nd_mult"))),
+      shiny::column(
         3,
         shiny::selectizeInput(
           ns("od_method"),
@@ -59,10 +56,10 @@ mod_censored_data_ui <- function(id) {
           options = list(maxItems = 1)
         )
       ),
-      column(3, shiny::uiOutput(ns("od_mult")))
+      shiny::column(3, shiny::uiOutput(ns("od_mult")))
     ),
     shiny::fluidRow(
-      column(
+      shiny::column(
         3,
         shiny::actionButton(
           ns("apply_methods"), 
@@ -70,10 +67,10 @@ mod_censored_data_ui <- function(id) {
           disabled = TRUE,
           style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
       ),
-      column(3, shiny::uiOutput(ns("undo_methods")))
+      shiny::column(3, shiny::uiOutput(ns("undo_methods")))
     ),
     htmltools::br(),
-    shiny::fluidRow(column(12, DT::DTOutput(ns(
+    shiny::fluidRow(shiny::column(12, DT::DTOutput(ns(
       "see_det"
     )))),
     htmltools::br(),
@@ -85,10 +82,10 @@ mod_censored_data_ui <- function(id) {
     ),
     htmltools::br(),
     shiny::fluidRow(shiny::wellPanel(
-      shiny::fluidRow(column(12, shiny::uiOutput(
+      shiny::fluidRow(shiny::column(12, shiny::uiOutput(
         ns("cens_groups")
       ))),
-      shiny::fluidRow(column(
+      shiny::fluidRow(shiny::column(
         12,
         shiny::actionButton(ns("cens_sumbutton"), "ID and Summarize Censored Data", style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
       ))

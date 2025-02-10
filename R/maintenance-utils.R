@@ -25,3 +25,7 @@ utils::globalVariables(c(
   "siteid", "startDate", "statecode", "od_mult", "field_sel",
   "DetectionQuantitationLimitMeasure.MeasureValue"
 ))
+
+# Auto generates or updates TADAShiny-package.R file
+# how to import specific functions from packages for use throughout app
+# usethis::use_import_from(package = "shiny", fun = c("NS", "tagList"))

@@ -1,6 +1,7 @@
 CCO
 Codespaces
 NALMS
+ORCID
 RSTUDIO
 Repo
 TADA
@@ -14,6 +15,5 @@ codespaces
 devcontainers
 golem
 io
-magrittr
 shinyapp
 shinyapps

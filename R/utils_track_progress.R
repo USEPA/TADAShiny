@@ -54,6 +54,18 @@ writeFile <- function(tadat, filename) {
 }
 
 readFile <- function(tadat, filename) {
+  newVals <- c()
+  critical_missing <- c()
+  n_missing <- 0
+  load_attribute <- function(attribute, attribute_name, required=TRUE) {
+    if (is.null(attribute) & !required) {
+      print(paste("Missing required parameter ", attribute))
+      n_missing <- n_missing + 1
+      critical_missing[n_missing] <- attribute_name
+    }
+    return(attribute)
+  }
+  
   load(filename, verbose = FALSE)
   tadat$load_progress_file <- filename
   
@@ -63,39 +75,46 @@ readFile <- function(tadat, filename) {
     tadat$m2f <- m2f
   }
   
-  
   if (!is.null(selected_flags)) {
     tadat$selected_flags <- selected_flags
-    shinyjs::enable(selector = '.nav li a[data-value="Flag"]')
+    
   }
   
   # Enable tabs if certain fields are not null
   if (!is.null(selected_filters)) {
-    shinyjs::enable(selector = '.nav li a[data-value="Filter"]')
+    
   }
   
-  tadat$original_source <- original_source
-  tadat$job_id <- job_id
-  tadat$example_data <- example_data
-  tadat$statecode <- statecode
-  tadat$countycode <- countycode
-  tadat$huc <- huc
-  tadat$siteid <- siteid
-  tadat$siteType <- siteType
-  tadat$characteristicName <- characteristicName
-  tadat$characteristicType <- characteristicType
-  tadat$sampleMedia <- sampleMedia
-  tadat$project <- project
-  tadat$organization <- organization
-  tadat$startDate <- startDate
-  tadat$endDate <- endDate
-  tadat$org_table <- org_table
-  tadat$selected_filters <- selected_filters
-  tadat$nd_method <- nd_method
-  tadat$od_method <- od_method
-  tadat$nd_mult <- nd_mult
-  tadat$od_mult <- od_mult
-  tadat$field_sel <- field_sel
+  newVals$original_source <- original_source
+  newVals$job_id <- load_attribute(job_id, 'job_id')
+  newVals$example_data <- load_attribute(example_data, 'example_data')
+  newVals$statecode <- load_attribute(statecode, 'statecode')
+  newVals$countycode <- load_attribute(countycode, 'countycode')
+  newVals$huc <- load_attribute(huc, 'huc')
+  newVals$siteid <- load_attribute(siteid, 'siteid')
+  newVals$siteType <- load_attribute(siteType, 'siteType')
+  newVals$characteristicName <- load_attribute(characteristicName, 'characteristicName')
+  newVals$characteristicType <- load_attribute(characteristicType, 'characteristicType')
+  newVals$sampleMedia <- load_attribute(sampleMedia, 'sampleMedia')
+  newVals$project <- load_attribute(project, 'project')
+  newVals$organization <- load_attribute(organization, 'organization')
+  newVals$startDate <- load_attribute(startDate, 'startDate')
+  newVals$endDate <- load_attribute(endDate, 'endDate')
+  newVals$org_table <- load_attribute(org_table, 'org_table')
+  newVals$selected_filters <- load_attribute(selected_filters, 'selected_filters')
+  newVals$nd_method <- load_attribute(nd_method, 'nd_method')
+  newVals$od_method <- load_attribute(od_method, 'od_method')
+  newVals$nd_mult <- load_attribute(nd_mult, 'nd_mult')
+  newVals$od_mult <- load_attribute(od_mult, 'od_mult')
+  newVals$field_sel <- load_attribute(field_sel, 'field_sel')
+  if (n_missing > 0) {
+    showNotification(
+      paste("Unable to load progress file. Missing fields: ", critical_missing
+    ))
+  } else {
+    updateExisting(tadat, newVals)
+    showNotification("Successfully loaded progress file")
+  }
 }
 
 
@@ -151,20 +170,20 @@ writeNarrativeDataFrame <- function(tadat) {
         tadat$endDate
       )
     )
-
+    
     for (i in seq_len(nrow(query_params))) {
       if (!is.null(query_params[i, "value"])) {
         df[nrow(df) + 1, ] <- query_params[i, ]
       }
     }
   }
-
+  
   # Overview Tab
   for (row in 1:nrow(tadat$org_table)) {
     df[nrow(df) + 1, ] <- c(paste0("Organization Rank ", row), tadat$org_table[row, "OrganizationFormalName"])
   }
-
-
+  
+  
   
   # Flagging Tab
   for (flag in tadat$selected_flags) {
@@ -177,7 +196,7 @@ writeNarrativeDataFrame <- function(tadat) {
   } else {
     df[nrow(df) + 1, ] <- c("Depth unit conversion", "None")
   }
-
+  
   # Filtering tab
   # skips the recording of selected filters in the progress file if the filters haven't been selected yet
   if (nrow(tadat$selected_filters) > 0) {
@@ -192,8 +211,8 @@ writeNarrativeDataFrame <- function(tadat) {
       new_entry <- c("Selected Filter", val)
       df[nrow(df) + 1, ] <- new_entry
     }
-  } 
-
+  }
+  
   # Censored Data tab
   if (is.null(tadat$nd_mult)) {
     tadat$nd_mult <- "n/a"
@@ -207,4 +226,56 @@ writeNarrativeDataFrame <- function(tadat) {
                           sub("x", tadat$od_mult, tadat$od_method))
   
   return(df)
+}
+
+fetchExisting <- function(tadat) {
+  existingVals <- list()
+  existingVals$original_source <- tadat$original_source
+  existingVals$job_id <- tadat$job_id
+  existingVals$example_data <- tadat$example_data
+  existingVals$statecode <- tadat$statecode
+  existingVals$countycode <- tadat$countycode
+  existingVals$huc <- tadat$huc
+  existingVals$siteid <- tadat$siteid
+  existingVals$siteType <- tadat$siteType
+  existingVals$characteristicName <- tadat$characteristicName
+  existingVals$characteristicType <- tadat$characteristicType
+  existingVals$sampleMedia <- tadat$sampleMedia
+  existingVals$project <- tadat$project
+  existingVals$organization <- tadat$organization
+  existingVals$startDate <- tadat$startDate
+  existingVals$endDate <- tadat$endDate
+  existingVals$org_table <- tadat$org_table
+  existingVals$selected_filters <- tadat$selected_filters
+  existingVals$nd_method <- tadat$nd_method
+  existingVals$od_method <- tadat$od_method
+  existingVals$nd_mult <- tadat$nd_mult
+  existingVals$od_mult <- tadat$od_mult
+  existingVals$field_sel <- tadat$field_sel
+  return(existingVals)
+}
+
+updateExisting <- function(tadat, newVals) {
+  tadat$original_source <- newVals$original_source
+  tadat$job_id <- newVals$job_id
+  tadat$example_data <- newVals$example_data
+  tadat$statecode <- newVals$statecode
+  tadat$countycode <- newVals$countycode
+  tadat$huc <- newVals$huc
+  tadat$siteid <- newVals$siteid
+  tadat$siteType <- newVals$siteType
+  tadat$characteristicName <- newVals$characteristicName
+  tadat$characteristicType <- newVals$characteristicType
+  tadat$sampleMedia <- newVals$sampleMedia
+  tadat$project <- newVals$project
+  tadat$organization <- newVals$organization
+  tadat$startDate <- newVals$startDate
+  tadat$endDate <- newVals$endDate
+  tadat$org_table <- newVals$org_table
+  tadat$selected_filters <- newVals$selected_filters
+  tadat$nd_method <- newVals$nd_method
+  tadat$od_method <- newVals$od_method
+  tadat$nd_mult <- newVals$nd_mult
+  tadat$od_mult <- newVals$od_mult
+  tadat$field_sel <- newVals$field_sel
 }
