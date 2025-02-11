@@ -108,12 +108,12 @@ readFile <- function(tadat, filename) {
   newVals$od_mult <- load_attribute(od_mult, 'od_mult')
   newVals$field_sel <- load_attribute(field_sel, 'field_sel')
   if (n_missing > 0) {
-    showNotification(
+    shiny::showNotification(
       paste("Unable to load progress file. Missing fields: ", critical_missing
     ))
   } else {
     updateExisting(tadat, newVals)
-    showNotification("Successfully loaded progress file")
+    shiny::showNotification("Successfully loaded progress file")
   }
 }
 

@@ -35,7 +35,7 @@ mod_TADA_summary_ui <- function(id) {
         )))),
         shiny::fluidRow(column(
           6,
-          actionButton(
+          shiny::actionButton(
             ns("download_working_button"),
             "Download Working Dataset (.zip)",
             style = "color: #fff; background-color: #337ab7; border-color: #2e6da4; margin-bottom: 10px;"
@@ -43,15 +43,15 @@ mod_TADA_summary_ui <- function(id) {
         )),
         shiny::fluidRow(column(
           6,
-          actionButton(
+          shiny::actionButton(
             ns("download_final_button"),
             "Download Final Dataset (.zip)",
             style = "color: #fff; background-color: #337ab7; border-color: #2e6da4; margin-bottom: 10px;"
           )
         ))
       ),
-      shiny::conditionalPanel("false", downloadButton(ns("dwn_working"), "Download Working")),
-      shiny::conditionalPanel("false", downloadButton(ns("dwn_final"), "Download Final")),
+      shiny::conditionalPanel("false", shiny::downloadButton(ns("dwn_working"), "Download Working")),
+      shiny::conditionalPanel("false", shiny::downloadButton(ns("dwn_final"), "Download Final")),
       shiny::fluidRow(column(
         2, shiny::actionButton(ns("disclaimer"), "DISCLAIMER")
       )),
@@ -82,7 +82,7 @@ mod_TADA_summary_server <- function(id, tadat) {
       }
     })
     
-    observeEvent(input$download_working_button, {
+    shiny::observeEvent(input$download_working_button, {
       tryCatch({
         tmpdir <- tempdir()
         setwd(tempdir())
@@ -103,15 +103,15 @@ mod_TADA_summary_server <- function(id, tadat) {
         shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
         shinyjs::click("dwn_working")
       }, error = function(e) {
-        showNotification("Error writing working files")
+        shiny::showNotification("Error writing working files")
         print(e)
       }, warning = function(w) {
-        showNotification("Warning writing working files")
+        shiny::showNotification("Warning writing working files")
         print(w)
       })
     })
     
-    observeEvent(input$download_final_button, {
+    shiny::observeEvent(input$download_final_button, {
       tryCatch({
         tmpdir <- tempdir()
         setwd(tempdir())
@@ -132,10 +132,10 @@ mod_TADA_summary_server <- function(id, tadat) {
         shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
         shinyjs::click("dwn_final")
       }, error = function(e) {
-        showNotification("Error writing output files")
+        shiny::showNotification("Error writing output files")
         print(e)
       }, warning = function(w) {
-        showNotification("Warning writing output files")
+        shiny::showNotification("Warning writing output files")
         print(w)
       })
     })
