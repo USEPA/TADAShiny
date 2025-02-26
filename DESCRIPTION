@@ -54,7 +54,9 @@ Suggests:
     devtools,
     usethis,
     rsconnect,
-    roxygen2
+    roxygen2,
+    lwgeom,
+    renv
 Depends: 
     R (>= 3.5.0)
 Encoding: UTF-8

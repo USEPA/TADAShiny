@@ -146,7 +146,7 @@ checkFlagColumns <- function(dataset) {
   } else {
     if (length(missing) > 0) {
       print("Missing the following fields that are in the csv files:")
-      print(missing)
+      # print(missing)
     }
     return(TRUE)
   }

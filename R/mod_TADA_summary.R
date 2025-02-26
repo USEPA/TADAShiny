@@ -104,10 +104,10 @@ mod_TADA_summary_server <- function(id, tadat) {
         shinyjs::click("dwn_working")
       }, error = function(e) {
         shiny::showNotification("Error writing working files")
-        print(e)
+        # print(e)
       }, warning = function(w) {
         shiny::showNotification("Warning writing working files")
-        print(w)
+        # print(w)
       })
     })
     
@@ -133,10 +133,10 @@ mod_TADA_summary_server <- function(id, tadat) {
         shinyjs::click("dwn_final")
       }, error = function(e) {
         shiny::showNotification("Error writing output files")
-        print(e)
+        # print(e)
       }, warning = function(w) {
         shiny::showNotification("Warning writing output files")
-        print(w)
+        # print(w)
       })
     })
     
