@@ -9,19 +9,15 @@ Authors@R: c(
     person("Trip", "Hook", role = "aut"),
     person("Elise", "Hinman", role = "aut")
   )
-Description: Assists data partners in retrieving, wrangling, quality checking, and harmonizing data from the Water Quality Portal for subsequent analyses.
+Description: Assists data partners in retrieving, wrangling, quality checking, and harmonizing data from the Water Quality Portal for analyses.
 License: CC0
-Copyright: This software is in the public domain because it contains materials
-    that originally came from the U.S. Environmental Protection Agency.
+Copyright: This software is in the public domain because it contains materials that originally came from the U.S. Environmental Protection Agency.
 Imports: 
     EPATADA,
+    htmltools, 
     shiny,
     golem, 
-    magrittr
-Remotes: 
-    github::USEPA/EPATADA
-Suggests: 
-    htmltools,
+    magrittr,
     readxl,
     writexl,
     leaflet,
@@ -42,21 +38,21 @@ Suggests:
     shinyjs,
     gotop,
     config,
-    testthat,
-    remotes,
-    covr,
-    rmarkdown, 
-    knitr,
-    spelling,
-    sf,
-    stringr,
-    utils,
+    utils
+Remotes: 
+    github::USEPA/EPATADA
+Suggests: 
+    remotes, 
     devtools,
+    covr,
+    knitr, 
+    renv, 
+    rmarkdown, 
+    roxygen2, 
     usethis,
     rsconnect,
-    roxygen2,
-    lwgeom,
-    renv
+    testthat,
+    spelling
 Depends: 
     R (>= 3.5.0)
 Encoding: UTF-8

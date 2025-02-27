@@ -6,7 +6,7 @@
 \alias{TADAShiny-package}
 \title{TADAShiny: Water Quality Portal Data Discovery and Cleaning: First R Shiny App in the TADA (Tools for Automated Data Analysis) Series}
 \description{
-Assists data partners in retrieving, wrangling, quality checking, and harmonizing data from the Water Quality Portal for subsequent analyses.
+Assists data partners in retrieving, wrangling, quality checking, and harmonizing data from the Water Quality Portal for analyses.
 }
 \seealso{
 Useful links:
