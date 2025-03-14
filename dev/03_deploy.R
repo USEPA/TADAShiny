@@ -28,17 +28,7 @@
 # golem::add_positconnect_file()
 # golem::add_shinyappsio_file()
 # golem::add_shinyserver_file()
-# 
-# ## Docker ----
-# ## If you want to deploy via a generic Dockerfile
-# golem::add_dockerfile()
-# 
-# ## If you want to deploy to ShinyProxy
-# golem::add_dockerfile_shinyproxy()
-# 
-# ## If you want to deploy to Heroku
-# golem::add_dockerfile_heroku()
-# 
+
 # ## If you want to build github pages
 # usethis::use_pkgdown() # run once to configure your package
 # pkgdown::build_site() 

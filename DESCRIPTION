@@ -39,7 +39,7 @@ Imports:
     config,
     utils
 Remotes:
-    USEPA/EPATADA@v1.0.0-beta
+    USEPA/EPATADA@main
 Suggests: 
     remotes, 
     devtools,
