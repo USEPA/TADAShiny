@@ -4,9 +4,9 @@
 \name{TADAShiny-package}
 \alias{TADAShiny}
 \alias{TADAShiny-package}
-\title{TADAShiny: Water Quality Portal Data Discovery and Cleaning: First R Shiny App in the TADA (Tools for Automated Data Analysis) Series}
+\title{TADAShiny: TADAShiny: Data Discovery and Cleaning}
 \description{
-Assists data partners in retrieving, wrangling, quality checking, and harmonizing data from the Water Quality Portal for analyses.
+Assists data partners in retrieving, wrangling, quality checking, and harmonizing data from the Water Quality Portal for subsequent analyses.
 }
 \seealso{
 Useful links:
@@ -21,7 +21,6 @@ Useful links:
 
 Authors:
 \itemize{
-  \item TADA Team U.S. Environmental Protection Agency
   \item Trip Hook
   \item Elise Hinman
 }

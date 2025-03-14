@@ -13,18 +13,14 @@
 ## Fill the DESCRIPTION ----
 ## Add meta data about your application
 ## 
-## /!\ Note: if you want to change the name of your app during development, 
+## Note: if you want to change the name of your app during development, 
 ## either re-run this function, call golem::set_golem_name(), or don't forget
-## to change the name in the app_sys() function in app_config.R /!\
-## 
+## to change the name in the app_sys() function in app_config.R
 golem::fill_desc(
   pkg_name = "TADAShiny", # The Name of the package containing the App 
-  pkg_title = "Water Quality Portal Data Discovery and Cleaning: First R Shiny App in the TADA (Tools for Automated Data Analysis) Series", # The Title of the package containing the App 
+  pkg_title = "TADAShiny: Data Discovery and Cleaning", # The Title of the package containing the App 
   pkg_description = "Assists data partners in retrieving, wrangling, quality checking, and harmonizing data from the Water Quality Portal for subsequent analyses.", # The Description of the package containing the App 
   authors = c(
-    person(given = "TADA Team", 
-           family = "U.S. Environmental Protection Agency", 
-           role = "aut"),
     person(given = "Cristina",
            family = "Mullin",
            role = c("aut", "cre"),

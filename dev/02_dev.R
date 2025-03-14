@@ -56,7 +56,6 @@
 # golem::add_fct( "helpers" )
 # golem::add_utils( "helpers" )
 
-
 ## External resources
 ## Creates .js and .css files at inst/app/www
 # golem::add_js_file( "script" )
@@ -77,6 +76,7 @@
 # usethis::use_vignette("TADAShiny")
 # devtools::build_vignettes()
 
+## We already have this as a github workflow
 ## Code Coverage----
 ## Set the code coverage service ("codecov" or "coveralls")
 # usethis::use_coverage()

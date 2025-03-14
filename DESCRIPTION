@@ -1,15 +1,14 @@
 Package: TADAShiny
 Type: Package
-Title: Water Quality Portal Data Discovery and Cleaning: First R Shiny App in the TADA (Tools for Automated Data Analysis) Series
+Title: TADAShiny: Data Discovery and Cleaning
 Version: 0.0.0.9000
 Authors@R: c(
-    person("TADA Team", "U.S. Environmental Protection Agency", role = "aut"),
     person("Cristina", "Mullin", , "mywaterway@epa.gov", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-0615-6087")),
     person("Trip", "Hook", role = "aut"),
     person("Elise", "Hinman", role = "aut")
   )
-Description: Assists data partners in retrieving, wrangling, quality checking, and harmonizing data from the Water Quality Portal for analyses.
+Description: Assists data partners in retrieving, wrangling, quality checking, and harmonizing data from the Water Quality Portal for subsequent analyses.
 License: CC0
 Copyright: This software is in the public domain because it contains materials that originally came from the U.S. Environmental Protection Agency.
 Imports: 
