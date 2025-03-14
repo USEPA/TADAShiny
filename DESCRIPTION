@@ -40,7 +40,7 @@ Imports:
     config,
     utils
 Remotes: 
-    github::USEPA/EPATADA
+    github::USEPA/EPATADA@v1.0.0-beta
 Suggests: 
     remotes, 
     devtools,

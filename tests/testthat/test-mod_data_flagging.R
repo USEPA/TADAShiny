@@ -11,7 +11,7 @@ testthat::test_that("flagging can run", {
                               EPATADA::TADA_FlagMeasureQualifierCode(clean = FALSE, define = TRUE) %>%
                               EPATADA::TADA_FlagMethod(clean = FALSE) %>%
                               EPATADA::TADA_FindPotentialDuplicatesSingleOrg() %>%
-                              EPATADA::TADA_FindPotentialDuplicatesMultipleOrgs(org_hierarchy = orgs) %>%
+                              # EPATADA::TADA_FindPotentialDuplicatesMultipleOrgs(org_hierarchy = orgs) %>%
                               EPATADA::TADA_FlagContinuousData(clean = FALSE, flaggedonly = FALSE) %>%
                               EPATADA::TADA_FlagAboveThreshold(clean = FALSE) %>%
                               EPATADA::TADA_FlagBelowThreshold(clean = FALSE) %>%
@@ -30,7 +30,7 @@ testthat::test_that("flagging can run", {
                               EPATADA::TADA_FlagMeasureQualifierCode(clean = FALSE, define = TRUE) %>%
                               EPATADA::TADA_FlagMethod(clean = FALSE) %>%
                               EPATADA::TADA_FindPotentialDuplicatesSingleOrg() %>%
-                              EPATADA::TADA_FindPotentialDuplicatesMultipleOrgs(org_hierarchy = orgs) %>%
+                              # EPATADA::TADA_FindPotentialDuplicatesMultipleOrgs(org_hierarchy = orgs) %>%
                               EPATADA::TADA_FlagContinuousData(clean = FALSE, flaggedonly = FALSE) %>%
                               EPATADA::TADA_FlagAboveThreshold(clean = FALSE) %>%
                               EPATADA::TADA_FlagBelowThreshold(clean = FALSE) %>%

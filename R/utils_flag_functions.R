@@ -105,7 +105,7 @@ applyFlags <- function(in_table, orgs) {
 
   # multiple org duplicative uploads
   ## NOTE: THIS FUNCTION USES A REACTIVE OBJECT AS AN INPUT
-  out <- EPATADA::TADA_FindPotentialDuplicatesMultipleOrgs(out, org_hierarchy = orgs)
+  # out <- EPATADA::TADA_FindPotentialDuplicatesMultipleOrgs(out, org_hierarchy = orgs)
 
   # QAPP Not Approved - this flag isn't looking for a TADA-created flag column,
   # so do not need to run any flag function here. If switched ON, remove all data

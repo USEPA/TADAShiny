@@ -529,7 +529,8 @@ mod_query_data_server <- function(id, tadat) {
         startDate = tadat$startDate,
         endDate = tadat$endDate,
         providers = tadat$providers,
-        applyautoclean = TRUE
+        applyautoclean = TRUE,
+        ask = FALSE
       )
 
       # remove the modal once the dataset has been pulled

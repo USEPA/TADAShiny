@@ -51,7 +51,6 @@ Result value is not numeric or NA,TADA.ResultMeasureValueDataTypes.Flag,Result V
 Result value is not numeric or NA,TADA.ResultMeasureValueDataTypes.Flag,Result Value/Unit Estimated from Detection Limit,0,0,,,
 Result value is not numeric or NA,TADA.ResultMeasureValueDataTypes.Flag,NA - Not Available,0,1,,,
 Result value is not numeric or NA,TADA.ResultMeasureValueDataTypes.Flag,Text,0,1,,,
-Metadata indicates duplicative uploads of the same results by multiple organizations,TADA.ResultSelectedMultipleOrgs,N,0,1,,,
 Suspect characteristic and unit combination,TADA.ResultUnit.Flag,Pass,0,0,,,
 Suspect characteristic and unit combination,TADA.ResultUnit.Flag,NonStandardized,0,0,,,
 Suspect characteristic and unit combination,TADA.ResultUnit.Flag,Suspect,0,1,,,
