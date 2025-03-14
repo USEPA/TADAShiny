@@ -4,7 +4,7 @@
 
 [![](https://github.com/USEPA/TADAShiny/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/USEPA/TADAShiny/actions/workflows/R-CMD-check.yaml)
 
-TADAShiny provides a user interface (<https://rconnect-public.epa.gov/TADAShiny/>) on top of the TADAPackage (<https://github.com/USEPA/TADA>). This application can be used to compile and evaluate Water Quality Portal (WQP) data for samples collected from surface water monitoring sites on streams and lakes.
+TADAShiny provides a user interface on top of the TADAPackage (<https://github.com/USEPA/TADA>). This application can be used to compile and evaluate Water Quality Portal (WQP) data for samples collected from surface water monitoring sites on streams and lakes.
 
 In 2012, the WQP was deployed by the U.S. Geological Survey (USGS), the U.S. Environmental Protection Agency (USEPA), and the National Water Quality Monitoring Council to combine and serve water-quality data from numerous sources in a standardized format. The WQP holds over 420 million water quality sample results from over 1000 federal, state, tribal and other partners, and is the nation's largest source for single point of access for water-quality data. Participating organizations submit their data to the WQP using the EPA's Water Quality Exchange (WQX), a framework designed to map their data holdings to a common data structure.
 
@@ -27,6 +27,10 @@ library(TADAShiny)
 
 TADAShiny::run_app()
 ```
+
+## Run Web Version
+
+Alternatively, you can run the web version of this application (<https://rconnect-public.epa.gov/TADAShiny/>). Beware that this version is not the most up to date and we recommend running the app from R studio instead if possible. 
 
 ### Run in GitHub Codespaces
 This repository also has devcontainers to allow it to run in GitHub codespaces. To use those:
