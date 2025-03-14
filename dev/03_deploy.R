@@ -21,7 +21,6 @@
 ## Local, CRAN or Package Manager ---- 
 ## This will build a tar.gz that can be installed locally, 
 ## sent to CRAN, or to a package manager
-# devtools::check()
 # devtools::build()
 
 # ## RStudio ----
