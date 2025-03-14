@@ -39,8 +39,8 @@ Imports:
     gotop,
     config,
     utils
-Remotes: 
-    github::USEPA/EPATADA@v1.0.0-beta
+Remotes:
+    USEPA/EPATADA@v1.0.0-beta
 Suggests: 
     remotes, 
     devtools,

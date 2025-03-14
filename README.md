@@ -30,23 +30,25 @@ TADAShiny::run_app()
 
 ## Run Web Version
 
-Alternatively, you can run the web version of this application (<https://rconnect-public.epa.gov/TADAShiny/>). Beware that this version is not the most up to date and we recommend running the app from R studio instead if possible. 
+Alternatively, you can run the web version of this application (<https://rconnect-public.epa.gov/TADAShiny/>). Beware that this version is not the most up to date and we recommend running the app from R studio instead if possible.
 
 ### Run in GitHub Codespaces
-This repository also has devcontainers to allow it to run in GitHub codespaces. To use those:
-- Fork the repository to your account
-- In the "Code" button on the upper right of your browser, within the Codespaces tab click on the three dots and choose "New with Options", then you will have the choices:
-    - R Studio Server (the default useful for coding; you should set the RSTUDIO_PASSWORD with this option)
-    - Shiny apps for demos (useful for training or demoing)
-- To stop or delete your codespace when you are done: go to [GitHub Codespaces](https://github.com/codespaces)
+
+This repository also has devcontainers to allow it to run in GitHub codespaces. To use those: - Fork the repository to your account - In the "Code" button on the upper right of your browser, within the Codespaces tab click on the three dots and choose "New with Options", then you will have the choices: - R Studio Server (the default useful for coding; you should set the RSTUDIO_PASSWORD with this option) - Shiny apps for demos (useful for training or demoing) - To stop or delete your codespace when you are done: go to [GitHub Codespaces](https://github.com/codespaces)
 
 ## R Shiny Learning Resources
 
-Please visit the North American Lake Management Society (NALMS) Shiny Apps site to access other R Shiny applications that you may find useful (https://nalms.shinyapps.io/NALMS_Shiny_Home/), and for information on how to develop R Shiny Applications (https://nalms.shinyapps.io/Shiny_for_Water_Resources/). 
+Please visit the North American Lake Management Society (NALMS) Shiny Apps site to access other R Shiny applications that you may find useful (<https://nalms.shinyapps.io/NALMS_Shiny_Home/>), and for information on how to develop R Shiny Applications (<https://nalms.shinyapps.io/Shiny_for_Water_Resources/>).
 
 This site has been created to be a resource for both those who are interested in learning how to create Shiny apps and those who are already experienced with making apps but want to see what other people are doing and what tools and packages are available for the community to use. It was created as a companion to the 2023 National Monitoring Conference, with the goal that it be used beyond that event and be useful to anyone who is interested in this topic.
 
 The NALMS shinyapps.io service also provides a place for the water resources community to make their Shiny Apps readily available to the public. It is free for anyone to use. If you would like to submit a Shiny App for deployment of the NALMS shinyapp.io service, please follow the directions on the "Submit a Shiny App" page.
+
+### Recommended Citation:
+
+```         
+Mullin, C.A., Hinman, E., Hook, T., 2025, TADAShiny: Data Discovery and Cleaning, https://github.com/USEPA/TADAShiny
+```
 
 ## Open-Source Code Policy
 
