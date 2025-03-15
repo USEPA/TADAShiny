@@ -37,9 +37,11 @@ Imports:
     shinyjs,
     gotop,
     config,
-    utils
+    utils,
+    dataRetrieval
 Remotes:
-    USEPA/EPATADA@v1.0.0-beta
+    USEPA/EPATADA@main,
+    DOI-USGS/dataRetrieval@develop
 Suggests: 
     remotes, 
     devtools,
