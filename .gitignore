@@ -20,3 +20,4 @@ _snaps
 .Ruserdata
 .vscode/
 .Rbuildignore
+_disable_autoload.R
