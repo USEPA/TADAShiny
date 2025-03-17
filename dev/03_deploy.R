@@ -14,21 +14,26 @@
 
 ## Run checks ----
 ## Check the package before sending to prod
-# devtools::check()
+## Run devtools test, check and build
+devtools::test()
+devtools::check()
+devtools::build()
+
+# Check renv lock file
+renv::status()
 
 # Deploy
 
 ## Local, CRAN or Package Manager ---- 
 ## This will build a tar.gz that can be installed locally, 
 ## sent to CRAN, or to a package manager
-# devtools::build()
 
-# ## RStudio ----
-# ## If you want to deploy on RStudio related platforms
+## RStudio ----
+## If you want to deploy on RStudio related platforms
 golem::add_positconnect_file()
 # golem::add_shinyappsio_file()
 # golem::add_shinyserver_file()
 
-# ## If you want to build github pages
+## If you want to build github pages
 # usethis::use_pkgdown() # run once to configure your package
 # pkgdown::build_site() 
