@@ -32,7 +32,9 @@ TADAShiny::run_app()
 
 ## Run Web Version
 
-Alternatively, you can run the web version of this application (<https://rconnect-public.epa.gov/TADAShiny/>). Beware that this version is not the most up to date and we recommend running the app from R studio instead if possible.
+Alternatively, you can run the public web version of this application (<https://rconnect-public.epa.gov/TADAShiny/>). Beware that this version is not the most up to date and we recommend running the app from R studio instead if possible.
+
+EPA users may also run the staging version (<https://rstudio-connect.dmap-stage.aws.epa.gov/content/da3ffe2f-b443-4051-a029-3adb491434cb>) if they are logged onto the VPN.
 
 ### Run in GitHub Codespaces
 
