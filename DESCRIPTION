@@ -43,6 +43,7 @@ Remotes:
     USEPA/EPATADA@main,
     DOI-USGS/dataRetrieval@develop
 Suggests:
+    remotes, 
     devtools,
     covr,
     knitr, 
