@@ -42,8 +42,7 @@ Imports:
 Remotes:
     USEPA/EPATADA@main,
     DOI-USGS/dataRetrieval@develop
-Suggests: 
-    remotes, 
+Suggests:
     devtools,
     covr,
     knitr, 
