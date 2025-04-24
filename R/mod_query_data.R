@@ -282,11 +282,20 @@ mod_query_data_server <- function(id, tadat) {
       HUC8_dat
     })
     
+    # A reactive object to store the huc id
+    huc_id <- reactive({
+      req(input$huc)
+      # split on commas, trim whitespace, drop empties
+      vals <- strsplit(input$huc, "\\s*,\\s*")[[1]]
+      vals[nzchar(vals)]
+      return(vals)
+    })
+    
     # Create a reactive version to highlight HUC based on input$huc
     HUC8_dat_se_reactive <- reactive({
-      req(input$huc != "")
+      req(huc_id(), HUC8_dat_reactive())
       HUC8_dat_reactive2 <- HUC8_dat_reactive() %>%
-        filter(huc8 %in% input$huc)
+        dplyr::filter(huc8 %in% huc_id())
       return(HUC8_dat_reactive2)
     })
     
@@ -297,11 +306,13 @@ mod_query_data_server <- function(id, tadat) {
       "HUC8map",
       data = HUC8_dat_reactive,
       selected = reactive({
-        req(input$huc)
-        # split on commas, trim whitespace, drop empties
-        vals <- strsplit(input$huc, "\\s*,\\s*")[[1]]
-        vals[nzchar(vals)]
-      })
+        req(huc_id())
+        huc_id()
+      }),
+      highlight_data = {
+        req(huc_id())
+        HUC8_dat_se_reactive
+      }
     )
     
     # Watch for map selection changes → update the text input

@@ -15,7 +15,10 @@ mod_mapUI <- function(id) {
   )
 }
 
-mod_mapServer <- function(id, data, selected = reactive({ character(0) })) {
+mod_mapServer <- function(id, 
+                          data, 
+                          selected = reactive({ character(0) }),
+                          highlight_data = NULL) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
@@ -60,21 +63,27 @@ mod_mapServer <- function(id, data, selected = reactive({ character(0) })) {
       events$selected <- if (is.null(new_sel)) character(0) else new_sel
     })
     
-    # 3) highlight whatever’s in events$selected
+    # 3) highlight whatever’s in events$selected **or** highlight_data()
     observe({
       proxy <- leaflet::leafletProxy(ns("map"), session)
       proxy %>% leaflet::clearGroup("highlighted_polygon")
-      sel <- events$selected
-      if (length(sel)) {
-        sel_sf <- data() %>% dplyr::filter(huc8 %in% sel)
-        if (nrow(sel_sf)) {
-          proxy %>% leaflet::addPolylines(
-            data  = sel_sf,
-            group = "highlighted_polygon",
-            color = "red",
-            weight = 2
-          )
+      
+      # if the user provided a reactive sf for highlights, use it,
+      # otherwise fall back to filtering `data()` by IDs in events$selected
+      sel_sf <-
+        if (!is.null(highlight_data)) {
+          highlight_data()
+        } else {
+          data() %>% dplyr::filter(huc8 %in% events$selected)
         }
+      
+      if (inherits(sel_sf, "sf") && nrow(sel_sf)) {
+        proxy %>% leaflet::addPolylines(
+          data  = sel_sf,
+          group = "highlighted_polygon",
+          color = "red",
+          weight = 2
+        )
       }
     })
     
