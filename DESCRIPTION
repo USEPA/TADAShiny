@@ -1,0 +1,66 @@
+Package: TADAShiny
+Type: Package
+Title: TADAShiny: Data Discovery and Cleaning
+Version: 0.0.0.9000
+Authors@R: c(
+    person("Cristina", "Mullin", , "mywaterway@epa.gov", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-0615-6087")),
+    person("Trip", "Hook", role = "aut"),
+    person("Elise", "Hinman", role = "aut")
+  )
+Description: Assists data partners in retrieving, wrangling, quality checking, and harmonizing data from the Water Quality Portal for subsequent analyses.
+License: CC0
+Copyright: This software is in the public domain because it contains materials that originally came from the U.S. Environmental Protection Agency.
+Imports: 
+    EPATADA,
+    htmltools, 
+    shiny,
+    golem, 
+    magrittr,
+    readxl,
+    writexl,
+    leaflet,
+    shinyWidgets,
+    shinycssloaders,
+    DT,
+    ggplot2,
+    shinybusy, 
+    dplyr, 
+    plyr,
+    tidyr,
+    scales,
+    forcats,
+    RColorBrewer,
+    grDevices,
+    lubridate,
+    plotly, 
+    shinyjs,
+    gotop,
+    config,
+    utils,
+    dataRetrieval
+Remotes:
+    USEPA/EPATADA@main,
+    DOI-USGS/dataRetrieval@develop
+Suggests:
+    devtools,
+    covr,
+    knitr, 
+    renv, 
+    rmarkdown, 
+    roxygen2, 
+    usethis,
+    rsconnect,
+    testthat,
+    spelling
+Depends: 
+    R (>= 3.5.0)
+Encoding: UTF-8
+Language: en-US
+Config/testthat/edition: 3
+Config/testthat/load-all: list(export_all = FALSE, helpers = FALSE)
+LazyData: true
+URL: https://github.com/USEPA/TADAShiny
+BugReports: https://github.com/USEPA/TADAShiny/issues
+RoxygenNote: 7.3.2
+Roxygen: list(markdown = TRUE)

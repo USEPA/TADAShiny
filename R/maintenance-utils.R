@@ -1,0 +1,31 @@
+utils::globalVariables(c(
+  "TADA.CensoredData.Flag", "ResultIdentifier",
+  "num", "Label", "TADA.ResultMeasureValue",
+  "TADA.CensoredMethod", "TADA.Remove",
+  "MonitoringLocationIdentifier", "MonitoringLocationName",
+  "TADA.LatitudeMeasure", "TADA.LongitudeMeasure",
+  "ActivityStartDate", "TADA.CharacteristicName",
+  "OrganizationIdentifier", "OrganizationFormalName",
+  "Result_Count", "TADA.Chars", "Step", "Count",
+  "Legend", "req",
+  "TADA.DetectionQuantitationLimitMeasure.MeasureValue",
+  "DetectionQuantitationLimitMeasure.MeasureUnitCode",
+  "TADA.ResultMeasure.MeasureUnitCode",
+  "group", "groupname", "MonitoringLocationTypeName",
+  "quantile", "median", "moduleServer",
+  "Target.TADA.CharacteristicName",
+  "Target.TADA.MethodSpeciationName",
+  "write.csv", "read.csv", "downloadHandler",
+  "Rank", "Target.TADA.ResultSampleFractionText",
+  "Field", "characteristicName", "characteristicType",
+  "countycode", "endDate", "example_data", "huc", "m2f",
+  "nd_method", "nd_mult", "od_method", "org_table",
+  "organization", "original_source", "project", "sampleMedia",
+  "selected_filters", "selected_flags", "siteType",
+  "siteid", "startDate", "statecode", "od_mult", "field_sel",
+  "DetectionQuantitationLimitMeasure.MeasureValue"
+))
+
+# Auto generates or updates TADAShiny-package.R file
+# how to import specific functions from packages for use throughout app
+# usethis::use_import_from(package = "shiny", fun = c("NS", "tagList"))
