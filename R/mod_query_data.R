@@ -665,6 +665,9 @@ mod_query_data_server <- function(id, tadat) {
           Start_temp <- site_all3$Start[i]
           End_temp <- site_all3$End[i]
           
+          print("Test 1")
+          print(HUC_temp)
+          
           # storing the output of TADAdataRetrieval with the user's input choices as a reactive object named "raw" in the tadat list.
           output_temp <- EPATADA::TADA_DataRetrieval(
             statecode = tadat$statecode,
@@ -681,6 +684,7 @@ mod_query_data_server <- function(id, tadat) {
             startDate = Start_temp,
             endDate = End_temp,
             providers = tadat$providers,
+            ask = FALSE,
             applyautoclean = TRUE
           )
           
