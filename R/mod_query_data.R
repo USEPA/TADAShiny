@@ -515,7 +515,7 @@ mod_query_data_server <- function(id, tadat) {
       if (input$huc == "") {
         tadat$huc <- "null"
       } else {
-        tadat$huc <- gsub("\\s", "", input$huc)
+        tadat$huc <- gsub(",", ";", input$huc)
       }
       if (is.null(input$siteid)) {
         tadat$siteid <- "null"
@@ -572,9 +572,24 @@ mod_query_data_server <- function(id, tadat) {
         text = "Querying WQP database...",
         session = shiny::getDefaultReactiveDomain()
       )
+      
+      # a section to estimate the sample size
+      shiny::showModal(modalDialog(title = "Estimating the sample size...", footer = NULL))
 
-      # storing the output of TADAdataRetrieval with the user's input choices as a reactive object named "raw" in the tadat list.
-      raw <- EPATADA::TADA_DataRetrieval(
+      # Calculate the year summary number
+      req(tadat$startDate)
+      YearSum <- lubridate::year(Sys.Date()) - 
+          lubridate::year(lubridate::ymd(tadat$startDate)) + 1
+      if (YearSum <= 1){
+        YearSum2 <- 1
+      } else if (YearSum > 1 & YearSum <= 5){
+        YearSum2 <- 5
+      } else {
+        YearSum2 <- "all"
+      }
+      
+      # Create the list of input arguments for dataRetrieval::readWQPsummary
+      args_temp <- args_create(
         statecode = tadat$statecode,
         countycode = tadat$countycode,
         countrycode = tadat$countrycode,
@@ -586,12 +601,110 @@ mod_query_data_server <- function(id, tadat) {
         sampleMedia = tadat$sampleMedia,
         project = tadat$project,
         organization = tadat$organization,
-        startDate = tadat$startDate,
-        endDate = tadat$endDate,
-        providers = tadat$providers,
-        applyautoclean = TRUE
+        providers = tadat$providers
       )
 
+      # Use dataRetrieval::readWQPsummary to get the summary data
+      raw_summary <- dataRetrieval::readWQPsummary(args_temp)
+
+      # Filter raw_summary by year of the tadat$startDate and tadat$endDate
+      raw_summary2 <- raw_summary %>%
+        dplyr::filter(YearSummarized >= lubridate::year(lubridate::ymd(tadat$startDate)), 
+                        YearSummarized <= lubridate::year(lubridate::ymd(tadat$endDate)))
+      
+      # A warning section to show if the sample size is too large
+      sample_size <- nrow(raw_summary2)
+      
+      if (sample_size > 100000){
+        shinyalert::shinyalert(
+          title = "Process Started",
+          text = paste0("The estimated sample size is ", 
+                        scales::comma(sample_size), 
+                        ", which is above 100,000 and could be above the memory limit. Please select a smaller geographic area or a shorter period with multiple downloads."),
+          type = "warning"
+        )
+        removeModal()
+        return()
+      }
+      
+      # Sum the total ResultCount in raw_summary2 
+      site_all <- raw_summary2 %>% 
+        dplyr::group_by(HUCEightDigitCode, YearSummarized) %>%
+        dplyr::summarize(ResultCount = sum(ResultCount)) %>%
+        dplyr::ungroup() %>%
+        dplyr::arrange(HUCEightDigitCode, YearSummarized)
+      
+      # Download the data with TADAdataRetrieval with a for loop
+      
+      # If nrow(site_all) > 0, download the data
+      if (nrow(site_all) > 0){
+        
+        site_all_list <- site_all %>% split(.$HUCEightDigitCode)
+        site_all2 <- purrr::map_dfr(site_all_list, cumsum_group, col = "ResultCount", threshold = 25000)
+        site_all3 <- site_all2 %>% summarized_year()
+        
+        shinyWidgets::progressSweetAlert(
+          session = session, id = "myprogress",
+          title = "Download Progress",
+          display_pct = TRUE, value = 0
+        )
+        
+        dat_temp_all_list <- list()
+        
+        # Download the data as TADA data frame
+        
+        for (i in 1:nrow(site_all3)){
+          
+          shinyWidgets::updateProgressBar(
+            session = session,
+            id = "myprogress",
+            value = round(i/nrow(site_all3) * 100, 2)
+          )
+          
+          HUC_temp <- site_all3$HUCEightDigitCode[i]
+          Start_temp <- site_all3$Start[i]
+          End_temp <- site_all3$End[i]
+          
+          # storing the output of TADAdataRetrieval with the user's input choices as a reactive object named "raw" in the tadat list.
+          output_temp <- EPATADA::TADA_DataRetrieval(
+            statecode = tadat$statecode,
+            countycode = tadat$countycode,
+            countrycode = tadat$countrycode,
+            huc = HUC_temp,
+            siteid = tadat$siteid,
+            siteType = tadat$siteType,
+            characteristicName = tadat$characteristicName,
+            characteristicType = tadat$characteristicType,
+            sampleMedia = tadat$sampleMedia,
+            project = tadat$project,
+            organization = tadat$organization,
+            startDate = Start_temp,
+            endDate = End_temp,
+            providers = tadat$providers,
+            applyautoclean = TRUE
+          )
+          
+          if (dim(output_temp)[1] < 1){
+            output_temp <- TADA_download_temp
+          }
+          
+          dat_temp_all_list[[i]] <- output_temp
+          
+        }
+          
+        shinyWidgets::closeSweetAlert(session = session)
+          
+        dat_temp_com <- data.table::rbindlist(dat_temp_all_list, fill = TRUE)
+          
+        raw <- dat_temp_com %>%
+          # Filter with the site ID in the state and dates
+          dplyr::filter(MonitoringLocationIdentifier %in% raw_summary2$MonitoringLocationIdentifier) %>%
+          dplyr::filter(ActivityStartDate >= lubridate::ymd(tadat$startDate) & 
+                          ActivityStartDate <= lubridate::ymd(tadat$endDate))
+      } else {
+        raw <- TADA_download_temp
+      } 
+      
       # remove the modal once the dataset has been pulled
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
 
