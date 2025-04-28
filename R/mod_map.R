@@ -1,12 +1,12 @@
 # R/mod_map.R
 
-#’ Map Module
-#’
-#’ @param id          Internal parameters for {shiny}
-#’ @param data        A **reactive** returning an sf (or Spatial*) with column `huc8`
-#’ @param selected    A **reactive** character vector of `huc8` to highlight externally
-#’ @return            A list with `selected` reactive
-#’ @noRd
+#' Map Module
+#'
+#' @param id          Internal parameters for {shiny}
+#' @param data        A **reactive** returning an sf (or Spatial*) with column `huc8`
+#' @param selected    A **reactive** character vector of `huc8` to highlight externally
+#' @return            A list with `selected` reactive
+#' @noRd
 
 mod_mapUI <- function(id) {
   ns <- NS(id)
@@ -22,10 +22,14 @@ mod_mapServer <- function(id,
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
+    # Add a safeguard for initial map rendering
+    map_ready <- reactiveVal(FALSE)
+    
     # 1) render base map
     output$map <- leaflet::renderLeaflet({
       req(data())
-      leaflet::leaflet() %>%
+      # Create the map
+      m <- leaflet::leaflet() %>%
         leaflet::addTiles() %>%
         leaflet::addPolygons(
           data = data(),
@@ -38,6 +42,11 @@ mod_mapServer <- function(id,
           label      = ~huc8
         ) %>%
         add_USGS_base()
+      
+      # Signal that the map is ready
+      map_ready(TRUE)
+      
+      return(m)
     })
     
     # 2) track selection in a reactiveValues
@@ -45,41 +54,57 @@ mod_mapServer <- function(id,
     
     # a) map‐click → toggle
     observeEvent(input$map_shape_click, {
-      req(input$map_shape_click$id)
+      req(map_ready(), input$map_shape_click$id)
+      # Ensure data is available
+      req(data())
+      
       sel <- events$selected
       click_id <- input$map_shape_click$id
-      events$selected <- if (click_id %in% sel) {
-        setdiff(sel, click_id)
+      
+      # Validate the click_id exists in the data
+      if (click_id %in% data()$huc8) {
+        events$selected <- if (click_id %in% sel) {
+          setdiff(sel, click_id)
+        } else {
+          c(sel, click_id)
+        }
+      }
+    }, ignoreNULL = TRUE, ignoreInit = TRUE)
+    
+    # b) external `selected()` → overwrite
+    observe({
+      # Ensure selected() is ready
+      req(selected)
+      new_sel <- selected()
+      
+      # coerce NULL → empty character
+      events$selected <- if (is.null(new_sel)) {
+        character(0)
       } else {
-        c(sel, click_id)
+        # Ensure values exist in data if data is available
+        if (!is.null(data()) && length(new_sel) > 0) {
+          new_sel[new_sel %in% data()$huc8]
+        } else {
+          new_sel
+        }
       }
     })
     
-    # b) external `selected()` → overwrite
-    # any time the parent “selected” reactive changes, push it into our internal state
+    # 3) highlight whatever's in events$selected **or** highlight_data()
     observe({
-      new_sel <- selected()
-      # coerce NULL → empty character
-      events$selected <- if (is.null(new_sel)) character(0) else new_sel
-    })
-    
-    # 3) highlight whatever’s in events$selected **or** highlight_data()
-    observe({
+      # Make sure highlight_data exists before trying to use it
+      req(!is.null(highlight_data), map_ready())
+      
       proxy <- leaflet::leafletProxy(ns("map"), session)
       proxy %>% leaflet::clearGroup("highlighted_polygon")
       
-      # if the user provided a reactive sf for highlights, use it,
-      # otherwise fall back to filtering `data()` by IDs in events$selected
-      sel_sf <-
-        if (!is.null(highlight_data)) {
-          highlight_data()
-        } else {
-          data() %>% dplyr::filter(huc8 %in% events$selected)
-        }
+      # Use isolate to avoid dependency cycle if needed
+      sel_sf <- highlight_data()
       
-      if (inherits(sel_sf, "sf") && nrow(sel_sf)) {
+      # Verify we have valid data
+      if (!is.null(sel_sf) && inherits(sel_sf, "sf") && nrow(sel_sf) > 0) {
         proxy %>% leaflet::addPolylines(
-          data  = sel_sf,
+          data = sel_sf,
           group = "highlighted_polygon",
           color = "red",
           weight = 2
