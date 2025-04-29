@@ -1,3 +1,7 @@
+# Load the input data
+data_path1 <- app_sys("extdata/filter_descriptions.RData")
+load(data_path1)
+
 mod_filtering_ui <- function(id) {
   ns <- NS(id)
   tagList(
@@ -67,7 +71,8 @@ mod_filtering_server <- function(id, tadat) {
         tables$dat <-
           subset(tadat$raw, tadat$raw$TADA.Remove == FALSE)
         tables$filter_fields <-
-          EPATADA::TADA_FieldCounts(tables$dat, display = "key")
+          EPATADA::TADA_FieldCounts(tables$dat, display = "key") |>
+          dplyr::left_join(filter_dat, by = c("Fields"))
       }
     })
     
