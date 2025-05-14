@@ -8,7 +8,7 @@
 #' 
 #' 
 # Load the input data
-data_path1 <- app_sys("extdata/HUC8.RData")
+data_path1 <- app_sys("extdata/InputData40.RData")
 load(data_path1)
 
 data_path2 <- app_sys("extdata/statecodes_df.Rdata")
@@ -17,23 +17,64 @@ load(data_path2)
 data_path3 <- app_sys("extdata/query_choices.Rdata")
 load(data_path3)
 
-data_path4 <- app_sys("extdata/tribal_boundary.RData")
-load(data_path4)
-
 # Create a function that performs the EPATADA::TADA_DataRetrieval with purrr::possibly
 # to handle the error case when downloading tribal data
 poss_TADA_DataRetrieval <- EPATADA::TADA_DataRetrieval |>
   purrr::possibly(otherwise = TADA_download_temp)
 
-# A function to return the tribal data frame with tribal name as an sf object
-return_tribal_sf <- function(tribal_layer, tribal_name, tribal_list = tribal_list){
-  
-  tribal_data2 <- tribal_list |>
-    purrr::pluck(tribal_layer) |>
-    dplyr::filter(TRIBE_NAME %in% tribal_name)
-  
-  return(tribal_data2)
+# Download tribal data when loading the tool
+Alaska_Native_Allotments <- 
+  EPATADA::TADA_TribalOptions(tribal_area_type = "Alaska Native Allotments",
+                              return_sf = TRUE) |>
+  # Change PARCEL_NO to TRIBE_NAME consistency with other data frames
+  dplyr::rename(TRIBE_NAME = PARCEL_NO)
+
+# American Indian Reservations
+American_Indian_Reservations <- 
+  EPATADA::TADA_TribalOptions(tribal_area_type = "American Indian Reservations",
+                              return_sf = TRUE)
+
+# Off-reservation Trust Lands
+Off_reservation_Trust_Lands <- 
+  EPATADA::TADA_TribalOptions(tribal_area_type = "Off-reservation Trust Lands",
+                              return_sf = TRUE)
+
+# Oklahoma Tribal Statistical Areas
+Oklahoma_Tribal_StatisticalAreas <- 
+  EPATADA::TADA_TribalOptions(tribal_area_type = "Oklahoma Tribal Statistical Areas",
+                              return_sf = TRUE)
+
+# Create a list containing the four data frames
+tribal_list <- list(
+  "Alaska Native Allotments" = Alaska_Native_Allotments,
+  "American Indian Reservations" = American_Indian_Reservations,
+  "Off-reservation Trust Lands" = Off_reservation_Trust_Lands,
+  "Oklahoma Tribal Statistical Areas" = Oklahoma_Tribal_StatisticalAreas
+)
+
+# A function to get the tribal data
+return_tribal_data <- function(data_name, tribal_list = tribal_list){
+  tribal_data <- tribal_list[[data_name]]
+  return(tribal_data)
 }
+
+
+# A function to return the list of tribal name based on the data frame
+return_tribal_name <- function(tribal_data){
+  tribal_name <- tribal_data[["TRIBE_NAME"]]
+  return(tribal_name)
+}
+
+# A function to return the tribal data frame with tribal name as an sf object based on 
+return_tribal_sf <- function(tribal_data, tribal_name){
+  tribal_data |>
+    dplyr::filter(TRIBE_NAME %in% tribal_name)
+  return(tribal_data)
+}
+
+# A function to get the bounding box information
+
+
 
 # new (2024-05-23) list for new Country/Ocean(s) Query the Water Quality Portal option. Not included in saved query_choices file
 countrycode_url <- 'https://www.waterqualitydata.us/Codes/countrycode?mimeType=json'
@@ -139,17 +180,6 @@ mod_query_data_ui <- function(id) {
         6,
         strong("Select the HUC8 based on the map or the dropdown menu"),
         mod_mapUI(ns("HUC8map"))
-      )
-    ),
-    br(),
-    br(),
-    shiny::fluidRow(
-      column(4, shiny::selectizeInput(ns("tribe_layer"), "Tribal Data Layers", 
-                                      choices = NULL)),
-      column(
-        4,
-        shiny::selectizeInput(ns("tribe_name"), "Tribe Name", 
-                              choices = NULL)
       )
     ),
     htmltools::h4("Metadata Filters"),   
@@ -495,14 +525,6 @@ mod_query_data_server <- function(id, tadat) {
       options = list(placeholder = "Start typing or use drop down menu"),
       server = TRUE
     )
-    shiny::updateSelectizeInput(
-      session,
-      "tribe_layer",
-      choices = names(tribal_list),
-      selected = character(0),
-      options = list(placeholder = "Select tribal data layer", maxItems = 1),
-      server = TRUE
-    )
 
     # this observes when the user inputs a state into the drop down and subsets the choices for counties to only those counties within that state.
     shiny::observeEvent(input$state, {
@@ -514,22 +536,6 @@ mod_query_data_server <- function(id, tadat) {
         selected = character(0),
         options = list(
           placeholder = "Select county",
-          maxItems = 1
-        ),
-        server = TRUE
-      )
-    })
-    
-    # this observes when the user inputs a tribal data layer into the drop down and subsets the choices for data layer to only those tribes within that dataset.
-    shiny::observeEvent(input$tribe_layer, {
-      tribal_names <- sort(tribal_list[[input$tribe_layer]][["TRIBE_NAME"]])
-      shiny::updateSelectizeInput(
-        session,
-        "tribe_name",
-        choices = tribal_names,
-        selected = character(0),
-        options = list(
-          placeholder = "Select tribe name or ID",
           maxItems = 1
         ),
         server = TRUE
@@ -618,22 +624,6 @@ mod_query_data_server <- function(id, tadat) {
       } else {
         tadat$startDate <- as.character(input$startDate)
       }
-      
-      # If there are tribal information, get the tribal as a polygon
-      if (!input$tribe_layer %in% "" & !input$tribe_name %in% "") {
-        # ensure if date is empty, the query receives a proper input ("null")
-        tribal_sf_object <- return_tribal_sf(tribal_layer = input$tribe_layer,
-                                                  tribal_name = input$tribe_name,
-                                                  tribal_list = tribal_list)
-        tadat$tribal_boundary <- tribal_sf_object
-        tadat$tribal_bbox <- unname(sf::st_bbox(tribal_sf_object))
-          
-        
-      } else {
-        tadat$tribal_boundary <- "null"
-        tadat$tribal_bbox <- "null"
-      }
-      
       # a modal that pops up showing it's working on querying the portal
       shinybusy::show_modal_spinner(
         spin = "double-bounce",
@@ -670,8 +660,7 @@ mod_query_data_server <- function(id, tadat) {
         sampleMedia = tadat$sampleMedia,
         project = tadat$project,
         organization = tadat$organization,
-        providers = tadat$providers,
-        bBox = tadat$tribal_bbox
+        providers = tadat$providers
       )
 
       # Use dataRetrieval::readWQPsummary to get the summary data
@@ -682,26 +671,6 @@ mod_query_data_server <- function(id, tadat) {
         dplyr::filter(YearSummarized >= lubridate::year(lubridate::ymd(tadat$startDate)), 
                         YearSummarized <= lubridate::year(lubridate::ymd(tadat$endDate)))
       
-      # If using tribal data, filter the raw_summary2 by boundary
-      if (!input$tribe_layer %in% "" & !input$tribe_name %in% ""){
-        req(tadat$tribal_boundary)
-        
-        # Convert the summary data to an sf object
-        raw_summary2_sf <- raw_summary2 |>
-          sf::st_as_sf(coords = c("MonitoringLocationLongitude",
-                                  "MonitoringLocationLatitude"),
-                       crs = 4326) |>
-          sf::st_transform(crs = sf::st_crs(tadat$tribal_boundary))
-        
-        # Filter the sites within the tribal boundary
-        raw_summary2_sf_filter <- raw_summary2_sf %>%
-          sf::st_filter(tadat$tribal_boundary)
-        
-        raw_summary2 <- raw_summary2_sf_filter %>%
-          sf::st_set_geometry(NULL)
-        
-      }
-      
       # A warning section to show if the sample size is too large
       sample_size <- nrow(raw_summary2)
       
@@ -711,17 +680,6 @@ mod_query_data_server <- function(id, tadat) {
           text = paste0("The estimated sample size is ", 
                         scales::comma(sample_size), 
                         ", which is above 100,000 and could be above the memory limit. Please select a smaller geographic area or a shorter period with multiple downloads."),
-          type = "warning"
-        )
-        removeModal()
-        return()
-      }
-      
-      # A warning section to show if the sample size is zero
-      if (sample_size == 0){
-        shinyalert::shinyalert(
-          title = "Empty Query",
-          text = "Your query returned zero results. Please adjust your search inputs and try again. Remember to update the start and end dates.",
           type = "warning"
         )
         removeModal()
@@ -805,8 +763,6 @@ mod_query_data_server <- function(id, tadat) {
           dplyr::filter(MonitoringLocationIdentifier %in% raw_summary2$MonitoringLocationIdentifier) %>%
           dplyr::filter(ActivityStartDate >= lubridate::ymd(tadat$startDate) & 
                           ActivityStartDate <= lubridate::ymd(tadat$endDate))
-        
-        
       } else {
         raw <- TADA_download_temp
       } 

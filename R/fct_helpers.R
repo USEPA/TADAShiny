@@ -12,7 +12,8 @@ args_create <- function(statecode = NULL,
                         organization = NULL,
                         startDateLo = NULL,
                         startDateHi = NULL,
-                        providers = NULL){
+                        providers = NULL,
+                        bBox = NULL){
   # Construct the arguments for downloads
   args <- list(
     "statecode" = statecode,
@@ -28,7 +29,8 @@ args_create <- function(statecode = NULL,
     "organization" = organization,
     "startDateLo" = startDateLo,
     "startDateHi" = startDateHi,
-    "providers" = providers
+    "providers" = providers,
+    "bBox" = bBox
   )
 
   # Replace null with NULL
