@@ -72,7 +72,10 @@ mod_filtering_server <- function(id, tadat) {
           subset(tadat$raw, tadat$raw$TADA.Remove == FALSE)
         tables$filter_fields <-
           EPATADA::TADA_FieldCounts(tables$dat, display = "key") |>
-          dplyr::left_join(filter_dat, by = c("Fields"))
+          dplyr::left_join(filter_dat, by = c("Fields")) |>
+          dplyr::mutate(Description = ifelse(is.na(Description),
+                                             "No description available",
+                                             Description))
       }
     })
     
@@ -182,7 +185,11 @@ mod_filtering_server <- function(id, tadat) {
       shiny::updateRadioButtons(session, "field_sel", selected = tadat$field_sel)
       if (!is.null(tables$dat)) {
         tables$filter_fields <-
-          EPATADA::TADA_FieldCounts(tables$dat, display = tadat$field_sel)
+          EPATADA::TADA_FieldCounts(tables$dat, display = tadat$field_sel) |>
+          dplyr::left_join(filter_dat, by = c("Fields")) |>
+          dplyr::mutate(Description = ifelse(is.na(Description),
+                                             "No description available",
+                                             Description))
       }
     })
     
