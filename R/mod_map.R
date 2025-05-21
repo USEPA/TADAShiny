@@ -41,7 +41,8 @@ mod_mapServer <- function(id,
           group      = "base_map",
           label      = ~huc8
         ) %>%
-        add_USGS_base()
+        add_USGS_base() %>%
+        leaflet::setView(lng = -114, lat = 42, zoom = 3)
       
       # Signal that the map is ready
       map_ready(TRUE)

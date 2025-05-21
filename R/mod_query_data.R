@@ -20,6 +20,9 @@ load(data_path3)
 data_path4 <- app_sys("extdata/tribal_boundary.RData")
 load(data_path4)
 
+data_path5 <- app_sys("extdata/TADA_Download_Temp.RData")
+load(data_path5)
+
 # Create a function that performs the EPATADA::TADA_DataRetrieval with purrr::possibly
 # to handle the error case when downloading tribal data
 poss_TADA_DataRetrieval <- EPATADA::TADA_DataRetrieval |>
@@ -111,46 +114,48 @@ mod_query_data_ui <- function(id) {
       )
     ),
     htmltools::h4("Location Information"),
+    "Choose at least one spatial location from the following options. If multiple options are used, the locations must be overlapping.",
+    htmltools::br(),
+    shiny::fluidRow(
+      column(4, shiny::selectizeInput(ns("countryocean"),
+                                      "Country/Ocean(s)", 
+                                      choices = NULL, 
+                                      multiple = TRUE))
+    ),
     shiny::fluidRow(
       column(4, shiny::selectizeInput(ns("state"), "State", choices = NULL)),
       column(
         4,
         shiny::selectizeInput(ns("county"), "County (pick state first)", choices = NULL)
-      ),
-      column(4,
-             shiny::selectizeInput(ns("siteid"),
-                                   "Monitoring Location ID(s)",
-                                   choices = NULL,
-                                   multiple = TRUE))
+      )
+    ),
+    shiny::fluidRow(
+      column(4, shiny::selectizeInput(ns("tribe_layer"), "Tribe Data Layers", 
+                                      choices = NULL)),
+      column(
+        4,
+        shiny::selectizeInput(ns("tribe_name"), "Tribe Name (pick data layers first)", 
+                              choices = NULL)
+      )
     ),
     shiny::fluidRow(
       column(
         4,
         shiny::textInput(ns("huc"), "Hydrologic Unit", placeholder = "e.g. 020700100103")
       ),
-      column(4, 
-             shiny::selectizeInput(ns("countryocean"),
-             "Country/Ocean(s)", 
-             choices = NULL, 
-             multiple = TRUE))
-    ),
-    shiny::fluidRow(
       column(
         6,
         strong("Select the HUC8 based on the map or the dropdown menu"),
         mod_mapUI(ns("HUC8map"))
       )
     ),
-    br(),
-    br(),
     shiny::fluidRow(
-      column(4, shiny::selectizeInput(ns("tribe_layer"), "Tribal Data Layers", 
-                                      choices = NULL)),
       column(
         4,
-        shiny::selectizeInput(ns("tribe_name"), "Tribe Name", 
-                              choices = NULL)
-      )
+        shiny::selectizeInput(ns("siteid"),
+                              "Monitoring Location ID(s)",
+                              choices = NULL,
+                              multiple = TRUE))
     ),
     htmltools::h4("Metadata Filters"),   
     shiny::fluidRow(
