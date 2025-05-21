@@ -22,7 +22,7 @@ mod_review_data_ui <- function(id) {
       8, shiny::plotOutput(ns("review_barchar"), height = "500px")
     )),
     shiny::fluidRow(column(12, shiny::plotOutput(ns(
-      "reason_pie"
+      "reason_barchar"
     )))),
     htmltools::HTML(
       "<B>Note:</B> This pie chart shows the number of results flagged/filtered for each reason. Some results may be removed for multiple reasons. Because of this, the total number of flagged results in this pie chart is equal to or greater than the number of unique results removed."
@@ -71,9 +71,9 @@ mod_review_data_server <- function(id, tadat) {
       step_rems_plot <-
         data.frame(
           Step = c(
-            "Starting Total",
-            "Measurements Retained After Flagging",
-            "Measurements Retained After Filtering"
+            "1: Starting Total",
+            "2: Measurements Retained After Flagging",
+            "3: Measurements Retained After Filtering"
           ),
           Count = c(total, mrfl, mrfi)
         )
@@ -81,14 +81,14 @@ mod_review_data_server <- function(id, tadat) {
         factor(
           step_rems_plot$Step,
           levels = c(
-            "Starting Total",
-            "Measurements Retained After Flagging",
-            "Measurements Retained After Filtering"
+            "1: Starting Total",
+            "2: Measurements Retained After Flagging",
+            "3: Measurements Retained After Filtering"
           )
         )
       review_things$step_rems_plot <- step_rems_plot
 
-      # data for pie chart
+      # data for removal reason bar column chart
       rem_reas <-
         data.frame(
           Reason = names(tadat$removals),
@@ -105,62 +105,57 @@ mod_review_data_server <- function(id, tadat) {
     # characteristics bar chart showing top characteristics by result number in dataset
     output$review_barchar <- shiny::renderPlot({
       shiny::req(review_things$step_rems_plot)
-      ggplot2::ggplot(
-        review_things$step_rems_plot,
-        ggplot2::aes(x = Count, y = Step)
-      ) +
-        ggplot2::geom_bar(
-          stat = "identity",
-          fill = "#005ea2",
-          color = "black"
-        ) +
-        ggplot2::scale_y_discrete(limits=rev) + 
-        ggplot2::labs(title = "Results Retained Following Flagging/Filtering Steps", x = "Results Count", y = "") +
-        ggplot2::theme_classic(base_size = 16) +
-        ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1)) +
-        ggplot2::geom_text(
-          ggplot2::aes(
-            x = Count + (0.07 * max(Count)),
-            y = Step,
-            label = Count
-          ),
-          size = 5,
-          color = "black"
-        ) #+
+      dat <- review_things$step_rems_plot |>
+        dplyr::mutate(num_chr = paste0("n = ", Count)) |>
+        dplyr::rowwise() |>
+        dplyr::mutate(Step_wrap = stringr::str_wrap(string = Step, width = 30))
+      ggplot2::ggplot(dat, ggplot2::aes(x = Step_wrap, y = Count)) +
+        ggplot2::geom_col(width = 0.75,
+                          fill = "#005ea2",
+                          color = "black") +
+        ggplot2::geom_text(ggplot2::aes(label = num_chr),
+                           vjust = -0.5,
+                           size = 5) +
+        ggplot2::labs(title = "Results Retained Following Flagging/Filtering Steps", x = "Step Description", y = "Count") +
+        ggplot2::theme_classic() +
+        ggplot2::theme(plot.title = ggplot2::element_text(face = "bold", size = 18),
+                       axis.title = ggplot2::element_text(size = 16),
+                       axis.text = ggplot2::element_text(size = 14),
+                       legend.position = "none")
     })
 
-    output$reason_pie <- shiny::renderPlot({
+    # column bar chart showing the reasons why data was removed
+    output$reason_barchar <- shiny::renderPlot({
       shiny::req(review_things$rem_reas)
-      dat <- review_things$rem_reas
-      if (nrow(review_things$rem_reas) > 1) {
-        dat$Legend <- paste0(dat$Reason, " - ", dat$Count, " results")
-      } else {
-        dat$Legend <- paste0(dat$Reason)
-      }
-      dat <- dat %>%
-        dplyr::rowwise() %>%
-        dplyr::mutate(Legend = EPATADA::TADA_InsertBreaks(Legend, len = 100))
+      dat <- review_things$rem_reas |>
+        dplyr::mutate(Legend_raw = dplyr::if_else(is.na(Reason), "Not Applicable", paste0(Reason)),
+                      num_chr = paste0("n = ", Count)) |>
+        dplyr::rowwise() |>
+        dplyr::mutate(Legend = stringr::str_wrap(string = Legend_raw, width = 30))
 
-      # define number of colors required for pie chart
+      # define number of colors required for bar chart
       colorCount <- length(unique(dat$Legend))
 
       # define color palette
       getPalette <-
         grDevices::colorRampPalette(RColorBrewer::brewer.pal(8, "Set2"))
 
-      # create pie chart
-      ggplot2::ggplot(dat, ggplot2::aes(x = "", y = Count, fill = Legend)) +
+      # create column bar chart
+      ggplot2::ggplot(dat, ggplot2::aes(x = Legend, y = Count, fill = Legend)) +
         ggplot2::scale_fill_manual(values = getPalette(colorCount), name = "Removal Reasons") +
-        ggplot2::geom_bar(stat = "identity", width = 1) +
-        ggplot2::coord_polar("y", start = 0) +
-        ggplot2::theme_void() +
+        ggplot2::geom_col(width = 0.75,
+                          color = "black") +
+        ggplot2::geom_text(ggplot2::aes(label = num_chr),
+                           vjust = -0.5,
+                           size = 5) +
+        ggplot2::labs(title = "Reasons for Removal of Results", x = "Reason", y = "Count") +
+        ggplot2::theme_classic() +
         ggplot2::theme(
-          legend.key.size = ggplot2::unit(1, "cm"),
-          # change legend key size
-          legend.title = ggplot2::element_text(size = 14),
-          # change legend title font size
-          legend.text = ggplot2::element_text(size = 12)
-        )
+          plot.title = ggplot2::element_text(face = "bold", size = 18),
+          axis.title = ggplot2::element_text(size = 16),
+          axis.text = ggplot2::element_text(size = 14),
+          legend.title = ggplot2::element_text(size = 16),
+          legend.text = ggplot2::element_text(size = 16))
     })
   })
 }

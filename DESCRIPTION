@@ -13,9 +13,9 @@ License: CC0
 Copyright: This software is in the public domain because it contains materials that originally came from the U.S. Environmental Protection Agency.
 Imports: 
     EPATADA,
-    htmltools, 
+    htmltools,
     shiny,
-    golem, 
+    golem,
     magrittr,
     readxl,
     writexl,
@@ -24,8 +24,8 @@ Imports:
     shinycssloaders,
     DT,
     ggplot2,
-    shinybusy, 
-    dplyr, 
+    shinybusy,
+    dplyr,
     plyr,
     tidyr,
     scales,
@@ -33,12 +33,13 @@ Imports:
     RColorBrewer,
     grDevices,
     lubridate,
-    plotly, 
+    plotly,
     shinyjs,
     gotop,
     config,
     utils,
-    dataRetrieval
+    dataRetrieval,
+    stringr
 Remotes:
     USEPA/EPATADA@main,
     DOI-USGS/dataRetrieval@develop

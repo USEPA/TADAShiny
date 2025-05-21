@@ -39,6 +39,7 @@
 # usethis::use_package("TADA")
 # usethis::use_package("scales")
 # usethis::use_package("combinat")
+# usethis::use_package("stringr")
 
 ## Add modules ----
 ## Create a module infrastructure in R/

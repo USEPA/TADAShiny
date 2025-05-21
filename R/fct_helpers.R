@@ -1,3 +1,11 @@
+#' helpers
+#'
+#' @description A fct function
+#'
+#' @return The return value, if any, from executing the function.
+#'
+#' @noRd
+
 ### A function to construct the argument list
 args_create <- function(statecode = NULL,
                         countycode = NULL,
