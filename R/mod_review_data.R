@@ -127,6 +127,7 @@ mod_review_data_server <- function(id, tadat) {
     # column bar chart showing the reasons why data was removed
     output$reason_barchar <- shiny::renderPlot({
       shiny::req(review_things$rem_reas)
+
       dat <- review_things$rem_reas |>
         dplyr::mutate(Legend_raw = dplyr::if_else(is.na(Reason), "Not Applicable", paste0(Reason)),
                       num_chr = paste0("n = ", Count)) |>
