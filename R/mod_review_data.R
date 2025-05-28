@@ -139,7 +139,7 @@ mod_review_data_server <- function(id, tadat) {
       }
       dat <- dat %>%
         dplyr::rowwise() %>%
-        dplyr::mutate(Legend = EPATADA::TADA_InsertBreaks(Legend, len = 100))
+        dplyr::mutate(Legend = stringr::str_wrap(Legend))
 
       # define number of colors required for pie chart
       colorCount <- length(unique(dat$Legend))
