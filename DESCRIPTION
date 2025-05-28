@@ -40,7 +40,9 @@ Imports:
     utils,
     stringr,
     mapview, 
-    purrr
+    purrr,
+    dataRetrieval,
+    sf
 Remotes:
     USEPA/EPATADA@develop,
     DOI-USGS/dataRetrieval@develop
@@ -55,8 +57,6 @@ Suggests:
     rsconnect,
     testthat,
     spelling,
-    dataRetrieval,
-    sf,
     shinyalert
 Depends: 
     R (>= 4.1.0)

@@ -648,7 +648,9 @@ mod_query_data_server <- function(id, tadat) {
       )
       
       # a section to estimate the sample size
-      shiny::showModal(modalDialog(title = "Estimating the sample size...", footer = NULL))
+      shiny::showModal(modalDialog(title = 
+                                     "Estimating the sample size...", 
+                                   footer = NULL))
 
       # Calculate the year summary number
       req(tadat$startDate)
