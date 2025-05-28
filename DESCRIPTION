@@ -38,7 +38,9 @@ Imports:
     gotop,
     config,
     utils,
-    stringr
+    stringr,
+    mapview, 
+    purrr
 Remotes:
     USEPA/EPATADA@develop,
     DOI-USGS/dataRetrieval@develop
@@ -53,7 +55,9 @@ Suggests:
     rsconnect,
     testthat,
     spelling,
-    dataRetrieval
+    dataRetrieval,
+    sf,
+    shinyalert
 Depends: 
     R (>= 4.1.0)
 Encoding: UTF-8

@@ -145,7 +145,7 @@ mod_query_data_ui <- function(id) {
       ),
       column(
         6,
-        strong("Select the HUC8 based on the map or the dropdown menu"),
+        htmltools::strong("Select the HUC8 based on the map or the dropdown menu"),
         mod_mapUI(ns("HUC8map"))
       )
     ),
