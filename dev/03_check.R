@@ -15,14 +15,11 @@
 # Check renv lock file
 renv::status()
 # See `?renv::status` for advice on resolving issues
-# If you have multiple packages in an inconsistent state, we recommend 
-# renv::restore(), then renv::install(), then renv::snapshot(), 
-# but that also suggests you should be running status more frequently.
 
 ## Run checks ----
 ## Check the package before sending to prod
 ## Run devtools test, check and build
 devtools::document() # make sure all dependencies are listed in description file
 devtools::test()
-devtools::build()
+# devtools::build()
 devtools::check()

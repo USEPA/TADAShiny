@@ -42,7 +42,8 @@ Imports:
     mapview, 
     purrr,
     dataRetrieval,
-    sf
+    sf,
+    shinyalert
 Remotes:
     USEPA/EPATADA@develop,
     DOI-USGS/dataRetrieval@develop
@@ -56,8 +57,7 @@ Suggests:
     usethis,
     rsconnect,
     testthat,
-    spelling,
-    shinyalert
+    spelling
 Depends: 
     R (>= 4.1.0)
 Encoding: UTF-8

@@ -36,6 +36,3 @@ AN_dat <- EPATADA::TADA_DataRetrieval(
   tribe_name_parcel = c("Iowa Tribe of Oklahoma"),
   ask = FALSE
 )
-
-
-
