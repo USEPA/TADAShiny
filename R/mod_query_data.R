@@ -342,10 +342,10 @@ mod_query_data_server <- function(id, tadat) {
       )
 
       tadat$example_data <- input$example_data
-      if (input$example_data == "Shepherdstown (34k results)") {
-        raw <- EPATADA::Data_NCTCShepherdstown_HUC12
+      if (input$example_data == "EPA Region 5 May 1-7 2019 (172k results)") {
+        raw <- EPATADA::Data_R5_TADAPackageDemo
       }
-      if (input$example_data == "Tribal (132k results)") {
+      if (input$example_data == "Tribal (136k results)") {
         raw <- EPATADA::Data_6Tribes_5y
       }
       if (input$example_data == "Nutrients Utah (15k results)") {
