@@ -23,7 +23,7 @@ renv::status()
 devtools::document() # make sure all dependencies are listed in description file
 devtools::test()
 devtools::check()
-devtools::build()
+# devtools::build()
 
 # Deploy ----
 ## Local, CRAN or Package Manager ---- 
