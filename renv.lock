@@ -165,7 +165,6 @@
         "yaml",
         "remotes"
       ],
-      "Remotes": "DOI-USGS/dataRetrieval@develop",
       "VignetteBuilder": "knitr, rmarkdown",
       "Language": "en-US",
       "Config/testthat/edition": "3",
@@ -174,15 +173,15 @@
       "LazyData": "true",
       "LazyDataCompression": "xz",
       "Config/Needs/website": "rmarkdown",
+      "Author": "Cristina Mullin [aut, cre] (<https://orcid.org/0000-0002-0615-6087>), Hillary Marler [aut] (<https://orcid.org/0009-0006-0323-1172>), Jacob Greif [aut], Elise Hinman [aut], Kenny Wong [aut], Kathryn Willi [aut], Matt Brousil [aut], Kathleen Healy [aut], Justin Bousquin [aut], TADA Working Group [ctb]",
+      "Maintainer": "Cristina Mullin <mullin.cristina@epa.gov>",
       "RemoteType": "github",
+      "Remotes": "DOI-USGS/dataRetrieval@develop",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "EPATADA",
       "RemoteUsername": "USEPA",
       "RemoteRef": "main",
-      "RemoteSha": "e090929ba8d4779828775686380e06fcc34271c6",
-      "NeedsCompilation": "no",
-      "Author": "Cristina Mullin [aut, cre] (<https://orcid.org/0000-0002-0615-6087>), Hillary Marler [aut] (<https://orcid.org/0009-0006-0323-1172>), Jacob Greif [aut], Elise Hinman [aut], Kenny Wong [aut], Kathryn Willi [aut], Matt Brousil [aut], Kathleen Healy [aut], Justin Bousquin [aut], TADA Working Group [ctb]",
-      "Maintainer": "Cristina Mullin <mullin.cristina@epa.gov>"
+      "RemoteSha": "e090929ba8d4779828775686380e06fcc34271c6"
     },
     "KernSmooth": {
       "Package": "KernSmooth",
@@ -1968,15 +1967,14 @@
       "VignetteBuilder": "knitr",
       "BugReports": "https://github.com/DOI-USGS/dataRetrieval/issues",
       "RoxygenNote": "7.3.2",
+      "Author": "Laura DeCicco [aut, cre] (<https://orcid.org/0000-0002-3915-9487>), Robert Hirsch [aut] (<https://orcid.org/0000-0002-4534-075X>), David Lorenz [aut], Jordan Read [ctb], Jordan Walker [ctb], Lindsay Platt [ctb], David Watkins [aut] (<https://orcid.org/0000-0002-7544-0700>), David Blodgett [aut] (<https://orcid.org/0000-0001-9489-1710>), Mike Johnson [aut] (<https://orcid.org/0000-0002-5288-8350>), Aliesha Krall [ctb] (<https://orcid.org/0000-0003-2521-5043>), Lee Stanish [ctb] (<https://orcid.org/0000-0002-9775-6861>)",
+      "Maintainer": "Laura DeCicco <ldecicco@usgs.gov>",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "dataRetrieval",
       "RemoteUsername": "DOI-USGS",
       "RemoteRef": "develop",
-      "RemoteSha": "3ae3ade44dc575f1c1b58dc03e60d5a06a02b4cb",
-      "NeedsCompilation": "no",
-      "Author": "Laura DeCicco [aut, cre] (<https://orcid.org/0000-0002-3915-9487>), Robert Hirsch [aut] (<https://orcid.org/0000-0002-4534-075X>), David Lorenz [aut], Jordan Read [ctb], Jordan Walker [ctb], Lindsay Platt [ctb], David Watkins [aut] (<https://orcid.org/0000-0002-7544-0700>), David Blodgett [aut] (<https://orcid.org/0000-0001-9489-1710>), Mike Johnson [aut] (<https://orcid.org/0000-0002-5288-8350>), Aliesha Krall [ctb] (<https://orcid.org/0000-0003-2521-5043>), Lee Stanish [ctb] (<https://orcid.org/0000-0002-9775-6861>)",
-      "Maintainer": "Laura DeCicco <ldecicco@usgs.gov>"
+      "RemoteSha": "3ae3ade44dc575f1c1b58dc03e60d5a06a02b4cb"
     },
     "dbplyr": {
       "Package": "dbplyr",
@@ -4333,7 +4331,8 @@
       "NeedsCompilation": "yes",
       "Author": "Deepayan Sarkar [aut, cre] (<https://orcid.org/0000-0003-4107-1553>), Felix Andrews [ctb], Kevin Wright [ctb] (documentation), Neil Klepeis [ctb], Johan Larsson [ctb] (miscellaneous improvements), Zhijian (Jason) Wen [cph] (filled contour code), Paul Murrell [ctb], Stefan Eng [ctb] (violin plot improvements), Achim Zeileis [ctb] (modern colors), Alexandre Courtiol [ctb] (generics for larrows, lpolygon, lrect and lsegments)",
       "Maintainer": "Deepayan Sarkar <deepayan.sarkar@r-project.org>",
-      "Repository": "CRAN"
+      "Repository": "RSPM",
+      "Encoding": "UTF-8"
     },
     "lazyeval": {
       "Package": "lazyeval",
@@ -4769,7 +4768,8 @@
       "ByteCompile": "yes",
       "License": "GPL (>= 2)",
       "NeedsCompilation": "yes",
-      "Repository": "CRAN"
+      "Repository": "RSPM",
+      "Encoding": "UTF-8"
     },
     "mime": {
       "Package": "mime",
@@ -6203,7 +6203,7 @@
     },
     "renv": {
       "Package": "renv",
-      "Version": "1.1.2",
+      "Version": "1.1.4",
       "Source": "Repository",
       "Type": "Package",
       "Title": "Project Environments",

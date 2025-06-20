@@ -10,24 +10,25 @@
 #### CURRENT FILE: DEPLOY SCRIPT #######
 ########################################
 
-# Test your app
+# Check renv lock file ----
+renv::status()
+# See `?renv::status` for advice on resolving issues
+# If you have multiple packages in an inconsistent state, we recommend 
+# renv::restore(), then renv::install(), then renv::snapshot(), 
+# but that also suggests you should be running status more frequently.
 
 ## Run checks ----
 ## Check the package before sending to prod
 ## Run devtools test, check and build
+devtools::document() # make sure all dependencies are listed in description file
 devtools::test()
 devtools::check()
-devtools::build()
+# devtools::build()
 
-# Check renv lock file
-renv::status()
-
-# Deploy
-
+# Deploy ----
 ## Local, CRAN or Package Manager ---- 
 ## This will build a tar.gz that can be installed locally, 
 ## sent to CRAN, or to a package manager
-
 ## RStudio ----
 ## If you want to deploy on RStudio related platforms
 golem::add_positconnect_file()

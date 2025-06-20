@@ -38,9 +38,9 @@ Imports:
     gotop,
     config,
     utils,
-    dataRetrieval
+    stringr
 Remotes:
-    USEPA/EPATADA@main,
+    USEPA/EPATADA@develop,
     DOI-USGS/dataRetrieval@develop
 Suggests:
     devtools,
@@ -52,7 +52,8 @@ Suggests:
     usethis,
     rsconnect,
     testthat,
-    spelling
+    spelling,
+    dataRetrieval
 Depends: 
     R (>= 3.5.0)
 Encoding: UTF-8
