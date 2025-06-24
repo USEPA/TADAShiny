@@ -99,7 +99,7 @@ mod_TADA_summary_server <- function(id, tadat) {
         summary_things$temp_files = c(datafile_name, progress_file_name)
         dfs <- list(Data = out_data, Parameterization = desc)
         writeFile(tadat, progress_file_name)
-        writexl::write_xlsx(dfs, path = datafile_name)
+        writexl::write_xlsx(dfs, path = datafile_name, use_zip64 = TRUE)
         shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
         shinyjs::click("dwn_working")
       }, error = function(e) {
@@ -128,7 +128,7 @@ mod_TADA_summary_server <- function(id, tadat) {
         summary_things$temp_files = c(datafile_name, progress_file_name)
         dfs <- list(Data = out_data, Parameterization = desc)
         writeFile(tadat, progress_file_name)
-        writexl::write_xlsx(dfs, path = datafile_name)
+        writexl::write_xlsx(dfs, path = datafile_name, use_zip64 = TRUE)
         shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
         shinyjs::click("dwn_final")
       }, error = function(e) {
