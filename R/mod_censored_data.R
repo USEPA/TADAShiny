@@ -110,6 +110,14 @@ mod_censored_data_server <- function(id, tadat) {
     shiny::observeEvent(tadat$tab, {
       shiny::req(tadat$raw)
       if (tadat$tab == "Censored") {
+        # dat = subset(tadat$raw, tadat$raw$TADA.Remove==FALSE) # first, get rid of anything that has removed=FALSE flag
+        # dat$TADA.Remove = ifelse(!dat$TADA.CensoredData.Flag%in%c("Non-Detect","Over-Detect","Uncensored", "Other Condition/Limit Populated"),TRUE,dat$TADA.Remove)
+        # if(any(dat$TADA.Remove==TRUE)){ # let users know when there are "problem" censored data results that will be flagged for removal.
+        #   shiny::showModal(shiny::modalDialog(
+        #     title = "Detection Limit Data Warning",
+        #     paste0(length(dat$ResultIdentifier[dat$TADA.Remove==TRUE])," results were flagged for removal because they have conflicting, ambiguous and/or unfamiliar detection limits and conditions. These will show up in the pie chart, but only 'Non-Detect', 'Over-Detect', and 'Uncensored' results will be used in the sections below. You may download your dataset for review at any time using the 'Download Working Dataset' button at the bottom of the page.")
+        #   ))
+        # }
         censdat$dat <-
           subset(tadat$raw, tadat$raw$TADA.Remove == FALSE) # however, this reactive object has all of the data that were not previously removed and do not have ambiguous detection limit data. This is the "clean" dataset
       }
@@ -143,11 +151,13 @@ mod_censored_data_server <- function(id, tadat) {
           plot.title = ggplot2::element_text(face = "bold", size = 18),
           legend.title = ggplot2::element_text(size = 16),
           legend.text = ggplot2::element_text(size = 14)
-        )
+        ) #+
+      # ggplot2::geom_text(ggplot2::aes(label = scales::comma(num)), color = "white", size=6,position = ggplot2::position_stack(vjust = 0.5))
     })
 
 
     # this adds the multiplier numeric input next to the method selection if the nd method selected is to mult det limit by x
+
     output$nd_mult <- shiny::renderUI({
       init_val <- tadat$nd_mult
       if (is.null(init_val)) {
@@ -179,6 +189,7 @@ mod_censored_data_server <- function(id, tadat) {
 
 
     # initialize global variables for saving/loading
+
     tadat$censor_applied <- FALSE
 
     shiny::observeEvent(tadat$load_progress_file, {
@@ -241,6 +252,7 @@ mod_censored_data_server <- function(id, tadat) {
       }
     })
 
+
     # Button to apply the simple methods to the nd and od results in the dataset.
     shiny::observeEvent(input$apply_methods, {
       shinybusy::show_modal_spinner(
@@ -298,7 +310,12 @@ mod_censored_data_server <- function(id, tadat) {
           "TADA.ResultMeasureValue",
           "TADA.ResultMeasure.MeasureUnitCode"
         )]
-
+      
+      # COMMENT out for now to discuss later
+      # this does not work as is... the idea is to select just the rows where 
+      # limit has been changed because others are not really relevant.  Right?
+      # dat <- dat %>% dplyr::filter(DetectionQuantitationLimitMeasure.MeasureValue != TADA.ResultMeasureValue)
+      
       dat <-
         dat %>% dplyr::rename(
           "Original Detection Limit Value" = DetectionQuantitationLimitMeasure.MeasureValue,

@@ -50,8 +50,8 @@ mod_TADA_summary_ui <- function(id) {
           )
         ))
       ),
-      shiny::conditionalPanel("false", shiny::downloadButton(ns("dwn_working"), "Download Working Dataset (.zip)")),
-      shiny::conditionalPanel("false", shiny::downloadButton(ns("dwn_final"), "Download Final Dataset (.zip)")),
+      shiny::conditionalPanel("false", shiny::downloadButton(ns("dwn_working"), "Download Working")),
+      shiny::conditionalPanel("false", shiny::downloadButton(ns("dwn_final"), "Download Final")),
       shiny::fluidRow(column(
         2, shiny::actionButton(ns("disclaimer"), "DISCLAIMER")
       )),
@@ -86,7 +86,7 @@ mod_TADA_summary_server <- function(id, tadat) {
       tryCatch({
         tmpdir <- tempdir()
         setwd(tempdir())
-        datafile_name_working <- paste0(tadat$default_outfile, "_working.xlsx")
+        datafile_name <- paste0(tadat$default_outfile, ".xlsx")
         progress_file_name <- paste0(tadat$default_outfile, "_prog.RData")
         desc <- writeNarrativeDataFrame(tadat)
         shinybusy::show_modal_spinner(
@@ -96,10 +96,10 @@ mod_TADA_summary_server <- function(id, tadat) {
           session = shiny::getDefaultReactiveDomain()
         )
         out_data = EPATADA::TADA_OrderCols(tadat$raw)
-        # summary_things$temp_files = c(datafile_name_working, progress_file_name)
+        summary_things$temp_files = c(datafile_name, progress_file_name)
         dfs <- list(Data = out_data, Parameterization = desc)
         writeFile(tadat, progress_file_name)
-        writexl::write_xlsx(dfs, path = datafile_name_working, use_zip64 = TRUE)
+        writexl::write_xlsx(dfs, path = datafile_name)
         shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
         shinyjs::click("dwn_working")
       }, error = function(e) {
@@ -115,7 +115,7 @@ mod_TADA_summary_server <- function(id, tadat) {
       tryCatch({
         tmpdir <- tempdir()
         setwd(tempdir())
-        datafile_name_final <- paste0(tadat$default_outfile, "_final.xlsx")
+        datafile_name <- paste0(tadat$default_outfile, ".xlsx")
         progress_file_name <- paste0(tadat$default_outfile, "_prog.RData")
         desc <- writeNarrativeDataFrame(tadat)
         shinybusy::show_modal_spinner(
@@ -125,10 +125,10 @@ mod_TADA_summary_server <- function(id, tadat) {
           session = shiny::getDefaultReactiveDomain()
         )
         out_data = EPATADA::TADA_OrderCols(tadat$raw[!tadat$raw$TADA.Remove, ])
-        # summary_things$temp_files = c(datafile_name_final, progress_file_name)
+        summary_things$temp_files = c(datafile_name, progress_file_name)
         dfs <- list(Data = out_data, Parameterization = desc)
         writeFile(tadat, progress_file_name)
-        writexl::write_xlsx(dfs, path = datafile_name_final, use_zip64 = TRUE)
+        writexl::write_xlsx(dfs, path = datafile_name)
         shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
         shinyjs::click("dwn_final")
       }, error = function(e) {
@@ -144,24 +144,18 @@ mod_TADA_summary_server <- function(id, tadat) {
       filename = function() {
         paste0(tadat$default_outfile, "_working.zip")
       },
-      content = function(file) {
-        # utils::zip(zipfile = fname, files = summary_things$temp_files, zip64 = TRUE)
-        zip::zipr(file, files = c(datafile_name_working, progress_file_name), zip64 = TRUE)
-        # Clean up the temporary files after zipping
-        file.remove("datafile_name_working", "progress_file_name")
+      content = function(fname) {
+        utils::zip(zipfile = fname, files = summary_things$temp_files)
       },
       contentType = "application/zip"
     )
     
     output$dwn_final <- shiny::downloadHandler(
       filename = function() {
-        paste0(tadat$default_outfile, "final.zip")
+        paste0(tadat$default_outfile, "_final.zip")
       },
-      content = function(file) {
-        # utils::zip(zipfile = fname, files = summary_things$temp_files, zip64 = TRUE)
-        zip::zipr(file, files = c(datafile_name_final, progress_file_name), zip64 = TRUE)
-        # Clean up the temporary files after zipping
-        file.remove("datafile_name_final", "progress_file_name")
+      content = function(fname) {
+        utils::zip(zipfile = fname, files = summary_things$temp_files)
       },
       contentType = "application/zip"
     )

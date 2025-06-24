@@ -37,8 +37,8 @@ Imports:
     shinyjs,
     gotop,
     config,
-    stringr,
-    zip
+    utils,
+    stringr
 Remotes:
     USEPA/EPATADA@develop,
     DOI-USGS/dataRetrieval@develop
@@ -53,8 +53,7 @@ Suggests:
     rsconnect,
     testthat,
     spelling,
-    dataRetrieval,
-    utils
+    dataRetrieval
 Depends: 
     R (>= 3.5.0)
 Encoding: UTF-8
