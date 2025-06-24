@@ -274,7 +274,7 @@ mod_query_data_server <- function(id, tadat) {
           # write.csv(template_data(), file)
           ## format excel (xlsx)
           d = template_data()
-          writexl::write_xlsx(d, path = file)
+          writexl::write_xlsx(d, path = file, use_zip64 = TRUE)
         },
         contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
      ) 
