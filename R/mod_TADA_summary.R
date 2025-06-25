@@ -9,11 +9,11 @@
 mod_TADA_summary_ui <- function(id) {
   ns <- NS(id)
   tagList(shiny::fluidRow(
-    column(
-      4,
+    #column(
+      #6,
       style = "padding-left:20px",
       shiny::wellPanel(
-        htmltools::h3("TADA Working Summary"),
+        htmltools::h3("Results Summary"),
         shiny::fluidRow(htmltools::h5(shiny::textOutput(ns(
           "rec_tot"
         )))),
@@ -24,6 +24,7 @@ mod_TADA_summary_ui <- function(id) {
           "rec_clean"
         )))),
         htmltools::hr(),
+        htmltools::h3("Monitoring Location Summary"),
         shiny::fluidRow(htmltools::h5(shiny::textOutput(ns(
           "site_tot"
         )))),
@@ -33,22 +34,38 @@ mod_TADA_summary_ui <- function(id) {
         shiny::fluidRow(htmltools::h5(shiny::textOutput(ns(
           "site_clean"
         )))),
+        htmltools::hr(),
+        htmltools::h3("Download Working or Final Dataset"),
+        htmltools::HTML(
+          "Download the working dataset as a .xlsx file. This includes all results that were in the 
+          original data query. In addition, it includes all the TADA flag columns, 
+          including an overall 'Remove' and 'Removal Reason' column.<br><br>"
+        ),
         shiny::fluidRow(column(
           6,
           shiny::actionButton(
             ns("download_working_button"),
-            "Download Working Dataset (.zip)",
+            "Working Dataset (.zip)",
             style = "color: #fff; background-color: #337ab7; border-color: #2e6da4; margin-bottom: 10px;"
           )
         )),
+        htmltools::HTML(
+          "Download the final dataset as a .xlsx file. This has been filtered to remove
+          all results that the user flagged for removal throughout the application.<br><br>"
+        ),
         shiny::fluidRow(column(
           6,
           shiny::actionButton(
             ns("download_final_button"),
-            "Download Final Dataset (.zip)",
+            "Final Dataset (.zip)",
             style = "color: #fff; background-color: #337ab7; border-color: #2e6da4; margin-bottom: 10px;"
           )
-        ))
+        )),
+        htmltools::h5("Note: A progress file in the .RData format will always be 
+        included in the download. See the 'Upload Progress File' option on the 
+        import tab for details on how to use this file to regenerate a dataset 
+        with the same decisions you made before, or to apply the same user
+        selections to a new dataset."),
       ),
       shiny::conditionalPanel("false", shiny::downloadButton(ns("dwn_working"), "Download Working")),
       shiny::conditionalPanel("false", shiny::downloadButton(ns("dwn_final"), "Download Final")),
@@ -57,10 +74,9 @@ mod_TADA_summary_ui <- function(id) {
       )),
       htmltools::br(),
       htmltools::br()
-    )
+    #)
     
   ))
-
 }
 
 #' TADA_summary Server Functions
