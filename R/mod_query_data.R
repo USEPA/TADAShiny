@@ -41,8 +41,8 @@ mod_query_data_ui <- function(id) {
         choices = c(
           "",
           "Nutrients Utah (15k results)",
-          "Shepherdstown (34k results)",
-          "Tribal (132k results)"
+          "EPA Region 5 May 1-7 2019 (172k results)",
+          "Tribal (136k results)"
         )
       ))
     ),
