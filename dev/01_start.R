@@ -4,7 +4,8 @@
 # fill them out before getting started. 
 # 01_start.R should only be used when first creating an app. 
 # 02_dev.R should be used to keep track of your development process.
-# 03_deploy.R should be used to document your deployment process.
+# 03_maintenance.R should be used to test and maintain the app before deployment.
+# 04_deploy.R should be used to document your deployment process.
 
 ########################################
 #### CURRENT FILE: START SCRIPT ########

@@ -4,11 +4,12 @@
 # fill them out before getting started. 
 # 01_start.R should only be used when first creating an app. 
 # 02_dev.R should be used to keep track of your development process.
-# 03_deploy.R should be used to document your deployment process.
+# 03_maintenance.R should be used to test and maintain the app before deployment.
+# 04_deploy.R should be used to document your deployment process.
 
-########################################
-#### CURRENT FILE: DEPLOY SCRIPT #######
-########################################
+#############################################
+#### CURRENT FILE: MAINTENANCE SCRIPT #######
+#############################################
 
 # Check renv lock file ----
 renv::status()
@@ -25,16 +26,6 @@ devtools::test()
 devtools::check()
 # devtools::build()
 
-# Deploy ----
-## Local, CRAN or Package Manager ---- 
-## This will build a tar.gz that can be installed locally, 
-## sent to CRAN, or to a package manager
-## RStudio ----
-## If you want to deploy on RStudio related platforms
-golem::add_positconnect_file()
-# golem::add_shinyappsio_file()
-# golem::add_shinyserver_file()
-
-## If you want to build github pages
-# usethis::use_pkgdown() # run once to configure your package
-# pkgdown::build_site() 
+# # You're now set! ----
+# # go to dev/04_maintenance.R
+rstudioapi::navigateToFile("dev/04_deploy.R")
