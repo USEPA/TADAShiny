@@ -38,7 +38,7 @@ golem::fill_desc(
 )     
 
 ## Set {golem} options ----
-golem::set_golem_options()
+# golem::set_golem_options()
 
 ## Create Common Files ----
 ## See ?usethis for more information
@@ -59,9 +59,9 @@ golem::set_golem_options()
 # golem::use_recommended_deps()
 
 ## Favicon ----
-# If you want to change the favicon (default is golem's one)
-golem::use_favicon() # path = "path/to/ico". Can be an online file. 
-golem::remove_favicon()
+# # If you want to change the favicon (default is golem's one)
+# golem::use_favicon() # path = "path/to/ico". Can be an online file. 
+# golem::remove_favicon()
 
 ## Add helper functions ----
 # golem::use_utils_ui()
