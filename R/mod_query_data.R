@@ -343,7 +343,7 @@ mod_query_data_server <- function(id, tadat) {
 
       tadat$example_data <- input$example_data
       if (input$example_data == "EPA Region 5 May 1-7 2019 (172k results)") {
-        raw <- EPATADA::Data_R5_TADAPackageDemo
+        raw <- EPATADA::TADA_AutoClean(EPATADA::Data_R5_TADAPackageDemo)
       }
       if (input$example_data == "Tribal (136k results)") {
         raw <- EPATADA::Data_6Tribes_5y
