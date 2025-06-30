@@ -4,7 +4,8 @@
 # fill them out before getting started. 
 # 01_start.R should only be used when first creating an app. 
 # 02_dev.R should be used to keep track of your development process.
-# 03_deploy.R should be used to document your deployment process.
+# 03_maintenance.R should be used to test and maintain the app before deployment.
+# 04_deploy.R should be used to document your deployment process.
 
 ########################################
 #### CURRENT FILE: START SCRIPT ########
@@ -37,7 +38,7 @@ golem::fill_desc(
 )     
 
 ## Set {golem} options ----
-golem::set_golem_options()
+# golem::set_golem_options()
 
 ## Create Common Files ----
 ## See ?usethis for more information
@@ -58,9 +59,9 @@ golem::set_golem_options()
 # golem::use_recommended_deps()
 
 ## Favicon ----
-# If you want to change the favicon (default is golem's one)
-golem::use_favicon() # path = "path/to/ico". Can be an online file. 
-golem::remove_favicon()
+# # If you want to change the favicon (default is golem's one)
+# golem::use_favicon() # path = "path/to/ico". Can be an online file. 
+# golem::remove_favicon()
 
 ## Add helper functions ----
 # golem::use_utils_ui()

@@ -41,8 +41,8 @@ mod_query_data_ui <- function(id) {
         choices = c(
           "",
           "Nutrients Utah (15k results)",
-          "Shepherdstown (34k results)",
-          "Tribal (132k results)"
+          "EPA Region 5 May 1-7 2019 (172k results)",
+          "Tribal (136k results)"
         )
       ))
     ),
@@ -238,7 +238,7 @@ mod_query_data_ui <- function(id) {
         previous use of the TADA Shiny application, then it can be uploaded here and used
         to automatically parameterize the TADA Shiny app with the same selections. This file can
         be used to regenerate a dataset with the same decisions as before, or can be used
-        to apply the same user selctions to a new dataset"
+        to apply the same user selections to a new dataset"
       )),
       # widget to upload WQP profile or WQX formatted spreadsheet
       column(
@@ -274,7 +274,7 @@ mod_query_data_server <- function(id, tadat) {
           # write.csv(template_data(), file)
           ## format excel (xlsx)
           d = template_data()
-          writexl::write_xlsx(d, path = file)
+          writexl::write_xlsx(d, path = file, use_zip64 = TRUE)
         },
         contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
      ) 
@@ -343,7 +343,7 @@ mod_query_data_server <- function(id, tadat) {
 
       tadat$example_data <- input$example_data
       if (input$example_data == "EPA Region 5 May 1-7 2019 (172k results)") {
-        raw <- EPATADA::Data_R5_TADAPackageDemo
+        raw <- EPATADA::TADA_AutoClean(EPATADA::Data_R5_TADAPackageDemo)
       }
       if (input$example_data == "Tribal (136k results)") {
         raw <- EPATADA::Data_6Tribes_5y
