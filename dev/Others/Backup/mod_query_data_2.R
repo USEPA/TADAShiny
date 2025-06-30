@@ -622,7 +622,7 @@ mod_query_data_server <- function(id, tadat) {
 
       # a section to estimate the sample size
       shiny::showModal(modalDialog(title =
-                                     "Downloading the data ...",
+                                     "Estimating the sample size...",
                                    footer = NULL))
       
       # Create the list of input arguments for dataRetrieval::readWQPsummary
@@ -691,7 +691,6 @@ mod_query_data_server <- function(id, tadat) {
   
       # Set the cut point to decide the small or big sites
       maxrecs <- 100000
-      pretty_maxrecs <- prettyNum(maxrecs, big.mark = ",", scientific = FALSE)
       
       smallsites <- tot_sites |> dplyr::filter(tot_n <= maxrecs)
       bigsites <- tot_sites |> dplyr::filter(tot_n > maxrecs)
@@ -713,47 +712,55 @@ mod_query_data_server <- function(id, tadat) {
         
         smallsites_list <- list()
         
-        small_title <- paste0("Downloading data from sites with less than or equal to ", pretty_maxrecs,
+        small_title <- paste0("Downloading data from sites with less than or equal to ", maxrecs,
                               " results.")
         
-        shiny::withProgress(message = small_title, detail = "0%", value = 0, {
-          for (i in 1:max(smallsitesgrp$group)){
-            
-            shiny::incProgress(1/max(smallsitesgrp$group), 
-                               detail = paste0(round(i/max(smallsitesgrp$group) * 100), "%"))
-            
-            small_site_chunk <- subset(smallsitesgrp$MonitoringLocationIdentifier,
-                                       smallsitesgrp$group == i)
-            
-            args_temp_small <- args_temp2
-            
-            args_temp_small[["siteid"]] <- small_site_chunk
-            
-            # Download the result data
-            smallsites_result_temp <- dataRetrieval::readWQPdata(args_temp_small,
-                                                                 dataProfile = "resultPhysChem",
-                                                                 ignore_attributes = TRUE)
-            
-            # Download the site data
-            smallsites_site_temp <- dataRetrieval::whatWQPsites(args_temp_small)
-            
-            # Download the project data
-            smallsites_project_temp <- dataRetrieval::readWQPdata(args_temp_small,
-                                                                  service = "Project",
-                                                                  ignore_attributes = TRUE)
-            
-            # Create TADA data frame
-            TADAprofile_smallsites_temp <- EPATADA::TADA_JoinWQPProfiles(
-              FullPhysChem = smallsites_result_temp,
-              Sites = smallsites_site_temp,
-              Projects = smallsites_project_temp) |>
-              dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
-            
-            # Assign the data to the list
-            smallsites_list[[i]] <- TADAprofile_smallsites_temp
-            
-          }
-        })
+        shinyWidgets::progressSweetAlert(
+          session = session, id = "myprogress_small", title = small_title,
+          status = "info", display_pct = TRUE, value = 0
+        )
+        
+        for (i in 1:max(smallsitesgrp$group)){
+          
+          shinyWidgets::updateProgressBar(
+            session = session,
+            id = "myprogress_small",
+            value = round(i/max(smallsitesgrp$group) * 100, 2)
+          )
+          
+          small_site_chunk <- subset(smallsitesgrp$MonitoringLocationIdentifier,
+                                     smallsitesgrp$group == i)
+          
+          args_temp_small <- args_temp2
+          
+          args_temp_small[["siteid"]] <- small_site_chunk
+          
+          # Download the result data
+          smallsites_result_temp <- dataRetrieval::readWQPdata(args_temp_small,
+                                                               dataProfile = "resultPhysChem",
+                                                               ignore_attributes = TRUE)
+          
+          # Download the site data
+          smallsites_site_temp <- dataRetrieval::whatWQPsites(args_temp_small)
+          
+          # Download the project data
+          smallsites_project_temp <- dataRetrieval::readWQPdata(args_temp_small,
+                                                                service = "Project",
+                                                                ignore_attributes = TRUE)
+          
+          # Create TADA data frame
+          TADAprofile_smallsites_temp <- EPATADA::TADA_JoinWQPProfiles(
+            FullPhysChem = smallsites_result_temp,
+            Sites = smallsites_site_temp,
+            Projects = smallsites_project_temp) |>
+            dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
+          
+          # Assign the data to the list
+          smallsites_list[[i]] <- TADAprofile_smallsites_temp
+          
+        }
+        
+        shinyWidgets::closeSweetAlert(session = session)
         
         # Combine the data
         TADA_smallsites <- dplyr::bind_rows(smallsites_list)
@@ -773,44 +780,53 @@ mod_query_data_server <- function(id, tadat) {
         
         bsitesvec <- unique(bigsites$MonitoringLocationIdentifier)
         
-        big_title <- paste0("Downloading data from sites with greater than ", pretty_maxrecs,
+        big_title <- paste0("Downloading data from sites with greater than ", maxrecs,
                             " results.")
         
-        shiny::withProgress(message = big_title, detail = "0%", value = 0, {
-          for (i in 1:length(bsitesvec)){
-            
-            shiny::incProgress(1/length(bsitesvec), 
-                               detail = paste0(round(i/length(bsitesvec) * 100), "%"))
-            
-            args_temp_big <- args_temp2
-            
-            args_temp_big[["siteid"]] <- bsitesvec[i]
-            
-            # Download the result data
-            bigsites_result_temp <- dataRetrieval::readWQPdata(args_temp_big,
-                                                               dataProfile = "resultPhysChem",
-                                                               ignore_attributes = TRUE)
-            
-            # Download the site data
-            bigsites_site_temp <- dataRetrieval::whatWQPsites(args_temp_big)
-            
-            # Download the project data
-            bigsites_project_temp <- dataRetrieval::readWQPdata(args_temp_big,
-                                                                service = "Project",
-                                                                ignore_attributes = TRUE)
-            
-            # Create TADA data frame
-            TADAprofile_bigsites_temp <- EPATADA::TADA_JoinWQPProfiles(
-              FullPhysChem = bigsites_result_temp,
-              Sites = bigsites_site_temp,
-              Projects = bigsites_project_temp) |>
-              dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
-            
-            # Assign the data to the list
-            bigsites_list[[i]] <- TADAprofile_bigsites_temp
-          }
-        })
-
+        shinyWidgets::progressSweetAlert(
+          session = session, id = "myprogress_big", title = big_title, 
+          status = "info", display_pct = TRUE, value = 0
+        )
+        
+        for (i in 1:length(bsitesvec)){
+          
+          shinyWidgets::updateProgressBar(
+            session = session,
+            id = "myprogress_big",
+            value = round(i/length(bsitesvec) * 100, 2)
+          )
+          
+          args_temp_big <- args_temp2
+          
+          args_temp_big[["siteid"]] <- bsitesvec[i]
+          
+          # Download the result data
+          bigsites_result_temp <- dataRetrieval::readWQPdata(args_temp_big,
+                                                             dataProfile = "resultPhysChem",
+                                                             ignore_attributes = TRUE)
+          
+          # Download the site data
+          bigsites_site_temp <- dataRetrieval::whatWQPsites(args_temp_big)
+          
+          # Download the project data
+          bigsites_project_temp <- dataRetrieval::readWQPdata(args_temp_big,
+                                                              service = "Project",
+                                                              ignore_attributes = TRUE)
+          
+          # Create TADA data frame
+          TADAprofile_bigsites_temp <- EPATADA::TADA_JoinWQPProfiles(
+            FullPhysChem = bigsites_result_temp,
+            Sites = bigsites_site_temp,
+            Projects = bigsites_project_temp) |>
+            dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
+          
+          # Assign the data to the list
+          bigsites_list[[i]] <- TADAprofile_bigsites_temp
+          
+        }
+        
+        shinyWidgets::closeSweetAlert(session = session)
+        
         # Combine the data
         TADA_bigsites <- dplyr::bind_rows(bigsites_list)
         

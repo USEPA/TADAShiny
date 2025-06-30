@@ -526,11 +526,11 @@ mod_query_data_server <- function(id, tadat) {
       } else {
         tadat$providers <- input$providers
       }
-      # if (input$huc == "") {
-      #   tadat$huc <- "null"
-      # } else {
-      #   tadat$huc <- gsub("\\s", "", input$huc)
-      # }
+      if (input$huc == "") {
+        tadat$huc <- "null"
+      } else {
+        tadat$huc <- gsub("\\s", "", input$huc)
+      }
       if (is.null(input$siteid)) {
         tadat$siteid <- "null"
       } else {
@@ -620,16 +620,12 @@ mod_query_data_server <- function(id, tadat) {
         session = shiny::getDefaultReactiveDomain()
       )
 
-      # a section to estimate the sample size
-      shiny::showModal(modalDialog(title =
-                                     "Downloading the data ...",
-                                   footer = NULL))
-      
-      # Create the list of input arguments for dataRetrieval::readWQPsummary
-      args_temp <- args_create(
+      # storing the output of TADAdataRetrieval with the user's input choices as a reactive object named "raw" in the tadat list.
+      raw <- EPATADA::TADA_DataRetrieval(
         statecode = tadat$statecode,
         countycode = tadat$countycode,
         countrycode = tadat$countrycode,
+        huc = tadat$huc,
         siteid = tadat$siteid,
         siteType = tadat$siteType,
         characteristicName = tadat$characteristicName,
@@ -637,209 +633,13 @@ mod_query_data_server <- function(id, tadat) {
         sampleMedia = tadat$sampleMedia,
         project = tadat$project,
         organization = tadat$organization,
+        startDate = tadat$startDate,
+        endDate = tadat$endDate,
         providers = tadat$providers,
-        bBox = bbox_reactive()
+        applyautoclean = TRUE,
+        ask = FALSE
       )
-      
-      # Get the data summary
-      result_summary <- dataRetrieval::whatWQPdata(args_temp)
-      
-      # Check if anything is outside the tribal's shapefile boundary
-      if (inherits(tadat$tribal_boundary, "sf")){
-        
-        # Convert result_summary to sf object
-        result_summary_sf <- result_summary |>
-          sf::st_as_sf(coords= c("lon", "lat"), crs = 4326) |>
-          sf::st_transform(crs = sf::st_crs(tadat$tribal_boundary))
-        
-        # Filter the sites within the tribal boundary
-        result_summary_sf_filter <- result_summary_sf |>
-          sf::st_filter(tadat$tribal_boundary)
-        
-        result_summary <- result_summary_sf_filter |>
-          sf::st_set_geometry(NULL)
-      }
-      
-      # A warning section to show if the sample size is zero
-      if (nrow(result_summary) == 0){
-        shinyalert::shinyalert(
-          title = "Empty Query",
-          text = "Your query returned zero results. Please adjust your search inputs and try again. Remember to update the start and end dates.",
-          type = "warning"
-        )
-        removeModal()
-        return()
-      }
 
-      tot_sites <- result_summary |>
-        dplyr::group_by(MonitoringLocationIdentifier) |>
-        dplyr::summarise(tot_n = sum(resultCount)) |>
-        dplyr::filter(tot_n > 0) %>% dplyr::arrange(tot_n)
-      
-      # A warning section to show if the sample size is zero
-      if (nrow(tot_sites) == 0){
-        shinyalert::shinyalert(
-          title = "Empty Query",
-          text = "Your query returned zero results. Please adjust your search inputs and try again. Remember to update the start and end dates.",
-          type = "warning"
-        )
-        removeModal()
-        return()
-      }
-      
-      # Separate the sites into small and big sites
-  
-      # Set the cut point to decide the small or big sites
-      maxrecs <- 100000
-      pretty_maxrecs <- prettyNum(maxrecs, big.mark = ",", scientific = FALSE)
-      
-      smallsites <- tot_sites |> dplyr::filter(tot_n <= maxrecs)
-      bigsites <- tot_sites |> dplyr::filter(tot_n > maxrecs)
-      
-      # Set other location inputs to be NULL as site ID is available
-      args_temp2 <- args_temp
-      
-      args_temp2[["statecode"]] <- NULL
-      args_temp2[["countycode"]] <- NULL
-      args_temp2[["countrycode"]] <- NULL
-      args_temp2[["bBox"]] <- NULL
-      
-      # Download the data for small sites
-      if (nrow(smallsites) > 0){
-        smallsitesgrp <- smallsites |>
-          dplyr::mutate(group = MESS::cumsumbinning(x = tot_n,
-                                                    threshold = maxrecs,
-                                                    maxgroupsize = 300))
-        
-        smallsites_list <- list()
-        
-        small_title <- paste0("Downloading data from sites with less than or equal to ", pretty_maxrecs,
-                              " results.")
-        
-        shiny::withProgress(message = small_title, detail = "0%", value = 0, {
-          for (i in 1:max(smallsitesgrp$group)){
-            
-            shiny::incProgress(1/max(smallsitesgrp$group), 
-                               detail = paste0(round(i/max(smallsitesgrp$group) * 100), "%"))
-            
-            small_site_chunk <- subset(smallsitesgrp$MonitoringLocationIdentifier,
-                                       smallsitesgrp$group == i)
-            
-            args_temp_small <- args_temp2
-            
-            args_temp_small[["siteid"]] <- small_site_chunk
-            
-            # Download the result data
-            smallsites_result_temp <- dataRetrieval::readWQPdata(args_temp_small,
-                                                                 dataProfile = "resultPhysChem",
-                                                                 ignore_attributes = TRUE)
-            
-            # Download the site data
-            smallsites_site_temp <- dataRetrieval::whatWQPsites(args_temp_small)
-            
-            # Download the project data
-            smallsites_project_temp <- dataRetrieval::readWQPdata(args_temp_small,
-                                                                  service = "Project",
-                                                                  ignore_attributes = TRUE)
-            
-            # Create TADA data frame
-            TADAprofile_smallsites_temp <- EPATADA::TADA_JoinWQPProfiles(
-              FullPhysChem = smallsites_result_temp,
-              Sites = smallsites_site_temp,
-              Projects = smallsites_project_temp) |>
-              dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
-            
-            # Assign the data to the list
-            smallsites_list[[i]] <- TADAprofile_smallsites_temp
-            
-          }
-        })
-        
-        # Combine the data
-        TADA_smallsites <- dplyr::bind_rows(smallsites_list)
-        
-        # Apply TADA_autoclean
-        TADA_smallsites_clean <- EPATADA::TADA_AutoClean(TADA_smallsites) |>
-            dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
-        
-      } else {
-        TADA_smallsites_clean <- TADA_download_temp
-      }
-      
-      # Download the data for big sites
-      if (nrow(bigsites) > 0){
-        
-        bigsites_list <- list()
-        
-        bsitesvec <- unique(bigsites$MonitoringLocationIdentifier)
-        
-        big_title <- paste0("Downloading data from sites with greater than ", pretty_maxrecs,
-                            " results.")
-        
-        shiny::withProgress(message = big_title, detail = "0%", value = 0, {
-          for (i in 1:length(bsitesvec)){
-            
-            shiny::incProgress(1/length(bsitesvec), 
-                               detail = paste0(round(i/length(bsitesvec) * 100), "%"))
-            
-            args_temp_big <- args_temp2
-            
-            args_temp_big[["siteid"]] <- bsitesvec[i]
-            
-            # Download the result data
-            bigsites_result_temp <- dataRetrieval::readWQPdata(args_temp_big,
-                                                               dataProfile = "resultPhysChem",
-                                                               ignore_attributes = TRUE)
-            
-            # Download the site data
-            bigsites_site_temp <- dataRetrieval::whatWQPsites(args_temp_big)
-            
-            # Download the project data
-            bigsites_project_temp <- dataRetrieval::readWQPdata(args_temp_big,
-                                                                service = "Project",
-                                                                ignore_attributes = TRUE)
-            
-            # Create TADA data frame
-            TADAprofile_bigsites_temp <- EPATADA::TADA_JoinWQPProfiles(
-              FullPhysChem = bigsites_result_temp,
-              Sites = bigsites_site_temp,
-              Projects = bigsites_project_temp) |>
-              dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
-            
-            # Assign the data to the list
-            bigsites_list[[i]] <- TADAprofile_bigsites_temp
-          }
-        })
-
-        # Combine the data
-        TADA_bigsites <- dplyr::bind_rows(bigsites_list)
-        
-        # Apply TADA_autoclean
-        TADA_bigsites_clean <- EPATADA::TADA_AutoClean(TADA_bigsites) |>
-          dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
-        
-      } else {
-        TADA_bigsites_clean <- TADA_download_temp
-      }
-      
-      # Combine the Small and Big sites
-      raw <- dplyr::bind_rows(TADA_smallsites_clean, TADA_bigsites_clean)
-      
-      # Convert the column types
-      raw <- raw |>
-        dplyr::mutate(dplyr::across(tidyselect::everything(), ~ {
-          col_name <- dplyr::cur_column()
-          target_class <- class(TADA_download_temp_type[[col_name]])[1]
-          switch(target_class,
-            "integer" = as.integer(.x),
-            "numeric" = as.numeric(.x),
-            "logical" = as.logical(.x),
-            "Date" = as.Date(.x),
-            "factor" = as.factor(.x),
-            as.character(.x)  # default case
-          )
-        }))
-      
       # remove the modal once the dataset has been pulled
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
 
@@ -871,6 +671,7 @@ mod_query_data_server <- function(id, tadat) {
         } else if (tadat$original_source == "Query") {
           shiny::updateSelectizeInput(session, "state", selected = tadat$statecode)
           shiny::updateSelectizeInput(session, "county", selected = tadat$countycode)
+          shiny::updateTextInput(session, "huc")
           shiny::updateSelectizeInput(session, "siteid", selected = tadat$siteid)
           shiny::updateSelectizeInput(session, "type", selected = tadat$siteType)
           shiny::updateSelectizeInput(session, "characteristic", selected = tadat$characteristicName)
