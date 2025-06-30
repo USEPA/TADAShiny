@@ -81,7 +81,7 @@ getCounts <- function(sites, removed_records) {
 applyFlags <- function(in_table, orgs) {
   # Missing metadata for censored results
   out <- EPATADA::TADA_IDCensoredData(in_table)
-  
+
   # Suspect Speciation
   out <- EPATADA::TADA_FlagSpeciation(out, clean = "none")
 
@@ -117,8 +117,10 @@ applyFlags <- function(in_table, orgs) {
   }
 
   # Continuous data
-  out <- EPATADA::TADA_FlagContinuousData(out, clean = FALSE, 
-                                          flaggedonly = FALSE)
+  out <- EPATADA::TADA_FlagContinuousData(out,
+    clean = FALSE,
+    flaggedonly = FALSE
+  )
 
   # Above WQX Upper Threshold
   out <- EPATADA::TADA_FlagAboveThreshold(out, clean = FALSE)

@@ -23,7 +23,7 @@ writeFile <- function(tadat, filename) {
   nd_mult <- tadat$nd_mult
   od_mult <- tadat$od_mult
   field_sel <- tadat$field_sel
-  
+
   save(
     original_source,
     job_id,
@@ -57,7 +57,7 @@ readFile <- function(tadat, filename) {
   newVals <- c()
   critical_missing <- c()
   n_missing <- 0
-  load_attribute <- function(attribute, attribute_name, required=TRUE) {
+  load_attribute <- function(attribute, attribute_name, required = TRUE) {
     if (is.null(attribute) & !required) {
       print(paste("Missing required parameter ", attribute))
       n_missing <- n_missing + 1
@@ -65,52 +65,51 @@ readFile <- function(tadat, filename) {
     }
     return(attribute)
   }
-  
+
   load(filename, verbose = FALSE)
   tadat$load_progress_file <- filename
-  
+
   # Confirm compatibility
   job_id <- job_id
   if (!is.null(m2f)) {
     tadat$m2f <- m2f
   }
-  
+
   if (!is.null(selected_flags)) {
     tadat$selected_flags <- selected_flags
-    
   }
-  
+
   # Enable tabs if certain fields are not null
   if (!is.null(selected_filters)) {
-    
+
   }
-  
+
   newVals$original_source <- original_source
-  newVals$job_id <- load_attribute(job_id, 'job_id')
-  newVals$example_data <- load_attribute(example_data, 'example_data')
-  newVals$statecode <- load_attribute(statecode, 'statecode')
-  newVals$countycode <- load_attribute(countycode, 'countycode')
-  newVals$huc <- load_attribute(huc, 'huc')
-  newVals$siteid <- load_attribute(siteid, 'siteid')
-  newVals$siteType <- load_attribute(siteType, 'siteType')
-  newVals$characteristicName <- load_attribute(characteristicName, 'characteristicName')
-  newVals$characteristicType <- load_attribute(characteristicType, 'characteristicType')
-  newVals$sampleMedia <- load_attribute(sampleMedia, 'sampleMedia')
-  newVals$project <- load_attribute(project, 'project')
-  newVals$organization <- load_attribute(organization, 'organization')
-  newVals$startDate <- load_attribute(startDate, 'startDate')
-  newVals$endDate <- load_attribute(endDate, 'endDate')
-  newVals$org_table <- load_attribute(org_table, 'org_table')
-  newVals$selected_filters <- load_attribute(selected_filters, 'selected_filters')
-  newVals$nd_method <- load_attribute(nd_method, 'nd_method')
-  newVals$od_method <- load_attribute(od_method, 'od_method')
-  newVals$nd_mult <- load_attribute(nd_mult, 'nd_mult')
-  newVals$od_mult <- load_attribute(od_mult, 'od_mult')
-  newVals$field_sel <- load_attribute(field_sel, 'field_sel')
+  newVals$job_id <- load_attribute(job_id, "job_id")
+  newVals$example_data <- load_attribute(example_data, "example_data")
+  newVals$statecode <- load_attribute(statecode, "statecode")
+  newVals$countycode <- load_attribute(countycode, "countycode")
+  newVals$huc <- load_attribute(huc, "huc")
+  newVals$siteid <- load_attribute(siteid, "siteid")
+  newVals$siteType <- load_attribute(siteType, "siteType")
+  newVals$characteristicName <- load_attribute(characteristicName, "characteristicName")
+  newVals$characteristicType <- load_attribute(characteristicType, "characteristicType")
+  newVals$sampleMedia <- load_attribute(sampleMedia, "sampleMedia")
+  newVals$project <- load_attribute(project, "project")
+  newVals$organization <- load_attribute(organization, "organization")
+  newVals$startDate <- load_attribute(startDate, "startDate")
+  newVals$endDate <- load_attribute(endDate, "endDate")
+  newVals$org_table <- load_attribute(org_table, "org_table")
+  newVals$selected_filters <- load_attribute(selected_filters, "selected_filters")
+  newVals$nd_method <- load_attribute(nd_method, "nd_method")
+  newVals$od_method <- load_attribute(od_method, "od_method")
+  newVals$nd_mult <- load_attribute(nd_mult, "nd_mult")
+  newVals$od_mult <- load_attribute(od_mult, "od_mult")
+  newVals$field_sel <- load_attribute(field_sel, "field_sel")
   if (n_missing > 0) {
     shiny::showNotification(
-      paste("Unable to load progress file. Missing fields: ", critical_missing
-    ))
+      paste("Unable to load progress file. Missing fields: ", critical_missing)
+    )
   } else {
     updateExisting(tadat, newVals)
     shiny::showNotification("Successfully loaded progress file")
@@ -135,7 +134,7 @@ writeNarrativeDataFrame <- function(tadat) {
   df <- data.frame(Parameter = character(), Value = character())
   df[nrow(df) + 1, ] <- c("TADA Shiny Job ID", tadat$job_id)
   df[nrow(df) + 1, ] <- c("Original data source: ", tadat$original_source)
-  
+
   # Data Query Tab
   if (tadat$original_source == "Example") {
     df[nrow(df) + 1, ] <- c("Example data file", tadat$example_data)
@@ -170,38 +169,38 @@ writeNarrativeDataFrame <- function(tadat) {
         tadat$endDate
       )
     )
-    
+
     for (i in seq_len(nrow(query_params))) {
       if (!is.null(query_params[i, "value"])) {
         df[nrow(df) + 1, ] <- query_params[i, ]
       }
     }
   }
-  
+
   # Overview Tab
   for (row in 1:nrow(tadat$org_table)) {
     df[nrow(df) + 1, ] <- c(paste0("Organization Rank ", row), tadat$org_table[row, "OrganizationFormalName"])
   }
-  
-  
-  
+
+
+
   # Flagging Tab
   for (flag in tadat$selected_flags) {
     df[nrow(df) + 1, ] <- c("Selected Flag", flag)
   }
-  
-  
+
+
   if (!is.null(tadat$m2f)) {
     df[nrow(df) + 1, ] <- c("Depth unit conversion", tadat$m2f)
   } else {
     df[nrow(df) + 1, ] <- c("Depth unit conversion", "None")
   }
-  
+
   # Filtering tab
   # skips the recording of selected filters in the progress file if the filters haven't been selected yet
   if (nrow(tadat$selected_filters) > 0) {
     for (row in 1:nrow(tadat$selected_filters)) {
-      val <-       paste0(
+      val <- paste0(
         tadat$selected_filters[row, "Filter"],
         ": ",
         tadat$selected_filters[row, "Field"],
@@ -212,7 +211,7 @@ writeNarrativeDataFrame <- function(tadat) {
       df[nrow(df) + 1, ] <- new_entry
     }
   }
-  
+
   # Censored Data tab
   if (is.null(tadat$nd_mult)) {
     tadat$nd_mult <- "n/a"
@@ -220,11 +219,15 @@ writeNarrativeDataFrame <- function(tadat) {
   if (is.null(tadat$od_mult)) {
     tadat$od_mult <- "n/a"
   }
-  df[nrow(df) + 1, ] <- c("Non-Detect Handling Method",
-                          sub("x", tadat$nd_mult, tadat$nd_method))
-  df[nrow(df) + 1, ] <- c("Over-Detect Handling Method",
-                          sub("x", tadat$od_mult, tadat$od_method))
-  
+  df[nrow(df) + 1, ] <- c(
+    "Non-Detect Handling Method",
+    sub("x", tadat$nd_mult, tadat$nd_method)
+  )
+  df[nrow(df) + 1, ] <- c(
+    "Over-Detect Handling Method",
+    sub("x", tadat$od_mult, tadat$od_method)
+  )
+
   return(df)
 }
 
