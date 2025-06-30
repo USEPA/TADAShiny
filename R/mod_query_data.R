@@ -324,20 +324,6 @@ mod_query_data_server <- function(id, tadat) {
           stop("The uploaded file must contain more than one row.")
         }
         
-        # add empty TADA.Remove column
-        raw$TADA.Remove <- NULL
-        
-        initializeTable(tadat, raw)
-        
-        # check for required fields to run TADA_AutoClean
-        autoclean_required_cols <- c(
-          "ActivityMediaName", "ResultMeasureValue", "ResultMeasure.MeasureUnitCode",
-          "CharacteristicName", "ResultSampleFractionText", "MethodSpeciationName",
-          "DetectionQuantitationLimitMeasure.MeasureUnitCode", "ResultDetectionConditionText",
-          "ResultIdentifier", "DetectionQuantitationLimitMeasure.MeasureValue",
-          "LatitudeMeasure", "LongitudeMeasure"
-        )
-        
         # Define the required columns
         required_cols <- c(
           "ActivityMediaName", "ResultMeasureValue", "ResultMeasure.MeasureUnitCode",
@@ -348,7 +334,7 @@ mod_query_data_server <- function(id, tadat) {
         )
         
         # Check for missing columns
-        missing_cols <- setdiff(required_cols, names(tadat$raw))
+        missing_cols <- setdiff(required_cols, names(raw))
         
         # If any required columns are missing, stop processing and show an error
         if (length(missing_cols) > 0) {
@@ -358,21 +344,15 @@ mod_query_data_server <- function(id, tadat) {
             paste(missing_cols, collapse = ", ")
           ))
         }
-        
-        EPATADA::TADA_CheckColumns(tadat$raw, autoclean_required_cols)
-        
+    
         # run autoclean
-        tadat$raw <- EPATADA::TADA_AutoClean(tadat$raw)
+        raw <- EPATADA::TADA_AutoClean(raw)
         
         # check for ALL required fields (after autoclean is run)
-        if (!EPATADA::TADA_CheckRequiredFields(tadat$raw)) {
+        if (!EPATADA::TADA_CheckRequiredFields(raw)) {
           stop("The uploaded file is missing required columns.")
         }
-        
-        if (!is.null(tadat$original_source)) {
-          tadat$original_source <- "Upload"
-        }
-        
+      
         success <- TRUE  # Set flag to true if all operations succeed
         
         # Restore warning options
@@ -389,18 +369,25 @@ mod_query_data_server <- function(id, tadat) {
         shiny::showNotification(
           paste("Error: ", e$message),
           type = "error",
-          duration = 15
+          duration = 30
         )
       })
       
       # Ensure spinner is removed regardless of success or error
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
       
-      # If not successful, consider resetting the app state or session
-      if (!success) {
-        # Reset app state here
-        tadat$raw <- NULL
+      # If successful, initialize table and add blank TADA.Remove column
+      if (success == TRUE) {
+        # add empty TADA.Remove column
+        raw$TADA.Remove <- NULL
+        
+        initializeTable(tadat, raw)
+        
+        if (!is.null(tadat$original_source)) {
+          tadat$original_source <- "Upload"
+        }
       }
+      
     })
     
     ####################
