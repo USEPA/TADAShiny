@@ -286,6 +286,8 @@ mod_query_data_server <- function(id, tadat) {
           shinyjs::enable("example_data_go")
       } 
     })
+
+    ####################
     
     # handles option C user data uploads
     shiny::observeEvent(input$file, {
@@ -300,6 +302,10 @@ mod_query_data_server <- function(id, tadat) {
       success <- FALSE  # Flag to track if the process completes successfully
       
       tryCatch({
+        # Temporarily treat warnings as errors
+        old_warn <- options("warn")
+        options(warn = 2)
+        
         # Validate file input
         if (is.null(input$file)) {
           stop("No file uploaded.")
@@ -323,10 +329,42 @@ mod_query_data_server <- function(id, tadat) {
         
         initializeTable(tadat, raw)
         
+        # check for required fields to run TADA_AutoClean
+        autoclean_required_cols <- c(
+          "ActivityMediaName", "ResultMeasureValue", "ResultMeasure.MeasureUnitCode",
+          "CharacteristicName", "ResultSampleFractionText", "MethodSpeciationName",
+          "DetectionQuantitationLimitMeasure.MeasureUnitCode", "ResultDetectionConditionText",
+          "ResultIdentifier", "DetectionQuantitationLimitMeasure.MeasureValue",
+          "LatitudeMeasure", "LongitudeMeasure"
+        )
+        
+        # Define the required columns
+        required_cols <- c(
+          "ActivityMediaName", "ResultMeasureValue", "ResultMeasure.MeasureUnitCode",
+          "CharacteristicName", "ResultSampleFractionText", "MethodSpeciationName",
+          "DetectionQuantitationLimitMeasure.MeasureUnitCode", "ResultDetectionConditionText",
+          "ResultIdentifier", "DetectionQuantitationLimitMeasure.MeasureValue",
+          "LatitudeMeasure", "LongitudeMeasure"
+        )
+        
+        # Check for missing columns
+        missing_cols <- setdiff(required_cols, names(tadat$raw))
+        
+        # If any required columns are missing, stop processing and show an error
+        if (length(missing_cols) > 0) {
+          stop(paste(
+            "Data upload is missing required column(s).",
+            "Please make sure the following columns are included:",
+            paste(missing_cols, collapse = ", ")
+          ))
+        }
+        
+        EPATADA::TADA_CheckColumns(tadat$raw, autoclean_required_cols)
+        
         # run autoclean
         tadat$raw <- EPATADA::TADA_AutoClean(tadat$raw)
         
-        # check required fields
+        # check for ALL required fields (after autoclean is run)
         if (!EPATADA::TADA_CheckRequiredFields(tadat$raw)) {
           stop("The uploaded file is missing required columns.")
         }
@@ -336,8 +374,14 @@ mod_query_data_server <- function(id, tadat) {
         }
         
         success <- TRUE  # Set flag to true if all operations succeed
+        
+        # Restore warning options
+        options(old_warn)
       }, 
       error = function(e) {
+        # Restore warning options in case of error
+        options(old_warn)
+        
         # Log error details for debugging
         cat("Error: ", e$message, "\n")
         
@@ -345,7 +389,7 @@ mod_query_data_server <- function(id, tadat) {
         shiny::showNotification(
           paste("Error: ", e$message),
           type = "error",
-          duration = 5
+          duration = 15
         )
       })
       
@@ -354,10 +398,12 @@ mod_query_data_server <- function(id, tadat) {
       
       # If not successful, consider resetting the app state or session
       if (!success) {
-        # Reset or handle app state here if needed
+        # Reset app state here
         tadat$raw <- NULL
       }
     })
+    
+    ####################
 
     # Read the TADA progress file
     shiny::observe({
