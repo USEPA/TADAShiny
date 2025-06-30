@@ -286,8 +286,8 @@ mod_query_data_server <- function(id, tadat) {
           shinyjs::enable("example_data_go")
       } 
     })
-
-    # read in the excel spreadsheet dataset if this input reactive object is populated via fileInput and define as tadat$raw
+    
+    # handles option C user data uploads
     shiny::observeEvent(input$file, {
       # a modal that pops up showing it's working on uploading the dataset from the users file
       shinybusy::show_modal_spinner(
@@ -296,32 +296,67 @@ mod_query_data_server <- function(id, tadat) {
         text = "Uploading dataset from excel file ...",
         session = shiny::getDefaultReactiveDomain()
       )
-
-      # user uploaded data
-      raw <- readxl::read_excel(input$file$datapath, sheet = 1, col_types = "text")
       
-      # run autoclean
-      raw <- EPATADA::TADA_AutoClean(raw)
+      success <- FALSE  # Flag to track if the process completes successfully
       
-      #####
-      # check that all TADA template columns are included (returns TRUE or FALSE)
-      # if FALSE, returns an error with names of specific columns that are missing but required
-      # this section needs to be updated to handle the error within the shiny app (instead of crashing) & display a message to users
-      # EPATADA::TADA_CheckRequiredFields(raw)
-      #####
+      tryCatch({
+        # Validate file input
+        if (is.null(input$file)) {
+          stop("No file uploaded.")
+        }
+        
+        # user uploaded data
+        raw <- readxl::read_excel(input$file$datapath, sheet = 1, col_types = "text")
+        
+        # Validate data structure
+        if (!is.data.frame(raw)) {
+          stop("Uploaded file is not a valid data frame.")
+        }
+        
+        # Check for multiple rows
+        if (nrow(raw) <= 1) {
+          stop("The uploaded file must contain more than one row.")
+        }
+        
+        # add empty TADA.Remove column
+        raw$TADA.Remove <- NULL
+        
+        initializeTable(tadat, raw)
+        
+        # run autoclean
+        tadat$raw <- EPATADA::TADA_AutoClean(tadat$raw)
+        
+        # check required fields
+        if (!EPATADA::TADA_CheckRequiredFields(tadat$raw)) {
+          stop("The uploaded file is missing required columns.")
+        }
+        
+        if (!is.null(tadat$original_source)) {
+          tadat$original_source <- "Upload"
+        }
+        
+        success <- TRUE  # Set flag to true if all operations succeed
+      }, 
+      error = function(e) {
+        # Log error details for debugging
+        cat("Error: ", e$message, "\n")
+        
+        # Show error notification to the user
+        shiny::showNotification(
+          paste("Error: ", e$message),
+          type = "error",
+          duration = 5
+        )
+      })
       
-      # other steps to prepare data for app
-      raw$TADA.Remove <- NULL
-      initializeTable(tadat, raw)
-      
-      # this needs to run to create additional QA fields
-      tadat$raw <- EPATADA::TADA_AutoClean(tadat$raw)
-      
-      if (!is.null(tadat$original_source)) {
-        tadat$original_source <- "Upload"
-      }
-
+      # Ensure spinner is removed regardless of success or error
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+      
+      # If not successful, consider resetting the app state or session
+      if (!success) {
+        # Reset or handle app state here if needed
+        tadat$raw <- NULL
+      }
     })
 
     # Read the TADA progress file
