@@ -4,7 +4,7 @@ writeFile <- function(tadat, filename) {
   statecode <- tadat$statecode
   countycode <- tadat$countycode
   example_data <- tadat$example_data
-  huc <- tadat$huc
+  # huc <- tadat$huc
   siteid <- tadat$siteid
   siteType <- tadat$siteType
   characteristicName <- tadat$characteristicName
@@ -30,7 +30,7 @@ writeFile <- function(tadat, filename) {
     example_data,
     statecode,
     countycode,
-    huc,
+    # huc,
     siteid,
     siteType,
     characteristicName,
@@ -90,7 +90,7 @@ readFile <- function(tadat, filename) {
   newVals$example_data <- load_attribute(example_data, 'example_data')
   newVals$statecode <- load_attribute(statecode, 'statecode')
   newVals$countycode <- load_attribute(countycode, 'countycode')
-  newVals$huc <- load_attribute(huc, 'huc')
+  # newVals$huc <- load_attribute(huc, 'huc')
   newVals$siteid <- load_attribute(siteid, 'siteid')
   newVals$siteType <- load_attribute(siteType, 'siteType')
   newVals$characteristicName <- load_attribute(characteristicName, 'characteristicName')
@@ -144,7 +144,7 @@ writeNarrativeDataFrame <- function(tadat) {
       param = c(
         "State Code",
         "County Code",
-        "HUC Code",
+        # "HUC Code",
         "Site ID",
         "Site Type",
         "Characteristic Name",
@@ -158,7 +158,7 @@ writeNarrativeDataFrame <- function(tadat) {
       value = c(
         tadat$statecode,
         tadat$countycode,
-        tadat$huc,
+        # tadat$huc,
         tadat$siteid,
         tadat$siteType,
         tadat$characteristicName,
@@ -235,7 +235,7 @@ fetchExisting <- function(tadat) {
   existingVals$example_data <- tadat$example_data
   existingVals$statecode <- tadat$statecode
   existingVals$countycode <- tadat$countycode
-  existingVals$huc <- tadat$huc
+  # existingVals$huc <- tadat$huc
   existingVals$siteid <- tadat$siteid
   existingVals$siteType <- tadat$siteType
   existingVals$characteristicName <- tadat$characteristicName
@@ -261,7 +261,7 @@ updateExisting <- function(tadat, newVals) {
   tadat$example_data <- newVals$example_data
   tadat$statecode <- newVals$statecode
   tadat$countycode <- newVals$countycode
-  tadat$huc <- newVals$huc
+  # tadat$huc <- newVals$huc
   tadat$siteid <- newVals$siteid
   tadat$siteType <- newVals$siteType
   tadat$characteristicName <- newVals$characteristicName

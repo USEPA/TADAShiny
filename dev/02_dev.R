@@ -39,6 +39,7 @@
 # usethis::use_package("TADA")
 # usethis::use_package("scales")
 # usethis::use_package("combinat")
+usethis::use_package("")
 
 ## Add modules ----
 ## Create a module infrastructure in R/
@@ -50,13 +51,13 @@
 # golem::add_module(name = "summary", with_test = TRUE) # Name of the module
 # golem::add_module(name = "TADA_summary") # Name of the module
 # golem::add_module(name = "censored_data")
-golem::add_module(name = "map_bbox")
+# golem::add_module(name = "map_bbox")
 
 # Add helper functions ----
 # Creates fct_* and utils_*
 # golem::add_fct( "helpers" )
 # golem::add_utils( "helpers" )
-golem::add_fct("map")
+# golem::add_fct("map")
 
 
 ## External resources

@@ -16,6 +16,7 @@ renv::status()
 # If you have multiple packages in an inconsistent state, we recommend 
 # renv::restore(), then renv::install(), then renv::snapshot(), 
 # but that also suggests you should be running status more frequently.
+renv::restore()
 
 ## Run checks ----
 ## Check the package before sending to prod
@@ -31,8 +32,8 @@ devtools::check()
 ## sent to CRAN, or to a package manager
 ## RStudio ----
 ## If you want to deploy on RStudio related platforms
-golem::add_positconnect_file()
-# golem::add_shinyappsio_file()
+# golem::add_positconnect_file()
+golem::add_shinyappsio_file()
 # golem::add_shinyserver_file()
 
 ## If you want to build github pages
