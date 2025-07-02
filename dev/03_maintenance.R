@@ -33,7 +33,7 @@ spelling::update_wordlist()
 # See: https://styler.r-lib.org/reference/style_pkg.html
 # Run the following with defaults
 library(styler)
-style_pkg()
+styler::style_pkg()
 
 ## Run checks ----
 ## Check the package before sending to prod

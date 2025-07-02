@@ -5,7 +5,7 @@
 #' @inheritParams shiny::shinyApp
 #'
 #' @export
-#' 
+#'
 run_app <- function(
     onStart = NULL,
     options = list(),
