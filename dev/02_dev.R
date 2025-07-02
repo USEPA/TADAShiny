@@ -39,7 +39,10 @@
 # usethis::use_package("TADA")
 # usethis::use_package("scales")
 # usethis::use_package("combinat")
-usethis::use_package("")
+# usethis::use_package("EPATADA")
+# usethis::use_package("MESS")
+# usethis::use_package("leaflet.extras")
+# usethis::use_package("covr", type = "Suggests")
 
 ## Add modules ----
 ## Create a module infrastructure in R/

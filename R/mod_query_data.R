@@ -6,8 +6,7 @@
 #'
 #' @noRd
 #' 
-#' 
-#' # Load the input data
+# Load the input data
 data_path1 <- app_sys("extdata/statecodes_df.Rdata")
 load(data_path1)
 
@@ -143,7 +142,7 @@ mod_query_data_ui <- function(id) {
     shiny::fluidRow(
       column(
         6,
-        strong("Provide the latitude and longitude by drawing a rectangle on the map"),
+        shiny::strong("Provide the latitude and longitude by drawing a rectangle on the map"),
         br(),
         mod_map_bboxUI(ns("BBox_map"))
       )

@@ -16,7 +16,6 @@ renv::status()
 # If you have multiple packages in an inconsistent state, we recommend 
 # renv::restore(), then renv::install(), then renv::snapshot(), 
 # but that also suggests you should be running status more frequently.
-renv::restore()
 
 ## Run checks ----
 ## Check the package before sending to prod
@@ -39,3 +38,10 @@ golem::add_shinyappsio_file()
 ## If you want to build github pages
 # usethis::use_pkgdown() # run once to configure your package
 # pkgdown::build_site() 
+
+# 5. Deploy to shinyapps.io
+rsconnect::deployApp(
+  appFiles = c("app.R", "DESCRIPTION", "NAMESPACE", "R/", "inst/", "data/"),
+  appName = "TADAShiny",
+  forceUpdate = TRUE
+)
