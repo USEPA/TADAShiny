@@ -636,6 +636,8 @@ mod_query_data_server <- function(id, tadat) {
         sampleMedia = tadat$sampleMedia,
         project = tadat$project,
         organization = tadat$organization,
+        startDateLo = tadat$startDate,
+        startDateHi = tadat$endDate,
         providers = tadat$providers,
         bBox = bbox_reactive()
       )
