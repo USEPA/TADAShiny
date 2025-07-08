@@ -683,7 +683,7 @@ mod_query_data_server <- function(id, tadat) {
 
       # If use tribal dataset, use the tribal dataset's bbox
       # Otherwise, use the bbox from tadat
-      bbox_reactive <- reactive({
+      bbox_reactive <- shiny::reactive({
         if (!inherits(tadat$tribal_boundary, "sf")) {
           tadat$bBox
         } else {
@@ -700,7 +700,7 @@ mod_query_data_server <- function(id, tadat) {
       )
 
       # a section to estimate the sample size
-      shiny::showModal(modalDialog(
+      shiny::showModal(shiny::modalDialog(
         title =
           "Downloading the data ...",
         footer = NULL
