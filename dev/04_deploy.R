@@ -17,8 +17,14 @@
 ## sent to CRAN, or to a package manager
 ## RStudio ----
 ## If you want to deploy on RStudio related platforms
-# golem::add_positconnect_file()
+
+# This is how to deploy to EPA's Posit Connect
+golem::add_positconnect_file()
+
+# This is how to deploy to TetraTech's shinyappsio. This can be removed later
+# along with the file produced here TADAShiny\rsconnect\shinyapps.io\tetratech-wtr-wne 
 golem::add_shinyappsio_file()
+
 # golem::add_shinyserver_file()
 
 ## If you want to build github pages

@@ -11,16 +11,16 @@ mod_map_bboxUI <- function(id, label = "Clear Drawing") {
   ns <- NS(id)
   tagList(
     leaflet::leafletOutput(ns("map_bbox")),
-    actionButton(inputId = ns("clear_map"), label = label)
+    shiny::actionButton(inputId = ns("clear_map"), label = label)
   )
 }
 
 mod_map_bboxServer <- function(id) {
-  moduleServer(id, function(input, output, session) {
+  shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
     # Initialize reactive values FIRST
-    bbox_reVal <- reactiveValues(bbox = NULL)
+    bbox_reVal <- shiny::reactiveValues(bbox = NULL)
 
     # Render base map
     output$map_bbox <- leaflet::renderLeaflet({
@@ -62,7 +62,7 @@ mod_map_bboxServer <- function(id) {
     })
 
     # Handle new drawings
-    observeEvent(input$map_bbox_draw_new_feature, {
+    shiny::observeEvent(input$map_bbox_draw_new_feature, {
       feat <- input$map_bbox_draw_new_feature
       coords <- unlist(feat$geometry$coordinates)
       coords_m <- matrix(coords, ncol = 2, byrow = TRUE)
