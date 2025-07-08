@@ -114,7 +114,7 @@ mod_review_data_server <- function(id, tadat) {
           fill = "#005ea2",
           color = "black"
         ) +
-        ggplot2::scale_y_discrete(limits=rev) + 
+        ggplot2::scale_y_discrete(limits = rev) +
         ggplot2::labs(title = "Results Retained Following Flagging/Filtering Steps", x = "Results Count", y = "") +
         ggplot2::theme_classic(base_size = 16) +
         ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1)) +

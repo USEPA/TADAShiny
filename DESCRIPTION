@@ -45,6 +45,7 @@ Remotes:
     USEPA/EPATADA@develop,
     DOI-USGS/dataRetrieval@develop
 Suggests:
+    remotes, 
     devtools,
     covr,
     knitr, 

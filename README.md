@@ -1,44 +1,80 @@
-# Welcome to TADAShiny: Data Discovery and Cleaning
+# TADAShiny: Module 1 Data Discovery and Cleaning
 
 [![](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 
 [![](https://github.com/USEPA/TADAShiny/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/USEPA/TADAShiny/actions/workflows/R-CMD-check.yaml)
 
-[![](https://codecov.io/gh/USEPA/TADAShiny/graph/badge.svg)](https://app.codecov.io/gh/USEPA/TADAShiny)
+TADAShiny provides a user interface on top of the [EPATADA R Package](https://github.com/USEPA/EPATADA). This TADAShiny application, **Module 1: Data Discovery and Cleaning**, retrieves data from the WQP, and runs it through a series of data retrieval, wrangling, filtering and cleaning steps. Features include WQP data retrieval, flagging suspect results and metadata using validation reference tables, harmonization of synonyms, result and depth unit conversions, censored data substitutions, dataset filtering, and data visualizations. Users will be able to review and download summary information about their dataset, along with a data file and that is ready for additional manual review and use in subsequent analyses. Users make all decisions using the app to flag data for removal or keep data depending on its quality and relevance for their analysis.
 
-TADAShiny provides a user interface on top of the TADAPackage (<https://github.com/USEPA/EPATADA>). This application can be used to compile and evaluate Water Quality Portal (WQP) data for samples collected from surface water monitoring sites on streams and lakes.
+## Install and run application from R Studio (recommended)
 
-In 2012, the WQP was deployed by the U.S. Geological Survey (USGS), the U.S. Environmental Protection Agency (USEPA), and the National Water Quality Monitoring Council to combine and serve water-quality data from numerous sources in a standardized format. The WQP holds over 420 million water quality sample results from over 1000 federal, state, tribal and other partners, and is the nation's largest source for single point of access for water-quality data. Participating organizations submit their data to the WQP using the EPA's Water Quality Exchange (WQX), a framework designed to map their data holdings to a common data structure.
+You must first have R and R Studio installed to use the TADA R Package (see instructions below if needed). Our team is actively developing TADA, therefore we highly recommend that you update the TADA R Package and all of its dependency libraries each time you use the package. You can install and/or update the TADA R Package and all dependencies by running:
 
-TADAShiny (Module 1: Data Discovery and Cleaning) retrieves data from the WQP, and runs it through a series of data discovery, wrangling, and cleaning steps. Features include WQP data retrieval, flagging suspect results and metadata using validation reference tables, harmonization of synonyms, result and depth unit conversions, censored data substitutions, dataset filtering, and data visualizations. Users will be able to review and download summary information about their dataset, along with a data file and that is ready for additional manual review and use in subsequent analyses. Users make all decisions using the app to flag data for removal or keep data depending on its quality and relevance for their analysis.
-
-[More about the EPA TADA Project](https://www.epa.gov/waterdata/TADA)
-
-## Installation
-
-You can install and run the development version of TADAShiny from [GitHub](https://github.com/USEPA/TADAShiny) by running:
-
-``` r
+```{r}
 if(!"remotes"%in%installed.packages()){
 install.packages("remotes")
 }
 
-remotes::install_github("USEPA/TADAShiny", ref = "develop", dependencies = TRUE)
+library(remotes)
+
+remotes::install_github("USEPA/EPATADA", ref = "develop", dependencies = TRUE, force = TRUE)
+
+library(EPATADA)
+```
+
+The TADA R Shiny application can be run [on the web](https://rconnect-public.epa.gov/TADAShiny/) (R and R Studio install not required), or within R Studio. We recommend running it within R Studio if possible to avoid time out issues (especially when working with large datasets) and to make sure you are using the most up to date version. The web version of the application is on a slightly lagged update schedule. Run the following code within R Studio to install or update and run the most recent version of the [TADA R Shiny](https://github.com/USEPA/TADAShiny) application:
+
+```{r}
+if(!"remotes"%in%installed.packages()){
+install.packages("remotes")
+}
+
+library(remotes)
+
+remotes::install_github("USEPA/TADAShiny", ref = "develop", dependencies = TRUE, force = TRUE)
 
 library(TADAShiny)
 
-TADAShiny::run_app()
+run_app()
 ```
 
-## Run Web Version
+## Run web application
 
 Alternatively, you can run the public web version of this application (<https://rconnect-public.epa.gov/TADAShiny/>). Beware that this version is not the most up to date and we recommend running the app from R studio instead if possible.
 
-EPA users may also run the staging version (<https://rstudio-connect.dmap-stage.aws.epa.gov/content/da3ffe2f-b443-4051-a029-3adb491434cb>) if they are logged onto the VPN.
+## Run in GitHub Codespaces
 
-### Run in GitHub Codespaces
+This repository also has devcontainers to allow it to run in GitHub codespaces. To use those:
 
-This repository also has devcontainers to allow it to run in GitHub codespaces. To use those: - Fork the repository to your account - In the "Code" button on the upper right of your browser, within the Codespaces tab click on the three dots and choose "New with Options", then you will have the choices: - R Studio Server (the default useful for coding; you should set the RSTUDIO_PASSWORD with this option) - Shiny apps for demos (useful for training or demoing) - To stop or delete your codespace when you are done: go to [GitHub Codespaces](https://github.com/codespaces)
+-   Fork the repository to your account
+
+-   In the "Code" button on the upper right of your browser, within the Codespaces tab click on the three dots and choose "New with Options", then you will have the choices:
+
+    -   R Studio Server (the default useful for coding; you should set the RSTUDIO_PASSWORD with this option)
+
+    -   Shiny apps for demos (useful for training or demoing)
+
+    -   To stop or delete your codespace when you are done, go to [GitHub Codespaces](https://github.com/codespaces).
+
+## TADA Background
+
+Tools for Automated Data Analysis, or TADA, is being developed to help States, Tribes (i.e., Tribal Nations, Pueblos, Bands, Rancherias, Communities, Colonies, Towns, Indians, Villages), federal partners, and other [Water Quality Portal (WQP)](https://www.waterqualitydata.us/) users (e.g. researchers) efficiently compile and evaluate WQP data collected from water quality monitoring sites.
+
+In 2012, the WQP was deployed by the U.S. Geological Survey (USGS), the U.S. Environmental Protection Agency (USEPA), and the National Water Quality Monitoring Council to combine and serve water-quality data from numerous sources in a standardized format. The WQP holds over 420 million water quality sample results from over 1000 federal, state, tribal and other partners, and is the nation's largest source for single point of access for water-quality data. Participating organizations submit their data to the WQP using the EPA's Water Quality Exchange (WQX), a framework designed to map their data holdings to a common data structure.
+
+-   For more details, see:
+
+    -   [Function Reference](https://usepa.github.io/EPATADA/reference/index.html)
+
+    -   Articles Tab for Example Workflows ([Here](https://usepa.github.io/EPATADA/))
+
+-   [How to Contribute](https://usepa.github.io/EPATADA/articles/CONTRIBUTING.html)
+
+    -   We encourage stakeholders to test the functionality and provide feedback. Moreover, open source software provides an avenue for water quality data originators and users to develop and share code, and we welcome your contributions! We hope to build a collaborative community dedicated to this effort where TADA users and contributors can discover, share and build the functionality over time.
+
+-   More information on how TADA leverages the [WQX QAQC Service](https://usepa.github.io/EPATADA/articles/WQXValidationService.html)
+
+-   [More about the TADA Project](https://www.epa.gov/waterdata/TADA)
 
 ## R Shiny Learning Resources
 
@@ -48,7 +84,15 @@ This site has been created to be a resource for both those who are interested in
 
 The NALMS shinyapps.io service also provides a place for the water resources community to make their Shiny Apps readily available to the public. It is free for anyone to use. If you would like to submit a Shiny App for deployment of the NALMS shinyapp.io service, please follow the directions on the "Submit a Shiny App" page.
 
-### Recommended Citation:
+## Install R and R Studio
+
+1.  To download R: Go to <https://cran.r-project.org/> and click the link that describes your computer operating system in the first box in the menu entitled "Download and Install R".
+2.  Clicking your operating system will take you to a new page, which looks slightly different for PC (first image) and Macs (second image):
+3.  Download the program by clicking the appropriate link for your system, and click through the installer windows on your computer, accepting all defaults.
+4.  Next, go to the following link to download RStudio: <https://posit.co/download/rstudio-desktop/>, scroll down a little, and click download RStudio.
+5.  Again, download the installer, click through the prompts, and accept the defaults.
+
+## Recommended Citation
 
 ```         
 Mullin, C.A., Hinman, E., Hook, T., 2025, TADAShiny: Data Discovery and Cleaning, https://github.com/USEPA/TADAShiny

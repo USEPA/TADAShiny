@@ -62,10 +62,11 @@ mod_censored_data_ui <- function(id) {
       shiny::column(
         3,
         shiny::actionButton(
-          ns("apply_methods"), 
-          "Apply Methods to Dataset", 
+          ns("apply_methods"),
+          "Apply Methods to Dataset",
           disabled = TRUE,
-          style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
+          style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
+        )
       ),
       shiny::column(3, shiny::uiOutput(ns("undo_methods")))
     ),
@@ -100,7 +101,7 @@ mod_censored_data_ui <- function(id) {
 mod_censored_data_server <- function(id, tadat) {
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
-    
+
     # initialize dropdown values
 
     # reactive values specific to this module
@@ -219,8 +220,8 @@ mod_censored_data_server <- function(id, tadat) {
     shiny::observeEvent(input$nd_method, {
       tadat$nd_method <- input$nd_method
 
-      if ((input$nd_method == "Multiply detection limit by x" && !is.numeric(input$nd_mult))
-          || (input$nd_method == "No change" && input$od_method == "No change" )){ 
+      if ((input$nd_method == "Multiply detection limit by x" && !is.numeric(input$nd_mult)) ||
+        (input$nd_method == "No change" && input$od_method == "No change")) {
         shinyjs::disable("apply_methods")
       } else {
         shinyjs::enable("apply_methods")
@@ -229,19 +230,19 @@ mod_censored_data_server <- function(id, tadat) {
 
     shiny::observeEvent(input$nd_mult, {
       tadat$nd_mult <- input$nd_mult
-      
-      if (input$nd_method == "Multiply detection limit by x" && !is.numeric(input$nd_mult)) { 
+
+      if (input$nd_method == "Multiply detection limit by x" && !is.numeric(input$nd_mult)) {
         shinyjs::disable("apply_methods")
       } else {
         shinyjs::enable("apply_methods")
-      }      
+      }
     })
 
     shiny::observeEvent(input$od_method, {
       tadat$od_method <- input$od_method
 
-      if ((input$od_method == "Multiply detection limit by x" && !is.numeric(input$od_mult))
-          || (input$nd_method == "No change" && input$od_method == "No change" )){ 
+      if ((input$od_method == "Multiply detection limit by x" && !is.numeric(input$od_mult)) ||
+        (input$nd_method == "No change" && input$od_method == "No change")) {
         shinyjs::disable("apply_methods")
       } else {
         shinyjs::enable("apply_methods")
@@ -250,8 +251,8 @@ mod_censored_data_server <- function(id, tadat) {
 
     shiny::observeEvent(input$od_mult, {
       tadat$od_mult <- input$od_mult
-      
-      if (input$od_method == "Multiply detection limit by x" && !is.numeric(input$od_mult)) { 
+
+      if (input$od_method == "Multiply detection limit by x" && !is.numeric(input$od_mult)) {
         shinyjs::disable("apply_methods")
       } else {
         shinyjs::enable("apply_methods")
@@ -316,12 +317,12 @@ mod_censored_data_server <- function(id, tadat) {
           "TADA.ResultMeasureValue",
           "TADA.ResultMeasure.MeasureUnitCode"
         )]
-      
+
       # COMMENT out for now to discuss later
-      # this does not work as is... the idea is to select just the rows where 
+      # this does not work as is... the idea is to select just the rows where
       # limit has been changed because others are not really relevant.  Right?
       # dat <- dat %>% dplyr::filter(DetectionQuantitationLimitMeasure.MeasureValue != TADA.ResultMeasureValue)
-      
+
       dat <-
         dat %>% dplyr::rename(
           "Original Detection Limit Value" = DetectionQuantitationLimitMeasure.MeasureValue,
@@ -329,13 +330,13 @@ mod_censored_data_server <- function(id, tadat) {
           "Estimated Detection Limit Value" = TADA.ResultMeasureValue,
           "Estimated Unit" = TADA.ResultMeasure.MeasureUnitCode
         )
-      
+
       # create censored data table
       censdat$exdat <- dat # [1:10, ] # just show the first 10 records so user can see what happened to data
 
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
       tadat$censor_applied <- TRUE
-      
+
       # disable the button so the user can not redo the handling
       shinyjs::disable("apply_methods")
       shinyjs::disable("nd_mult")
@@ -363,7 +364,7 @@ mod_censored_data_server <- function(id, tadat) {
         "Result Value/Unit Copied from Detection Limit" # reset data types flag to what it was before simpleCensoredMethods function run
       tadat$raw <- tadat$raw %>% dplyr::select(-TADA.CensoredMethod)
       tadat$censor_applied <- FALSE
-      
+
       # enable the button so the user can re-apply the handling
       shinyjs::enable("apply_methods")
       shinyjs::enable("nd_mult")
@@ -376,24 +377,26 @@ mod_censored_data_server <- function(id, tadat) {
     output$see_det <- DT::renderDT({
       shiny::req(censdat$exdat)
       DT::datatable(
-        censdat$exdat, #[1:10, ], #cm removed on 12/26/24, limits table to 10 results
+        censdat$exdat, # [1:10, ], #cm removed on 12/26/24, limits table to 10 results
         class = "cell-border stripe",
         filter = "top",
         options = list(
-          dom = "Blftipr", #"t",#cm updated to match harmonization table on 12/26/24
+          dom = "Blftipr", # "t",#cm updated to match harmonization table on 12/26/24
           scrollX = TRUE,
           pageLength = 10
-          #searching = FALSE #cm updated to TRUE (default) on 12/26/24
+          # searching = FALSE #cm updated to TRUE (default) on 12/26/24
         ),
         selection = "none",
         rownames = FALSE
       ) %>%
         DT::formatStyle(columns = names(censdat$exdat), `font-size` = "12px") %>%
-        DT::formatStyle(columns = c("Estimated Detection Limit Value", "Estimated Unit"), 
-                        backgroundColor = "#2e6da4", 
-                        color = "white")
-      })
-    
+        DT::formatStyle(
+          columns = c("Estimated Detection Limit Value", "Estimated Unit"),
+          backgroundColor = "#2e6da4",
+          color = "white"
+        )
+    })
+
     # from the clean dataset, get all of the column names someone might want to group by when summarizing their data for use in more advanced censored data methods.
     output$cens_groups <- shiny::renderUI({
       shiny::req(censdat$dat)

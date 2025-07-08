@@ -40,10 +40,10 @@ return_tribal_sf <- function(tribal_layer, tribal_name, tribal_list = tribal_lis
 }
 
 # new (2024-05-23) list for new Country/Ocean(s) Query the Water Quality Portal option. Not included in saved query_choices file
-countrycode_url <- 'https://www.waterqualitydata.us/Codes/countrycode?mimeType=json'
-countryocean_source <- jsonlite::fromJSON(txt=countrycode_url)
-countryocean_source <- countryocean_source$codes %>% dplyr::select(-one_of('providers'))
-countryocean_source <- countryocean_source[order(countryocean_source$desc),]
+countrycode_url <- "https://www.waterqualitydata.us/Codes/countrycode?mimeType=json"
+countryocean_source <- jsonlite::fromJSON(txt = countrycode_url)
+countryocean_source <- countryocean_source$codes %>% dplyr::select(-one_of("providers"))
+countryocean_source <- countryocean_source[order(countryocean_source$desc), ]
 countryocean_choices <- countryocean_source$value
 names(countryocean_choices) <- countryocean_source$desc
 
@@ -71,8 +71,8 @@ mod_query_data_ui <- function(id) {
         choices = c(
           "",
           "Nutrients Utah (15k results)",
-          "Shepherdstown (34k results)",
-          "Tribal (132k results)"
+          "EPA Region 5 May 1-7 2019 (172k results)",
+          "Tribal (136k results)"
         )
       ))
     ),
@@ -155,7 +155,7 @@ mod_query_data_ui <- function(id) {
                               choices = NULL,
                               multiple = TRUE))
     ),
-    htmltools::h4("Metadata Filters"),   
+    htmltools::h4("Metadata Filters"),
     shiny::fluidRow(
       column(
         4,
@@ -219,20 +219,22 @@ mod_query_data_ui <- function(id) {
       column(
         4,
         shiny::selectizeInput(
-          ns("chargroup"), 
-          "Characteristic Group", 
+          ns("chargroup"),
+          "Characteristic Group",
           choices = NULL,
           options = list(placeholder = "Start typing or use drop down menu"),
           multiple = TRUE
-          )
+        )
       )
     ),
     shiny::fluidRow(
       column(
-             4,
-             shiny::radioButtons(ns("providers"), 
-             "Data Source", 
-             c("NWIS (USGS)" = "NWIS", "WQX (EPA)" = "STORET", "Both (NWIS and WQX)" = "all"), selected = "all")
+        4,
+        shiny::radioButtons(ns("providers"),
+          "Data Source",
+          c("NWIS (USGS)" = "NWIS", "WQX (EPA)" = "STORET", "Both (NWIS and WQX)" = "all"),
+          selected = "all"
+        )
       )
     ),
     shiny::fluidRow(column(
@@ -262,17 +264,18 @@ mod_query_data_ui <- function(id) {
       )
     ),
     shiny::fluidRow(
-        htmltools::HTML(
-          "Download a blank TADA data template in .xlsx format. This template is available to assist users that do not have data available in the WQP (and therefore cannot use Option B) prepare their data for upload to this R Shiny application using import Option C.
+      htmltools::HTML(
+        "Download a blank TADA data template in .xlsx format. This template is available to assist users that do not have data available in the WQP (and therefore cannot use Option B) prepare their data for upload to this R Shiny application using import Option C.
           You may reach out to the TADA team through the helpdesk at mywaterway@epa.gov for assistance preparing your data. If your data is not in the WQP yet and you are interested in submitting it, you may reach out to the WQX helpdesk at WQX@epa.gov for assistance preparing and submitting your data
                                     to the WQP through EPA's WQX.<br><br>"
-        ),
-        column(
+      ),
+      column(
         9,
         shiny::downloadButton(
-          ns("download_template"), 
-          "Download Template", 
-          style = "color: #fff; background-color: #337ab7; border-color: #2e6da4;")
+          ns("download_template"),
+          "Download Template",
+          style = "color: #fff; background-color: #337ab7; border-color: #2e6da4;"
+        )
       )
     ),
     htmltools::hr(),
@@ -285,7 +288,7 @@ mod_query_data_ui <- function(id) {
         previous use of the TADA Shiny application, then it can be uploaded here and used
         to automatically parameterize the TADA Shiny app with the same selections. This file can
         be used to regenerate a dataset with the same decisions as before, or can be used
-        to apply the same user selctions to a new dataset"
+        to apply the same user selections to a new dataset"
       )),
       # widget to upload WQP profile or WQX formatted spreadsheet
       column(
@@ -316,28 +319,30 @@ mod_query_data_server <- function(id, tadat) {
     template_data <- shiny::reactive(EPATADA::TADA_GetTemplate())
     # return an ms excel file with the template columns
     output$download_template <- shiny::downloadHandler(
-        filename = function() { 
-          paste0("tada_template", ".xlsx")
-        },
-        content = function(file) {
-          ## format csv.  contentType = "text/csv"
-          # write.csv(template_data(), file)
-          ## format excel (xlsx)
-          d = template_data()
-          writexl::write_xlsx(d, path = file)
-        },
-        contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-     ) 
+      filename = function() {
+        paste0("tada_template", ".xlsx")
+      },
+      content = function(file) {
+        ## format csv.  contentType = "text/csv"
+        # write.csv(template_data(), file)
+        ## format excel (xlsx)
+        d <- template_data()
+        writexl::write_xlsx(d, path = file, use_zip64 = TRUE)
+      },
+      contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
 
     ## greys out Load button for example data until file has been selected
     # https://stackoverflow.com/questions/24175997/force-no-default-selection-in-selectinput
     shiny::observeEvent(input$example_data, {
       if (!is.na(input$example_data) && nchar(input$example_data) > 1) {
-          shinyjs::enable("example_data_go")
-      } 
+        shinyjs::enable("example_data_go")
+      }
     })
 
-    # read in the excel spreadsheet dataset if this input reactive object is populated via fileInput and define as tadat$raw
+    ####################
+
+    # handles option C user data uploads
     shiny::observeEvent(input$file, {
       # a modal that pops up showing it's working on uploading the dataset from the users file
       shinybusy::show_modal_spinner(
@@ -346,33 +351,104 @@ mod_query_data_server <- function(id, tadat) {
         text = "Uploading dataset from excel file ...",
         session = shiny::getDefaultReactiveDomain()
       )
+      
+      success <- FALSE # Flag to track if the process completes successfully
 
-      # user uploaded data
-      raw <- readxl::read_excel(input$file$datapath, sheet = 1, col_types = "text")
-      
-      # run autoclean
-      raw <- EPATADA::TADA_AutoClean(raw)
-      
-      #####
-      # check that all TADA template columns are included (returns TRUE or FALSE)
-      # if FALSE, returns an error with names of specific columns that are missing but required
-      # this section needs to be updated to handle the error within the shiny app (instead of crashing) & display a message to users
-      # EPATADA::TADA_CheckRequiredFields(raw)
-      #####
-      
-      # other steps to prepare data for app
-      raw$TADA.Remove <- NULL
-      initializeTable(tadat, raw)
-      
-      # this needs to run to create additional QA fields
-      tadat$raw <- EPATADA::TADA_AutoClean(tadat$raw)
-      
-      if (!is.null(tadat$original_source)) {
-        tadat$original_source <- "Upload"
-      }
+      tryCatch(
+        {
+          # Temporarily treat warnings as errors
+          old_warn <- options("warn")
+          options(warn = 2)
 
+          # Validate file input
+          if (is.null(input$file)) {
+            stop("No file uploaded.")
+          }
+
+          # user uploaded data
+          raw <- readxl::read_excel(input$file$datapath, sheet = 1, col_types = "text")
+
+          # Validate data structure
+          if (!is.data.frame(raw)) {
+            stop("Uploaded file is not a valid data frame.")
+          }
+
+          # Check for multiple rows
+          if (nrow(raw) <= 1) {
+            stop("The uploaded file must contain more than one row.")
+          }
+
+          # Define the required columns
+          required_cols <- c(
+            "ActivityMediaName", "ResultMeasureValue", "ResultMeasure.MeasureUnitCode",
+            "CharacteristicName", "ResultSampleFractionText", "MethodSpeciationName",
+            "DetectionQuantitationLimitMeasure.MeasureUnitCode", "ResultDetectionConditionText",
+            "ResultIdentifier", "DetectionQuantitationLimitMeasure.MeasureValue",
+            "LatitudeMeasure", "LongitudeMeasure"
+          )
+
+          # Check for missing columns
+          missing_cols <- setdiff(required_cols, names(raw))
+
+          # If any required columns are missing, stop processing and show an error
+          if (length(missing_cols) > 0) {
+            stop(paste(
+              "Data upload is missing required column(s).",
+              "Please make sure the following columns are included:",
+              paste(missing_cols, collapse = ", ")
+            ))
+          }
+
+          # run autoclean
+          raw <- EPATADA::TADA_AutoClean(raw)
+
+          # check for ALL required fields (after autoclean is run)
+          if (!EPATADA::TADA_CheckRequiredFields(raw)) {
+            stop("The uploaded file is missing required columns.")
+          }
+
+          success <- TRUE # Set flag to true if all operations succeed
+
+          # Restore warning options
+          options(old_warn)
+        },
+        error = function(e) {
+          # Restore warning options in case of error
+          options(old_warn)
+
+          # Log error details for debugging
+          cat("Error: ", e$message, "\n")
+
+          # Show error notification to the user
+          shiny::showNotification(
+            paste("Error: ", e$message),
+            type = "error",
+            duration = NULL,
+            id = "uploadError"
+          )
+        }
+      )
+
+      # Ensure spinner is removed regardless of success or error
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+
+      # If successful, initialize table and add blank TADA.Remove column
+      if (success == TRUE) {
+        # add empty TADA.Remove column
+        raw$TADA.Remove <- NULL
+
+        initializeTable(tadat, raw)
+
+        if (!is.null(tadat$original_source)) {
+          tadat$original_source <- "Upload"
+        }
+        
+        # Clear any existing notification with the same ID
+        shiny::removeNotification("uploadError")
+      }
     })
+
+    ####################
 
     # Read the TADA progress file
     shiny::observe({
@@ -393,7 +469,7 @@ mod_query_data_server <- function(id, tadat) {
 
       tadat$example_data <- input$example_data
       if (input$example_data == "EPA Region 5 May 1-7 2019 (172k results)") {
-        raw <- EPATADA::Data_R5_TADAPackageDemo
+        raw <- EPATADA::TADA_AutoClean(EPATADA::Data_R5_TADAPackageDemo)
       }
       if (input$example_data == "Tribal (136k results)") {
         raw <- EPATADA::Data_6Tribes_5y
@@ -565,7 +641,7 @@ mod_query_data_server <- function(id, tadat) {
       } else {
         tadat$organization <- input$org
       }
-      
+
       if (length(input$endDate) == 0) {
         # ensure if date is empty, the query receives a proper input ("null")
         tadat$endDate <- "null"
@@ -845,7 +921,7 @@ mod_query_data_server <- function(id, tadat) {
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
 
       # show a modal dialog box when tadat$raw is empty and the query didn't return any records.
-      # but if tadat$raw isn't empty, perform some initial QC of data that aren't media type water 
+      # but if tadat$raw isn't empty, perform some initial QC of data that aren't media type water
       # or have NA Resultvalue and no detection limit data
       if (dim(raw)[1] < 1) {
         shiny::showModal(
@@ -912,7 +988,7 @@ initializeTable <- function(tadat, raw) {
   removals <- data.frame(matrix(nrow = nrow(raw), ncol = 0))
   tadat$raw <- raw
   tadat$removals <- removals
-  
+
   # display the download buttons
   tadat$ready_for_download <- TRUE
 }

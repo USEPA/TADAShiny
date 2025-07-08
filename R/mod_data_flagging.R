@@ -92,7 +92,7 @@ mod_data_flagging_server <- function(id, tadat) {
       if (!is.null(tadat$removals)) {
         tadat$removals <- dplyr::select(tadat$removals, -(dplyr::starts_with(flag_prefix)))
       }
-      if ((!is.null(tadat$raw)) & (!is.null(tadat$selected_flags))){
+      if ((!is.null(tadat$raw)) & (!is.null(tadat$selected_flags))) {
         shinyjs::enable(selector = '.nav li a[data-value="Flag"]')
       }
       # Loop through the flags

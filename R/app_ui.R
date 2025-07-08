@@ -32,18 +32,18 @@ app_ui <- function(request) {
     shiny::fluidPage(
       tags$html(class = "no-js", lang = "en"),
       # standardized Go to Top button appears on lower-right corner when window is scrolled down 100 pixels
-      gotop::use_gotop(  # add it inside the ui
+      gotop::use_gotop( # add it inside the ui
         src = "fas fa-chevron-circle-up", # css class from Font Awesome
         opacity = 0.8, # transparency
         width = 60, # size
         appear = 100 # number of pixels before appearance
-      ), # ), 
+      ), # ),
       # adds development banner
       # HTML("<div id='eq-disclaimer-banner' class='padding-1 text-center text-white bg-secondary-dark'><strong>EPA development environment:</strong> The
       # content on this page is not production ready. This site is being used
       # for <strong>development</strong> and/or <strong>testing</strong> purposes
       # only.</div>"),
-      
+
       # adds epa header html from here: https://www.epa.gov/themes/epa_theme/pattern-lab/patterns/pages-standalone-template/pages-standalone-template.rendered.html
       shiny::includeHTML(app_sys("app/www/header.html")),
       shinyjs::useShinyjs(),

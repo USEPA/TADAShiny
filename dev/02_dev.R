@@ -4,7 +4,8 @@
 # fill them out before getting started. 
 # 01_start.R should only be used when first creating an app. 
 # 02_dev.R should be used to keep track of your development process.
-# 03_deploy.R should be used to document your deployment process.
+# 03_maintenance.R should be used to test and maintain the app before deployment.
+# 04_deploy.R should be used to document your deployment process.
 
 ########################################
 #### CURRENT FILE: DEV SCRIPT ##########
@@ -125,5 +126,5 @@
 # usethis::use_gitlab_ci()
 # 
 # # You're now set! ----
-# # go to dev/03_deploy.R
-rstudioapi::navigateToFile("dev/03_deploy.R")
+# # go to dev/03_maintenance.R
+rstudioapi::navigateToFile("dev/03_maintenance.R")
