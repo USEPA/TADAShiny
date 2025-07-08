@@ -53,10 +53,7 @@ golem::fill_desc(
 
 ## Init Testing Infrastructure ----
 ## Create a template for tests
-# golem::use_recommended_tests()
-
-## Use Recommended Packages ----
-# golem::use_recommended_deps()
+golem::use_recommended_tests()
 
 ## Favicon ----
 # # If you want to change the favicon (default is golem's one)
