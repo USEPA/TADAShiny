@@ -21,7 +21,7 @@ args_create <- function(statecode = NULL,
                         startDateLo = NULL,
                         startDateHi = NULL,
                         providers = NULL,
-                        bBox = NULL){
+                        bBox = NULL) {
   # Construct the arguments for downloads
   args <- list(
     "statecode" = statecode,
@@ -40,12 +40,12 @@ args_create <- function(statecode = NULL,
     "providers" = providers,
     "bBox" = bBox
   )
-  
+
   # Replace null with NULL
   args[args %in% "null"] <- list(NULL)
-  
+
   # Remove NULL attribute
   args <- args[purrr::map_lgl(args, function(x) !is.null(x))]
-  
+
   return(args)
 }

@@ -130,28 +130,36 @@ mod_censored_data_server <- function(id, tadat) {
       bardat <- censdat$dat |>
         dplyr::group_by(TADA.CensoredData.Flag) |>
         dplyr::summarise(num = length(ResultIdentifier)) |>
-        dplyr::mutate(num_chr = paste0("n = ", num),
-                      flag_simple = dplyr::case_when(TADA.CensoredData.Flag == "Non-Detect" ~ "Non-Detect",
-                                                     TADA.CensoredData.Flag == "Over-Detect" ~ "Over-Detect",
-                                                     TADA.CensoredData.Flag == "Uncensored" ~ "Uncensored",
-                                                     TADA.CensoredData.Flag == "Other Condition/Limit Populated" ~ "Other",
-                                                     TADA.CensoredData.Flag == "Conflict between Condition and Limit" ~ "Conflict",
-                                                     TADA.CensoredData.Flag == "Detection condition or detection limit is not documented in TADA reference tables." ~ "Not documented",
-                                                     TADA.CensoredData.Flag == "Detection condition is missing and required for censored data ID." ~ "Missing",
-                                                     (TADA.CensoredData.Flag == "" | is.na(TADA.CensoredData.Flag)) ~ "Mixed",
-                                                     .default = "Unknown Shiny Category"))
-      
+        dplyr::mutate(
+          num_chr = paste0("n = ", num),
+          flag_simple = dplyr::case_when(TADA.CensoredData.Flag == "Non-Detect" ~ "Non-Detect",
+            TADA.CensoredData.Flag == "Over-Detect" ~ "Over-Detect",
+            TADA.CensoredData.Flag == "Uncensored" ~ "Uncensored",
+            TADA.CensoredData.Flag == "Other Condition/Limit Populated" ~ "Other",
+            TADA.CensoredData.Flag == "Conflict between Condition and Limit" ~ "Conflict",
+            TADA.CensoredData.Flag == "Detection condition or detection limit is not documented in TADA reference tables." ~ "Not documented",
+            TADA.CensoredData.Flag == "Detection condition is missing and required for censored data ID." ~ "Missing",
+            (TADA.CensoredData.Flag == "" | is.na(TADA.CensoredData.Flag)) ~ "Mixed",
+            .default = "Unknown Shiny Category"
+          )
+        )
+
       # basic column bar chart
       ggplot2::ggplot(bardat, ggplot2::aes(x = flag_simple, y = num, fill = flag_simple)) +
-        ggplot2::geom_col(width = 0.75,
-                          color = "black") +
+        ggplot2::geom_col(
+          width = 0.75,
+          color = "black"
+        ) +
         ggplot2::geom_text(ggplot2::aes(label = num_chr),
-                           vjust = -0.5,
-                           size = 5) +
-        ggplot2::labs(title = "Number of Results per Censored Data Category",
-                      x = "Category",
-                      y = "Count",
-                      fill = "Category Type") +
+          vjust = -0.5,
+          size = 5
+        ) +
+        ggplot2::labs(
+          title = "Number of Results per Censored Data Category",
+          x = "Category",
+          y = "Count",
+          fill = "Category Type"
+        ) +
         ggplot2::scale_fill_brewer(palette = "Dark2") +
         ggplot2::theme_classic() +
         ggplot2::theme(
@@ -161,7 +169,7 @@ mod_censored_data_server <- function(id, tadat) {
           legend.title = ggplot2::element_text(size = 16),
           legend.text = ggplot2::element_text(size = 14)
         )
-      })
+    })
 
     # this adds the multiplier numeric input next to the method selection if
     # the nd method selected is to multiply detection limit by x

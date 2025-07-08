@@ -5,7 +5,7 @@
 #' @param id,input,output,session Internal parameters for {shiny}.
 #'
 #' @noRd
-#' 
+#'
 # Load the input data
 data_path1 <- app_sys("extdata/statecodes_df.Rdata")
 load(data_path1)
@@ -30,12 +30,11 @@ poss_whatWQPdata <- dataRetrieval::whatWQPdata |>
   purrr::possibly(otherwise = NULL)
 
 # A function to return the tribal data frame with tribal name as an sf object
-return_tribal_sf <- function(tribal_layer, tribal_name, tribal_list = tribal_list){
-  
+return_tribal_sf <- function(tribal_layer, tribal_name, tribal_list = tribal_list) {
   tribal_data2 <- tribal_list |>
     purrr::pluck(tribal_layer) |>
     dplyr::filter(TRIBE_NAME %in% tribal_name)
-  
+
   return(tribal_data2)
 }
 
@@ -119,9 +118,10 @@ mod_query_data_ui <- function(id) {
     htmltools::br(),
     shiny::fluidRow(
       column(4, shiny::selectizeInput(ns("countryocean"),
-                                      "Country/Ocean(s)",
-                                      choices = NULL,
-                                      multiple = TRUE))
+        "Country/Ocean(s)",
+        choices = NULL,
+        multiple = TRUE
+      ))
     ),
     shiny::fluidRow(
       column(4, shiny::selectizeInput(ns("state"), "State", choices = NULL)),
@@ -132,11 +132,13 @@ mod_query_data_ui <- function(id) {
     ),
     shiny::fluidRow(
       column(4, shiny::selectizeInput(ns("tribe_layer"), "Tribe Data Layers",
-                                      choices = NULL)),
+        choices = NULL
+      )),
       column(
         4,
         shiny::selectizeInput(ns("tribe_name"), "Tribe Name (pick data layers first)",
-                              choices = NULL)
+          choices = NULL
+        )
       )
     ),
     shiny::fluidRow(
@@ -151,9 +153,11 @@ mod_query_data_ui <- function(id) {
       column(
         4,
         shiny::selectizeInput(ns("siteid"),
-                              "Monitoring Location ID(s)",
-                              choices = NULL,
-                              multiple = TRUE))
+          "Monitoring Location ID(s)",
+          choices = NULL,
+          multiple = TRUE
+        )
+      )
     ),
     htmltools::h4("Metadata Filters"),
     shiny::fluidRow(
@@ -311,10 +315,10 @@ mod_query_data_ui <- function(id) {
 mod_query_data_server <- function(id, tadat) {
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
-    
+
     # Call the bbox map module and capture its return value
     bbox_data <- mod_map_bboxServer("BBox_map")
-    
+
     ## creates download template button used for importing data to TADAShiny - used in option C
     template_data <- shiny::reactive(EPATADA::TADA_GetTemplate())
     # return an ms excel file with the template columns
@@ -351,7 +355,7 @@ mod_query_data_server <- function(id, tadat) {
         text = "Uploading dataset from excel file ...",
         session = shiny::getDefaultReactiveDomain()
       )
-      
+
       success <- FALSE # Flag to track if the process completes successfully
 
       tryCatch(
@@ -442,7 +446,7 @@ mod_query_data_server <- function(id, tadat) {
         if (!is.null(tadat$original_source)) {
           tadat$original_source <- "Upload"
         }
-        
+
         # Clear any existing notification with the same ID
         shiny::removeNotification("uploadError")
       }
@@ -539,7 +543,7 @@ mod_query_data_server <- function(id, tadat) {
       options = list(placeholder = "Select tribal data layer", maxItems = 1),
       server = TRUE
     )
-    
+
     # this observes when the user inputs a state into the drop down and subsets the choices for counties to only those counties within that state.
     shiny::observeEvent(input$state, {
       state_counties <- subset(county, county$STUSAB == input$state)
@@ -555,7 +559,7 @@ mod_query_data_server <- function(id, tadat) {
         server = TRUE
       )
     })
-    
+
     # this observes when the user inputs a tribal data layer into the drop down and subsets the choices for data layer to only those tribes within that dataset.
     shiny::observeEvent(input$tribe_layer, {
       tribal_names <- sort(tribal_list[[input$tribe_layer]][["TRIBE_NAME"]])
@@ -654,39 +658,39 @@ mod_query_data_server <- function(id, tadat) {
       } else {
         tadat$startDate <- as.character(input$startDate)
       }
-      
+
       # If there are tribal information, get the tribal as a polygon
       if (!input$tribe_layer %in% "" & !input$tribe_name %in% "") {
         # ensure if date is empty, the query receives a proper input ("null")
-        tribal_sf_object <- return_tribal_sf(tribal_layer = input$tribe_layer,
-                                             tribal_name = input$tribe_name,
-                                             tribal_list = tribal_list)
+        tribal_sf_object <- return_tribal_sf(
+          tribal_layer = input$tribe_layer,
+          tribal_name = input$tribe_name,
+          tribal_list = tribal_list
+        )
         tadat$tribal_boundary <- tribal_sf_object
         tadat$tribal_bBox <- unname(sf::st_bbox(tribal_sf_object))
-        
-        
       } else {
         tadat$tribal_boundary <- "null"
         tadat$tribal_bBox <- "null"
       }
-      
+
       # Handle bounding box data
       if (!is.null(bbox_data$bBox)) {
         tadat$bBox <- bbox_data$bBox
       } else {
         tadat$bBox <- "null"
       }
-      
+
       # If use tribal dataset, use the tribal dataset's bbox
       # Otherwise, use the bbox from tadat
       bbox_reactive <- reactive({
-        if (!inherits(tadat$tribal_boundary, "sf")){
+        if (!inherits(tadat$tribal_boundary, "sf")) {
           tadat$bBox
         } else {
           tadat$tribal_bBox
         }
       })
-      
+
       # a modal that pops up showing it's working on querying the portal
       shinybusy::show_modal_spinner(
         spin = "double-bounce",
@@ -696,10 +700,12 @@ mod_query_data_server <- function(id, tadat) {
       )
 
       # a section to estimate the sample size
-      shiny::showModal(modalDialog(title =
-                                     "Downloading the data ...",
-                                   footer = NULL))
-      
+      shiny::showModal(modalDialog(
+        title =
+          "Downloading the data ...",
+        footer = NULL
+      ))
+
       # Create the list of input arguments for dataRetrieval::readWQPsummary
       args_temp <- args_create(
         statecode = tadat$statecode,
@@ -717,28 +723,27 @@ mod_query_data_server <- function(id, tadat) {
         providers = tadat$providers,
         bBox = bbox_reactive()
       )
-      
+
       # Get the data summary
       result_summary <- dataRetrieval::whatWQPdata(args_temp)
-      
+
       # Check if anything is outside the tribal's shapefile boundary
-      if (inherits(tadat$tribal_boundary, "sf")){
-        
+      if (inherits(tadat$tribal_boundary, "sf")) {
         # Convert result_summary to sf object
         result_summary_sf <- result_summary |>
-          sf::st_as_sf(coords= c("lon", "lat"), crs = 4326) |>
+          sf::st_as_sf(coords = c("lon", "lat"), crs = 4326) |>
           sf::st_transform(crs = sf::st_crs(tadat$tribal_boundary))
-        
+
         # Filter the sites within the tribal boundary
         result_summary_sf_filter <- result_summary_sf |>
           sf::st_filter(tadat$tribal_boundary)
-        
+
         result_summary <- result_summary_sf_filter |>
           sf::st_set_geometry(NULL)
       }
-      
+
       # A warning section to show if the sample size is zero
-      if (nrow(result_summary) == 0){
+      if (nrow(result_summary) == 0) {
         shinyalert::shinyalert(
           title = "Empty Query",
           text = "Your query returned zero results. Please adjust your search inputs and try again. Remember to update the start and end dates.",
@@ -751,10 +756,11 @@ mod_query_data_server <- function(id, tadat) {
       tot_sites <- result_summary |>
         dplyr::group_by(MonitoringLocationIdentifier) |>
         dplyr::summarise(tot_n = sum(resultCount)) |>
-        dplyr::filter(tot_n > 0) %>% dplyr::arrange(tot_n)
-      
+        dplyr::filter(tot_n > 0) %>%
+        dplyr::arrange(tot_n)
+
       # A warning section to show if the sample size is zero
-      if (nrow(tot_sites) == 0){
+      if (nrow(tot_sites) == 0) {
         shinyalert::shinyalert(
           title = "Empty Query",
           text = "Your query returned zero results. Please adjust your search inputs and try again. Remember to update the start and end dates.",
@@ -763,126 +769,137 @@ mod_query_data_server <- function(id, tadat) {
         removeModal()
         return()
       }
-      
+
       # Separate the sites into small and big sites
-  
+
       # Set the cut point to decide the small or big sites
       maxrecs <- 100000
       pretty_maxrecs <- prettyNum(maxrecs, big.mark = ",", scientific = FALSE)
-      
+
       smallsites <- tot_sites |> dplyr::filter(tot_n <= maxrecs)
       bigsites <- tot_sites |> dplyr::filter(tot_n > maxrecs)
-      
+
       # Set other location inputs to be NULL as site ID is available
       args_temp2 <- args_temp
-      
+
       args_temp2[["statecode"]] <- NULL
       args_temp2[["countycode"]] <- NULL
       args_temp2[["countrycode"]] <- NULL
       args_temp2[["bBox"]] <- NULL
-      
+
       # Download the data for small sites
-      if (nrow(smallsites) > 0){
+      if (nrow(smallsites) > 0) {
         smallsitesgrp <- smallsites |>
-          dplyr::mutate(group = MESS::cumsumbinning(x = tot_n,
-                                                    threshold = maxrecs,
-                                                    maxgroupsize = 300))
-        
+          dplyr::mutate(group = MESS::cumsumbinning(
+            x = tot_n,
+            threshold = maxrecs,
+            maxgroupsize = 300
+          ))
+
         smallsites_list <- list()
-        
-        small_title <- paste0("Downloading data from sites with less than or equal to ", pretty_maxrecs,
-                              " results.")
-        
+
+        small_title <- paste0(
+          "Downloading data from sites with less than or equal to ", pretty_maxrecs,
+          " results."
+        )
+
         shiny::withProgress(message = small_title, detail = "0%", value = 0, {
-          for (i in 1:max(smallsitesgrp$group)){
-            
-            shiny::incProgress(1/max(smallsitesgrp$group), 
-                               detail = paste0(round(i/max(smallsitesgrp$group) * 100), "%"))
-            
-            small_site_chunk <- subset(smallsitesgrp$MonitoringLocationIdentifier,
-                                       smallsitesgrp$group == i)
-            
+          for (i in 1:max(smallsitesgrp$group)) {
+            shiny::incProgress(1 / max(smallsitesgrp$group),
+              detail = paste0(round(i / max(smallsitesgrp$group) * 100), "%")
+            )
+
+            small_site_chunk <- subset(
+              smallsitesgrp$MonitoringLocationIdentifier,
+              smallsitesgrp$group == i
+            )
+
             args_temp_small <- args_temp2
-            
+
             args_temp_small[["siteid"]] <- small_site_chunk
-            
+
             # Download the result data
             smallsites_result_temp <- dataRetrieval::readWQPdata(args_temp_small,
-                                                                 dataProfile = "resultPhysChem",
-                                                                 ignore_attributes = TRUE)
-            
+              dataProfile = "resultPhysChem",
+              ignore_attributes = TRUE
+            )
+
             # Download the site data
             smallsites_site_temp <- dataRetrieval::whatWQPsites(args_temp_small)
-            
+
             # Download the project data
             smallsites_project_temp <- dataRetrieval::readWQPdata(args_temp_small,
-                                                                  service = "Project",
-                                                                  ignore_attributes = TRUE)
-            
+              service = "Project",
+              ignore_attributes = TRUE
+            )
+
             # Create TADA data frame
             TADAprofile_smallsites_temp <- EPATADA::TADA_JoinWQPProfiles(
               FullPhysChem = smallsites_result_temp,
               Sites = smallsites_site_temp,
-              Projects = smallsites_project_temp) |>
+              Projects = smallsites_project_temp
+            ) |>
               dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
-            
+
             # Assign the data to the list
             smallsites_list[[i]] <- TADAprofile_smallsites_temp
-            
           }
         })
-        
+
         # Combine the data
         TADA_smallsites <- dplyr::bind_rows(smallsites_list)
-        
+
         # Apply TADA_autoclean
         TADA_smallsites_clean <- EPATADA::TADA_AutoClean(TADA_smallsites) |>
-            dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
-        
+          dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
       } else {
         TADA_smallsites_clean <- TADA_download_temp
       }
-      
+
       # Download the data for big sites
-      if (nrow(bigsites) > 0){
-        
+      if (nrow(bigsites) > 0) {
         bigsites_list <- list()
-        
+
         bsitesvec <- unique(bigsites$MonitoringLocationIdentifier)
-        
-        big_title <- paste0("Downloading data from sites with greater than ", pretty_maxrecs,
-                            " results.")
-        
+
+        big_title <- paste0(
+          "Downloading data from sites with greater than ", pretty_maxrecs,
+          " results."
+        )
+
         shiny::withProgress(message = big_title, detail = "0%", value = 0, {
-          for (i in 1:length(bsitesvec)){
-            
-            shiny::incProgress(1/length(bsitesvec), 
-                               detail = paste0(round(i/length(bsitesvec) * 100), "%"))
-            
+          for (i in 1:length(bsitesvec)) {
+            shiny::incProgress(1 / length(bsitesvec),
+              detail = paste0(round(i / length(bsitesvec) * 100), "%")
+            )
+
             args_temp_big <- args_temp2
-            
+
             args_temp_big[["siteid"]] <- bsitesvec[i]
-            
+
             # Download the result data
             bigsites_result_temp <- dataRetrieval::readWQPdata(args_temp_big,
-                                                               dataProfile = "resultPhysChem",
-                                                               ignore_attributes = TRUE)
-            
+              dataProfile = "resultPhysChem",
+              ignore_attributes = TRUE
+            )
+
             # Download the site data
             bigsites_site_temp <- dataRetrieval::whatWQPsites(args_temp_big)
-            
+
             # Download the project data
             bigsites_project_temp <- dataRetrieval::readWQPdata(args_temp_big,
-                                                                service = "Project",
-                                                                ignore_attributes = TRUE)
-            
+              service = "Project",
+              ignore_attributes = TRUE
+            )
+
             # Create TADA data frame
             TADAprofile_bigsites_temp <- EPATADA::TADA_JoinWQPProfiles(
               FullPhysChem = bigsites_result_temp,
               Sites = bigsites_site_temp,
-              Projects = bigsites_project_temp) |>
+              Projects = bigsites_project_temp
+            ) |>
               dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
-            
+
             # Assign the data to the list
             bigsites_list[[i]] <- TADAprofile_bigsites_temp
           }
@@ -890,18 +907,17 @@ mod_query_data_server <- function(id, tadat) {
 
         # Combine the data
         TADA_bigsites <- dplyr::bind_rows(bigsites_list)
-        
+
         # Apply TADA_autoclean
         TADA_bigsites_clean <- EPATADA::TADA_AutoClean(TADA_bigsites) |>
           dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
-        
       } else {
         TADA_bigsites_clean <- TADA_download_temp
       }
-      
+
       # Combine the Small and Big sites
       raw <- dplyr::bind_rows(TADA_smallsites_clean, TADA_bigsites_clean)
-      
+
       # Convert the column types
       raw <- raw |>
         dplyr::mutate(dplyr::across(tidyselect::everything(), ~ {
@@ -913,10 +929,10 @@ mod_query_data_server <- function(id, tadat) {
             "logical" = as.logical(.x),
             "Date" = as.Date(.x),
             "factor" = as.factor(.x),
-            as.character(.x)  # default case
+            as.character(.x) # default case
           )
         }))
-      
+
       # remove the modal once the dataset has been pulled
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
 

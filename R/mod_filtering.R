@@ -74,8 +74,9 @@ mod_filtering_server <- function(id, tadat) {
           EPATADA::TADA_FieldCounts(tables$dat, display = "key") |>
           dplyr::left_join(filter_dat, by = c("Fields")) |>
           dplyr::mutate(Description = ifelse(is.na(Description),
-                                             "No description available",
-                                             Description))
+            "No description available",
+            Description
+          ))
       }
     })
 
@@ -188,8 +189,9 @@ mod_filtering_server <- function(id, tadat) {
           EPATADA::TADA_FieldCounts(tables$dat, display = tadat$field_sel) |>
           dplyr::left_join(filter_dat, by = c("Fields")) |>
           dplyr::mutate(Description = ifelse(is.na(Description),
-                                             "No description available",
-                                             Description))
+            "No description available",
+            Description
+          ))
       }
     })
 
