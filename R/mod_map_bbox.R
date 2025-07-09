@@ -25,7 +25,7 @@ mod_map_bboxServer <- function(id) {
     # Render base map
     output$map_bbox <- leaflet::renderLeaflet({
       # Create the map
-      m <- leaflet::leaflet() |>
+      m <- leaflet::leaflet() %>%
         leaflet.extras::addDrawToolbar(
           targetGroup = "drawn_items",
           polylineOptions = FALSE,
@@ -35,8 +35,8 @@ mod_map_bboxServer <- function(id) {
           polygonOptions = FALSE,
           rectangleOptions = leaflet.extras::drawRectangleOptions(),
           singleFeature = TRUE
-        ) |>
-        add_USGS_base() |>
+        ) %>%
+        add_USGS_base() %>%
         leaflet::setView(lng = -114, lat = 42, zoom = 3)
 
       return(m)

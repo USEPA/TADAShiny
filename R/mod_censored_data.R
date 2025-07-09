@@ -127,9 +127,9 @@ mod_censored_data_server <- function(id, tadat) {
     # column bar chart showing breakdown of censored/uncensored data passed through idCensoredData function
     output$id_censplot <- shiny::renderPlot({
       shiny::req(censdat$dat)
-      bardat <- censdat$dat |>
-        dplyr::group_by(TADA.CensoredData.Flag) |>
-        dplyr::summarise(num = length(ResultIdentifier)) |>
+      bardat <- censdat$dat %>%
+        dplyr::group_by(TADA.CensoredData.Flag) %>%
+        dplyr::summarise(num = length(ResultIdentifier)) %>%
         dplyr::mutate(
           num_chr = paste0("n = ", num),
           flag_simple = dplyr::case_when(TADA.CensoredData.Flag == "Non-Detect" ~ "Non-Detect",

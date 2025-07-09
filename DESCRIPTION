@@ -15,7 +15,6 @@ Imports:
     EPATADA,
     htmltools,
     shiny,
-    golem,
     magrittr,
     readxl,
     writexl,
@@ -40,10 +39,11 @@ Imports:
     utils,
     stringr,
     MESS,
-    leaflet.extras
+    leaflet.extras,
+    shinyalert,
+    golem
 Remotes:
-    USEPA/EPATADA@develop,
-    DOI-USGS/dataRetrieval@develop
+    USEPA/EPATADA@develop
 Suggests:
     remotes, 
     devtools,
@@ -55,8 +55,7 @@ Suggests:
     usethis,
     rsconnect,
     testthat,
-    spelling,
-    dataRetrieval
+    spelling
 Depends: 
     R (>= 4.1.0)
 Encoding: UTF-8
@@ -69,4 +68,3 @@ BugReports: https://github.com/USEPA/TADAShiny/issues
 RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
 StagedInstall: TRUE
-

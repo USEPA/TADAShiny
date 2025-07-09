@@ -21,18 +21,18 @@ load(data_path4)
 
 # Create a function that performs the EPATADA::TADA_DataRetrieval with purrr::possibly
 # to handle the error case when downloading tribal data
-poss_TADA_DataRetrieval <- EPATADA::TADA_DataRetrieval |>
+poss_TADA_DataRetrieval <- EPATADA::TADA_DataRetrieval %>%
   purrr::possibly(otherwise = TADA_download_temp)
 
 # Create a function that performs the dataRetrieval::whatWQPdata with purrr::possibly
 # to handle the error case
-poss_whatWQPdata <- dataRetrieval::whatWQPdata |>
+poss_whatWQPdata <- dataRetrieval::whatWQPdata %>%
   purrr::possibly(otherwise = NULL)
 
 # A function to return the tribal data frame with tribal name as an sf object
 return_tribal_sf <- function(tribal_layer, tribal_name, tribal_list = tribal_list) {
-  tribal_data2 <- tribal_list |>
-    purrr::pluck(tribal_layer) |>
+  tribal_data2 <- tribal_list %>%
+    purrr::pluck(tribal_layer) %>%
     dplyr::filter(TRIBE_NAME %in% tribal_name)
 
   return(tribal_data2)
@@ -730,15 +730,15 @@ mod_query_data_server <- function(id, tadat) {
       # Check if anything is outside the tribal's shapefile boundary
       if (inherits(tadat$tribal_boundary, "sf")) {
         # Convert result_summary to sf object
-        result_summary_sf <- result_summary |>
-          sf::st_as_sf(coords = c("lon", "lat"), crs = 4326) |>
+        result_summary_sf <- result_summary %>%
+          sf::st_as_sf(coords = c("lon", "lat"), crs = 4326) %>%
           sf::st_transform(crs = sf::st_crs(tadat$tribal_boundary))
 
         # Filter the sites within the tribal boundary
-        result_summary_sf_filter <- result_summary_sf |>
+        result_summary_sf_filter <- result_summary_sf %>%
           sf::st_filter(tadat$tribal_boundary)
 
-        result_summary <- result_summary_sf_filter |>
+        result_summary <- result_summary_sf_filter %>%
           sf::st_set_geometry(NULL)
       }
 
@@ -753,9 +753,9 @@ mod_query_data_server <- function(id, tadat) {
         return()
       }
 
-      tot_sites <- result_summary |>
-        dplyr::group_by(MonitoringLocationIdentifier) |>
-        dplyr::summarise(tot_n = sum(resultCount)) |>
+      tot_sites <- result_summary %>%
+        dplyr::group_by(MonitoringLocationIdentifier) %>%
+        dplyr::summarise(tot_n = sum(resultCount)) %>%
         dplyr::filter(tot_n > 0) %>%
         dplyr::arrange(tot_n)
 
@@ -776,8 +776,8 @@ mod_query_data_server <- function(id, tadat) {
       maxrecs <- 100000
       pretty_maxrecs <- prettyNum(maxrecs, big.mark = ",", scientific = FALSE)
 
-      smallsites <- tot_sites |> dplyr::filter(tot_n <= maxrecs)
-      bigsites <- tot_sites |> dplyr::filter(tot_n > maxrecs)
+      smallsites <- tot_sites %>% dplyr::filter(tot_n <= maxrecs)
+      bigsites <- tot_sites %>% dplyr::filter(tot_n > maxrecs)
 
       # Set other location inputs to be NULL as site ID is available
       args_temp2 <- args_temp
@@ -789,7 +789,7 @@ mod_query_data_server <- function(id, tadat) {
 
       # Download the data for small sites
       if (nrow(smallsites) > 0) {
-        smallsitesgrp <- smallsites |>
+        smallsitesgrp <- smallsites %>%
           dplyr::mutate(group = MESS::cumsumbinning(
             x = tot_n,
             threshold = maxrecs,
@@ -838,7 +838,7 @@ mod_query_data_server <- function(id, tadat) {
               FullPhysChem = smallsites_result_temp,
               Sites = smallsites_site_temp,
               Projects = smallsites_project_temp
-            ) |>
+            ) %>%
               dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
 
             # Assign the data to the list
@@ -850,7 +850,7 @@ mod_query_data_server <- function(id, tadat) {
         TADA_smallsites <- dplyr::bind_rows(smallsites_list)
 
         # Apply TADA_autoclean
-        TADA_smallsites_clean <- EPATADA::TADA_AutoClean(TADA_smallsites) |>
+        TADA_smallsites_clean <- EPATADA::TADA_AutoClean(TADA_smallsites) %>%
           dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
       } else {
         TADA_smallsites_clean <- TADA_download_temp
@@ -897,7 +897,7 @@ mod_query_data_server <- function(id, tadat) {
               FullPhysChem = bigsites_result_temp,
               Sites = bigsites_site_temp,
               Projects = bigsites_project_temp
-            ) |>
+            ) %>%
               dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
 
             # Assign the data to the list
@@ -909,7 +909,7 @@ mod_query_data_server <- function(id, tadat) {
         TADA_bigsites <- dplyr::bind_rows(bigsites_list)
 
         # Apply TADA_autoclean
-        TADA_bigsites_clean <- EPATADA::TADA_AutoClean(TADA_bigsites) |>
+        TADA_bigsites_clean <- EPATADA::TADA_AutoClean(TADA_bigsites) %>%
           dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
       } else {
         TADA_bigsites_clean <- TADA_download_temp
@@ -919,7 +919,7 @@ mod_query_data_server <- function(id, tadat) {
       raw <- dplyr::bind_rows(TADA_smallsites_clean, TADA_bigsites_clean)
 
       # Convert the column types
-      raw <- raw |>
+      raw <- raw %>%
         dplyr::mutate(dplyr::across(tidyselect::everything(), ~ {
           col_name <- dplyr::cur_column()
           target_class <- class(TADA_download_temp_type[[col_name]])[1]

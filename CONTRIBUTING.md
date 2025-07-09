@@ -15,7 +15,7 @@ editor_options:
     wrap: 72
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include = FALSE}
 library(knitr)
 
 knitr::opts_chunk$set(
@@ -54,8 +54,8 @@ organizations most in need.
 
 ## Development
 
-This article will walk through how to contribute to TADA via
-a pull request workflow. This is also not a complete guide to R package
+This article will walk through how to contribute to TADA via a pull
+request workflow. This is also not a complete guide to R package
 development (a comprehensive guide is [R
 Packages](https://r-pkgs.org/)), instead this is meant as more of a
 checklist for the general steps. Several references are included at the
@@ -82,9 +82,11 @@ There are multiple ways to interact with GitHub using Git.
 -   Option 2: Interact with GitHub using the command line or a web
     browser
 
-    -   [Setting Up Git](https://docs.github.com/en/get-started/getting-started-with-git/set-up-git)
+    -   [Setting Up
+        Git](https://docs.github.com/en/get-started/getting-started-with-git/set-up-git)
 
-    -   [Git Basics](https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository)
+    -   [Git
+        Basics](https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository)
 
     -   [Comprehensive Guide: Happy Git and GitHub for the
         useR](https://happygitwithr.com/ "Great and comprehensive guide for Git with an R flair")
