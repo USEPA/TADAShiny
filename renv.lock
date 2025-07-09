@@ -539,10 +539,10 @@
     },
     "Rcpp": {
       "Package": "Rcpp",
-      "Version": "1.0.14",
+      "Version": "1.1.0",
       "Source": "Repository",
       "Title": "Seamless R and C++ Integration",
-      "Date": "2025-01-11",
+      "Date": "2025-07-01",
       "Authors@R": "c(person(\"Dirk\", \"Eddelbuettel\", role = c(\"aut\", \"cre\"), email = \"edd@debian.org\", comment = c(ORCID = \"0000-0001-6419-907X\")), person(\"Romain\", \"Francois\", role = \"aut\", comment = c(ORCID = \"0000-0002-2444-4226\")), person(\"JJ\", \"Allaire\", role = \"aut\", comment = c(ORCID = \"0000-0003-0174-9868\")), person(\"Kevin\", \"Ushey\", role = \"aut\", comment = c(ORCID = \"0000-0003-2880-7407\")), person(\"Qiang\", \"Kou\", role = \"aut\", comment = c(ORCID = \"0000-0001-6786-5453\")), person(\"Nathan\", \"Russell\", role = \"aut\"), person(\"Iñaki\", \"Ucar\", role = \"aut\", comment = c(ORCID = \"0000-0001-6403-5550\")), person(\"Doug\", \"Bates\", role = \"aut\", comment = c(ORCID = \"0000-0001-8316-9503\")), person(\"John\", \"Chambers\", role = \"aut\"))",
       "Description": "The 'Rcpp' package provides R functions as well as C++ classes which offer a seamless integration of R and C++. Many R data types and objects can be mapped back and forth to C++ equivalents which facilitates both writing of new code as well as easier integration of third-party libraries. Documentation about 'Rcpp' is provided by several vignettes included in this package, via the 'Rcpp Gallery' site at <https://gallery.rcpp.org>, the paper by Eddelbuettel and Francois (2011, <doi:10.18637/jss.v040.i08>), the book by Eddelbuettel (2013, <doi:10.1007/978-1-4614-6868-4>) and the paper by Eddelbuettel and Balamuta (2018, <doi:10.1080/00031305.2017.1375990>); see 'citation(\"Rcpp\")' for details.",
       "Imports": [
@@ -562,17 +562,17 @@
       "RoxygenNote": "6.1.1",
       "Encoding": "UTF-8",
       "NeedsCompilation": "yes",
-      "Author": "Dirk Eddelbuettel [aut, cre] (<https://orcid.org/0000-0001-6419-907X>), Romain Francois [aut] (<https://orcid.org/0000-0002-2444-4226>), JJ Allaire [aut] (<https://orcid.org/0000-0003-0174-9868>), Kevin Ushey [aut] (<https://orcid.org/0000-0003-2880-7407>), Qiang Kou [aut] (<https://orcid.org/0000-0001-6786-5453>), Nathan Russell [aut], Iñaki Ucar [aut] (<https://orcid.org/0000-0001-6403-5550>), Doug Bates [aut] (<https://orcid.org/0000-0001-8316-9503>), John Chambers [aut]",
+      "Author": "Dirk Eddelbuettel [aut, cre] (ORCID: <https://orcid.org/0000-0001-6419-907X>), Romain Francois [aut] (ORCID: <https://orcid.org/0000-0002-2444-4226>), JJ Allaire [aut] (ORCID: <https://orcid.org/0000-0003-0174-9868>), Kevin Ushey [aut] (ORCID: <https://orcid.org/0000-0003-2880-7407>), Qiang Kou [aut] (ORCID: <https://orcid.org/0000-0001-6786-5453>), Nathan Russell [aut], Iñaki Ucar [aut] (ORCID: <https://orcid.org/0000-0001-6403-5550>), Doug Bates [aut] (ORCID: <https://orcid.org/0000-0001-8316-9503>), John Chambers [aut]",
       "Maintainer": "Dirk Eddelbuettel <edd@debian.org>",
       "Repository": "CRAN"
     },
     "RcppArmadillo": {
       "Package": "RcppArmadillo",
-      "Version": "14.4.3-1",
+      "Version": "14.6.0-1",
       "Source": "Repository",
       "Type": "Package",
       "Title": "'Rcpp' Integration for the 'Armadillo' Templated Linear Algebra Library",
-      "Date": "2025-05-21",
+      "Date": "2025-07-02",
       "Authors@R": "c(person(\"Dirk\", \"Eddelbuettel\", role = c(\"aut\", \"cre\"), email = \"edd@debian.org\", comment = c(ORCID = \"0000-0001-6419-907X\")), person(\"Romain\", \"Francois\", role = \"aut\", comment = c(ORCID = \"0000-0002-2444-4226\")), person(\"Doug\", \"Bates\", role = \"aut\", comment = c(ORCID = \"0000-0001-8316-9503\")), person(\"Binxiang\", \"Ni\", role = \"aut\"), person(\"Conrad\", \"Sanderson\", role = \"aut\", comment = c(ORCID = \"0000-0002-0049-4501\")))",
       "Description": "'Armadillo' is a templated C++ linear algebra library (by Conrad Sanderson) that aims towards a good balance between speed and ease of use. Integer, floating point and complex numbers are supported, as well as a subset of trigonometric and statistics functions. Various matrix decompositions are provided through optional integration with LAPACK and ATLAS libraries.  The 'RcppArmadillo' package includes the header files from the templated 'Armadillo' library. Thus users do not need to install 'Armadillo' itself in order to use 'RcppArmadillo'. From release 7.800.0 on, 'Armadillo' is licensed under Apache License 2; previous releases were under licensed as MPL 2.0 from version 3.800.0 onwards and LGPL-3 prior to that; 'RcppArmadillo' (the 'Rcpp' bindings/bridge to Armadillo) is licensed under the GNU GPL version 2 or later, as is the rest of 'Rcpp'.",
       "License": "GPL (>= 2)",
@@ -1548,7 +1548,7 @@
     },
     "commonmark": {
       "Package": "commonmark",
-      "Version": "1.9.5",
+      "Version": "2.0.0",
       "Source": "Repository",
       "Type": "Package",
       "Title": "High Performance CommonMark and Github Markdown Rendering in R",
@@ -1566,7 +1566,7 @@
       "Language": "en-US",
       "Encoding": "UTF-8",
       "NeedsCompilation": "yes",
-      "Author": "Jeroen Ooms [aut, cre] (<https://orcid.org/0000-0002-4035-0289>), John MacFarlane [cph] (Author of cmark)",
+      "Author": "Jeroen Ooms [aut, cre] (ORCID: <https://orcid.org/0000-0002-4035-0289>), John MacFarlane [cph] (Author of cmark)",
       "Maintainer": "Jeroen Ooms <jeroenooms@gmail.com>",
       "Repository": "CRAN"
     },
@@ -4523,14 +4523,14 @@
     },
     "maplegend": {
       "Package": "maplegend",
-      "Version": "0.2.0",
+      "Version": "0.3.0",
       "Source": "Repository",
       "Title": "Legends for Maps",
       "Authors@R": "c(person(\"Timothée\", \"Giraud\", email = \"timothee.giraud@cnrs.fr\", role = c(\"cre\",\"aut\"), comment = c(ORCID = \"0000-0002-1932-3323\")))",
       "Description": "Create legends for maps and other graphics. Thematic maps need to be accompanied by legible legends to be fully comprehensible. This package offers a wide range of legends useful for cartography, some of which may also be useful for other types of graphics.",
       "License": "GPL-3",
       "Depends": [
-        "R (>= 3.6.0)"
+        "R (>= 4.1.0)"
       ],
       "Imports": [
         "graphics",
@@ -4546,16 +4546,16 @@
       "URL": "https://github.com/riatelab/maplegend/",
       "BugReports": "https://github.com/riatelab/maplegend/issues/",
       "NeedsCompilation": "no",
-      "Author": "Timothée Giraud [cre, aut] (<https://orcid.org/0000-0002-1932-3323>)",
+      "Author": "Timothée Giraud [cre, aut] (ORCID: <https://orcid.org/0000-0002-1932-3323>)",
       "Maintainer": "Timothée Giraud <timothee.giraud@cnrs.fr>",
       "Repository": "CRAN"
     },
     "mapsf": {
       "Package": "mapsf",
-      "Version": "0.12.0",
+      "Version": "1.0.0",
       "Source": "Repository",
       "Title": "Thematic Cartography",
-      "Authors@R": "c(person(given = \"Timothée\", family = \"Giraud\", email = \"timothee.giraud@cnrs.fr\", role = c(\"cre\",\"aut\"), comment = c(ORCID = \"0000-0002-1932-3323\")), person(given = \"Hugues\", family = \"Pecout\", role = \"ctb\", comment = c(ORCID = \"0000-0002-0246-0954\", \"Logo\")), person(given = \"Ronan\", family = \"Ysebaert\", role = \"ctb\", comment = c(ORCID = \"0000-0002-7344-5911\", \"Cheat sheet\")), person(given = \"Ian\", family = \"Fellows\", role = \"cph\", comment = \"No overlap algorithm for labels, from wordcloud package\"), person(given = \"Jim\", family = \"Lemon\", role = \"cph\", comment = \"Arc drawing algorithm for annotations, from plotrix package\"))",
+      "Authors@R": "c(person(given = \"Timothée\", family = \"Giraud\", email = \"timothee.giraud@cnrs.fr\", role = c(\"cre\",\"aut\"), comment = c(ORCID = \"0000-0002-1932-3323\")), person(given = \"Hugues\", family = \"Pecout\", role = \"ctb\", comment = c(ORCID = \"0000-0002-0246-0954\", \"Logo\")), person(given = \"Ronan\", family = \"Ysebaert\", role = \"ctb\", comment = c(ORCID = \"0000-0002-7344-5911\", \"Cheat sheet\")), person(given = \"Elina\", family = \"Marveaux\", role = \"ctb\", comment = c(ORCID = \"0009-0000-8667-3019\", \"Themes\")), person(given = \"Ian\", family = \"Fellows\", role = \"cph\", comment = \"No overlap algorithm for labels, from wordcloud package\"), person(given = \"Jim\", family = \"Lemon\", role = \"cph\", comment = \"Arc drawing algorithm for annotations, from plotrix package\"))",
       "Description": "Create and integrate thematic maps in your workflow. This package helps to design various cartographic representations such as proportional symbols, choropleth or typology maps. It also offers several functions to display layout elements that improve the graphic presentation of maps (e.g. scale bar, north arrow, title, labels). 'mapsf' maps 'sf' objects on 'base' graphics.",
       "License": "GPL (>= 3)",
       "URL": "https://riatelab.github.io/mapsf/",
@@ -4581,15 +4581,17 @@
         "lwgeom",
         "knitr",
         "rmarkdown",
+        "svglite",
         "tinytest",
-        "covr"
+        "covr",
+        "altdoc"
       ],
       "Encoding": "UTF-8",
       "RoxygenNote": "7.3.2",
       "VignetteBuilder": "knitr",
       "Language": "en-US",
       "NeedsCompilation": "no",
-      "Author": "Timothée Giraud [cre, aut] (<https://orcid.org/0000-0002-1932-3323>), Hugues Pecout [ctb] (<https://orcid.org/0000-0002-0246-0954>, Logo), Ronan Ysebaert [ctb] (<https://orcid.org/0000-0002-7344-5911>, Cheat sheet), Ian Fellows [cph] (No overlap algorithm for labels, from wordcloud package), Jim Lemon [cph] (Arc drawing algorithm for annotations, from plotrix package)",
+      "Author": "Timothée Giraud [cre, aut] (ORCID: <https://orcid.org/0000-0002-1932-3323>), Hugues Pecout [ctb] (ORCID: <https://orcid.org/0000-0002-0246-0954>, Logo), Ronan Ysebaert [ctb] (ORCID: <https://orcid.org/0000-0002-7344-5911>, Cheat sheet), Elina Marveaux [ctb] (ORCID: <https://orcid.org/0009-0000-8667-3019>, Themes), Ian Fellows [cph] (No overlap algorithm for labels, from wordcloud package), Jim Lemon [cph] (Arc drawing algorithm for annotations, from plotrix package)",
       "Maintainer": "Timothée Giraud <timothee.giraud@cnrs.fr>",
       "Repository": "CRAN"
     },
@@ -5036,7 +5038,7 @@
     },
     "pillar": {
       "Package": "pillar",
-      "Version": "1.10.2",
+      "Version": "1.11.0",
       "Source": "Repository",
       "Title": "Coloured Formatting for Columns",
       "Authors@R": "c(person(given = \"Kirill\", family = \"M\\u00fcller\", role = c(\"aut\", \"cre\"), email = \"kirill@cynkra.com\", comment = c(ORCID = \"0000-0002-1416-3412\")), person(given = \"Hadley\", family = \"Wickham\", role = \"aut\"), person(given = \"RStudio\", role = \"cph\"))",
@@ -5087,7 +5089,7 @@
       "Config/gha/extra-packages": "units=?ignore-before-r=4.3.0",
       "Config/Needs/website": "tidyverse/tidytemplate",
       "NeedsCompilation": "no",
-      "Author": "Kirill Müller [aut, cre] (<https://orcid.org/0000-0002-1416-3412>), Hadley Wickham [aut], RStudio [cph]",
+      "Author": "Kirill Müller [aut, cre] (ORCID: <https://orcid.org/0000-0002-1416-3412>), Hadley Wickham [aut], RStudio [cph]",
       "Maintainer": "Kirill Müller <kirill@cynkra.com>",
       "Repository": "CRAN"
     },
@@ -5201,6 +5203,7 @@
         "magick",
         "methods",
         "pkgload (>= 1.0.2)",
+        "quarto",
         "rsconnect",
         "rstudioapi",
         "rticles",
@@ -5208,10 +5211,12 @@
         "testthat (>= 3.1.3)",
         "tools"
       ],
+      "VignetteBuilder": "knitr, quarto",
       "Config/Needs/website": "usethis, servr",
       "Config/potools/style": "explicit",
       "Config/testthat/edition": "3",
       "Config/testthat/parallel": "true",
+      "Config/testthat/start-first": "build-article, build-quarto-article, build-reference",
       "Encoding": "UTF-8",
       "SystemRequirements": "pandoc",
       "RoxygenNote": "7.3.2",
@@ -6406,6 +6411,7 @@
         "quarto",
         "RCurl",
         "reticulate",
+        "rmarkdown (>= 1.1)",
         "shiny",
         "testthat (>= 3.1.9)",
         "webfakes",
@@ -6763,7 +6769,7 @@
     },
     "shiny": {
       "Package": "shiny",
-      "Version": "1.11.0",
+      "Version": "1.11.1",
       "Source": "Repository",
       "Type": "Package",
       "Title": "Web Application Framework for R",

@@ -68,3 +68,5 @@ URL: https://github.com/USEPA/TADAShiny
 BugReports: https://github.com/USEPA/TADAShiny/issues
 RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
+StagedInstall: TRUE
+
