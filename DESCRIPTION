@@ -60,7 +60,8 @@ Suggests:
     spelling,
     dataRetrieval,
     styler,
-    quarto
+    quarto,
+    covr
 Depends: 
     R (>= 4.1.0)
 Encoding: UTF-8
