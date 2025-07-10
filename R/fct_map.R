@@ -8,7 +8,7 @@
 # Stored USGS map element names
 grp <- c("USGS Topo", "USGS Imagery Only", "USGS Imagery Topo", "USGS Shaded Relief", "Hydrography")
 
-att <- paste0(
+att <- base::paste0(
   "<a href='https://www.usgs.gov/'>",
   "U.S. Geological Survey</a> | ",
   "<a href='https://www.usgs.gov/laws/policies_notices.html'>",

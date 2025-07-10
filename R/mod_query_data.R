@@ -324,7 +324,7 @@ mod_query_data_server <- function(id, tadat) {
     # return an ms excel file with the template columns
     output$download_template <- shiny::downloadHandler(
       filename = function() {
-        paste0("tada_template", ".xlsx")
+        base::paste0("tada_template", ".xlsx")
       },
       content = function(file) {
         ## format csv.  contentType = "text/csv"
@@ -798,7 +798,7 @@ mod_query_data_server <- function(id, tadat) {
 
         smallsites_list <- list()
 
-        small_title <- paste0(
+        small_title <- base::paste0(
           "Downloading data from sites with less than or equal to ", pretty_maxrecs,
           " results."
         )
@@ -806,7 +806,7 @@ mod_query_data_server <- function(id, tadat) {
         shiny::withProgress(message = small_title, detail = "0%", value = 0, {
           for (i in 1:max(smallsitesgrp$group)) {
             shiny::incProgress(1 / max(smallsitesgrp$group),
-              detail = paste0(round(i / max(smallsitesgrp$group) * 100), "%")
+              detail = base::paste0(round(i / max(smallsitesgrp$group) * 100), "%")
             )
 
             small_site_chunk <- subset(
@@ -862,7 +862,7 @@ mod_query_data_server <- function(id, tadat) {
 
         bsitesvec <- unique(bigsites$MonitoringLocationIdentifier)
 
-        big_title <- paste0(
+        big_title <- base::paste0(
           "Downloading data from sites with greater than ", pretty_maxrecs,
           " results."
         )
@@ -870,7 +870,7 @@ mod_query_data_server <- function(id, tadat) {
         shiny::withProgress(message = big_title, detail = "0%", value = 0, {
           for (i in 1:length(bsitesvec)) {
             shiny::incProgress(1 / length(bsitesvec),
-              detail = paste0(round(i / length(bsitesvec) * 100), "%")
+              detail = base::paste0(round(i / length(bsitesvec) * 100), "%")
             )
 
             args_temp_big <- args_temp2

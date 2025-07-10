@@ -102,7 +102,7 @@ mod_filtering_server <- function(id, tadat) {
       tables$filter_values <-
         data.frame(getValues(tables$dat, values$selected_field))
       output$promptStep2 <- shiny::renderUI(HTML(
-        paste0(
+        base::paste0(
           "<h3>Filter by '",
           values$selected_field,
           "'</h3>
@@ -312,7 +312,7 @@ mod_filtering_server <- function(id, tadat) {
             }
             all_vals <- paste(field_filters$Value, collapse = " or ")
             label <-
-              paste0(
+              base::paste0(
                 prefix,
                 filter_type,
                 " ",

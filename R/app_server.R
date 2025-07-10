@@ -36,8 +36,8 @@ app_server <- function(input, output, session) {
   tadat$load_progress_file <- NA
   tadat$save_progress_file <- NA
   tadat$flags_present <- FALSE
-  job_id <- paste0("ts", format(Sys.time(), "%y%m%d%H%M%S"))
-  tadat$default_outfile <- paste0("tada_output_", job_id)
+  job_id <- base::paste0("ts", format(Sys.time(), "%y%m%d%H%M%S"))
+  tadat$default_outfile <- base::paste0("tada_output_", job_id)
   tadat$job_id <- job_id
 
   # switch to overview tab when tadat$new changes and provide user with window letting them know how many records were automatically flagged for removal upon upload

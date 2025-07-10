@@ -181,7 +181,7 @@ mod_harmonize_np_server <- function(id, tadat) {
       num <- length(dat$TADA.Harmonized.Flag[dat$TADA.Harmonized.Flag == TRUE])
       shiny::showModal(shiny::modalDialog(
         title = "Success! Harmonization Complete.",
-        paste0("Synonym reference table was successfully applied to TADA dataset. ", scales::comma(num), " results were harmonized to fit into more informative characteristic-fraction-speciation-unit groups.")
+        base::paste0("Synonym reference table was successfully applied to TADA dataset. ", scales::comma(num), " results were harmonized to fit into more informative characteristic-fraction-speciation-unit groups.")
       ))
     })
 
@@ -230,7 +230,7 @@ mod_harmonize_np_server <- function(id, tadat) {
 
       shiny::showModal(shiny::modalDialog(
         title = "Success! Calculations Complete.",
-        paste0(scales::comma(nitrolen), " Total Nitrogen results calculated and ", scales::comma(phoslen), " Total Phosphorus results calculated.")
+        base::paste0(scales::comma(nitrolen), " Total Nitrogen results calculated and ", scales::comma(phoslen), " Total Phosphorus results calculated.")
       ))
       shinyjs::disable("sum_apply")
     })

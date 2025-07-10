@@ -116,7 +116,7 @@ mod_censored_data_server <- function(id, tadat) {
         # if(any(dat$TADA.Remove==TRUE)){ # let users know when there are "problem" censored data results that will be flagged for removal.
         #   shiny::showModal(shiny::modalDialog(
         #     title = "Detection Limit Data Warning",
-        #     paste0(length(dat$ResultIdentifier[dat$TADA.Remove==TRUE])," results were flagged for removal because they have conflicting, ambiguous and/or unfamiliar detection limits and conditions. These will show up in the pie chart, but only 'Non-Detect', 'Over-Detect', and 'Uncensored' results will be used in the sections below. You may download your dataset for review at any time using the 'Download Working Dataset' button at the bottom of the page.")
+        #     base::paste0(length(dat$ResultIdentifier[dat$TADA.Remove==TRUE])," results were flagged for removal because they have conflicting, ambiguous and/or unfamiliar detection limits and conditions. These will show up in the pie chart, but only 'Non-Detect', 'Over-Detect', and 'Uncensored' results will be used in the sections below. You may download your dataset for review at any time using the 'Download Working Dataset' button at the bottom of the page.")
         #   ))
         # }
         censdat$dat <-
@@ -131,7 +131,7 @@ mod_censored_data_server <- function(id, tadat) {
         dplyr::group_by(TADA.CensoredData.Flag) %>%
         dplyr::summarise(num = length(ResultIdentifier)) %>%
         dplyr::mutate(
-          num_chr = paste0("n = ", num),
+          num_chr = base::paste0("n = ", num),
           flag_simple = dplyr::case_when(TADA.CensoredData.Flag == "Non-Detect" ~ "Non-Detect",
             TADA.CensoredData.Flag == "Over-Detect" ~ "Over-Detect",
             TADA.CensoredData.Flag == "Uncensored" ~ "Uncensored",

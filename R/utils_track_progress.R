@@ -180,7 +180,7 @@ writeNarrativeDataFrame <- function(tadat) {
 
   # Overview Tab
   for (row in 1:nrow(tadat$org_table)) {
-    df[nrow(df) + 1, ] <- c(paste0("Organization Rank ", row), tadat$org_table[row, "OrganizationFormalName"])
+    df[nrow(df) + 1, ] <- c(base::paste0("Organization Rank ", row), tadat$org_table[row, "OrganizationFormalName"])
   }
 
 
@@ -201,7 +201,7 @@ writeNarrativeDataFrame <- function(tadat) {
   # skips the recording of selected filters in the progress file if the filters haven't been selected yet
   if (nrow(tadat$selected_filters) > 0) {
     for (row in 1:nrow(tadat$selected_filters)) {
-      val <- paste0(
+      val <- base::paste0(
         tadat$selected_filters[row, "Filter"],
         ": ",
         tadat$selected_filters[row, "Field"],

@@ -41,7 +41,9 @@ Imports:
     MESS,
     leaflet.extras,
     shinyalert,
-    golem
+    golem,
+    purrr,
+    sf
 Remotes:
     USEPA/EPATADA@develop
 Suggests:
@@ -55,7 +57,10 @@ Suggests:
     usethis,
     rsconnect,
     testthat,
-    spelling
+    spelling,
+    dataRetrieval,
+    styler,
+    quarto
 Depends: 
     R (>= 4.1.0)
 Encoding: UTF-8

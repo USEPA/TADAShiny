@@ -187,7 +187,7 @@ local({
       return(paste(prefix, label))
   
     tail <- paste(rep.int(suffix, n), collapse = "")
-    paste0(prefix, " ", label, " ", tail)
+    base::paste0(prefix, " ", label, " ", tail)
   
   }
   
