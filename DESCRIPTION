@@ -41,29 +41,28 @@ Imports:
     MESS,
     leaflet.extras,
     shinyalert,
-    golem,
     purrr,
-    sf
+    sf,
+    golem
 Remotes:
     USEPA/EPATADA@develop
 Suggests:
-    remotes, 
     devtools,
     covr,
     knitr, 
     renv, 
+    golem,
     rmarkdown, 
     roxygen2, 
     usethis,
     rsconnect,
     testthat,
     spelling,
-    dataRetrieval,
     styler,
-    quarto,
-    covr
+    covr,
+    sessioninfo
 Depends: 
-    R (>= 4.1.0)
+    R (>= 3.5.0)
 Encoding: UTF-8
 Language: en-US
 Config/testthat/edition: 3
