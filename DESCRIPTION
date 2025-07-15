@@ -43,24 +43,19 @@ Imports:
     shinyalert,
     purrr,
     sf,
-    golem
+    golem,
+    sessioninfo, 
+    knitr,
+    testthat,
+    renv, 
+    devtools, 
+    rsconnect
 Remotes:
     USEPA/EPATADA@develop
 Suggests:
-    devtools,
-    covr,
-    knitr, 
-    renv, 
-    golem,
-    rmarkdown, 
-    roxygen2, 
-    usethis,
-    rsconnect,
-    testthat,
     spelling,
     styler,
-    covr,
-    sessioninfo
+    covr
 Depends: 
     R (>= 3.5.0)
 Encoding: UTF-8
