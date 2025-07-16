@@ -170,6 +170,7 @@
         "rvest",
         "remotes"
       ],
+      "Remotes": "DOI-USGS/dataRetrieval@develop, USEPA/rExpertQuery@develop, USEPA/StreamCatTools@master",
       "VignetteBuilder": "knitr, rmarkdown",
       "Language": "en-US",
       "Config/testthat/edition": "3",
@@ -178,15 +179,15 @@
       "LazyData": "true",
       "LazyDataCompression": "xz",
       "Config/Needs/website": "rmarkdown",
-      "Author": "Cristina Mullin [aut, cre] (<https://orcid.org/0000-0002-0615-6087>), Hillary Marler [aut] (<https://orcid.org/0009-0006-0323-1172>), Jacob Greif [aut], Elise Hinman [aut], Kenny Wong [aut], Kathryn Willi [aut], Matt Brousil [aut], Kathleen Healy [aut], Justin Bousquin [aut], TADA Working Group [ctb]",
-      "Maintainer": "Cristina Mullin <mullin.cristina@epa.gov>",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
-      "RemoteUsername": "USEPA",
       "RemoteRepo": "EPATADA",
+      "RemoteUsername": "USEPA",
       "RemoteRef": "develop",
       "RemoteSha": "f35ffb24affe22e4f648af9b87cd9c56d62f7c04",
-      "Remotes": "DOI-USGS/dataRetrieval@develop, USEPA/rExpertQuery@develop, USEPA/StreamCatTools@master"
+      "NeedsCompilation": "no",
+      "Author": "Cristina Mullin [aut, cre] (<https://orcid.org/0000-0002-0615-6087>), Hillary Marler [aut] (<https://orcid.org/0009-0006-0323-1172>), Jacob Greif [aut], Elise Hinman [aut], Kenny Wong [aut], Kathryn Willi [aut], Matt Brousil [aut], Kathleen Healy [aut], Justin Bousquin [aut], TADA Working Group [ctb]",
+      "Maintainer": "Cristina Mullin <mullin.cristina@epa.gov>"
     },
     "KernSmooth": {
       "Package": "KernSmooth",
@@ -1851,14 +1852,15 @@
       "BugReports": "https://github.com/DOI-USGS/dataRetrieval/issues",
       "RoxygenNote": "7.3.2",
       "Roxygen": "list(markdown = TRUE)",
-      "Author": "Laura DeCicco [aut, cre] (<https://orcid.org/0000-0002-3915-9487>), Robert Hirsch [aut] (<https://orcid.org/0000-0002-4534-075X>), David Lorenz [aut], Jordan Read [ctb], Jordan Walker [ctb], Lindsay Platt [ctb], David Watkins [aut] (<https://orcid.org/0000-0002-7544-0700>), David Blodgett [aut] (<https://orcid.org/0000-0001-9489-1710>), Mike Johnson [aut] (<https://orcid.org/0000-0002-5288-8350>), Aliesha Krall [ctb] (<https://orcid.org/0000-0003-2521-5043>), Lee Stanish [ctb] (<https://orcid.org/0000-0002-9775-6861>), Joeseph Zemmels [ctb] (<https://orcid.org/0009-0008-1463-6313>), Elise Hinman [ctb] (<https://orcid.org/0000-0001-5396-1583>), Michael Mahoney [ctb] (<https://orcid.org/0000-0003-2402-304X>)",
-      "Maintainer": "Laura DeCicco <ldecicco@usgs.gov>",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
-      "RemoteUsername": "DOI-USGS",
       "RemoteRepo": "dataRetrieval",
+      "RemoteUsername": "DOI-USGS",
       "RemoteRef": "develop",
-      "RemoteSha": "a64272a04ce706114805079eba76c4a2c94d0050"
+      "RemoteSha": "a64272a04ce706114805079eba76c4a2c94d0050",
+      "NeedsCompilation": "no",
+      "Author": "Laura DeCicco [aut, cre] (<https://orcid.org/0000-0002-3915-9487>), Robert Hirsch [aut] (<https://orcid.org/0000-0002-4534-075X>), David Lorenz [aut], Jordan Read [ctb], Jordan Walker [ctb], Lindsay Platt [ctb], David Watkins [aut] (<https://orcid.org/0000-0002-7544-0700>), David Blodgett [aut] (<https://orcid.org/0000-0001-9489-1710>), Mike Johnson [aut] (<https://orcid.org/0000-0002-5288-8350>), Aliesha Krall [ctb] (<https://orcid.org/0000-0003-2521-5043>), Lee Stanish [ctb] (<https://orcid.org/0000-0002-9775-6861>), Joeseph Zemmels [ctb] (<https://orcid.org/0009-0008-1463-6313>), Elise Hinman [ctb] (<https://orcid.org/0000-0001-5396-1583>), Michael Mahoney [ctb] (<https://orcid.org/0000-0003-2402-304X>)",
+      "Maintainer": "Laura DeCicco <ldecicco@usgs.gov>"
     },
     "dbplyr": {
       "Package": "dbplyr",
@@ -3608,7 +3610,7 @@
     },
     "httr2": {
       "Package": "httr2",
-      "Version": "1.1.2",
+      "Version": "1.2.0",
       "Source": "Repository",
       "Title": "Perform HTTP Requests and Process the Responses",
       "Authors@R": "c( person(\"Hadley\", \"Wickham\", , \"hadley@posit.co\", role = c(\"aut\", \"cre\")), person(\"Posit Software, PBC\", role = c(\"cph\", \"fnd\")), person(\"Maximilian\", \"Girlich\", role = \"ctb\") )",
@@ -3617,11 +3619,11 @@
       "URL": "https://httr2.r-lib.org, https://github.com/r-lib/httr2",
       "BugReports": "https://github.com/r-lib/httr2/issues",
       "Depends": [
-        "R (>= 4.0)"
+        "R (>= 4.1)"
       ],
       "Imports": [
         "cli (>= 3.0.0)",
-        "curl (>= 6.2.1)",
+        "curl (>= 6.4.0)",
         "glue",
         "lifecycle",
         "magrittr",
@@ -3649,20 +3651,20 @@
         "rmarkdown",
         "testthat (>= 3.1.8)",
         "tibble",
-        "webfakes",
+        "webfakes (>= 1.4.0)",
         "xml2"
       ],
       "VignetteBuilder": "knitr",
       "Config/Needs/website": "tidyverse/tidytemplate",
       "Config/testthat/edition": "3",
       "Config/testthat/parallel": "true",
-      "Config/testthat/start-first": "multi-req, resp-stream, req-perform",
+      "Config/testthat/start-first": "resp-stream, req-perform",
       "Encoding": "UTF-8",
       "RoxygenNote": "7.3.2",
       "NeedsCompilation": "no",
       "Author": "Hadley Wickham [aut, cre], Posit Software, PBC [cph, fnd], Maximilian Girlich [ctb]",
       "Maintainer": "Hadley Wickham <hadley@posit.co>",
-      "Repository": "CRAN"
+      "Repository": "RSPM"
     },
     "hydroloom": {
       "Package": "hydroloom",
@@ -6310,7 +6312,7 @@
     },
     "rprojroot": {
       "Package": "rprojroot",
-      "Version": "2.0.4",
+      "Version": "2.1.0",
       "Source": "Repository",
       "Title": "Finding Files in Project Subdirectories",
       "Authors@R": "person(given = \"Kirill\", family = \"M\\u00fcller\", role = c(\"aut\", \"cre\"), email = \"kirill@cynkra.com\", comment = c(ORCID = \"0000-0002-1416-3412\"))",
@@ -6325,20 +6327,22 @@
         "covr",
         "knitr",
         "lifecycle",
-        "mockr",
         "rlang",
         "rmarkdown",
-        "testthat (>= 3.0.0)",
+        "testthat (>= 3.2.0)",
         "withr"
       ],
       "VignetteBuilder": "knitr",
       "Config/testthat/edition": "3",
       "Encoding": "UTF-8",
-      "RoxygenNote": "7.2.3",
+      "RoxygenNote": "7.3.2.9000",
+      "Config/autostyle/scope": "line_breaks",
+      "Config/autostyle/strict": "true",
+      "Config/Needs/website": "tidyverse/tidytemplate",
       "NeedsCompilation": "no",
-      "Author": "Kirill Müller [aut, cre] (<https://orcid.org/0000-0002-1416-3412>)",
+      "Author": "Kirill Müller [aut, cre] (ORCID: <https://orcid.org/0000-0002-1416-3412>)",
       "Maintainer": "Kirill Müller <kirill@cynkra.com>",
-      "Repository": "CRAN"
+      "Repository": "RSPM"
     },
     "rsconnect": {
       "Package": "rsconnect",
@@ -8085,7 +8089,7 @@
     },
     "waldo": {
       "Package": "waldo",
-      "Version": "0.6.1",
+      "Version": "0.6.2",
       "Source": "Repository",
       "Title": "Find Differences Between R Objects",
       "Authors@R": "c( person(\"Hadley\", \"Wickham\", , \"hadley@posit.co\", role = c(\"aut\", \"cre\")), person(\"Posit Software, PBC\", role = c(\"cph\", \"fnd\")) )",
@@ -8118,7 +8122,7 @@
       "NeedsCompilation": "no",
       "Author": "Hadley Wickham [aut, cre], Posit Software, PBC [cph, fnd]",
       "Maintainer": "Hadley Wickham <hadley@posit.co>",
-      "Repository": "CRAN"
+      "Repository": "RSPM"
     },
     "whisker": {
       "Package": "whisker",
