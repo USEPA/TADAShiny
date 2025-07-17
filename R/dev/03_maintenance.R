@@ -45,4 +45,4 @@ devtools::check(manual = FALSE, remote = TRUE, incoming = TRUE)
 
 # # You're now set! ----
 # # go to dev/04_maintenance.R
-rstudioapi::navigateToFile("dev/04_deploy.R")
+rstudioapi::navigateToFile("R/dev/04_deploy.R")

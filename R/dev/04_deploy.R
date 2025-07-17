@@ -33,7 +33,7 @@ golem::add_positconnect_file()
 
 # 5. Deploy to shinyapps.io
 rsconnect::deployApp(
-  appFiles = c("app.R", "DESCRIPTION", "NAMESPACE", "R/", "inst/", "data/"),
+  appFiles = c("app.R", "DESCRIPTION", "NAMESPACE", "R/", "inst/"),
   appName = "TADAShiny",
   forceUpdate = TRUE
 )

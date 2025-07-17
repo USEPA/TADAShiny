@@ -1,12 +1,10 @@
-name: tadashiny
-title: TADAShiny
+name: TADAShiny
+title:
 username: Cristina
 account: Cristina
 server: rstudio-connect.dmap-stage.aws.epa.gov
 hostUrl: https://rstudio-connect.dmap-stage.aws.epa.gov/__api__
-appId: 403
-bundleId: 7100
-url: https://rstudio-connect.dmap-stage.aws.epa.gov/content/da3ffe2f-b443-4051-a029-3adb491434cb/
+appId: 939
+bundleId: 7103
+url: https://rstudio-connect.dmap-stage.aws.epa.gov/content/128e38fa-42fd-4ce1-9c12-32ac0328b65b/
 version: 1
-asMultiple: FALSE
-asStatic: FALSE
