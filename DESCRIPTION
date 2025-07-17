@@ -47,18 +47,18 @@ Imports:
     utils,
     writexl,
     stringr,
-    rsconnect
+    rsconnect,
+    renv,
+    rstudioapi
 Remotes:
     USEPA/EPATADA@develop,
     DOI-USGS/dataRetrieval@develop
 Suggests:
-    rstudioapi,
     pkgload,
     config,
     covr,
     devtools,
     knitr,
-    renv,
     spelling,
     styler,
     testthat
