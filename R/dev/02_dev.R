@@ -1,8 +1,8 @@
 # Building a Prod-Ready, Robust Shiny Application.
 
-# Each step within each of the dev files is optional, and you don't have to 
-# fill them out before getting started. 
-# 01_start.R should only be used when first creating an app. 
+# Each step within each of the dev files is optional, and you don't have to
+# fill them out before getting started.
+# 01_start.R should only be used when first creating an app.
 # 02_dev.R should be used to keep track of your development process.
 # 03_maintenance.R should be used to test and maintain the app before deployment.
 # 04_deploy.R should be used to document your deployment process.
@@ -94,9 +94,9 @@
 ## service for your application
 ##
 ## (You'll need GitHub there)
-# 
+#
 # usethis::use_github()
-# 
+#
 # # GitHub Actions
 # usethis::use_github_action()
 # # Chose one of the two
@@ -106,25 +106,25 @@
 # # usethis::use_github_action_check_full()
 # # Add action for PR
 # usethis::use_github_action_pr_commands()
-# 
+#
 # # Travis CI
 # usethis::use_travis()
 # usethis::use_travis_badge()
-# 
+#
 # # AppVeyor
 # usethis::use_appveyor()
 # usethis::use_appveyor_badge()
-# 
+#
 # # Circle CI
 # usethis::use_circleci()
 # usethis::use_circleci_badge()
-# 
+#
 # # Jenkins
 # usethis::use_jenkins()
-# 
+#
 # # GitLab CI
 # usethis::use_gitlab_ci()
-# 
+#
 # # You're now set! ----
 # # go to dev/03_maintenance.R
 rstudioapi::navigateToFile("dev/03_maintenance.R")
