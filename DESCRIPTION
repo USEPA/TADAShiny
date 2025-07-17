@@ -12,56 +12,68 @@ Description: Assists data partners in retrieving, wrangling, quality checking, a
 License: CC0
 Copyright: This software is in the public domain because it contains materials that originally came from the U.S. Environmental Protection Agency.
 Imports: 
+    EPATADA,
+    golem,
+    magrittr,
+    shiny
+Remotes:
+    USEPA/EPATADA@develop
+Suggests:
+    arcgislayers,
     config,
+    covr,
+    data.table,
     dataRetrieval,
+    dbscan,
     devtools,
     DT,
     dplyr,
-    EPATADA,
     forcats,
+    geojsonsf,
     ggplot2,
-    golem,
     gotop,
     grDevices,
     htmltools,
+    httr,
+    igraph,
+    janitor,
+    jsonlite,
     knitr,
     leaflet,
     leaflet.extras,
     lubridate,
-    magrittr,
     MESS,
+    nhdplusTools,
+    openxlsx,
     plotly,
     plyr,
     purrr,
     RColorBrewer,
     readxl,
     renv,
-    rExpertQuery,
+    rlang,
     rsconnect,
     scales,
     sessioninfo,
     sf,
-    shiny,
     shinyalert,
     shinybusy,
     shinycssloaders,
     shinyjs,
     shinyWidgets,
+    spelling,
+    stats,
+    stringi,
     stringr,
+    styler,
     testthat,
+    tibble,
     tidyr,
+    tidyselect,
+    units,
+    urltools,
     utils,
     writexl
-Remotes:
-    DOI-USGS/dataRetrieval@develop,
-    USEPA/EPATADA@develop,
-    USEPA/rExpertQuery@develop,
-    USEPA/StreamCatTools@master
-Suggests:
-    covr,
-    spelling,
-    StreamCatTools,
-    styler
 Depends: 
     R (>= 3.5.0)
 Encoding: UTF-8
