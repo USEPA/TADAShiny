@@ -54,6 +54,7 @@ Imports:
     writexl
 Remotes:
     DOI-USGS/dataRetrieval@develop,
+    USEPA/EPATADA@develop,
     USEPA/rExpertQuery@develop,
     USEPA/StreamCatTools@master
 Suggests:
