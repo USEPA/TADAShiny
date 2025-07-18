@@ -26,6 +26,16 @@ jobs:
           extra-packages: any::covr
           needs: coverage
 
+      - name: Verify Package Installation
+        run: |
+          Rscript -e 'installed.packages()'
+        shell: Rscript {0}
+      
+      - name: Debug Environment Variables
+        run: |
+          printenv
+        shell: bash
+        
       - name: Test coverage
         run: |
           covr::codecov(

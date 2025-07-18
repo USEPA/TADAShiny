@@ -133,9 +133,9 @@ mod_review_data_server <- function(id, tadat) {
       shiny::req(review_things$rem_reas)
       dat <- review_things$rem_reas
       if (nrow(review_things$rem_reas) > 1) {
-        dat$Legend <- paste0(dat$Reason, " - ", dat$Count, " results")
+        dat$Legend <- base::paste0(dat$Reason, " - ", dat$Count, " results")
       } else {
-        dat$Legend <- paste0(dat$Reason)
+        dat$Legend <- base::paste0(dat$Reason)
       }
       dat <- dat %>%
         dplyr::rowwise() %>%

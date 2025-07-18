@@ -1,3 +1,7 @@
+# Load the input data
+data_path1 <- app_sys("extdata/filter_descriptions.RData")
+load(data_path1)
+
 mod_filtering_ui <- function(id) {
   ns <- NS(id)
   tagList(
@@ -67,7 +71,12 @@ mod_filtering_server <- function(id, tadat) {
         tables$dat <-
           subset(tadat$raw, tadat$raw$TADA.Remove == FALSE)
         tables$filter_fields <-
-          EPATADA::TADA_FieldCounts(tables$dat, display = "key")
+          EPATADA::TADA_FieldCounts(tables$dat, display = "key") %>%
+          dplyr::left_join(filter_dat, by = c("Fields")) %>%
+          dplyr::mutate(Description = ifelse(is.na(Description),
+            "No description available",
+            Description
+          ))
       }
     })
 
@@ -93,7 +102,7 @@ mod_filtering_server <- function(id, tadat) {
       tables$filter_values <-
         data.frame(getValues(tables$dat, values$selected_field))
       output$promptStep2 <- shiny::renderUI(HTML(
-        paste0(
+        base::paste0(
           "<h3>Filter by '",
           values$selected_field,
           "'</h3>
@@ -177,7 +186,12 @@ mod_filtering_server <- function(id, tadat) {
       shiny::updateRadioButtons(session, "field_sel", selected = tadat$field_sel)
       if (!is.null(tables$dat)) {
         tables$filter_fields <-
-          EPATADA::TADA_FieldCounts(tables$dat, display = tadat$field_sel)
+          EPATADA::TADA_FieldCounts(tables$dat, display = tadat$field_sel) %>%
+          dplyr::left_join(filter_dat, by = c("Fields")) %>%
+          dplyr::mutate(Description = ifelse(is.na(Description),
+            "No description available",
+            Description
+          ))
       }
     })
 
@@ -298,7 +312,7 @@ mod_filtering_server <- function(id, tadat) {
             }
             all_vals <- paste(field_filters$Value, collapse = " or ")
             label <-
-              paste0(
+              base::paste0(
                 prefix,
                 filter_type,
                 " ",

@@ -46,7 +46,7 @@ flagCensus <- function(raw) {
         tabular_results[flag] <- (results > 0)
       }
     } else {
-      print(paste0("No tests found for flag ", flag))
+      print(base::paste0("No tests found for flag ", flag))
     }
   }
 

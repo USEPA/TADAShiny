@@ -58,7 +58,7 @@ mod_data_flagging_server <- function(id, tadat) {
     flagSwitch <- function(len) {
       inputs <- character(len)
       for (i in seq_len(len)) {
-        switch_name <- paste0("switch_", i)
+        switch_name <- base::paste0("switch_", i)
         if (!(i %in% which(unlist(switch_disabled)))) {
           inputs[i] <- as.character(
             shinyWidgets::prettySwitch(
@@ -78,7 +78,7 @@ mod_data_flagging_server <- function(id, tadat) {
 
     shinyValue <- function(id, len) {
       unlist(lapply(seq_len(len), function(i) {
-        value <- input[[paste0(id, i)]]
+        value <- input[[base::paste0(id, i)]]
         if (is.null(value)) {
           FALSE
         } else {
@@ -101,7 +101,7 @@ mod_data_flagging_server <- function(id, tadat) {
         if (!is.null(tadat$removals)) {
           if (!all(is.na(values$testResults[flag]))) {
             # Problem here?
-            tadat$removals[paste0(flag_prefix, flag)] <- values$testResults[flag]
+            tadat$removals[base::paste0(flag_prefix, flag)] <- values$testResults[flag]
           }
         }
         # If the switch corresponding to this flag isn't on, switch it on
@@ -114,8 +114,8 @@ mod_data_flagging_server <- function(id, tadat) {
         # print(pos)
         # print(tadat$switch_defaults[pos])
         tadat$switch_defaults[pos] <- TRUE
-        if (!is.null(input[[paste0("switch_", pos)]])) {
-          switch_name <- paste0("switch_", pos)
+        if (!is.null(input[[base::paste0("switch_", pos)]])) {
+          switch_name <- base::paste0("switch_", pos)
           if (is.na(pos)) {
             invalidFile("flagging")
           } else if (!isTRUE(input[[switch_name]])) {
@@ -147,7 +147,7 @@ mod_data_flagging_server <- function(id, tadat) {
           switch_id <- "switch_"
           tadat$selected_flags <- flag_types[shinyValue(switch_id, n_switches)]
           for (i in which(switch_disabled)) {
-            shinyjs::disable(paste0(switch_id, i))
+            shinyjs::disable(base::paste0(switch_id, i))
           }
         })
 

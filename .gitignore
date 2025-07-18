@@ -1,5 +1,7 @@
 # RStudio files
 .Rproj.user
+TADAShiny.Rproj
+.Rprofile
 
 # History files
 .Rhistory

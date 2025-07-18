@@ -13,48 +13,55 @@ License: CC0
 Copyright: This software is in the public domain because it contains materials that originally came from the U.S. Environmental Protection Agency.
 Imports: 
     EPATADA,
-    htmltools, 
-    shiny,
-    golem, 
+    golem,
     magrittr,
-    readxl,
-    writexl,
-    leaflet,
-    shinyWidgets,
-    shinycssloaders,
+    shiny,
+    dataRetrieval,
+    data.table,
     DT,
-    ggplot2,
-    shinybusy, 
-    dplyr, 
-    plyr,
-    tidyr,
-    scales,
+    dplyr,
     forcats,
-    RColorBrewer,
-    grDevices,
-    lubridate,
-    plotly, 
-    shinyjs,
+    ggplot2,
     gotop,
-    config,
+    grDevices,
+    htmltools,
+    jsonlite,
+    leaflet,
+    leaflet.extras,
+    lubridate,
+    MESS,
+    plotly,
+    plyr,
+    purrr,
+    RColorBrewer,
+    readxl,
+    scales,
+    sf,
+    shinyalert,
+    shinybusy,
+    shinycssloaders,
+    shinyjs,
+    shinyWidgets,
+    tidyr,
+    tidyselect,
     utils,
-    stringr
+    writexl,
+    stringr,
+    rsconnect,
+    renv,
+    rstudioapi
 Remotes:
     USEPA/EPATADA@develop,
     DOI-USGS/dataRetrieval@develop
 Suggests:
-    remotes, 
-    devtools,
+    pkgload,
+    config,
     covr,
-    knitr, 
-    renv, 
-    rmarkdown, 
-    roxygen2, 
-    usethis,
-    rsconnect,
-    testthat,
+    devtools,
+    knitr,
     spelling,
-    dataRetrieval
+    styler,
+    testthat
 Depends: 
     R (>= 3.5.0)
 Encoding: UTF-8
@@ -66,3 +73,4 @@ URL: https://github.com/USEPA/TADAShiny
 BugReports: https://github.com/USEPA/TADAShiny/issues
 RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
+StagedInstall: TRUE

@@ -165,13 +165,13 @@ mod_figures_server <- function(id, tadat) {
       react$plotdataset <- groupdata
       react$mapdata <- groupdata %>%
         dplyr::group_by(OrganizationFormalName, MonitoringLocationIdentifier, MonitoringLocationName, MonitoringLocationTypeName, TADA.LatitudeMeasure, TADA.LongitudeMeasure) %>%
-        dplyr::summarise(Ncount = length(ResultIdentifier), MeanV = mean(TADA.ResultMeasureValue), GroupID = paste0(unique(sort(groupname)), collapse = ";"), DateRange = paste0(min(lubridate::year(as.Date(ActivityStartDate, "%Y-%m-%d"))), " - ", max(lubridate::year(as.Date(ActivityStartDate, "%Y-%m-%d")))))
+        dplyr::summarise(Ncount = length(ResultIdentifier), MeanV = mean(TADA.ResultMeasureValue), GroupID = base::paste0(unique(sort(groupname)), collapse = ";"), DateRange = base::paste0(min(lubridate::year(as.Date(ActivityStartDate, "%Y-%m-%d"))), " - ", max(lubridate::year(as.Date(ActivityStartDate, "%Y-%m-%d")))))
     })
 
     # taken from this stackoverflow: https://stackoverflow.com/questions/58505589/circles-in-legend-for-leaflet-map-with-addcirclemarkers-in-r-without-shiny
     addLegendCustom <- function(map, colors, labels, sizes, opacity = 0.5, title = NULL) {
-      colorAdditions <- paste0(colors, "; border-radius: 50%; width:", sizes, "px; height:", sizes, "px")
-      labelAdditions <- paste0("<div style='display: inline-block;height: ", sizes, "px;margin-top: 4px;line-height: ", sizes, "px;'>", labels, "</div>")
+      colorAdditions <- base::paste0(colors, "; border-radius: 50%; width:", sizes, "px; height:", sizes, "px")
+      labelAdditions <- base::paste0("<div style='display: inline-block;height: ", sizes, "px;margin-top: 4px;line-height: ", sizes, "px;'>", labels, "</div>")
 
       return(leaflet::addLegend(map, colors = colorAdditions, labels = labelAdditions, opacity = opacity, title = title))
     }
@@ -201,7 +201,7 @@ mod_figures_server <- function(id, tadat) {
           leaflet::addCircleMarkers(
             data = react$mapdata, lng = ~TADA.LongitudeMeasure, lat = ~TADA.LatitudeMeasure, color = "black", fillColor = ~ pal(react$mapdata$MeanV), fillOpacity = 0.7, stroke = TRUE, weight = 1.5,
             radius = ~radius,
-            popup = paste0(
+            popup = base::paste0(
               "Organization: ", react$mapdata$OrganizationFormalName,
               "<br> Site Name: ", react$mapdata$MonitoringLocationName,
               "<br> Site ID: ", react$mapdata$MonitoringLocationIdentifier,
@@ -224,7 +224,7 @@ mod_figures_server <- function(id, tadat) {
           leaflet::addCircleMarkers(
             data = react$mapdata, lng = ~TADA.LongitudeMeasure, lat = ~TADA.LatitudeMeasure, color = "black", fillColor = ~ pal(GroupID), fillOpacity = 0.7, stroke = TRUE, weight = 1.5,
             radius = ~radius,
-            popup = paste0(
+            popup = base::paste0(
               "Organization: ", react$mapdata$OrganizationFormalName,
               "<br> Site Name: ", react$mapdata$MonitoringLocationName,
               "<br> Site ID: ", react$mapdata$MonitoringLocationIdentifier,
@@ -250,7 +250,7 @@ mod_figures_server <- function(id, tadat) {
       # the list of 'sites' is managed in the server function (below)
       shiny::fluidRow(
         htmltools::h3("3. Select Specific Sites (Optional)"),
-        htmltools::HTML(paste0("Use the drop down to pick the sites you'd like to include
+        htmltools::HTML(base::paste0("Use the drop down to pick the sites you'd like to include
                                in the plots below and then click 'Generate Plots'.
                                Defaults to all sites in the dataset.
                                <B>NOTE:</B> Currently, the single-characteristic scatterplot,
@@ -295,7 +295,7 @@ mod_figures_server <- function(id, tadat) {
         if (!react$groups[1] %in% plotdata$groupname) {
           shiny::showModal(shiny::modalDialog(
             title = "Whoops!",
-            paste0("You selected a site/sites where ", react$groups[1], " was not sampled. Please use the legend in the map above to select site(s) where ", react$groups[1], "was sampled.")
+            base::paste0("You selected a site/sites where ", react$groups[1], " was not sampled. Please use the legend in the map above to select site(s) where ", react$groups[1], "was sampled.")
           ))
         } else {
           react$plotdata <- plotdata
@@ -318,7 +318,7 @@ mod_figures_server <- function(id, tadat) {
       exc1 <- length(vals[vals > input$benchmark1])
       exc2 <- length(vals[vals > input$benchmark2])
       tot <- length(vals)
-      shiny::wellPanel(htmltools::strong(paste0(exc1, " out of ", tot, " measurements (", round(exc1 / tot * 100, digits = 1), "%) exceed benchmark 1, while ", exc2, " out of ", tot, " measurements (", round(exc2 / tot * 100, digits = 1), "%) exceed benchmark 2.")))
+      shiny::wellPanel(htmltools::strong(base::paste0(exc1, " out of ", tot, " measurements (", round(exc1 / tot * 100, digits = 1), "%) exceed benchmark 1, while ", exc2, " out of ", tot, " measurements (", round(exc2 / tot * 100, digits = 1), "%) exceed benchmark 2.")))
     })
 
     # for plotting benchmarks

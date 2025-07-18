@@ -100,10 +100,10 @@ mod_TADA_summary_server <- function(id, tadat) {
     shiny::observeEvent(input$download_working_button, {
       tryCatch(
         {
-          tmpdir <- tempdir()
-          setwd(tempdir())
-          datafile_name <- paste0(tadat$default_outfile, "_working", ".xlsx")
-          progress_file_name <- paste0(tadat$default_outfile, "_prog.RData")
+          tmpdir <- base::tempdir()
+          setwd(base::tempdir())
+          datafile_name <- base::paste0(tadat$default_outfile, "_working", ".xlsx")
+          progress_file_name <- base::paste0(tadat$default_outfile, "_prog.RData")
           desc <- writeNarrativeDataFrame(tadat)
           shinybusy::show_modal_spinner(
             spin = "double-bounce",
@@ -133,10 +133,10 @@ mod_TADA_summary_server <- function(id, tadat) {
     shiny::observeEvent(input$download_final_button, {
       tryCatch(
         {
-          tmpdir <- tempdir()
-          setwd(tempdir())
-          datafile_name <- paste0(tadat$default_outfile, "_final", ".xlsx")
-          progress_file_name <- paste0(tadat$default_outfile, "_prog.RData")
+          tmpdir <- base::tempdir()
+          setwd(base::tempdir())
+          datafile_name <- base::paste0(tadat$default_outfile, "_final", ".xlsx")
+          progress_file_name <- base::paste0(tadat$default_outfile, "_prog.RData")
           desc <- writeNarrativeDataFrame(tadat)
           shinybusy::show_modal_spinner(
             spin = "double-bounce",
@@ -165,7 +165,7 @@ mod_TADA_summary_server <- function(id, tadat) {
 
     output$dwn_working <- shiny::downloadHandler(
       filename = function() {
-        paste0(tadat$default_outfile, "_working.zip")
+        base::paste0(tadat$default_outfile, "_working.zip")
       },
       content = function(fname) {
         utils::zip(zipfile = fname, files = summary_things$temp_files)
@@ -175,7 +175,7 @@ mod_TADA_summary_server <- function(id, tadat) {
 
     output$dwn_final <- shiny::downloadHandler(
       filename = function() {
-        paste0(tadat$default_outfile, "_final.zip")
+        base::paste0(tadat$default_outfile, "_final.zip")
       },
       content = function(fname) {
         utils::zip(zipfile = fname, files = summary_things$temp_files)
@@ -218,7 +218,7 @@ mod_TADA_summary_server <- function(id, tadat) {
       if (is.null(tadat$raw)) {
         "Total Results in Dataset: 0"
       } else {
-        paste0("Total Results in Dataset: ", scales::comma(length(tadat$raw$ResultIdentifier)))
+        base::paste0("Total Results in Dataset: ", scales::comma(length(tadat$raw$ResultIdentifier)))
       }
     })
 
@@ -226,7 +226,7 @@ mod_TADA_summary_server <- function(id, tadat) {
       if (is.null(tadat$raw)) {
         "Results Flagged for Removal: 0"
       } else {
-        paste0(
+        base::paste0(
           "Results Flagged for Removal: ",
           scales::comma(summary_things$rem_rec)
         )
@@ -237,7 +237,7 @@ mod_TADA_summary_server <- function(id, tadat) {
       if (is.null(tadat$raw)) {
         "Results Retained: 0"
       } else {
-        paste0(
+        base::paste0(
           "Results Retained: ",
           scales::comma(summary_things$clean_rec)
         )
@@ -248,7 +248,7 @@ mod_TADA_summary_server <- function(id, tadat) {
       if (is.null(tadat$raw)) {
         "Total Sites in Dataset: 0"
       } else {
-        paste0("Total Sites in Dataset: ", scales::comma(length(
+        base::paste0("Total Sites in Dataset: ", scales::comma(length(
           unique(tadat$raw$MonitoringLocationIdentifier)
         )))
       }
@@ -258,7 +258,7 @@ mod_TADA_summary_server <- function(id, tadat) {
       if (is.null(tadat$raw)) {
         "Total Sites Flagged for Removal: 0"
       } else {
-        paste0(
+        base::paste0(
           "Total Sites Flagged for Removal: ",
           scales::comma(summary_things$rem_site)
         )
@@ -269,7 +269,7 @@ mod_TADA_summary_server <- function(id, tadat) {
       if (is.null(tadat$raw)) {
         "Total Sites Retained: 0"
       } else {
-        paste0(
+        base::paste0(
           "Total Sites Retained: ",
           scales::comma(summary_things$clean_site)
         )
