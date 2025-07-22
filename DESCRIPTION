@@ -12,16 +12,16 @@ Description: Assists data partners in retrieving, wrangling, quality checking, a
 License: CC0
 Copyright: This software is in the public domain because it contains materials that originally came from the U.S. Environmental Protection Agency.
 Imports: 
-    EPATADA,
-    golem,
-    magrittr,
-    shiny,
-    dataRetrieval,
-    data.table,
     DT,
+    EPATADA,
+    MESS,
+    RColorBrewer,
+    data.table,
+    dataRetrieval,
     dplyr,
     forcats,
     ggplot2,
+    golem,
     gotop,
     grDevices,
     htmltools,
@@ -29,41 +29,44 @@ Imports:
     leaflet,
     leaflet.extras,
     lubridate,
-    MESS,
+    magrittr,
     plotly,
     plyr,
     purrr,
-    RColorBrewer,
     readxl,
+    renv,
+    rsconnect,
+    rstudioapi,
     scales,
     sf,
+    shiny,
+    shinyWidgets,
     shinyalert,
     shinybusy,
     shinycssloaders,
     shinyjs,
-    shinyWidgets,
+    stringr,
     tidyr,
     tidyselect,
     utils,
-    writexl,
-    stringr,
-    rsconnect,
-    renv,
-    rstudioapi
+    writexl
 Remotes:
     USEPA/EPATADA@develop,
     DOI-USGS/dataRetrieval@develop
 Suggests:
-    pkgload,
     config,
     covr,
     devtools,
     knitr,
+    pkgload,
+    rmarkdown,
+    roxygen2,
     spelling,
     styler,
-    testthat
+    testthat,
+    usethis
 Depends: 
-    R (>= 3.5.0)
+    R (>= 4.1.0)
 Encoding: UTF-8
 Language: en-US
 Config/testthat/edition: 3
