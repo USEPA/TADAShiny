@@ -25,6 +25,11 @@ packrat::init()
 packrat::snapshot()
 packrat::status()
 
+# # What is going on with my depends?
+# list = installed.packages()
+# user_installed_packages <- list[is.na(list[,"Priority"]), "Package"]
+# .libPaths()
+
 # spell check
 spelling::spell_check_package(
   pkg = ".",

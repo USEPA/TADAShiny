@@ -52,7 +52,7 @@ Imports:
     writexl
 Remotes:
     github::USEPA/rExpertQuery@develop,
-    github::USEPA/EPATADA@develop,
+    github::USEPA/EPATADA@v1.0.2-beta,
     github::DOI-USGS/dataRetrieval@develop
 Suggests:
     config,
