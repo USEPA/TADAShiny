@@ -22,3 +22,4 @@ _snaps
 .Ruserdata
 .vscode/
 .Rbuildignore
+packrat/lib*/

@@ -11,24 +11,20 @@
 #### CURRENT FILE: DEPLOY SCRIPT #######
 ########################################
 
-# Deploy ----
-## Local, CRAN or Package Manager ----
 ## This will build a tar.gz that can be installed locally,
 ## sent to CRAN, or to a package manager
-## RStudio ----
-## If you want to deploy on RStudio related platforms
+devtools::check()
+devtools::build()
+pkgbuild::build()
 
-# golem::add_shinyserver_file() #already exists 
-
-# not relevant to this package
-## If you want to build github pages
-# usethis::use_pkgdown() # run once to configure your package
+## If you want to build github pages (NOT CURRENLY USED IN TADAShiny)
 # pkgdown::build_site()
+# usethis::use_pkgdown() # run once to configure your package
 
 # # This is how to deploy to TetraTech's shinyappsio
-# # along with the file produced here TADAShiny\rsconnect\shinyapps.io\tetratech-wtr-wne
-# golem::add_shinyappsio_file()
+# # see file produced here TADAShiny\rsconnect\shinyapps.io\tetratech-wtr-wne
 # 5. Deploy to shinyapps.io
+# golem::add_shinyserver_file() #already exists
 rsconnect::deployApp(
   appFiles = c("app.R", "DESCRIPTION", "NAMESPACE", "R/", "inst/"),
   appName = "TADAShiny",
@@ -38,15 +34,15 @@ rsconnect::deployApp(
 # This is how to deploy to EPA's Posit Connect
 # golem::add_positconnect_file() # already exists
 rsconnect::deployApp(appDir = getwd(),
-                     account = "Cristina", 
+                     account = "Cristina",
                      appFiles = c("app.R", "DESCRIPTION", "NAMESPACE", "R/", "inst/"),
                      quarto = FALSE,
-                     server = "rstudio-connect.dmap-stage.aws.epa.gov",      
-                     appName = "TADAShiny", 
+                     server = "rstudio-connect.dmap-stage.aws.epa.gov",
+                     appName = "TADAShiny",
                      appTitle = "TADAShiny",
-                     appId = 403, 
-                     launch.browser = TRUE, 
-                     lint = TRUE, 
-                     metadata = list(asMultiple = FALSE, asStatic = FALSE),      
-                     logLevel = "verbose", 
+                     appId = 403,
+                     launch.browser = TRUE,
+                     lint = TRUE,
+                     metadata = list(asMultiple = FALSE, asStatic = FALSE),
+                     logLevel = "verbose",
                      forceUpdate = TRUE)

@@ -34,6 +34,7 @@ Imports:
     plyr,
     purrr,
     readxl,
+    rExpertQuery,
     renv,
     rsconnect,
     rstudioapi,
@@ -45,14 +46,17 @@ Imports:
     shinybusy,
     shinycssloaders,
     shinyjs,
+    StreamCatTools, 
     stringr,
     tidyr,
     tidyselect,
     utils,
     writexl
 Remotes:
-    USEPA/EPATADA@develop,
-    DOI-USGS/dataRetrieval@develop
+    USEPA/EPATADA@v1.0.2-beta,
+    DOI-USGS/dataRetrieval@develop,
+    USEPA/rExpertQuery@develop,
+    USEPA/StreamCatTools@master
 Suggests:
     config,
     covr,

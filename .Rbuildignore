@@ -17,3 +17,5 @@ README.Rmd
 dev_history.R
 .devcontainer
 ^codecov\.yml$
+^packrat/
+^\.Rprofile$
