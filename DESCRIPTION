@@ -51,10 +51,9 @@ Imports:
     utils,
     writexl
 Remotes:
-    github::DOI-USGS/dataRetrieval@develop,
     github::USEPA/rExpertQuery@develop,
-    github::USEPA/StreamCatTools@master,
-    github::USEPA/EPATADA@v1.0.2-beta
+    github::USEPA/EPATADA@develop,
+    github::DOI-USGS/dataRetrieval@develop
 Suggests:
     config,
     covr,
