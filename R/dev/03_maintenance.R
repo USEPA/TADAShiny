@@ -12,11 +12,18 @@
 #############################################
 
 # Check renv lock file ----
+renv::init() # only run once
 renv::status()
 # See `?renv::status` for advice on resolving issues
 # If you have multiple packages in an inconsistent state, we recommend
 # renv::restore(), then renv::install(), then renv::snapshot(),
 # but that also suggests you should be running status more frequently.
+
+# Use packrat instead of renv?
+# https://rstudio.github.io/packrat/walkthrough.html
+packrat::init()
+packrat::snapshot()
+packrat::status()
 
 # spell check
 spelling::spell_check_package(

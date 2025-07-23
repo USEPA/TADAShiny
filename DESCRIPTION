@@ -12,12 +12,11 @@ Description: Assists data partners in retrieving, wrangling, quality checking, a
 License: CC0
 Copyright: This software is in the public domain because it contains materials that originally came from the U.S. Environmental Protection Agency.
 Imports: 
+    devtools,
     DT,
-    EPATADA,
     MESS,
     RColorBrewer,
     data.table,
-    dataRetrieval,
     dplyr,
     forcats,
     ggplot2,
@@ -34,7 +33,6 @@ Imports:
     plyr,
     purrr,
     readxl,
-    rExpertQuery,
     renv,
     rsconnect,
     rstudioapi,
@@ -46,21 +44,20 @@ Imports:
     shinybusy,
     shinycssloaders,
     shinyjs,
-    StreamCatTools, 
     stringr,
     tidyr,
     tidyselect,
+    usethis, 
     utils,
     writexl
 Remotes:
-    USEPA/EPATADA@v1.0.2-beta,
-    DOI-USGS/dataRetrieval@develop,
-    USEPA/rExpertQuery@develop,
-    USEPA/StreamCatTools@master
+    github::DOI-USGS/dataRetrieval@develop,
+    github::USEPA/rExpertQuery@develop,
+    github::USEPA/StreamCatTools@master,
+    github::USEPA/EPATADA@v1.0.2-beta
 Suggests:
     config,
     covr,
-    devtools,
     knitr,
     pkgload,
     rmarkdown,
@@ -68,7 +65,7 @@ Suggests:
     spelling,
     styler,
     testthat,
-    usethis
+    remotes
 Depends: 
     R (>= 4.1.0)
 Encoding: UTF-8
