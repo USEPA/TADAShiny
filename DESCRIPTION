@@ -14,6 +14,8 @@ Copyright: This software is in the public domain because it contains materials t
 Imports: 
     devtools,
     DT,
+    dataRetrieval, 
+    EPATADA,
     MESS,
     RColorBrewer,
     data.table,
@@ -32,6 +34,7 @@ Imports:
     plotly,
     plyr,
     purrr,
+    rExpertQuery,
     readxl,
     renv,
     rsconnect,

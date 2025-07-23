@@ -33,16 +33,18 @@ rsconnect::deployApp(
 
 # This is how to deploy to EPA's Posit Connect
 # golem::add_positconnect_file() # already exists
-rsconnect::deployApp(appDir = getwd(),
-                     account = "Cristina",
-                     appFiles = c("app.R", "DESCRIPTION", "NAMESPACE", "R/", "inst/"),
-                     quarto = FALSE,
-                     server = "rstudio-connect.dmap-stage.aws.epa.gov",
-                     appName = "TADAShiny",
-                     appTitle = "TADAShiny",
-                     appId = 403,
-                     launch.browser = TRUE,
-                     lint = TRUE,
-                     metadata = list(asMultiple = FALSE, asStatic = FALSE),
-                     logLevel = "verbose",
-                     forceUpdate = TRUE)
+rsconnect::deployApp(
+  appDir = getwd(),
+  account = "Cristina",
+  appFiles = c("app.R", "DESCRIPTION", "NAMESPACE", "R/", "inst/"),
+  quarto = FALSE,
+  server = "rstudio-connect.dmap-stage.aws.epa.gov",
+  appName = "TADAShiny",
+  appTitle = "TADAShiny",
+  appId = 403,
+  launch.browser = TRUE,
+  lint = TRUE,
+  metadata = list(asMultiple = FALSE, asStatic = FALSE),
+  logLevel = "verbose",
+  forceUpdate = TRUE
+)
