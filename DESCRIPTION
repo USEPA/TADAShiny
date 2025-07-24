@@ -14,12 +14,12 @@ Copyright: This software is in the public domain because it contains materials t
 Imports: 
     devtools,
     DT,
-    dataRetrieval, 
-    EPATADA,
+    dataRetrieval,
     MESS,
     RColorBrewer,
     data.table,
     dplyr,
+    EPATADA,
     forcats,
     ggplot2,
     golem,
@@ -34,11 +34,11 @@ Imports:
     plotly,
     plyr,
     purrr,
-    rExpertQuery,
     readxl,
     renv,
     rsconnect,
     rstudioapi,
+    rExpertQuery,
     scales,
     sf,
     shiny,
@@ -54,9 +54,9 @@ Imports:
     utils,
     writexl
 Remotes:
-    github::USEPA/rExpertQuery@develop,
-    github::USEPA/EPATADA@v1.0.2-beta,
-    github::DOI-USGS/dataRetrieval@develop
+    USEPA/rExpertQuery@develop,
+    DOI-USGS/dataRetrieval@develop,
+    USEPA/EPATADA@develop
 Suggests:
     config,
     covr,
