@@ -38,7 +38,6 @@ Imports:
     renv,
     rsconnect,
     rstudioapi,
-    rExpertQuery,
     scales,
     sf,
     shiny,
@@ -54,9 +53,7 @@ Imports:
     utils,
     writexl
 Remotes:
-    USEPA/rExpertQuery@develop,
-    DOI-USGS/dataRetrieval@develop,
-    USEPA/EPATADA@develop
+    USEPA/EPATADA@v1.0.2-beta
 Suggests:
     config,
     covr,

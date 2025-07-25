@@ -48,7 +48,7 @@ spelling::update_wordlist()
 
 ## Run checks ----
 ## Check the package before sending to prod
-## Run devtools test, check and build
+## Run devtools test, check and build (not sure if build is needed... ?)
 devtools::document() # make sure all dependencies are listed in description file
 devtools::test()
 # more robust test for releases (includes broken link check)
