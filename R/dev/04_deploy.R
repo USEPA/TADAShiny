@@ -44,5 +44,5 @@ golem::document_and_reload()
 # golem::add_positconnect_file() # already exists
 # run these (update path)
 options(rsconnect.packrat = TRUE)
-rsconnect::deployApp("path/to/the/app")
+# rsconnect::deployApp("path/to/the/app")
 rsconnect::deployApp("C:/Users/CMULLI01/GitHub/TADAShiny")
