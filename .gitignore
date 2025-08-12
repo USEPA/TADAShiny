@@ -1,6 +1,5 @@
 # RStudio files
 .Rproj.user
-TADAShiny.Rproj
 .Rprofile
 
 # History files
@@ -21,4 +20,3 @@ TADAShiny.Rproj
 _snaps
 .Ruserdata
 .vscode/
-.Rbuildignore
