@@ -13,3 +13,5 @@ README.Rmd
 dev_history.R
 .devcontainer
 ^codecov\.yml$
+^.*\.Rproj$
+^\.Rproj\.user$

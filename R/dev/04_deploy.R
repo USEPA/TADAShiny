@@ -35,8 +35,14 @@ rsconnect::deployApp(
   forceUpdate = TRUE
 )
 
+
+# Detach all loaded packages and clean your environment
+golem::detach_all_attached()
+# Document and reload your package
+golem::document_and_reload()
 # This is how to deploy to EPA's Posit Connect
 # golem::add_positconnect_file() # already exists
 # run these (update path)
 options(rsconnect.packrat = TRUE)
 rsconnect::deployApp("path/to/the/app")
+rsconnect::deployApp("C:/Users/CMULLI01/GitHub/TADAShiny")
