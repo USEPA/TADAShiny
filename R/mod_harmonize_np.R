@@ -10,7 +10,17 @@ mod_harmonize_np_ui <- function(id) {
   ns <- NS(id)
   tagList(
     htmltools::h3("1. Synonym Harmonization"),
-    htmltools::HTML("Use this section to harmonize characteristic-fraction-speciation synonyms. Click 'Compose Synonym Table' and the table will appear below. The table shows the characteristic-fraction-speciation combinations in your dataset (original columns highlighted blue), as well as any changes that will be made to TADA metadata to allow synonyms to be grouped appropriately (denoted by 'Target' and 'Conversion' columns). Many of these harmonization decisions have been made and documented by the TADA Team in the 'Assumptions' columns. Click the 'CSV' button at the top left corner of the table to download the synonym reference table for your dataset. You may edit manually and re-upload in the file upload widget next to the blue button. When you are ready to harmonize your dataset to the synonym table target elements, click 'Harmonize Data with Synonym Table'. This button only appears when a synonym table has been generated/loaded into this tab."),
+    htmltools::HTML("Use this section to harmonize characteristic-fraction-speciation synonyms. 
+                    Click 'Compose Synonym Table' and the table will appear below. 
+                    The table shows the characteristic-fraction-speciation combinations in your dataset 
+                    (original columns highlighted blue), as well as any changes that will be made to TADA metadata 
+                    to allow synonyms to be grouped appropriately (denoted by 'Target' and 'Conversion' columns). 
+                    Many of these harmonization decisions have been made and documented by the TADA Team 
+                    in the 'Assumptions' columns. Click the 'CSV' button at the top left corner of the table 
+                    to download the synonym reference table for your dataset. 
+                    You may edit manually and re-upload in the file upload widget next to the blue button. 
+                    When you are ready to harmonize your dataset to the synonym table target elements, click 'Harmonize Data with Synonym Table'. 
+                    This button only appears when a synonym table has been generated/loaded into this tab."),
     shiny::fluidRow(
       column(2, htmltools::div(style = "margin-top:20px"), shiny::actionButton(ns("harm_go"), "Compose Synonym Table", style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")),
       column(2, htmltools::div(style = "margin-top:20px"), shiny::uiOutput(ns("harm_dwn")))
@@ -18,15 +28,33 @@ mod_harmonize_np_ui <- function(id) {
     htmltools::br(),
     shiny::fluidRow(column(11, DT::DTOutput(ns("syn_table")))),
     htmltools::br(),
-    shiny::fluidRow(column(3, htmltools::div(style = "margin-top:20px"), shiny::uiOutput(ns("harm_apply")))),
+    shiny::fluidRow(
+      column(2, htmltools::div(style = "margin-top:20px"), 
+                           shiny::uiOutput(ns("harm_apply"))),
+      column(2, htmltools::div(style = "margin-top:20px"), 
+                           shiny::uiOutput(ns("undo_harm_apply")))      
+    ),
     htmltools::br(),
-    htmltools::HTML("<B>Alternative option:</B> After running the 'Compose Synonym Table' button (above), download the TADAShiny-generated synonym table using the csv button at the top of the table, customize the table to meet your harmonization needs, and upload your csv here before clicking 'Harmonize Data with Synonym Table'."),
+    htmltools::HTML("<B>Alternative option:</B> After running the 'Compose Synonym Table' button (above), 
+                    download the TADAShiny-generated synonym table using the csv button at the top of the table, 
+                    customize the table to meet your harmonization needs, 
+                    and upload your csv here before clicking 'Harmonize Data with Synonym Table'."),
     shiny::fluidRow(column(4, shiny::fileInput(ns("harm_file"), "Upload Custom Table (.csv only)"))),
     htmltools::br(),
     htmltools::h3("2. Total Nitrogen and Phosphorus Summation"),
-    htmltools::p("Data generators commonly monitor for several nutrient subspecies that, when added together, can be used to estimate a total nitrogen or phosphorus value. TADA uses the logic provided in ECHO's Nurient Aggregation page (see: https://echo.epa.gov/trends/loading-tool/resources/nutrient-aggregation) to rank and sum subspecies for a given day, location, depth, activity media subdivision, and unit. Total Nitrogen and Total Phosphorus values are added as new results in the dataset. Users may view the nutrient aggregation reference sheet by clicking 'See Summation Reference'. Once data are harmonized, the user may then summarize total N and P.", htmltools::strong("NOTE: "), "When two or more measurements of the same substance occur on the same day at the same location, the function uses the maximum of the group of values to calculate a total nutrient value."),
+    htmltools::p("Data generators commonly monitor for several nutrient subspecies that, when added together, 
+                 can be used to estimate a total nitrogen or phosphorus value. TADA uses the logic provided in 
+                 ECHO's Nurient Aggregation page (see: https://echo.epa.gov/trends/loading-tool/resources/nutrient-aggregation) 
+                 to rank and sum subspecies for a given day, location, depth, activity media subdivision, and unit. 
+                 Total Nitrogen and Total Phosphorus values are added as new results in the dataset. 
+                 Users may view the nutrient aggregation reference sheet by clicking 'See Summation Reference'. 
+                 Once data are harmonized, the user may then summarize total N and P.", htmltools::strong("NOTE: "), 
+                 "When two or more measurements of the same substance occur on the same day at the same location, 
+                 the function uses the maximum of the group of values to calculate a total nutrient value."),
     shiny::fluidRow(
-      column(3, htmltools::div(style = "margin-top:20px"), shiny::downloadButton(ns("sum_dwn"), "See Summation Reference (.csv)", style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")),
+      column(3, htmltools::div(style = "margin-top:20px"), shiny::downloadButton(ns("sum_dwn"), 
+                                                                                 "See Summation Reference (.csv)", 
+                                                                                 style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")),
       column(3, htmltools::div(style = "margin-top:20px"), shiny::uiOutput(ns("sum_apply")))
     ),
     htmltools::br()
@@ -139,7 +167,10 @@ mod_harmonize_np_server <- function(id, tadat) {
     # Button to apply synonym table to data
     output$harm_apply <- shiny::renderUI({
       shiny::req(harm$ref)
-      shiny::actionButton(ns("harm_apply"), "Harmonize Data with Synonym Table", style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
+      shiny::actionButton(ns("harm_apply"), 
+                          "Harmonize Data with Synonym Table", 
+                          style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
+                          )
     })
 
     # Render data table of synonym ref
@@ -156,11 +187,18 @@ mod_harmonize_np_server <- function(id, tadat) {
         selection = "none", rownames = FALSE
       ) %>%
         DT::formatStyle(columns = names(harm$ref), `font-size` = "12px") %>%
-        DT::formatStyle(columns = c("TADA.CharacteristicName", "TADA.ResultSampleFractionText", "TADA.MethodSpeciationName"), backgroundColor = "#2e6da4", color = "white")
+        DT::formatStyle(columns = c("TADA.CharacteristicName", 
+                                    "TADA.ResultSampleFractionText", 
+                                    "TADA.MethodSpeciationName"), 
+                        backgroundColor = "#2e6da4", color = "white")
     })
 
     # apply synonym ref to data when button is pushed
     shiny::observeEvent(input$harm_apply, {
+      
+      # prevent button from being pressed more than 1 time
+      shinyjs::disable("harm_apply")
+      
       # a modal that pops up showing it's working on harmonizing
       shinybusy::show_modal_spinner(
         spin = "double-bounce",
@@ -181,8 +219,38 @@ mod_harmonize_np_server <- function(id, tadat) {
       num <- length(dat$TADA.Harmonized.Flag[dat$TADA.Harmonized.Flag == TRUE])
       shiny::showModal(shiny::modalDialog(
         title = "Success! Harmonization Complete.",
-        base::paste0("Synonym reference table was successfully applied to TADA dataset. ", scales::comma(num), " results were harmonized to fit into more informative characteristic-fraction-speciation-unit groups.")
+        base::paste0("Synonym reference table was successfully applied to TADA dataset. ", 
+                     scales::comma(num), " results were harmonized to fit into more informative characteristic-fraction-speciation-unit groups."),
+        easyClose = TRUE
       ))
+      
+    # this button appears after someone has hit "Harmonize Data with Synonym Table", 
+    # in case they want to undo and try another method instead
+    output$undo_harm_apply <- shiny::renderUI({
+      # shiny::req(censdat$exdat) # not sure what this does
+      shiny::actionButton(ns("undo_harm_apply"), 
+                          "Undo Harmonize Data with Synonym Table",
+                          style = "color: #fff; background-color: #337ab7; border-color: #2e6da4; margin-left: 10px;")
+    })
+
+    # executes the undo if 'Undo Harmonize Data with Synonym Table' is pressed.
+    shiny::observeEvent(input$undo_harm_apply, {
+      
+      # TODO - figure out what the undo steps are. 
+      ## these are to 'do' steps
+      # dat <- subset(tadat$raw, tadat$raw$TADA.Remove == FALSE)
+      # rem <- subset(tadat$raw, tadat$raw$TADA.Remove == TRUE)
+      # dat <- EPATADA::TADA_HarmonizeSynonyms(dat, ref = harm$ref)
+      # tadat$raw <- plyr::rbind.fill(dat, rem)
+      # tadat$raw <- EPATADA::TADA_OrderCols(tadat$raw)
+
+      # enable the "Harmonize Data with Synonym Table" button so the user can re-apply the handling
+      shinyjs::enable("harm_apply")
+      shinyjs::disable("undo_harm_apply")
+    })
+      
+      
+      
     })
 
     output$sum_dwn <- shiny::downloadHandler(

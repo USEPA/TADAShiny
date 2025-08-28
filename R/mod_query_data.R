@@ -88,7 +88,8 @@ mod_query_data_ui <- function(id) {
     htmltools::hr(),
     shiny::fluidRow(
       htmltools::h3("Option B: Query the Water Quality Portal (WQP)"),
-      "Use the fields below to download a dataset directly from WQP. Fields with '(s)' in the label allow multiple selections. Hydrologic Units may be at any scale, from subwatershed to region. However, be mindful that large queries may time out."
+      "Use the fields below to download a dataset directly from WQP. Fields with '(s)' in the label allow multiple selections. 
+      Hydrologic Units may be at any scale, from subwatershed to region. However, be mindful that large queries may time out."
     ),
     htmltools::br(),
     # styling several fluid rows with columns to hold the input drop down widgets
@@ -425,7 +426,9 @@ mod_query_data_server <- function(id, tadat) {
 
           # Show error notification to the user
           shiny::showNotification(
-            paste("Error: ", e$message),
+            ui = tagList(h4(strong("Error")), 
+                         hr(style = "margin-top: 5px; margin-bottom: 5px;"), # Adds a separator line
+                         paste(e$message)),
             type = "error",
             duration = NULL,
             id = "uploadError"
@@ -484,6 +487,8 @@ mod_query_data_server <- function(id, tadat) {
       initializeTable(tadat, raw)
 
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+      
+      disableLoading()
     })
 
     # this section has widget update commands for the selectizeinputs that have a lot of possible selections - shiny suggested hosting the choices server-side rather than ui-side
@@ -914,7 +919,9 @@ mod_query_data_server <- function(id, tadat) {
       } else {
         TADA_bigsites_clean <- TADA_download_temp
       }
-
+      
+      disableLoading()
+      
       # Combine the Small and Big sites
       raw <- dplyr::bind_rows(TADA_smallsites_clean, TADA_bigsites_clean)
 
@@ -974,6 +981,7 @@ mod_query_data_server <- function(id, tadat) {
           shiny::updateDateInput(session, "startDate", value = tadat$startDate)
           shiny::updateDateInput(session, "endDate", value = tadat$endDate)
         }
+        disableLoading()
       }
     })
   })
@@ -1001,6 +1009,9 @@ initializeTable <- function(tadat, raw) {
     raw$TADA.Remove <- FALSE
   }
 
+
+  
+  
   removals <- data.frame(matrix(nrow = nrow(raw), ncol = 0))
   tadat$raw <- raw
   tadat$removals <- removals
@@ -1009,6 +1020,33 @@ initializeTable <- function(tadat, raw) {
   tadat$ready_for_download <- TRUE
 }
 
+disableLoading <- function() {
+      # disable the button and show text telling the user to reload TADAShiny if they want to restart with new data
+      shinyjs::disable("#query_data_1-example_data_go")
+      shinyjs::disable("querynow")
+      shinyjs::hide("file")
+      shinyjs::disable("progress_file")
+      insertUI(
+          selector = "#query_data_1-example_data_go", # Insert relative to the button
+          where = "afterEnd",    # Place it immediately after the button
+          ui = tags$span("Reload the TADAShiny app to load new data", style = "margin-left: 10px;") # The text to insert
+      )
+      insertUI(
+          selector = "#query_data_1-querynow", # Insert relative to the button
+          where = "afterEnd",    # Place it immediately after the button
+          ui = tags$span("Reload the TADAShiny app to Query the Water Quality Portal", style = "margin-left: 10px;") # The text to insert
+      )
+      insertUI(
+          selector = "#query_data_1-download_template", # Insert relative to the button
+          where = "beforeBegin",    # Place it immediately after the button
+          ui = tags$span(HTML("Reload the TADAShiny app to Upload dataset<br><br>"), style = "margin-left: 10px;") # The text to insert
+      )
+      insertUI(
+          selector = "#query_data_1-progress_file_progress", # Insert relative to the button
+          where = "beforeBegin",    # Place it immediately after the button
+          ui = tags$span(HTML("Reload the TADAShiny app to Upload Progress File<br><br>"), style = "margin-left: 10px;") # The text to insert
+      )
+}
 
 ## To be copied in the UI
 # mod_query_data_ui("query_data_1")

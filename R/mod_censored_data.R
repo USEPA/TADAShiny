@@ -353,10 +353,13 @@ mod_censored_data_server <- function(id, tadat) {
       shinyjs::disable("od_method")
     })
 
-    # this button appears after someone has applied the OD/ND methods, in case they want to undo and try another method instead
+    # this button appears after someone has applied the OD/ND methods, 
+    # in case they want to undo and try another method instead
     output$undo_methods <- shiny::renderUI({
       shiny::req(censdat$exdat)
-      shiny::actionButton(ns("undo_methods"), "Undo Method Application", style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
+      shiny::actionButton(ns("undo_methods"), 
+                          "Undo Method Application",
+                          style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
     })
 
     # executes the undo if undo methods button is pressed.
