@@ -120,11 +120,11 @@ mod_TADA_summary_server <- function(id, tadat) {
           shinyjs::click("dwn_working")
         },
         error = function(e) {
-          shiny::showNotification("Error writing working files")
+          shiny::showNotification("Error writing working files. Please submit an issue with a reproducible example: https://github.com/USEPA/TADAShiny/issues")
           print(e)
         },
         warning = function(w) {
-          shiny::showNotification("Warning writing working files")
+          shiny::showNotification("Warning writing working files. Please submit an issue with a reproducible example: https://github.com/USEPA/TADAShiny/issues")
           print(w)
         }
       )

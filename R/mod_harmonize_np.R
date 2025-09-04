@@ -249,8 +249,6 @@ mod_harmonize_np_server <- function(id, tadat) {
       shinyjs::disable("undo_harm_apply")
     })
       
-      
-      
     })
 
     output$sum_dwn <- shiny::downloadHandler(
