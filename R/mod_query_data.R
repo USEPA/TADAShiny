@@ -754,7 +754,7 @@ mod_query_data_server <- function(id, tadat) {
           text = "Your query returned zero results. Please adjust your search inputs and try again. Remember to update the start and end dates.",
           type = "warning"
         )
-        removeModal()
+        shiny::removeModal()
         return()
       }
 
@@ -771,7 +771,7 @@ mod_query_data_server <- function(id, tadat) {
           text = "Your query returned zero results. Please adjust your search inputs and try again. Remember to update the start and end dates.",
           type = "warning"
         )
-        removeModal()
+        shiny::removeModal()
         return()
       }
 

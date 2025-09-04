@@ -23,7 +23,9 @@ utils::globalVariables(c(
   "organization", "original_source", "project", "sampleMedia",
   "selected_filters", "selected_flags", "siteType",
   "siteid", "startDate", "statecode", "od_mult", "field_sel",
-  "DetectionQuantitationLimitMeasure.MeasureValue"
+  "DetectionQuantitationLimitMeasure.MeasureValue",
+  "Description", "TRIBE_NAME", "flag_simple", "num_chr", 
+  "resultCount", "tot_n"
 ))
 
 # Auto generates or updates TADAShiny-package.R file
