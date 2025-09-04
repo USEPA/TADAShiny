@@ -426,8 +426,8 @@ mod_query_data_server <- function(id, tadat) {
 
           # Show error notification to the user
           shiny::showNotification(
-            ui = tagList(h4(strong("Error")), 
-                         hr(style = "margin-top: 5px; margin-bottom: 5px;"), # Adds a separator line
+            ui = tagList(htmltools::h4(htmltools::strong("Error")), 
+                         htmltools::hr(style = "margin-top: 5px; margin-bottom: 5px;"), # Adds a separator line
                          paste(e$message)),
             type = "error",
             duration = NULL,
@@ -1026,22 +1026,22 @@ disableLoading <- function() {
       shinyjs::disable("querynow")
       shinyjs::hide("file")
       shinyjs::disable("progress_file")
-      insertUI(
+      shiny::insertUI(
           selector = "#query_data_1-example_data_go", # Insert relative to the button
           where = "afterEnd",    # Place it immediately after the button
           ui = tags$span("Reload the TADAShiny app to load new data", style = "margin-left: 10px;") # The text to insert
       )
-      insertUI(
+      shiny::insertUI(
           selector = "#query_data_1-querynow", # Insert relative to the button
           where = "afterEnd",    # Place it immediately after the button
           ui = tags$span("Reload the TADAShiny app to Query the Water Quality Portal", style = "margin-left: 10px;") # The text to insert
       )
-      insertUI(
+      shiny::insertUI(
           selector = "#query_data_1-download_template", # Insert relative to the button
           where = "beforeBegin",    # Place it immediately after the button
           ui = tags$span(HTML("Reload the TADAShiny app to Upload dataset<br><br>"), style = "margin-left: 10px;") # The text to insert
       )
-      insertUI(
+      shiny::insertUI(
           selector = "#query_data_1-progress_file_progress", # Insert relative to the button
           where = "beforeBegin",    # Place it immediately after the button
           ui = tags$span(HTML("Reload the TADAShiny app to Upload Progress File<br><br>"), style = "margin-left: 10px;") # The text to insert

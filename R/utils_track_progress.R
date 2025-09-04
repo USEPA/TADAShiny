@@ -113,8 +113,8 @@ readFile <- function(tadat, filename) {
     # )
     
     shiny::showNotification(
-      ui = tagList(h4(strong("Error")), 
-                   hr(style = "margin-top: 5px; margin-bottom: 5px;"), # Adds a separator line
+      ui = tagList(htmltools::h4(htmltools::strong("Error")), 
+                   htmltools::hr(style = "margin-top: 5px; margin-bottom: 5px;"), # Adds a separator line
                    paste("Unable to load progress file. Missing fields: ", critical_missing)),
       type = "error",
       duration = NULL,
