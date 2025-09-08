@@ -63,7 +63,7 @@ Suggests:
     styler,
     testthat
 Depends: 
-    R (>= 3.5.0)
+    R (>= 4.1.0)
 Encoding: UTF-8
 Language: en-US
 Config/testthat/edition: 3
