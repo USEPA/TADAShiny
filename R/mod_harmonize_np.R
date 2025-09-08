@@ -22,7 +22,10 @@ mod_harmonize_np_ui <- function(id) {
                     When you are ready to harmonize your dataset to the synonym table target elements, click 'Harmonize Data with Synonym Table'. 
                     This button only appears when a synonym table has been generated/loaded into this tab."),
     shiny::fluidRow(
-      column(2, htmltools::div(style = "margin-top:20px"), shiny::actionButton(ns("harm_go"), "Compose Synonym Table", style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")),
+      column(2, htmltools::div(style = "margin-top:20px"), 
+             shiny::actionButton(ns("harm_go"), 
+                                     "Compose Synonym Table", 
+                                     style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")),
       column(2, htmltools::div(style = "margin-top:20px"), shiny::uiOutput(ns("harm_dwn")))
     ),
     htmltools::br(),
@@ -207,6 +210,9 @@ mod_harmonize_np_server <- function(id, tadat) {
         session = shiny::getDefaultReactiveDomain()
       )
 
+      # hold a copy of the un-harmonized data for use in 'undo'
+      tadat$raw_unharmonized <- tadat$raw
+      
       dat <- subset(tadat$raw, tadat$raw$TADA.Remove == FALSE)
       rem <- subset(tadat$raw, tadat$raw$TADA.Remove == TRUE)
       dat <- EPATADA::TADA_HarmonizeSynonyms(dat, ref = harm$ref)
@@ -217,6 +223,7 @@ mod_harmonize_np_server <- function(id, tadat) {
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
 
       num <- length(dat$TADA.Harmonized.Flag[dat$TADA.Harmonized.Flag == TRUE])
+      shinyjs::enable("undo_harm_apply")
       shiny::showModal(shiny::modalDialog(
         title = "Success! Harmonization Complete.",
         base::paste0("Synonym reference table was successfully applied to TADA dataset. ", 
@@ -224,31 +231,27 @@ mod_harmonize_np_server <- function(id, tadat) {
         easyClose = TRUE
       ))
       
-    # this button appears after someone has hit "Harmonize Data with Synonym Table", 
-    # in case they want to undo and try another method instead
-    output$undo_harm_apply <- shiny::renderUI({
-      # shiny::req(censdat$exdat) # not sure what this does
-      shiny::actionButton(ns("undo_harm_apply"), 
-                          "Undo Harmonize Data with Synonym Table",
-                          style = "color: #fff; background-color: #337ab7; border-color: #2e6da4; margin-left: 10px;")
-    })
+      # this button appears after someone has hit "Harmonize Data with Synonym Table", 
+      # in case they want to undo and try another method instead
+      output$undo_harm_apply <- shiny::renderUI({
+        # shiny::req(censdat$exdat) # not sure what this does
+        shiny::actionButton(ns("undo_harm_apply"), 
+                            "Undo Harmonize Data with Synonym Table",
+                            style = "color: #fff; background-color: #337ab7; border-color: #2e6da4; margin-left: 10px;")
+        # shinyjs::enable("undo_harm_apply")
+      })
 
-    # executes the undo if 'Undo Harmonize Data with Synonym Table' is pressed.
-    shiny::observeEvent(input$undo_harm_apply, {
-      
-      # TODO - figure out what the undo steps are. 
-      ## these are to 'do' steps
-      # dat <- subset(tadat$raw, tadat$raw$TADA.Remove == FALSE)
-      # rem <- subset(tadat$raw, tadat$raw$TADA.Remove == TRUE)
-      # dat <- EPATADA::TADA_HarmonizeSynonyms(dat, ref = harm$ref)
-      # tadat$raw <- plyr::rbind.fill(dat, rem)
-      # tadat$raw <- EPATADA::TADA_OrderCols(tadat$raw)
-
-      # enable the "Harmonize Data with Synonym Table" button so the user can re-apply the handling
-      shinyjs::enable("harm_apply")
-      shinyjs::disable("undo_harm_apply")
-    })
-      
+      # executes the undo if 'Undo Harmonize Data with Synonym Table' is pressed.
+      shiny::observeEvent(input$undo_harm_apply, {
+        
+        # the undo steps are just to reassign the saved unharmonized raw data 
+        tadat$raw <- tadat$raw_unharmonized
+        tadat$raw <- EPATADA::TADA_OrderCols(tadat$raw)
+        
+        # enable the "Harmonize Data with Synonym Table" button so the user can re-apply the handling
+        shinyjs::enable("harm_apply")
+        shinyjs::disable("undo_harm_apply")
+      })
     })
 
     output$sum_dwn <- shiny::downloadHandler(
