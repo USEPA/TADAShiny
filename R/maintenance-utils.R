@@ -15,7 +15,6 @@ utils::globalVariables(c(
   "quantile", "median", "moduleServer",
   "Target.TADA.CharacteristicName",
   "Target.TADA.MethodSpeciationName",
-  "write.csv", "read.csv", "downloadHandler",
   "Rank", "Target.TADA.ResultSampleFractionText",
   "Field", "characteristicName", "characteristicType",
   "countycode", "endDate", "example_data", "huc", "m2f",

@@ -328,9 +328,7 @@ mod_query_data_server <- function(id, tadat) {
         base::paste0("tada_template", ".xlsx")
       },
       content = function(file) {
-        ## format csv.  contentType = "text/csv"
-        # write.csv(template_data(), file)
-        ## format excel (xlsx)
+        # format excel (xlsx)
         d <- template_data()
         writexl::write_xlsx(d, path = file, use_zip64 = TRUE)
       },

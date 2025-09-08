@@ -205,8 +205,8 @@ mod_data_flagging_server <- function(id, tadat) {
       # not commented out once done with testing
       tadat$raw <- applyFlags(tadat$raw, tadat$orgs)
 
-      # write.csv(tadat$raw, "flagged.csv")
-      # tadat$raw = utils::read.csv("flagged.csv") # THIS IS TRIPS WORKING FILE FOR TESTING, COMMENT OUT WHEN COMMITTING TO DEVELOP
+      # write.csv(tadat$raw, "flagged.csv") # FOR TESTING
+      # tadat$raw = utils::read.csv("flagged.csv") # FOR TESTING
 
       # Remove progress bar and display instructions
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
