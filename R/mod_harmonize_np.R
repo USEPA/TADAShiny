@@ -127,7 +127,7 @@ mod_harmonize_np_server <- function(id, tadat) {
         "TADASynonymTable.csv"
       },
       content = function(file) {
-        write.csv(harm$ref, file, row.names = FALSE)
+        utils::write.csv(harm$ref, file, row.names = FALSE)
       }
     )
 
@@ -135,7 +135,7 @@ mod_harmonize_np_server <- function(id, tadat) {
     shiny::observe({
       shiny::req(input$harm_file)
       # user uploaded data
-      ref <- suppressWarnings(read.csv(input$harm_file$datapath))
+      ref <- suppressWarnings(utils::read.csv(input$harm_file$datapath))
       if (all(cols %in% names(ref)) & dim(ref)[1] > 0) {
         ref <- ref %>% dplyr::arrange(Target.TADA.CharacteristicName, Target.TADA.ResultSampleFractionText, Target.TADA.MethodSpeciationName)
         colns <- names(ref)
@@ -256,7 +256,7 @@ mod_harmonize_np_server <- function(id, tadat) {
         "TADA_NPSummationKey.csv"
       },
       content = function(file) {
-        write.csv(EPATADA::TADA_GetNutrientSummationRef(), file, row.names = FALSE)
+        utils::write.csv(EPATADA::TADA_GetNutrientSummationRef(), file, row.names = FALSE)
       }
     )
 
