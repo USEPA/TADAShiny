@@ -16,8 +16,6 @@ Imports:
     golem,
     magrittr,
     shiny,
-    dataRetrieval,
-    data.table,
     DT,
     dplyr,
     forcats,
@@ -25,7 +23,6 @@ Imports:
     gotop,
     grDevices,
     htmltools,
-    jsonlite,
     leaflet,
     leaflet.extras,
     lubridate,
@@ -47,12 +44,9 @@ Imports:
     utils,
     writexl,
     stringr,
-    rsconnect,
-    renv,
-    rstudioapi
+    dataRetrieval (>= 2.7.21)
 Remotes:
-    USEPA/EPATADA@develop,
-    DOI-USGS/dataRetrieval@develop
+    USEPA/EPATADA@develop
 Suggests:
     pkgload,
     config,
@@ -61,7 +55,13 @@ Suggests:
     knitr,
     spelling,
     styler,
-    testthat
+    testthat,
+    roxygen2,
+    rsconnect,
+    rstudioapi,
+    renv,
+    jsonlite,
+    data.table
 Depends: 
     R (>= 4.1.0)
 Encoding: UTF-8
@@ -71,6 +71,6 @@ Config/testthat/load-all: list(export_all = FALSE, helpers = FALSE)
 LazyData: true
 URL: https://github.com/USEPA/TADAShiny
 BugReports: https://github.com/USEPA/TADAShiny/issues
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)
-StagedInstall: TRUE
+StagedInstall: FALSE
