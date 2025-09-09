@@ -16,11 +16,8 @@ mod_harmonize_np_ui <- function(id) {
                     (original columns highlighted blue), as well as any changes that will be made to TADA metadata 
                     to allow synonyms to be grouped appropriately (denoted by 'Target' and 'Conversion' columns). 
                     Many of these harmonization decisions have been made and documented by the TADA Team 
-                    in the 'Assumptions' columns. Click the 'CSV' button at the top left corner of the table 
-                    to download the synonym reference table for your dataset. 
-                    You may edit manually and re-upload in the file upload widget next to the blue button. 
-                    When you are ready to harmonize your dataset to the synonym table target elements, click 'Harmonize Data with Synonym Table'. 
-                    This button only appears when a synonym table has been generated/loaded into this tab."),
+                    in the 'Assumptions' columns. You may edit this table manually and re-upload it (optional) in the 
+                    file upload widget below."),
     shiny::fluidRow(
       column(2, htmltools::div(style = "margin-top:20px"), 
              shiny::actionButton(ns("harm_go"), 
@@ -28,27 +25,31 @@ mod_harmonize_np_ui <- function(id) {
                                  style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"))
     ),
     htmltools::br(),
+    shiny::fluidRow(column(11, DT::DTOutput(ns("syn_table")))),  # Table output
+    htmltools::br(),
+    htmltools::HTML("<B>Optional:</B> After running the 'Compose Synonym Table' button (above), 
+                    download the TADAShiny-generated synonym table using the csv button below, 
+                    customize the table to meet your harmonization needs. 
+                    Upload your csv here before clicking 'Harmonize Data with Synonym Table'."),
     shiny::fluidRow(
-      column(2, htmltools::div(style = "margin-top:20px"), shiny::uiOutput(ns("harm_dwn")))
+      column(2, htmltools::div(style = "margin-top:20px"), shiny::uiOutput(ns("harm_dwn")))  # Download button output
     ),
     htmltools::br(),
-    shiny::fluidRow(column(11, DT::DTOutput(ns("syn_table")))),
+    shiny::fluidRow(column(4, shiny::fileInput(ns("harm_file"), "Upload Custom Table (.csv only)"))),  # File upload widget
+    htmltools::HTML("<B>Harmonize:</B> When you are ready to harmonize your dataset to the 
+                    synonym table target elements, click 'Harmonize Data with Synonym Table'. 
+                    This button only appears when a synonym table has been generated/loaded 
+                    into this tab."),
     htmltools::br(),
     shiny::fluidRow(
       column(2, htmltools::div(style = "margin-top:20px"), 
-             shiny::uiOutput(ns("harm_apply")))
+             shiny::uiOutput(ns("harm_apply")))  # Harmonize button output
     ),
     htmltools::br(),
     shiny::fluidRow(
       column(2, htmltools::div(style = "margin-top:20px"), 
-             shiny::uiOutput(ns("undo_harm_apply")))      
+             shiny::uiOutput(ns("undo_harm_apply")))  # Undo button output
     ),
-    htmltools::br(),
-    htmltools::HTML("<B>Alternative option:</B> After running the 'Compose Synonym Table' button (above), 
-                    download the TADAShiny-generated synonym table using the csv button at the top of the table, 
-                    customize the table to meet your harmonization needs, 
-                    and upload your csv here before clicking 'Harmonize Data with Synonym Table'."),
-    shiny::fluidRow(column(4, shiny::fileInput(ns("harm_file"), "Upload Custom Table (.csv only)"))),
     htmltools::br(),
     htmltools::h3("2. Total Nitrogen and Phosphorus Summation"),
     htmltools::p("Data generators commonly monitor for several nutrient subspecies that, when added together, 
@@ -265,7 +266,7 @@ mod_harmonize_np_server <- function(id, tadat) {
       # Render UI for the undo button
       output$undo_harm_apply <- shiny::renderUI({
         shiny::actionButton(ns("undo_harm_apply"), 
-                            "Undo Harmonize Data with Synonym Table",
+                            "Undo Harmonization",
                             style = "color: #fff; background-color: #6c757d; border-color: #5a6268; margin-top: 10px;")
       })
     })
