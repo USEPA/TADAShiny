@@ -1,4 +1,3 @@
-library(shinyjs)
 #' query_data UI Function
 #'
 #' @description A shiny Module.
@@ -260,12 +259,15 @@ mod_query_data_ui <- function(id) {
       # widget to upload WQP profile or WQX formatted spreadsheet
       column(
         9,
-        shiny::fileInput(
-          ns("file"),
-          "",
-          multiple = TRUE,
-          accept = c(".xlsx", ".xls"),
-          width = "100%"
+        tags$div(
+          id = "file-upload-wrapper", # Add a wrapper div with an id
+          shiny::fileInput(
+            ns("file"),
+            "",
+            multiple = TRUE,
+            accept = c(".xlsx", ".xls"),
+            width = "100%"
+          )
         )
       )
     ),
@@ -299,12 +301,15 @@ mod_query_data_ui <- function(id) {
       # widget to upload WQP profile or WQX formatted spreadsheet
       column(
         9,
-        shiny::fileInput(
+        tags$div(
+          id = "progress-file-wrapper", # Add a wrapper div with an id
+          shiny::fileInput(
           ns("progress_file"),
           "",
           multiple = TRUE,
           accept = c(".RData"),
           width = "100%"
+          )
         )
       )
     ),
@@ -1027,29 +1032,32 @@ disableLoading <- function(session) {
       shiny::updateSelectInput(session, "example_data", choices = NULL, selected = "")
       shinyjs::disable("example_data_go")
       shinyjs::disable("example_data")
-      
       shinyjs::disable("querynow")
-      shinyjs::hide("file")
+      shinyjs::disable("file")
       shinyjs::disable("progress_file")
       shiny::insertUI(
           selector = "#query_data_1-example_data_go", # Insert relative to the button
-          where = "afterEnd",    # Place it immediately after the button
-          ui = tags$span("Reload the TADAShiny app to load new data", style = "margin-left: 10px;") # The text to insert
+          where = "afterEnd", # Place it immediately after the button
+          ui = tags$span("Reload the TADAShiny app to load new data", 
+                         style = "margin-left: 10px; color: red;")
       )
       shiny::insertUI(
           selector = "#query_data_1-querynow", # Insert relative to the button
+          where = "afterEnd", # Place it immediately after the button
+          ui = tags$span("Reload the TADAShiny app to query the Water Quality Portal", 
+                         style = "margin-left: 10px; color: red;")
+      )
+      shiny::insertUI(
+        selector = "#file-upload-wrapper", # Use the wrapper div's id
+        where = "afterEnd",    # Place it immediately after the wrapper div
+        ui = tags$span("Reload the TADAShiny app to upload a new dataset",
+                       style = "margin-left: 10px; color: red;")
+      )
+      shiny::insertUI(
+          selector = "#progress-file-wrapper", # Insert relative to the button
           where = "afterEnd",    # Place it immediately after the button
-          ui = tags$span("Reload the TADAShiny app to Query the Water Quality Portal", style = "margin-left: 10px;") # The text to insert
-      )
-      shiny::insertUI(
-          selector = "#query_data_1-download_template", # Insert relative to the button
-          where = "beforeBegin",    # Place it immediately after the button
-          ui = tags$span(HTML("Reload the TADAShiny app to Upload a new dataset<br><br>"), style = "margin-left: 10px;") # The text to insert
-      )
-      shiny::insertUI(
-          selector = "#query_data_1-progress_file_progress", # Insert relative to the button
-          where = "beforeBegin",    # Place it immediately after the button
-          ui = tags$span(HTML("Reload the TADAShiny app to Upload a new Progress File<br><br>"), style = "margin-left: 10px;") # The text to insert
+          ui = tags$span("Reload the TADAShiny app to upload a new progress file",
+                         style = "margin-left: 10px; color: red;")
       )
 }
 
