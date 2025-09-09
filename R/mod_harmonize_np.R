@@ -24,8 +24,11 @@ mod_harmonize_np_ui <- function(id) {
     shiny::fluidRow(
       column(2, htmltools::div(style = "margin-top:20px"), 
              shiny::actionButton(ns("harm_go"), 
-                                     "Compose Synonym Table", 
-                                     style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")),
+                                 "Compose Synonym Table", 
+                                 style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"))
+    ),
+    htmltools::br(),
+    shiny::fluidRow(
       column(2, htmltools::div(style = "margin-top:20px"), shiny::uiOutput(ns("harm_dwn")))
     ),
     htmltools::br(),
@@ -33,9 +36,12 @@ mod_harmonize_np_ui <- function(id) {
     htmltools::br(),
     shiny::fluidRow(
       column(2, htmltools::div(style = "margin-top:20px"), 
-                           shiny::uiOutput(ns("harm_apply"))),
+             shiny::uiOutput(ns("harm_apply")))
+    ),
+    htmltools::br(),
+    shiny::fluidRow(
       column(2, htmltools::div(style = "margin-top:20px"), 
-                           shiny::uiOutput(ns("undo_harm_apply")))      
+             shiny::uiOutput(ns("undo_harm_apply")))      
     ),
     htmltools::br(),
     htmltools::HTML("<B>Alternative option:</B> After running the 'Compose Synonym Table' button (above), 
@@ -57,7 +63,10 @@ mod_harmonize_np_ui <- function(id) {
     shiny::fluidRow(
       column(3, htmltools::div(style = "margin-top:20px"), shiny::downloadButton(ns("sum_dwn"), 
                                                                                  "See Summation Reference (.csv)", 
-                                                                                 style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")),
+                                                                                 style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"))
+    ),
+    htmltools::br(),
+    shiny::fluidRow(
       column(3, htmltools::div(style = "margin-top:20px"), shiny::uiOutput(ns("sum_apply")))
     ),
     htmltools::br()
@@ -87,10 +96,10 @@ mod_harmonize_np_server <- function(id, tadat) {
       # "Target.TADA.UnitConversionFactor", #no longer in harmonization template
       "HarmonizationGroup"
     )
-
+    
     # reactive values for tab
     harm <- shiny::reactiveValues()
-
+    
     # when user hits harm go button, runs TADA_GetSynonymRef and makes friendly column names for table.
     shiny::observeEvent(input$harm_go, {
       ref <- EPATADA::TADA_GetSynonymRef(tadat$raw[tadat$raw$TADA.Remove == FALSE, ])
@@ -115,15 +124,18 @@ mod_harmonize_np_server <- function(id, tadat) {
       harm$ref <- ref
       shinyjs::disable("harm_go")
     })
-
+    
     # creates the download button once the synonym reference table exists
     output$harm_dwn <- shiny::renderUI({
       shiny::req(harm$ref)
       if (dim(harm$ref)[1] > 1) {
-        shiny::downloadButton(ns("harm_dwn1"), "Download Synonym Table (.csv)", style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
+        shiny::downloadButton(
+          ns("harm_dwn1"), 
+          "Download Synonym Table (.csv)", 
+          style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
       }
     })
-
+    
     # download handler for downloading the synonym reference table.
     output$harm_dwn1 <- shiny::downloadHandler(
       filename = function() {
@@ -133,7 +145,7 @@ mod_harmonize_np_server <- function(id, tadat) {
         utils::write.csv(harm$ref, file, row.names = FALSE)
       }
     )
-
+    
     # This essentially does the same thing with a file upload as the button above.
     shiny::observe({
       shiny::req(input$harm_file)
@@ -166,28 +178,28 @@ mod_harmonize_np_server <- function(id, tadat) {
         ))
       }
     })
-
+    
     # Button to apply synonym table to data
     output$harm_apply <- shiny::renderUI({
       shiny::req(harm$ref)
       shiny::actionButton(ns("harm_apply"), 
                           "Harmonize Data with Synonym Table", 
                           style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
-                          )
+      )
     })
-
+    
     # Render data table of synonym ref
     output$syn_table <- DT::renderDT({
       shiny::req(harm$ref)
       DT::datatable(harm$ref,
-        class = "cell-border stripe",
-        colnames = harm$colns,
-        filter = "top",
-        options = list(
-          dom = "Blftipr", scrollX = TRUE,
-          pageLength = 5
-        ),
-        selection = "none", rownames = FALSE
+                    class = "cell-border stripe",
+                    colnames = harm$colns,
+                    filter = "top",
+                    options = list(
+                      dom = "Blftipr", scrollX = TRUE,
+                      pageLength = 5
+                    ),
+                    selection = "none", rownames = FALSE
       ) %>%
         DT::formatStyle(columns = names(harm$ref), `font-size` = "12px") %>%
         DT::formatStyle(columns = c("TADA.CharacteristicName", 
@@ -195,7 +207,7 @@ mod_harmonize_np_server <- function(id, tadat) {
                                     "TADA.MethodSpeciationName"), 
                         backgroundColor = "#2e6da4", color = "white")
     })
-
+    
     # Harmonize button observe event
     shiny::observeEvent(input$harm_apply, {
       # Disable the harmonize button to prevent multiple presses
@@ -254,7 +266,7 @@ mod_harmonize_np_server <- function(id, tadat) {
       output$undo_harm_apply <- shiny::renderUI({
         shiny::actionButton(ns("undo_harm_apply"), 
                             "Undo Harmonize Data with Synonym Table",
-                            style = "color: #fff; background-color: #337ab7; border-color: #2e6da4; margin-left: 10px;")
+                            style = "color: #fff; background-color: #6c757d; border-color: #5a6268; margin-top: 10px;")
       })
     })
     
@@ -263,14 +275,14 @@ mod_harmonize_np_server <- function(id, tadat) {
       # Restore the un-harmonized data
       tadat$raw <- tadat$raw_unharmonized
       tadat$raw <- EPATADA::TADA_OrderCols(tadat$raw)
-      
+
       # Enable the harmonize button for re-application
       shinyjs::enable("harm_apply")
       
       # Disable the undo button after action
       shinyjs::disable("undo_harm_apply")
     })
-
+    
     output$sum_dwn <- shiny::downloadHandler(
       filename = function() {
         "TADA_NPSummationKey.csv"
@@ -279,13 +291,13 @@ mod_harmonize_np_server <- function(id, tadat) {
         utils::write.csv(EPATADA::TADA_GetNutrientSummationRef(), file, row.names = FALSE)
       }
     )
-
+    
     output$sum_apply <- shiny::renderUI({
       if ("TADA.Harmonized.Flag" %in% names(tadat$raw)) {
         shiny::actionButton(ns("sum_apply"), "Perform Total N and P Summations", style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
       }
     })
-
+    
     shiny::observeEvent(input$sum_apply, {
       # a modal that pops up showing it's working on harmonizing
       shinybusy::show_modal_spinner(
@@ -294,12 +306,12 @@ mod_harmonize_np_server <- function(id, tadat) {
         text = "Calculating Total N and P...",
         session = shiny::getDefaultReactiveDomain()
       )
-
+      
       dat <- subset(tadat$raw, tadat$raw$TADA.Remove == FALSE)
       rem <- subset(tadat$raw, tadat$raw$TADA.Remove == TRUE)
       dat <- EPATADA::TADA_CalculateTotalNP(dat, daily_agg = "max")
       dat$TADA.Remove[is.na(dat$TADA.Remove)] <- FALSE
-
+      
       # add new measurements to tadat$removals, all equal FALSE
       ## NOTE THAT THIS ASSUMES NEWLY CREATED RESULTS FROM TOTAL NP WILL NECESSARILY BE ADDED TO END OF TADAT$RAW DATA FRAME
       ncols <- ncol(tadat$removals)
@@ -313,7 +325,7 @@ mod_harmonize_np_server <- function(id, tadat) {
       phoslen <- length(dat$TADA.NutrientSummation.Flag[dat$TADA.NutrientSummation.Flag %in% c("Nutrient summation from one subspecies.")])
       # remove the modal once the dataset has been harmonized
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
-
+      
       shiny::showModal(shiny::modalDialog(
         title = "Success! Calculations Complete.",
         base::paste0(scales::comma(nitrolen), " Total Nitrogen results calculated and ", scales::comma(phoslen), " Total Phosphorus results calculated.")
