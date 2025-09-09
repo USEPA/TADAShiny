@@ -1,3 +1,4 @@
+library(shinyjs)
 #' query_data UI Function
 #'
 #' @description A shiny Module.
@@ -314,8 +315,10 @@ mod_query_data_ui <- function(id) {
 #'
 #' @noRd
 mod_query_data_server <- function(id, tadat) {
+  
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
+    # loadingReady <- shiny::reactiveValues(ok = TRUE)
 
     # Call the bbox map module and capture its return value
     bbox_data <- mod_map_bboxServer("BBox_map")
@@ -486,7 +489,7 @@ mod_query_data_server <- function(id, tadat) {
 
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
       
-      disableLoading()
+      disableLoading(session)
     })
 
     # this section has widget update commands for the selectizeinputs that have a lot of possible selections - shiny suggested hosting the choices server-side rather than ui-side
@@ -918,7 +921,7 @@ mod_query_data_server <- function(id, tadat) {
         TADA_bigsites_clean <- TADA_download_temp
       }
       
-      disableLoading()
+      disableLoading(session)
       
       # Combine the Small and Big sites
       raw <- dplyr::bind_rows(TADA_smallsites_clean, TADA_bigsites_clean)
@@ -966,7 +969,8 @@ mod_query_data_server <- function(id, tadat) {
       if (!is.na(tadat$load_progress_file)) {
         if (tadat$original_source == "Example") {
           shiny::updateSelectInput(session, "example_data", selected = tadat$example_data)
-        } else if (tadat$original_source == "Query") {
+        } 
+        else if (tadat$original_source == "Query") {
           shiny::updateSelectizeInput(session, "state", selected = tadat$statecode)
           shiny::updateSelectizeInput(session, "county", selected = tadat$countycode)
           shiny::updateSelectizeInput(session, "siteid", selected = tadat$siteid)
@@ -979,7 +983,7 @@ mod_query_data_server <- function(id, tadat) {
           shiny::updateDateInput(session, "startDate", value = tadat$startDate)
           shiny::updateDateInput(session, "endDate", value = tadat$endDate)
         }
-        disableLoading()
+        disableLoading(session)
       }
     })
   })
@@ -1018,9 +1022,12 @@ initializeTable <- function(tadat, raw) {
   tadat$ready_for_download <- TRUE
 }
 
-disableLoading <- function() {
+disableLoading <- function(session) {
       # disable the button and show text telling the user to reload TADAShiny if they want to restart with new data
-      shinyjs::disable("#query_data_1-example_data_go")
+      shiny::updateSelectInput(session, "example_data", choices = NULL, selected = "")
+      shinyjs::disable("example_data_go")
+      shinyjs::disable("example_data")
+      
       shinyjs::disable("querynow")
       shinyjs::hide("file")
       shinyjs::disable("progress_file")
@@ -1037,12 +1044,12 @@ disableLoading <- function() {
       shiny::insertUI(
           selector = "#query_data_1-download_template", # Insert relative to the button
           where = "beforeBegin",    # Place it immediately after the button
-          ui = tags$span(HTML("Reload the TADAShiny app to Upload dataset<br><br>"), style = "margin-left: 10px;") # The text to insert
+          ui = tags$span(HTML("Reload the TADAShiny app to Upload a new dataset<br><br>"), style = "margin-left: 10px;") # The text to insert
       )
       shiny::insertUI(
           selector = "#query_data_1-progress_file_progress", # Insert relative to the button
           where = "beforeBegin",    # Place it immediately after the button
-          ui = tags$span(HTML("Reload the TADAShiny app to Upload Progress File<br><br>"), style = "margin-left: 10px;") # The text to insert
+          ui = tags$span(HTML("Reload the TADAShiny app to Upload a new Progress File<br><br>"), style = "margin-left: 10px;") # The text to insert
       )
 }
 
