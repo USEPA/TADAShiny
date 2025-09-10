@@ -182,12 +182,16 @@ mod_figures_server <- function(id, tadat) {
 
       # prep for the radius of the points to correspond to the number of measurements and the legend to match
       react$mapdata$radius <- scales::rescale(react$mapdata$Ncount, c(5, 35))
-      leg_labs <- c(signif(stats::quantile(react$mapdata$Ncount, 0.10), 3), 
-                    signif(stats::median(react$mapdata$Ncount), 3), 
-                    signif(stats::quantile(react$mapdata$Ncount, 0.90), 3))
-      leg_sizes <- c(stats::quantile(react$mapdata$radius, 0.10), 
-                     stats::median(react$mapdata$radius), 
-                     stats::quantile(react$mapdata$radius, 0.90)) * 2
+      leg_labs <- c(
+        signif(stats::quantile(react$mapdata$Ncount, 0.10), 3),
+        signif(stats::median(react$mapdata$Ncount), 3),
+        signif(stats::quantile(react$mapdata$Ncount, 0.90), 3)
+      )
+      leg_sizes <- c(
+        stats::quantile(react$mapdata$radius, 0.10),
+        stats::median(react$mapdata$radius),
+        stats::quantile(react$mapdata$radius, 0.90)
+      ) * 2
 
       # base map
       map <- leaflet::leaflet() %>%

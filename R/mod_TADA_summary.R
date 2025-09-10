@@ -37,14 +37,14 @@ mod_TADA_summary_ui <- function(id) {
       htmltools::hr(),
       htmltools::h3("Download Working or Final Dataset"),
       htmltools::HTML(
-        "Download the working dataset as a .xlsx file. Original data are preserved with 
-        the original column names. This tool creates copies of any columns that are 
-        modified and adds the TADA. prefix to those. In addition, new TADA-only flag columns 
-        are added for transparency and tracking purposes. 
+        "Download the working dataset as a .xlsx file. Original data are preserved with
+        the original column names. This tool creates copies of any columns that are
+        modified and adds the TADA. prefix to those. In addition, new TADA-only flag columns
+        are added for transparency and tracking purposes.
         An overall summary <i>Remove</i> column (far right in output) is also added
-        to track decisions you make within this app to include or exclude results 
-        throughout the process. The <i>Removal Reason</i> column may also be included 
-        in this output but is only available here after running the 'Load Review Data' 
+        to track decisions you make within this app to include or exclude results
+        throughout the process. The <i>Removal Reason</i> column may also be included
+        in this output but is only available here after running the 'Load Review Data'
         button on the 'Review' tab.<br><br>"
       ),
       shiny::fluidRow(column(
@@ -92,17 +92,17 @@ mod_TADA_summary_server <- function(id, tadat) {
     ns <- session$ns
     # reactive list to hold reactive objects specific to this module
     summary_things <- shiny::reactiveValues()
-    
+
     # When data is loaded, enable the download buttons
     shiny::observeEvent(tadat$raw, {
       if (is.null(tadat$raw)) {
-        
+
       } else {
         shinyjs::enable("download_working_button")
         shinyjs::enable("download_final_button")
       }
     })
-    
+
     # Function to determine the download path based on OS
     get_download_path <- function() {
       if (.Platform$OS.type == "windows") {
@@ -113,17 +113,17 @@ mod_TADA_summary_server <- function(id, tadat) {
         return(file.path(Sys.getenv("HOME"), "Downloads"))
       }
     }
-    
+
     shiny::observeEvent(input$download_working_button, {
       tryCatch(
         {
           # Determine the path to use
           target_path <- get_download_path()
-          
+
           # Prepare filenames with full paths
           datafile_name <- file.path(target_path, paste0(tadat$default_outfile, "_working", ".xlsx"))
           progress_file_name <- file.path(target_path, paste0(tadat$default_outfile, "_prog.RData"))
-          
+
           # Show progress spinner
           shinybusy::show_modal_spinner(
             spin = "double-bounce",
@@ -131,20 +131,20 @@ mod_TADA_summary_server <- function(id, tadat) {
             text = "Preparing files for download...",
             session = shiny::getDefaultReactiveDomain()
           )
-          
+
           # Process data
           out_data <- EPATADA::TADA_OrderCols(tadat$raw)
           summary_things$temp_files <- c(datafile_name, progress_file_name)
           desc <- writeNarrativeDataFrame(tadat)
           dfs <- list(Data = out_data, Parameterization = desc)
-          
+
           # Write files
           writeFile(tadat, progress_file_name)
           writexl::write_xlsx(dfs, path = datafile_name, use_zip64 = TRUE)
-          
+
           # Remove progress spinner
           shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
-          
+
           # Trigger download action
           shinyjs::click("dwn_working")
         },
@@ -158,13 +158,13 @@ mod_TADA_summary_server <- function(id, tadat) {
         }
       )
     })
-    
+
     shiny::observeEvent(input$download_final_button, {
       tryCatch(
         {
           # Determine the path to use
           target_path <- get_download_path()
-          
+
           # Prepare filenames with full paths
           datafile_name <- file.path(target_path, paste0(tadat$default_outfile, "_final", ".xlsx"))
           progress_file_name <- file.path(target_path, paste0(tadat$default_outfile, "_prog.RData"))
@@ -176,20 +176,20 @@ mod_TADA_summary_server <- function(id, tadat) {
             text = "Preparing files for download...",
             session = shiny::getDefaultReactiveDomain()
           )
-          
+
           # Process data
           out_data <- EPATADA::TADA_OrderCols(tadat$raw[!tadat$raw$TADA.Remove, ])
           summary_things$temp_files <- c(datafile_name, progress_file_name)
           desc <- writeNarrativeDataFrame(tadat)
           dfs <- list(Data = out_data, Parameterization = desc)
-          
+
           # Write files
           writeFile(tadat, progress_file_name)
           writexl::write_xlsx(dfs, path = datafile_name, use_zip64 = TRUE)
-          
+
           # Remove progress spinner
           shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
-          
+
           # Trigger download action
           shinyjs::click("dwn_final")
         },
@@ -203,7 +203,7 @@ mod_TADA_summary_server <- function(id, tadat) {
         }
       )
     })
-    
+
     output$dwn_working <- shiny::downloadHandler(
       filename = function() {
         base::paste0(tadat$default_outfile, "_working.zip")
@@ -213,7 +213,7 @@ mod_TADA_summary_server <- function(id, tadat) {
       },
       contentType = "application/zip"
     )
-    
+
     output$dwn_final <- shiny::downloadHandler(
       filename = function() {
         base::paste0(tadat$default_outfile, "_final.zip")
@@ -223,25 +223,25 @@ mod_TADA_summary_server <- function(id, tadat) {
       },
       contentType = "application/zip"
     )
-    
+
     # calculate the stats needed to fill the summary box
     shiny::observe({
       shiny::req(tadat$raw)
       summary_things$rem_rec <-
         length(tadat$raw$ResultIdentifier[tadat$raw$TADA.Remove ==
-                                            TRUE])
+          TRUE])
       summary_things$clean_rec <-
         length(tadat$raw$ResultIdentifier[tadat$raw$TADA.Remove ==
-                                            FALSE])
+          FALSE])
       clean_sites <-
         unique(tadat$raw$MonitoringLocationIdentifier[tadat$raw$TADA.Remove ==
-                                                        FALSE])
+          FALSE])
       summary_things$clean_site <- length(clean_sites)
       summary_things$rem_site <-
         length(unique(tadat$raw$MonitoringLocationIdentifier[!tadat$raw$MonitoringLocationIdentifier %in%
-                                                               clean_sites]))
+          clean_sites]))
       summary_things$removals <- sort_removals(tadat$removals)
-      
+
       # enable the Download buttons
       shinyjs::enable("download_working")
       shinyjs::enable("download_final")
@@ -251,7 +251,7 @@ mod_TADA_summary_server <- function(id, tadat) {
       nrow = 0,
       dimnames = list(NULL, c("Reason", "Count"))
     ))
-    
+
     output$rec_tot <- shiny::renderText({
       if (is.null(tadat$raw)) {
         "Total Results in Dataset: 0"
@@ -259,7 +259,7 @@ mod_TADA_summary_server <- function(id, tadat) {
         base::paste0("Total Results in Dataset: ", scales::comma(length(tadat$raw$ResultIdentifier)))
       }
     })
-    
+
     output$rec_rem <- shiny::renderText({
       if (is.null(tadat$raw)) {
         "Results Flagged for Removal: 0"
@@ -270,7 +270,7 @@ mod_TADA_summary_server <- function(id, tadat) {
         )
       }
     })
-    
+
     output$rec_clean <- shiny::renderText({
       if (is.null(tadat$raw)) {
         "Results Retained: 0"
@@ -281,7 +281,7 @@ mod_TADA_summary_server <- function(id, tadat) {
         )
       }
     })
-    
+
     output$site_tot <- shiny::renderText({
       if (is.null(tadat$raw)) {
         "Total Sites in Dataset: 0"
@@ -291,7 +291,7 @@ mod_TADA_summary_server <- function(id, tadat) {
         )))
       }
     })
-    
+
     output$site_rem <- shiny::renderText({
       if (is.null(tadat$raw)) {
         "Total Sites Flagged for Removal: 0"
@@ -302,7 +302,7 @@ mod_TADA_summary_server <- function(id, tadat) {
         )
       }
     })
-    
+
     output$site_clean <- shiny::renderText({
       if (is.null(tadat$raw)) {
         "Total Sites Retained: 0"
@@ -313,8 +313,8 @@ mod_TADA_summary_server <- function(id, tadat) {
         )
       }
     })
-    
-    
+
+
     shiny::observeEvent(input$disclaimer, {
       shiny::showModal(
         shiny::modalDialog(
@@ -341,7 +341,7 @@ sort_removals <- function(removal_table) {
       ))
     colnames(results) <- prefixes
     results[is.na(results)] <- FALSE
-    
+
     for (prefix in prefixes) {
       active_cols <- fields[dplyr::starts_with(prefix, vars = fields)]
       if (length(active_cols) > 0) {

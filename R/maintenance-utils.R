@@ -1,13 +1,13 @@
 utils::globalVariables(c(
   "TADA.CensoredData.Flag", "ResultIdentifier", "TADA.ResultMeasureValue",
-  "TADA.CensoredMethod", "TADA.Remove", "MonitoringLocationIdentifier", 
+  "TADA.CensoredMethod", "TADA.Remove", "MonitoringLocationIdentifier",
   "MonitoringLocationName", "TADA.LatitudeMeasure", "TADA.LongitudeMeasure",
-  "ActivityStartDate", "TADA.CharacteristicName", "OrganizationIdentifier", 
-  "OrganizationFormalName", 
+  "ActivityStartDate", "TADA.CharacteristicName", "OrganizationIdentifier",
+  "OrganizationFormalName",
   "TADA.DetectionQuantitationLimitMeasure.MeasureValue",
   "DetectionQuantitationLimitMeasure.MeasureUnitCode",
   "TADA.ResultMeasure.MeasureUnitCode", "MonitoringLocationTypeName",
-  "Target.TADA.CharacteristicName", "Target.TADA.MethodSpeciationName", 
+  "Target.TADA.CharacteristicName", "Target.TADA.MethodSpeciationName",
   "Target.TADA.ResultSampleFractionText",
   "DetectionQuantitationLimitMeasure.MeasureValue",
   "Count", "Description", "Field", "Legend", "Rank", "Result_Count", "Step", "TADA.Chars",
@@ -17,7 +17,7 @@ utils::globalVariables(c(
   "organization", "original_source", "project", "resultCount", "sampleMedia",
   "selected_filters", "selected_flags", "siteType", "siteid", "startDate", "statecode",
   "tot_n"
-  ))
+))
 
 # Auto generates or updates TADAShiny-package.R file
 # how to import specific functions from packages for use throughout app
