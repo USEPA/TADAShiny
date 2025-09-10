@@ -20,20 +20,15 @@
 
 # golem::add_shinyserver_file() #already exists 
 
-# not relevant to this package
-## If you want to build github pages
-# usethis::use_pkgdown() # run once to configure your package
-# pkgdown::build_site()
-
 # # This is how to deploy to TetraTech's shinyappsio
 # # along with the file produced here TADAShiny\rsconnect\shinyapps.io\tetratech-wtr-wne
 # golem::add_shinyappsio_file()
-# 5. Deploy to shinyapps.io
-rsconnect::deployApp(
-  appFiles = c("app.R", "DESCRIPTION", "NAMESPACE", "R/", "inst/"),
-  appName = "TADAShiny",
-  forceUpdate = TRUE
-)
+# Deploy to shinyapps.io
+# rsconnect::deployApp(
+#   appFiles = c("app.R", "DESCRIPTION", "NAMESPACE", "R/", "inst/"),
+#   appName = "TADAShiny",
+#   forceUpdate = TRUE
+# )
 
 # Updated method using packrat?
 # Detach all loaded packages and clean your environment
@@ -45,19 +40,4 @@ golem::document_and_reload()
 # run these (update path)
 options(rsconnect.packrat = TRUE)
 # rsconnect::deployApp("path/to/the/app")
-rsconnect::deployApp("C:/Users/CMULLI01/GitHub/TADAShiny")
-
-# previous method?
-# rsconnect::deployApp(appDir = getwd(),
-#                      account = "Cristina", 
-#                      appFiles = c("app.R", "DESCRIPTION", "NAMESPACE", "R/", "inst/"),
-#                      quarto = FALSE,
-#                      server = "rstudio-connect.dmap-stage.aws.epa.gov",      
-#                      appName = "TADAShiny", 
-#                      appTitle = "TADAShiny",
-#                      appId = 403, 
-#                      launch.browser = TRUE, 
-#                      lint = TRUE, 
-#                      metadata = list(asMultiple = FALSE, asStatic = FALSE),      
-#                      logLevel = "verbose", 
-#                      forceUpdate = TRUE)
+rsconnect::deployApp(appDir = getwd())
