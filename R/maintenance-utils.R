@@ -1,32 +1,23 @@
 utils::globalVariables(c(
-  "TADA.CensoredData.Flag", "ResultIdentifier",
-  "num", "Label", "TADA.ResultMeasureValue",
-  "TADA.CensoredMethod", "TADA.Remove",
-  "MonitoringLocationIdentifier", "MonitoringLocationName",
-  "TADA.LatitudeMeasure", "TADA.LongitudeMeasure",
-  "ActivityStartDate", "TADA.CharacteristicName",
-  "OrganizationIdentifier", "OrganizationFormalName",
-  "Result_Count", "TADA.Chars", "Step", "Count",
-  "Legend", "req",
+  "TADA.CensoredData.Flag", "ResultIdentifier", "TADA.ResultMeasureValue",
+  "TADA.CensoredMethod", "TADA.Remove", "MonitoringLocationIdentifier", 
+  "MonitoringLocationName", "TADA.LatitudeMeasure", "TADA.LongitudeMeasure",
+  "ActivityStartDate", "TADA.CharacteristicName", "OrganizationIdentifier", 
+  "OrganizationFormalName", 
   "TADA.DetectionQuantitationLimitMeasure.MeasureValue",
   "DetectionQuantitationLimitMeasure.MeasureUnitCode",
-  "TADA.ResultMeasure.MeasureUnitCode",
-  "group", "groupname", "MonitoringLocationTypeName",
-  "quantile", "median", "moduleServer",
-  "Target.TADA.CharacteristicName",
-  "Target.TADA.MethodSpeciationName",
-  "write.csv", "read.csv", "downloadHandler",
-  "Rank", "Target.TADA.ResultSampleFractionText",
-  "Field", "characteristicName", "characteristicType",
-  "countycode", "endDate", "example_data", "huc", "m2f",
-  "nd_method", "nd_mult", "od_method", "org_table",
-  "organization", "original_source", "project", "sampleMedia",
-  "selected_filters", "selected_flags", "siteType",
-  "siteid", "startDate", "statecode", "od_mult", "field_sel",
+  "TADA.ResultMeasure.MeasureUnitCode", "MonitoringLocationTypeName",
+  "Target.TADA.CharacteristicName", "Target.TADA.MethodSpeciationName", 
+  "Target.TADA.ResultSampleFractionText",
   "DetectionQuantitationLimitMeasure.MeasureValue",
-  "Description", "TRIBE_NAME", "flag_simple", "num_chr", 
-  "resultCount", "tot_n"
-))
+  "Count", "Description", "Field", "Legend", "Rank", "Result_Count", "Step", "TADA.Chars",
+  "TRIBE_NAME", "characteristicName", "characteristicType", "countycode", "endDate",
+  "example_data", "field_sel", "flag_simple", "group", "groupname", "m2f",
+  "nd_method", "nd_mult", "num", "num_chr", "od_method", "od_mult", "org_table",
+  "organization", "original_source", "project", "resultCount", "sampleMedia",
+  "selected_filters", "selected_flags", "siteType", "siteid", "startDate", "statecode",
+  "tot_n"
+  ))
 
 # Auto generates or updates TADAShiny-package.R file
 # how to import specific functions from packages for use throughout app

@@ -108,9 +108,19 @@ readFile <- function(tadat, filename) {
   newVals$field_sel <- load_attribute(field_sel, "field_sel")
 
   if (n_missing > 0) {
+    # shiny::showNotification(
+    #   paste("Unable to load progress file. Missing fields: ", critical_missing)
+    # )
+    
     shiny::showNotification(
-      paste("Unable to load progress file. Missing fields: ", critical_missing)
+      ui = tagList(htmltools::h4(htmltools::strong("Error")), 
+                   htmltools::hr(style = "margin-top: 5px; margin-bottom: 5px;"), # Adds a separator line
+                   paste("Unable to load progress file. Missing fields: ", critical_missing)),
+      type = "error",
+      duration = NULL,
+      id = "uploadProgressFileError"
     )
+    
   } else {
     updateExisting(tadat, newVals)
     shiny::showNotification("Successfully loaded progress file")
