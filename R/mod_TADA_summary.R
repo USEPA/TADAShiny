@@ -37,9 +37,15 @@ mod_TADA_summary_ui <- function(id) {
       htmltools::hr(),
       htmltools::h3("Download Working or Final Dataset"),
       htmltools::HTML(
-        "Download the working dataset as a .xlsx file. This includes all results that were in the
-          original data query. In addition, it includes all the TADA flag columns,
-          including an overall 'Remove' and 'Removal Reason' column.<br><br>"
+        "Download the working dataset as a .xlsx file. Original data are preserved with 
+        the original column names. This tool creates copies of any columns that are 
+        modified and adds the TADA. prefix to those. In addition, new TADA-only flag columns 
+        are added for transparency and tracking purposes. 
+        An overall summary <i>Remove</i> column (far right in output) is also added
+        to track decisions you make within this app to include or exclude results 
+        throughout the process. The <i>Removal Reason</i> column may also be included 
+        in this output but is only available here after running the 'Load Review Data' 
+        button on the 'Review' tab.<br><br>"
       ),
       shiny::fluidRow(column(
         6,

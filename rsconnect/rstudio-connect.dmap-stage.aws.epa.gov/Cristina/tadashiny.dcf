@@ -1,12 +1,10 @@
-name: tadashiny
-title: TADAShiny
+name: TADAShiny
+title: TADAShiny Module 1 Data Discovery and Cleaning
 username: Cristina
 account: Cristina
 server: rstudio-connect.dmap-stage.aws.epa.gov
 hostUrl: https://rstudio-connect.dmap-stage.aws.epa.gov/__api__
-appId: 403
-bundleId: 7115
-url: https://rstudio-connect.dmap-stage.aws.epa.gov/content/da3ffe2f-b443-4051-a029-3adb491434cb/
+appId: 1012
+bundleId: 7826
+url: https://rstudio-connect.dmap-stage.aws.epa.gov/content/c33ad4c5-cef5-42f8-a2d4-fea6aa97fa2a/
 version: 1
-asMultiple: FALSE
-asStatic: FALSE
