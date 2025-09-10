@@ -35,7 +35,7 @@ rsconnect::deployApp(
   appDir = getwd(),
   appFiles = c("app.R", "DESCRIPTION", "NAMESPACE", "R/", "inst/"),
   appName = "TADAShiny",
-  appTitle = "TADAShiny Module 1 Data Discovery and Cleaning",
+  appTitle = "Module 1 Data Discovery and Cleaning",
   launch.browser = TRUE,
   forceUpdate = TRUE
 )

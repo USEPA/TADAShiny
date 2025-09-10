@@ -1,6 +1,6 @@
 Package: TADAShiny
 Type: Package
-Title: TADAShiny: Data Discovery and Cleaning
+Title: Module 1 Data Discovery and Cleaning
 Version: 0.0.0.9000
 Authors@R: c(
     person("Cristina", "Mullin", , "mywaterway@epa.gov", role = c("aut", "cre"),

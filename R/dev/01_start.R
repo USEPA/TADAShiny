@@ -19,7 +19,7 @@
 ## to change the name in the app_sys() function in app_config.R
 golem::fill_desc(
   pkg_name = "TADAShiny", # The Name of the package containing the App
-  pkg_title = "TADAShiny: Data Discovery and Cleaning", # The Title of the package containing the App
+  pkg_title = "Module 1 Data Discovery and Cleaning", # The Title of the package containing the App
   pkg_description = "Assists data partners in retrieving, wrangling, quality checking, and harmonizing data from the Water Quality Portal for subsequent analyses.", # The Description of the package containing the App
   authors = c(
     person(
