@@ -45,8 +45,6 @@ Imports:
     writexl,
     stringr,
     dataRetrieval (>= 2.7.21)
-Remotes:
-    USEPA/EPATADA@develop
 Suggests:
     pkgload,
     config,
