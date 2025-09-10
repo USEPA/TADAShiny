@@ -106,13 +106,11 @@ mod_TADA_summary_server <- function(id, tadat) {
     # Function to determine the download path based on OS
     get_download_path <- function() {
       if (.Platform$OS.type == "windows") {
-        one_drive_path <- file.path(Sys.getenv("ONEDRIVE"), "Downloads")
-        downloads_path <- file.path(Sys.getenv("USERPROFILE"), "Downloads")
-        return(if (dir.exists(one_drive_path)) one_drive_path else downloads_path)
+        # For Windows, get the Downloads directory from the USERPROFILE environment variable
+        return(file.path(Sys.getenv("USERPROFILE"), "Downloads"))
       } else {
-        # For macOS/Linux, default to home Downloads
-        downloads_path <- file.path(Sys.getenv("HOME"), "Downloads")
-        return(downloads_path)
+        # For macOS/Linux, get the Downloads directory from the HOME environment variable
+        return(file.path(Sys.getenv("HOME"), "Downloads"))
       }
     }
     
