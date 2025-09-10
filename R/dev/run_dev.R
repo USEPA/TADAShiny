@@ -1,7 +1,7 @@
 # Set options here
 options(golem.app.prod = TRUE) # TRUE = production mode, FALSE = development mode
 
-# When developing, work within a project (do not commit the project file to GitHub).
+# When developing, work within the project file.
 # Set your working directory to the package directory on your local drive.
 # Then use devtools to load TADAShiny
 library(devtools)
