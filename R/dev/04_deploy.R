@@ -12,32 +12,29 @@
 ########################################
 
 # Deploy ----
-## Local, CRAN or Package Manager ----
-## This will build a tar.gz that can be installed locally,
-## sent to CRAN, or to a package manager
-## RStudio ----
-## If you want to deploy on RStudio related platforms
 
-# golem::add_shinyserver_file() #already exists 
+# This is how to add the shiny sever file needed for any deployment
+# golem::add_shinyserver_file() # already exists
 
-# # This is how to deploy to TetraTech's shinyappsio
-# # along with the file produced here TADAShiny\rsconnect\shinyapps.io\tetratech-wtr-wne
-# golem::add_shinyappsio_file()
-# Deploy to shinyapps.io
-# rsconnect::deployApp(
-#   appFiles = c("app.R", "DESCRIPTION", "NAMESPACE", "R/", "inst/"),
-#   appName = "TADAShiny",
-#   forceUpdate = TRUE
-# )
+# This is how to setup deployment to EPA's Posit Connect
+# golem::add_positconnect_file() # already exists see rsconnect folder
 
-# Updated method using packrat?
+# This is how to setup deployment to TetraTech's shinyappsio
+# golem::add_shinyappsio_file() # already exists see rsconnect folder
+
+# This is how to deploy, works for both TT shinyappsio and EPA posit connect
 # Detach all loaded packages and clean your environment
 golem::detach_all_attached()
 # Document and reload your package
 golem::document_and_reload()
-# This is how to deploy to EPA's Posit Connect
-# golem::add_positconnect_file() # already exists
-# run these (update path)
-options(rsconnect.packrat = TRUE)
-# rsconnect::deployApp("path/to/the/app")
-rsconnect::deployApp(appDir = getwd())
+# Use packrat
+# options(rsconnect.packrat = TRUE) # already done
+# Deploy app
+rsconnect::deployApp(
+  appDir = getwd(),
+  appFiles = c("app.R", "DESCRIPTION", "NAMESPACE", "R/", "inst/"),
+  appName = "TADAShiny",
+  appTitle = "TADAShiny Module 1 Data Discovery and Cleaning",
+  launch.browser = TRUE,
+  forceUpdate = TRUE
+)
