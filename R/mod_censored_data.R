@@ -21,13 +21,9 @@ mod_censored_data_ui <- function(id) {
       "TADAdataRetrieval assigns each result in your dataset to non-detect, over-detect, other, or uncensored. The pie chart below displays the relative proportions of results in each category. Please note that detection limit data with conflicts or data quality issues are not displayed in this pie chart or handled in the methods below."
     ),
     htmltools::br(),
-    shiny::fluidRow(shiny::column(12, shiny::plotOutput(
-      ns("id_censplot")
-    ))),
+    shiny::fluidRow(shiny::column(12, shiny::plotOutput(ns("id_censplot")))),
     htmltools::br(),
-    shiny::fluidRow(htmltools::h3(
-      "Handle Censored Data Using Simple Methods"
-    )),
+    shiny::fluidRow(htmltools::h3("Handle Censored Data Using Simple Methods")),
     shiny::fluidRow(
       "Use the drop down menus below to pick a simple method for handling non-detects and over-detects in the dataset. When you press 'Apply Methods to Dataset', a table will appear below with the first 10 detection limit results, showing their initial values and estimated values."
     ),
@@ -65,15 +61,19 @@ mod_censored_data_ui <- function(id) {
           ns("apply_methods"),
           "Apply Methods to Dataset",
           disabled = TRUE,
-          style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
+          style = "color: #fff; background-color: #337ab7; border-color: #2e6da4; margin-bottom: 10px;"
         )
-      ),
-      shiny::column(3, shiny::uiOutput(ns("undo_methods")))
+      )
+    ),
+    htmltools::br(),  # Add a line break for spacing
+    shiny::fluidRow(
+      shiny::column(
+        3,
+        shiny::uiOutput(ns("undo_methods"))
+      )
     ),
     htmltools::br(),
-    shiny::fluidRow(shiny::column(12, DT::DTOutput(ns(
-      "see_det"
-    )))),
+    shiny::fluidRow(shiny::column(12, DT::DTOutput(ns("see_det")))),
     htmltools::br(),
     shiny::fluidRow(
       htmltools::h3("Consider More Complex Censored Data Handling Methods")
@@ -83,12 +83,14 @@ mod_censored_data_ui <- function(id) {
     ),
     htmltools::br(),
     shiny::fluidRow(shiny::wellPanel(
-      shiny::fluidRow(shiny::column(12, shiny::uiOutput(
-        ns("cens_groups")
-      ))),
+      shiny::fluidRow(shiny::column(12, shiny::uiOutput(ns("cens_groups")))),
       shiny::fluidRow(shiny::column(
         12,
-        shiny::actionButton(ns("cens_sumbutton"), "ID and Summarize Censored Data", style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
+        shiny::actionButton(
+          ns("cens_sumbutton"),
+          "ID and Summarize Censored Data",
+          style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
+        )
       ))
     )),
     shiny::fluidRow(DT::DTOutput(ns("cens_sumtable")), width = 600)
@@ -353,10 +355,15 @@ mod_censored_data_server <- function(id, tadat) {
       shinyjs::disable("od_method")
     })
 
-    # this button appears after someone has applied the OD/ND methods, in case they want to undo and try another method instead
+    # this button appears after someone has applied the OD/ND methods, 
+    # in case they want to undo and try another method instead
     output$undo_methods <- shiny::renderUI({
       shiny::req(censdat$exdat)
-      shiny::actionButton(ns("undo_methods"), "Undo Method Application", style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
+      shiny::actionButton(
+        ns("undo_methods"),
+        "Undo Method Application",
+        style = "color: #fff; background-color: #6c757d; border-color: #5a6268; margin-top: 10px;"
+      )
     })
 
     # executes the undo if undo methods button is pressed.

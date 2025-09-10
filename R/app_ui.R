@@ -19,6 +19,16 @@ css <- "
     margin-right: 0px;
     margin-left: 0px;
 }
+
+/* Put shiny notifications front and center */
+.shiny-notification {
+  position: fixed;
+  top: calc(50%);
+  left: calc(50%);
+  transform: translate(-50%, -50%); /* Centers the element precisely */
+  border-style: solid;
+  border-width: medium;
+}
 "
 
 app_ui <- function(request) {

@@ -1,3 +1,5 @@
+^.*\.Rproj$
+^\.Rproj\.user$
 ^data-raw$
 ^dev$
 $run_dev.*
@@ -13,5 +15,3 @@ README.Rmd
 dev_history.R
 .devcontainer
 ^codecov\.yml$
-^.*\.Rproj$
-^\.Rproj\.user$
