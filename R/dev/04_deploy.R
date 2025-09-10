@@ -35,7 +35,7 @@ rsconnect::deployApp(
   forceUpdate = TRUE
 )
 
-
+# Updated method using packrat?
 # Detach all loaded packages and clean your environment
 golem::detach_all_attached()
 # Document and reload your package
@@ -46,3 +46,18 @@ golem::document_and_reload()
 options(rsconnect.packrat = TRUE)
 # rsconnect::deployApp("path/to/the/app")
 rsconnect::deployApp("C:/Users/CMULLI01/GitHub/TADAShiny")
+
+# previous method?
+# rsconnect::deployApp(appDir = getwd(),
+#                      account = "Cristina", 
+#                      appFiles = c("app.R", "DESCRIPTION", "NAMESPACE", "R/", "inst/"),
+#                      quarto = FALSE,
+#                      server = "rstudio-connect.dmap-stage.aws.epa.gov",      
+#                      appName = "TADAShiny", 
+#                      appTitle = "TADAShiny",
+#                      appId = 403, 
+#                      launch.browser = TRUE, 
+#                      lint = TRUE, 
+#                      metadata = list(asMultiple = FALSE, asStatic = FALSE),      
+#                      logLevel = "verbose", 
+#                      forceUpdate = TRUE)
