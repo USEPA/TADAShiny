@@ -6,9 +6,6 @@
 #'
 #' @noRd
 #'
-#' @importFrom shiny NS tagList
-#'
-
 mod_overview_ui <- function(id) {
   ns <- NS(id)
   tagList(
@@ -112,7 +109,7 @@ mod_overview_server <- function(id, tadat) {
       chars$TADA.Chars <-
         ifelse(
           nchar(chars$TADA.CharacteristicName) > 22,
-          paste0(chars$TADA.Chars, "..."),
+          base::paste0(chars$TADA.Chars, "..."),
           chars$TADA.Chars
         )
       chars <-
@@ -127,7 +124,7 @@ mod_overview_server <- function(id, tadat) {
     # this widget produces the text at the top of the page describing record, site, and org numbers in dataset
     output$overview_totals <- shiny::renderText({
       shiny::req(mapdat$text)
-      paste0(
+      base::paste0(
         "Your dataset contains <B>",
         scales::comma(length(
           unique(mapdat$text$ResultIdentifier)

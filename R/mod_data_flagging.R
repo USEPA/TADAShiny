@@ -6,9 +6,6 @@
 #'
 #' @noRd
 #'
-#' @importFrom shiny NS tagList
-#'
-
 mod_data_flagging_ui <- function(id) {
   ns <- NS(id)
   tagList(
@@ -61,7 +58,7 @@ mod_data_flagging_server <- function(id, tadat) {
     flagSwitch <- function(len) {
       inputs <- character(len)
       for (i in seq_len(len)) {
-        switch_name <- paste0("switch_", i)
+        switch_name <- base::paste0("switch_", i)
         if (!(i %in% which(unlist(switch_disabled)))) {
           inputs[i] <- as.character(
             shinyWidgets::prettySwitch(
@@ -81,7 +78,7 @@ mod_data_flagging_server <- function(id, tadat) {
 
     shinyValue <- function(id, len) {
       unlist(lapply(seq_len(len), function(i) {
-        value <- input[[paste0(id, i)]]
+        value <- input[[base::paste0(id, i)]]
         if (is.null(value)) {
           FALSE
         } else {
@@ -95,21 +92,30 @@ mod_data_flagging_server <- function(id, tadat) {
       if (!is.null(tadat$removals)) {
         tadat$removals <- dplyr::select(tadat$removals, -(dplyr::starts_with(flag_prefix)))
       }
+      if ((!is.null(tadat$raw)) & (!is.null(tadat$selected_flags))) {
+        shinyjs::enable(selector = '.nav li a[data-value="Flag"]')
+      }
       # Loop through the flags
       for (flag in tadat$selected_flags) {
         # If not all the values are NA, add the test results to removals
         if (!is.null(tadat$removals)) {
           if (!all(is.na(values$testResults[flag]))) {
             # Problem here?
-            tadat$removals[paste0(flag_prefix, flag)] <- values$testResults[flag]
+            tadat$removals[base::paste0(flag_prefix, flag)] <- values$testResults[flag]
           }
         }
         # If the switch corresponding to this flag isn't on, switch it on
         # Checking a random switch to make sure they've been initialized
-        pos <- match(flag, prompts)
+        pos <- match(flag, flag_types)
+        # # testing
+        # print(111)
+        # print(flag)
+        # print(prompts)
+        # print(pos)
+        # print(tadat$switch_defaults[pos])
         tadat$switch_defaults[pos] <- TRUE
-        if (!is.null(input[[paste0("switch_", pos)]])) {
-          switch_name <- paste0("switch_", pos)
+        if (!is.null(input[[base::paste0("switch_", pos)]])) {
+          switch_name <- base::paste0("switch_", pos)
           if (is.na(pos)) {
             invalidFile("flagging")
           } else if (!isTRUE(input[[switch_name]])) {
@@ -141,7 +147,7 @@ mod_data_flagging_server <- function(id, tadat) {
           switch_id <- "switch_"
           tadat$selected_flags <- flag_types[shinyValue(switch_id, n_switches)]
           for (i in which(switch_disabled)) {
-            shinyjs::disable(paste0(switch_id, i))
+            shinyjs::disable(base::paste0(switch_id, i))
           }
         })
 
@@ -168,7 +174,7 @@ mod_data_flagging_server <- function(id, tadat) {
           options = list(
             dom = "t",
             paging = FALSE,
-            ordering = FALSE,
+            ordering = TRUE, # this adds ordering to the DT
             preDrawCallback = DT::JS(
               "function() { Shiny.unbindAll(this.api().table().node()); }"
             ),
@@ -187,7 +193,7 @@ mod_data_flagging_server <- function(id, tadat) {
       }
     })
 
-    # Runs when the flag button is clicked
+    # Runs when the flag button (tab 3. Flag, button 'Run Tests') is clicked
     shiny::observeEvent(input$runFlags, {
       shinybusy::show_modal_spinner(
         spin = "double-bounce",
@@ -200,8 +206,8 @@ mod_data_flagging_server <- function(id, tadat) {
       # not commented out once done with testing
       tadat$raw <- applyFlags(tadat$raw, tadat$orgs)
 
-      # write.csv(tadat$raw, "flagged.csv")
-      # tadat$raw = utils::read.csv("flagged.csv") # THIS IS TRIPS WORKING FILE FOR TESTING, COMMENT OUT WHEN COMMITTING TO DEVELOP
+      # utils::write.csv(tadat$raw, "flagged.csv") # FOR TESTING
+      # tadat$raw = utils::read.csv("flagged.csv") # FOR TESTING
 
       # Remove progress bar and display instructions
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())

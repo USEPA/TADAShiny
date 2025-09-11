@@ -1,9 +1,6 @@
-^renv$
-^renv\.lock$
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^data-raw$
-dev_history.R
 ^dev$
 $run_dev.*
 ^docs$
@@ -15,3 +12,7 @@ README.Rmd
 ^app\.R$
 ^rsconnect$
 ^LICENSE\.md$
+dev_history.R
+.devcontainer
+^codecov\.yml$
+_disable_autoload.R

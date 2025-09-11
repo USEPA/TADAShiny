@@ -7,7 +7,7 @@
 
 # Below increases the max data upload size from the Shiny default of 5MB per file
 # to 30MB for file
-options(shiny.maxRequestSize = 30 * 1024^2)
+options(shiny.maxRequestSize = 400 * 1024^2)
 options(warn = 2)
 app_server <- function(input, output, session) {
   # Your application server logic
@@ -38,8 +38,8 @@ app_server <- function(input, output, session) {
   tadat$load_progress_file <- NA
   tadat$save_progress_file <- NA
   tadat$flags_present <- FALSE
-  job_id <- paste0("ts", format(Sys.time(), "%y%m%d%H%M%S"))
-  tadat$default_outfile <- paste0("tada_output_", job_id)
+  job_id <- base::paste0("ts", format(Sys.time(), "%y%m%d%H%M%S"))
+  tadat$default_outfile <- base::paste0("tada_output_", job_id)
   tadat$job_id <- job_id
 
   # switch to overview tab when tadat$new changes and provide user with window letting them know how many records were automatically flagged for removal upon upload
@@ -47,7 +47,14 @@ app_server <- function(input, output, session) {
   shiny::observeEvent(tadat$new, {
     shiny::showModal(shiny::modalDialog(
       title = "Data Loaded",
-      "Your data were successfully loaded into the app and are displayed on the Overview tab. The following data wrangling steps were performed automatically when data was loaded: 1) created TADA versions of a subset of columns for editing (originals are retained), 2) handled/flagged special characters and text in result values and units, 3) harmonized result and depth units to TADA defaults, and 4) replaced retired characteristic names with current names. See summary information about your dataset in the gray box at the bottom of the app."
+      "Your data were successfully loaded into the app and are displayed on the Overview tab.
+      The following data wrangling steps were performed automatically when data was loaded:
+      1) created TADA versions of a subset of columns for editing (originals are retained),
+      2) handled/flagged special characters and text in result values and units,
+      3) harmonized result and depth units to TADA defaults, and
+      4) replaced retired characteristic names with current names.
+      See summary information about your dataset in the gray box at the bottom of the app.",
+      easyClose = TRUE
     ))
     shiny::updateTabsetPanel(session = session, inputId = "tabbar", selected = "Overview")
     tadat$new <- NULL
@@ -61,9 +68,6 @@ app_server <- function(input, output, session) {
   })
 
   shiny::observe({
-    # JCH - is this necessary?
-    # shiny::req(tadat$raw)
-    tadat$raw$TADAShiny.tab <- input$tabbar
     tadat$tab <- input$tabbar
   })
 

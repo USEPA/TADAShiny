@@ -1,6 +1,6 @@
 # RStudio files
-TADAShiny.Rproj
 .Rproj.user
+.Rprofile
 
 # History files
 .Rhistory
@@ -20,7 +20,3 @@ TADAShiny.Rproj
 _snaps
 .Ruserdata
 .vscode/
-.Rbuildignore
-
-# Trip's testing file
-flagged.csv

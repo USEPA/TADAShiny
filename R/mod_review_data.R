@@ -6,7 +6,6 @@
 #'
 #' @noRd
 #'
-#' @importFrom shiny NS tagList
 mod_review_data_ui <- function(id) {
   ns <- NS(id)
   tagList(
@@ -115,7 +114,7 @@ mod_review_data_server <- function(id, tadat) {
           fill = "#005ea2",
           color = "black"
         ) +
-        ggplot2::scale_y_discrete(limits=rev) + 
+        ggplot2::scale_y_discrete(limits = rev) +
         ggplot2::labs(title = "Results Retained Following Flagging/Filtering Steps", x = "Results Count", y = "") +
         ggplot2::theme_classic(base_size = 16) +
         ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1)) +
@@ -134,13 +133,13 @@ mod_review_data_server <- function(id, tadat) {
       shiny::req(review_things$rem_reas)
       dat <- review_things$rem_reas
       if (nrow(review_things$rem_reas) > 1) {
-        dat$Legend <- paste0(dat$Reason, " - ", dat$Count, " results")
+        dat$Legend <- base::paste0(dat$Reason, " - ", dat$Count, " results")
       } else {
-        dat$Legend <- paste0(dat$Reason)
+        dat$Legend <- base::paste0(dat$Reason)
       }
       dat <- dat %>%
         dplyr::rowwise() %>%
-        dplyr::mutate(Legend = EPATADA::TADA_InsertBreaks(Legend, len = 100))
+        dplyr::mutate(Legend = stringr::str_wrap(Legend))
 
       # define number of colors required for pie chart
       colorCount <- length(unique(dat$Legend))

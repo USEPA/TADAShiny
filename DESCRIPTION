@@ -1,65 +1,69 @@
 Package: TADAShiny
 Type: Package
-Title: Water Quality Portal Data Discovery and Cleaning: First R Shiny App in the TADA (Tools for Automated Data Analysis) Series
+Title: Module 1 Data Discovery and Cleaning
 Version: 0.0.0.9000
 Authors@R: c(
-  person(given = "U.S. Environmental Protection Agency", role = "aut"),
-  person(given = "Cristina",
-  family = "Mullin",
-  role = c("aut", "cre"),
-  email = "mullin.cristina@epa.gov",
-  comment = c(ORCID = "0000-0002-0615-6087")),
-  person(given = "Trip",
-  family = "Hook",
-  role = "aut"),
-  person(given = "Elise",
-  family = "Hinman",
-  role = "aut")
+    person("Cristina", "Mullin", , "mywaterway@epa.gov", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-0615-6087")),
+    person("Trip", "Hook", role = "aut"),
+    person("Elise", "Hinman", role = "aut")
   )
 Description: Assists data partners in retrieving, wrangling, quality checking, and harmonizing data from the Water Quality Portal for subsequent analyses.
 License: CC0
-Copyright: This software is in the public domain because it contains materials
-    that originally came from the U.S. Environmental Protection Agency.
+Copyright: This software is in the public domain because it contains materials that originally came from the U.S. Environmental Protection Agency.
 Imports: 
-    magrittr,
+    EPATADA,
     golem,
-    htmltools,
-    readxl,
-    writexl,
+    magrittr,
     shiny,
-    leaflet,
-    shinyWidgets,
-    shinycssloaders,
     DT,
-    ggplot2,
-    EPATADA, 
-    shinybusy, 
-    dplyr, 
-    plyr,
-    tidyr,
-    scales,
+    dplyr,
     forcats,
-    RColorBrewer,
+    ggplot2,
+    gotop,
     grDevices,
+    htmltools,
+    leaflet,
+    leaflet.extras,
     lubridate,
-    plotly, 
-    shinyjs, 
-    lwgeom
-Remotes: 
-    github::USEPA/EPATADA
-Suggests: 
+    MESS,
+    plotly,
+    plyr,
+    purrr,
+    RColorBrewer,
+    readxl,
+    scales,
+    sf,
+    shinyalert,
+    shinybusy,
+    shinycssloaders,
+    shinyjs,
+    shinyWidgets,
+    tidyr,
+    tidyselect,
+    utils,
+    writexl,
+    stringr,
+    dataRetrieval (>= 2.7.21)
+Suggests:
+    pkgload,
     config,
-    testthat,
-    remotes,
     covr,
-    rmarkdown, 
+    devtools,
     knitr,
     spelling,
-    sf,
-    stringr,
-    utils
+    styler,
+    testthat,
+    roxygen2,
+    rsconnect,
+    rstudioapi,
+    renv,
+    jsonlite,
+    data.table
+Remotes:
+    USEPA/EPATADA@develop
 Depends: 
-    R (>= 3.5.0)
+    R (>= 4.1.0)
 Encoding: UTF-8
 Language: en-US
 Config/testthat/edition: 3
@@ -67,5 +71,6 @@ Config/testthat/load-all: list(export_all = FALSE, helpers = FALSE)
 LazyData: true
 URL: https://github.com/USEPA/TADAShiny
 BugReports: https://github.com/USEPA/TADAShiny/issues
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)
+StagedInstall: FALSE

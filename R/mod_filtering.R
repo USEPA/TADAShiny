@@ -1,3 +1,7 @@
+# Load the input data
+data_path1 <- app_sys("extdata/filter_descriptions.RData")
+load(data_path1)
+
 mod_filtering_ui <- function(id) {
   ns <- NS(id)
   tagList(
@@ -20,16 +24,11 @@ mod_filtering_ui <- function(id) {
     shiny::fluidRow(
       column(
         3,
-        shiny::actionButton(ns("addOnlys"), "Include Only Selected Values",
-          style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
-        )
+        shiny::actionButton(ns("addOnlys"), "Include Only Selected Values", style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
       ),
       column(
         3,
-        shiny::actionButton(ns("addExcludes"),
-          "Exclude Selected Values",
-          style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
-        )
+        shiny::actionButton(ns("addExcludes"), "Exclude Selected Values", style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
       )
     ),
     htmltools::br(),
@@ -43,17 +42,11 @@ mod_filtering_ui <- function(id) {
     shiny::fluidRow(
       column(
         3,
-        shiny::actionButton(ns("removeFilters"),
-          "Reset Selected Filters",
-          style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
-        )
+        shiny::actionButton(ns("removeFilters"), "Reset Selected Filters", style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
       ),
       column(
         3,
-        shiny::actionButton(ns("resetFilters"),
-          "Reset All Filters",
-          style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
-        )
+        shiny::actionButton(ns("resetFilters"), "Reset All Filters", style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
       )
     )
   )
@@ -78,7 +71,12 @@ mod_filtering_server <- function(id, tadat) {
         tables$dat <-
           subset(tadat$raw, tadat$raw$TADA.Remove == FALSE)
         tables$filter_fields <-
-          EPATADA::TADA_FieldCounts(tables$dat, display = "key")
+          EPATADA::TADA_FieldCounts(tables$dat, display = "key") %>%
+          dplyr::left_join(filter_dat, by = c("Fields")) %>%
+          dplyr::mutate(Description = ifelse(is.na(Description),
+            "No description available",
+            Description
+          ))
       }
     })
 
@@ -104,7 +102,7 @@ mod_filtering_server <- function(id, tadat) {
       tables$filter_values <-
         data.frame(getValues(tables$dat, values$selected_field))
       output$promptStep2 <- shiny::renderUI(HTML(
-        paste0(
+        base::paste0(
           "<h3>Filter by '",
           values$selected_field,
           "'</h3>
@@ -188,7 +186,12 @@ mod_filtering_server <- function(id, tadat) {
       shiny::updateRadioButtons(session, "field_sel", selected = tadat$field_sel)
       if (!is.null(tables$dat)) {
         tables$filter_fields <-
-          EPATADA::TADA_FieldCounts(tables$dat, display = tadat$field_sel)
+          EPATADA::TADA_FieldCounts(tables$dat, display = tadat$field_sel) %>%
+          dplyr::left_join(filter_dat, by = c("Fields")) %>%
+          dplyr::mutate(Description = ifelse(is.na(Description),
+            "No description available",
+            Description
+          ))
       }
     })
 
@@ -282,48 +285,60 @@ mod_filtering_server <- function(id, tadat) {
       }
 
       # Only proceed if filters have been selected
-      if (!(is.null(tadat$raw)) &
-        (nrow(tadat$selected_filters) > 0)) {
-        # Since filters have been added, enable the ability to reset them
-        shinyjs::enable("resetFilters")
-        shinyjs::enable("removeFilters")
+      if (!(is.null(tadat$raw))) {
+        # Enable the filtering tab. Usually happens when filters are loaded from a progress file
+        shinyjs::enable(selector = '.nav li a[data-value="Filter"]')
+        if (nrow(tadat$selected_filters) > 0) {
+          # Since filters have been added, enable the ability to reset them
+          shinyjs::enable("resetFilters")
+          shinyjs::enable("removeFilters")
 
-        # Loop through the filters field-by-field
-        for (active_field in unique(tadat$selected_filters$Field)) {
-          filter_type <- values$locked[active_field]
-          field_filters <-
-            tadat$selected_filters[tadat$selected_filters == active_field, ]
-          results <- rep(FALSE, nrow(tadat$raw))
-          for (row in 1:nrow(field_filters)) {
-            sel <- (tadat$raw[[active_field]] == field_filters[row, "Value"])
-            sel[is.na(sel)] <- FALSE
-            results <- results | sel
+          # Loop through the filters field-by-field
+          for (active_field in unique(tadat$selected_filters$Field))
+          {
+            filter_type <- values$locked[active_field]
+            field_filters <-
+              tadat$selected_filters[tadat$selected_filters == active_field, ]
+            results <- rep(FALSE, nrow(tadat$raw))
+            for (row in 1:nrow(field_filters))
+            {
+              sel <- (tadat$raw[[active_field]] == field_filters[row, "Value"])
+              sel[is.na(sel)] <- FALSE
+              results <- results | sel
+            }
+            # Get the intersection of all the places where True
+            if (filter_type == "Keep only") {
+              results <- !results
+            }
+            all_vals <- paste(field_filters$Value, collapse = " or ")
+            label <-
+              base::paste0(
+                prefix,
+                filter_type,
+                " ",
+                active_field,
+                " is ",
+                all_vals
+              )
+            tadat$removals[label] <- as.logical(results)
           }
-          # Get the intersection of all the places where True
-          if (filter_type == "Keep only") {
-            results <- !results
-          }
-          all_vals <- paste(field_filters$Value, collapse = " or ")
-          label <-
-            paste0(prefix, filter_type, " ", active_field, " is ", all_vals)
-          tadat$removals[label] <- as.logical(results)
         }
-      }
 
-      # Get counts for the filters
-      if (!is.null(tables$dat) & nrow(tadat$selected_filters > 0)) {
-        # Refresh the 'count' field
-        new_selected_filters <- tadat$selected_filters
-        new_selected_filters$Count <- NULL
-        new_selected_filters <-
-          cbind(new_selected_filters, Count = 0)
-        for (i in 1:nrow(new_selected_filters)) {
-          row <- new_selected_filters[i, ]
-          values <- getValues(tables$dat, row$Field)
-          new_selected_filters[i, "Count"] <-
-            sum(values[(values$Value == row$Value), "Count"], na.rm = TRUE)
+        # Get counts for the filters
+        if (!is.null(tables$dat) & nrow(tadat$selected_filters > 0)) {
+          # Refresh the 'count' field
+          new_selected_filters <- tadat$selected_filters
+          new_selected_filters$Count <- NULL
+          new_selected_filters <-
+            cbind(new_selected_filters, Count = 0)
+          for (i in 1:nrow(new_selected_filters)) {
+            row <- new_selected_filters[i, ]
+            values <- getValues(tables$dat, row$Field)
+            new_selected_filters[i, "Count"] <-
+              sum(values[(values$Value == row$Value), "Count"], na.rm = TRUE)
+          }
+          tadat$selected_filters <- new_selected_filters
         }
-        tadat$selected_filters <- new_selected_filters
       }
     })
 

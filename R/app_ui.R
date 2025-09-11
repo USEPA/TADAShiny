@@ -6,13 +6,30 @@
 #'
 
 # THE BUSINESS STARTS ON line 223 or thereabouts.
+# css below addresses https://github.com/USEPA/TADAShiny/issues/198?
 css <- "
 .nav li a.disabled {
   background-color: #F5F5F5 !important;
   color: #333 !important;
   cursor: not-allowed !important;
   border-color: #F5F5F5 !important;
-}"
+}
+
+.row {
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
+/* Put shiny notifications front and center */
+.shiny-notification {
+  position: fixed;
+  top: calc(50%);
+  left: calc(50%);
+  transform: translate(-50%, -50%); /* Centers the element precisely */
+  border-style: solid;
+  border-width: medium;
+}
+"
 
 app_ui <- function(request) {
   tagList(
@@ -24,10 +41,19 @@ app_ui <- function(request) {
     # Your application UI logic
     shiny::fluidPage(
       tags$html(class = "no-js", lang = "en"),
-      HTML("<div id='eq-disclaimer-banner' class='padding-1 text-center text-white bg-secondary-dark'><strong>EPA development environment:</strong> The
-      content on this page is not production ready. This site is being used
-      for <strong>development</strong> and/or <strong>testing</strong> purposes
-      only.</div>"),
+      # standardized Go to Top button appears on lower-right corner when window is scrolled down 100 pixels
+      gotop::use_gotop( # add it inside the ui
+        src = "fas fa-chevron-circle-up", # css class from Font Awesome
+        opacity = 0.8, # transparency
+        width = 60, # size
+        appear = 100 # number of pixels before appearance
+      ), # ),
+      # adds development banner
+      # HTML("<div id='eq-disclaimer-banner' class='padding-1 text-center text-white bg-secondary-dark'><strong>EPA development environment:</strong> The
+      # content on this page is not production ready. This site is being used
+      # for <strong>development</strong> and/or <strong>testing</strong> purposes
+      # only.</div>"),
+
       # adds epa header html from here: https://www.epa.gov/themes/epa_theme/pattern-lab/patterns/pages-standalone-template/pages-standalone-template.rendered.html
       shiny::includeHTML(app_sys("app/www/header.html")),
       shinyjs::useShinyjs(),
@@ -84,6 +110,7 @@ app_ui <- function(request) {
         )
       ),
       htmltools::hr(),
+      # adds 'TADA Working Summary and download buttons above the app footer
       mod_TADA_summary_ui("TADA_summary_1"),
       # adds epa footer html
       shiny::includeHTML(app_sys("app/www/footer.html"))
@@ -96,10 +123,8 @@ app_ui <- function(request) {
 #' This function is internally used to add external
 #' resources inside the Shiny application.
 #'
-#' @importFrom golem add_resource_path activate_js favicon bundle_resources
 #' @noRd
 #'
-
 golem_add_external_resources <- function() {
   add_resource_path(
     "www",

@@ -46,7 +46,7 @@ flagCensus <- function(raw) {
         tabular_results[flag] <- (results > 0)
       }
     } else {
-      print(paste0("No tests found for flag ", flag))
+      print(base::paste0("No tests found for flag ", flag))
     }
   }
 
@@ -79,23 +79,25 @@ getCounts <- function(sites, removed_records) {
 }
 # Settings for each flag function in flag page mock up
 applyFlags <- function(in_table, orgs) {
+  # Missing metadata for censored results
   out <- EPATADA::TADA_IDCensoredData(in_table)
-  # Invalid Speciation
+
+  # Suspect Speciation
   out <- EPATADA::TADA_FlagSpeciation(out, clean = "none")
 
-  # Invalid fraction
+  # Suspect fraction
   out <- EPATADA::TADA_FlagFraction(out, clean = FALSE)
 
-  # Invalid result unit
+  # Suspect result unit
   out <- EPATADA::TADA_FlagResultUnit(out, clean = "none")
 
   # QC rep/blank
-  out <- EPATADA::TADA_FindQCActivities(out, clean = FALSE)
+  out <- EPATADA::TADA_FindQCActivities(out, clean = FALSE, flaggedonly = FALSE)
 
   # Result is flagged as suspect by data submitter
   out <- EPATADA::TADA_FlagMeasureQualifierCode(out, clean = FALSE, define = TRUE)
 
-  # Invalid analytical method
+  # Suspect analytical method
   out <- EPATADA::TADA_FlagMethod(out, clean = FALSE)
 
   # Single org duplicative uploads
@@ -103,7 +105,7 @@ applyFlags <- function(in_table, orgs) {
 
   # multiple org duplicative uploads
   ## NOTE: THIS FUNCTION USES A REACTIVE OBJECT AS AN INPUT
-  out <- EPATADA::TADA_FindPotentialDuplicatesMultipleOrgs(out, org_hierarchy = orgs)
+  # out <- EPATADA::TADA_FindPotentialDuplicatesMultipleOrgs(out, org_hierarchy = orgs)
 
   # QAPP Not Approved - this flag isn't looking for a TADA-created flag column,
   # so do not need to run any flag function here. If switched ON, remove all data
@@ -114,11 +116,11 @@ applyFlags <- function(in_table, orgs) {
     out <- EPATADA::TADA_FindQAPPDoc(out, clean = FALSE)
   }
 
-  # Dataset includes depth profile data - no function for this yet
-  # out <- out
-
-  # Aggregated continuous data
-  # out <- EPATADA::TADA_FlagContinuousData(out, clean = FALSE, flaggedonly = FALSE)
+  # Continuous data
+  out <- EPATADA::TADA_FlagContinuousData(out,
+    clean = FALSE,
+    flaggedonly = FALSE
+  )
 
   # Above WQX Upper Threshold
   out <- EPATADA::TADA_FlagAboveThreshold(out, clean = FALSE)
@@ -126,7 +128,7 @@ applyFlags <- function(in_table, orgs) {
   # Below WQX Lower Threshold
   out <- EPATADA::TADA_FlagBelowThreshold(out, clean = FALSE)
 
-  # Invalid coordinates
+  # Suspect coordinates
   out <-
     EPATADA::TADA_FlagCoordinates(
       out,
