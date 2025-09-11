@@ -65,7 +65,7 @@ mod_censored_data_ui <- function(id) {
         )
       )
     ),
-    htmltools::br(),  # Add a line break for spacing
+    htmltools::br(), # Add a line break for spacing
     shiny::fluidRow(
       shiny::column(
         3,
@@ -355,7 +355,7 @@ mod_censored_data_server <- function(id, tadat) {
       shinyjs::disable("od_method")
     })
 
-    # this button appears after someone has applied the OD/ND methods, 
+    # this button appears after someone has applied the OD/ND methods,
     # in case they want to undo and try another method instead
     output$undo_methods <- shiny::renderUI({
       shiny::req(censdat$exdat)

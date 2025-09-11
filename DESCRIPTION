@@ -1,6 +1,6 @@
 Package: TADAShiny
 Type: Package
-Title: TADAShiny: Data Discovery and Cleaning
+Title: Module 1 Data Discovery and Cleaning
 Version: 0.0.0.9000
 Authors@R: c(
     person("Cristina", "Mullin", , "mywaterway@epa.gov", role = c("aut", "cre"),
@@ -45,8 +45,6 @@ Imports:
     writexl,
     stringr,
     dataRetrieval (>= 2.7.21)
-Remotes:
-    USEPA/EPATADA@develop
 Suggests:
     pkgload,
     config,
@@ -62,6 +60,8 @@ Suggests:
     renv,
     jsonlite,
     data.table
+Remotes:
+    USEPA/EPATADA@develop
 Depends: 
     R (>= 4.1.0)
 Encoding: UTF-8

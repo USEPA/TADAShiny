@@ -45,12 +45,12 @@ app_server <- function(input, output, session) {
   shiny::observeEvent(tadat$new, {
     shiny::showModal(shiny::modalDialog(
       title = "Data Loaded",
-      "Your data were successfully loaded into the app and are displayed on the Overview tab. 
-      The following data wrangling steps were performed automatically when data was loaded: 
-      1) created TADA versions of a subset of columns for editing (originals are retained), 
-      2) handled/flagged special characters and text in result values and units, 
-      3) harmonized result and depth units to TADA defaults, and 
-      4) replaced retired characteristic names with current names. 
+      "Your data were successfully loaded into the app and are displayed on the Overview tab.
+      The following data wrangling steps were performed automatically when data was loaded:
+      1) created TADA versions of a subset of columns for editing (originals are retained),
+      2) handled/flagged special characters and text in result values and units,
+      3) harmonized result and depth units to TADA defaults, and
+      4) replaced retired characteristic names with current names.
       See summary information about your dataset in the gray box at the bottom of the app.",
       easyClose = TRUE
     ))

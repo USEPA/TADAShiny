@@ -88,7 +88,7 @@ mod_query_data_ui <- function(id) {
     htmltools::hr(),
     shiny::fluidRow(
       htmltools::h3("Option B: Query the Water Quality Portal (WQP)"),
-      "Use the fields below to download a dataset directly from WQP. Fields with '(s)' in the label allow multiple selections. 
+      "Use the fields below to download a dataset directly from WQP. Fields with '(s)' in the label allow multiple selections.
       Hydrologic Units may be at any scale, from subwatershed to region. However, be mindful that large queries may time out."
     ),
     htmltools::br(),
@@ -304,11 +304,11 @@ mod_query_data_ui <- function(id) {
         tags$div(
           id = "progress-file-wrapper", # Add a wrapper div with an id
           shiny::fileInput(
-          ns("progress_file"),
-          "",
-          multiple = TRUE,
-          accept = c(".RData"),
-          width = "100%"
+            ns("progress_file"),
+            "",
+            multiple = TRUE,
+            accept = c(".RData"),
+            width = "100%"
           )
         )
       )
@@ -320,7 +320,6 @@ mod_query_data_ui <- function(id) {
 #'
 #' @noRd
 mod_query_data_server <- function(id, tadat) {
-  
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
     # loadingReady <- shiny::reactiveValues(ok = TRUE)
@@ -432,9 +431,11 @@ mod_query_data_server <- function(id, tadat) {
 
           # Show error notification to the user
           shiny::showNotification(
-            ui = tagList(htmltools::h4(htmltools::strong("Error")), 
-                         htmltools::hr(style = "margin-top: 5px; margin-bottom: 5px;"), # Adds a separator line
-                         paste(e$message)),
+            ui = tagList(
+              htmltools::h4(htmltools::strong("Error")),
+              htmltools::hr(style = "margin-top: 5px; margin-bottom: 5px;"), # Adds a separator line
+              paste(e$message)
+            ),
             type = "error",
             duration = NULL,
             id = "uploadError"
@@ -493,7 +494,7 @@ mod_query_data_server <- function(id, tadat) {
       initializeTable(tadat, raw)
 
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
-      
+
       disableLoading(session)
     })
 
@@ -925,9 +926,9 @@ mod_query_data_server <- function(id, tadat) {
       } else {
         TADA_bigsites_clean <- TADA_download_temp
       }
-      
+
       disableLoading(session)
-      
+
       # Combine the Small and Big sites
       raw <- dplyr::bind_rows(TADA_smallsites_clean, TADA_bigsites_clean)
 
@@ -974,8 +975,7 @@ mod_query_data_server <- function(id, tadat) {
       if (!is.na(tadat$load_progress_file)) {
         if (tadat$original_source == "Example") {
           shiny::updateSelectInput(session, "example_data", selected = tadat$example_data)
-        } 
-        else if (tadat$original_source == "Query") {
+        } else if (tadat$original_source == "Query") {
           shiny::updateSelectizeInput(session, "state", selected = tadat$statecode)
           shiny::updateSelectizeInput(session, "county", selected = tadat$countycode)
           shiny::updateSelectizeInput(session, "siteid", selected = tadat$siteid)
@@ -1017,8 +1017,8 @@ initializeTable <- function(tadat, raw) {
   }
 
 
-  
-  
+
+
   removals <- data.frame(matrix(nrow = nrow(raw), ncol = 0))
   tadat$raw <- raw
   tadat$removals <- removals
@@ -1028,37 +1028,41 @@ initializeTable <- function(tadat, raw) {
 }
 
 disableLoading <- function(session) {
-      # disable the button and show text telling the user to reload TADAShiny if they want to restart with new data
-      shiny::updateSelectInput(session, "example_data", choices = NULL, selected = "")
-      shinyjs::disable("example_data_go")
-      shinyjs::disable("example_data")
-      shinyjs::disable("querynow")
-      shinyjs::disable("file")
-      shinyjs::disable("progress_file")
-      shiny::insertUI(
-          selector = "#query_data_1-example_data_go", # Insert relative to the button
-          where = "afterEnd", # Place it immediately after the button
-          ui = tags$span("Reload the TADAShiny app to load new data", 
-                         style = "margin-left: 10px; color: red;")
-      )
-      shiny::insertUI(
-          selector = "#query_data_1-querynow", # Insert relative to the button
-          where = "afterEnd", # Place it immediately after the button
-          ui = tags$span("Reload the TADAShiny app to query the Water Quality Portal", 
-                         style = "margin-left: 10px; color: red;")
-      )
-      shiny::insertUI(
-        selector = "#file-upload-wrapper", # Use the wrapper div's id
-        where = "afterEnd",    # Place it immediately after the wrapper div
-        ui = tags$span("Reload the TADAShiny app to upload a new dataset",
-                       style = "margin-left: 10px; color: red;")
-      )
-      shiny::insertUI(
-          selector = "#progress-file-wrapper", # Insert relative to the button
-          where = "afterEnd",    # Place it immediately after the button
-          ui = tags$span("Reload the TADAShiny app to upload a new progress file",
-                         style = "margin-left: 10px; color: red;")
-      )
+  # disable the button and show text telling the user to reload TADAShiny if they want to restart with new data
+  shiny::updateSelectInput(session, "example_data", choices = NULL, selected = "")
+  shinyjs::disable("example_data_go")
+  shinyjs::disable("example_data")
+  shinyjs::disable("querynow")
+  shinyjs::disable("file")
+  shinyjs::disable("progress_file")
+  shiny::insertUI(
+    selector = "#query_data_1-example_data_go", # Insert relative to the button
+    where = "afterEnd", # Place it immediately after the button
+    ui = tags$span("Reload the TADAShiny app to load new data",
+      style = "margin-left: 10px; color: red;"
+    )
+  )
+  shiny::insertUI(
+    selector = "#query_data_1-querynow", # Insert relative to the button
+    where = "afterEnd", # Place it immediately after the button
+    ui = tags$span("Reload the TADAShiny app to query the Water Quality Portal",
+      style = "margin-left: 10px; color: red;"
+    )
+  )
+  shiny::insertUI(
+    selector = "#file-upload-wrapper", # Use the wrapper div's id
+    where = "afterEnd", # Place it immediately after the wrapper div
+    ui = tags$span("Reload the TADAShiny app to upload a new dataset",
+      style = "margin-left: 10px; color: red;"
+    )
+  )
+  shiny::insertUI(
+    selector = "#progress-file-wrapper", # Insert relative to the button
+    where = "afterEnd", # Place it immediately after the button
+    ui = tags$span("Reload the TADAShiny app to upload a new progress file",
+      style = "margin-left: 10px; color: red;"
+    )
+  )
 }
 
 ## To be copied in the UI

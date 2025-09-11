@@ -37,14 +37,14 @@ mod_TADA_summary_ui <- function(id) {
       htmltools::hr(),
       htmltools::h3("Download Working or Final Dataset"),
       htmltools::HTML(
-        "Download the working dataset as a .xlsx file. Original data are preserved with 
-        the original column names. This tool creates copies of any columns that are 
-        modified and adds the TADA. prefix to those. In addition, new TADA-only flag columns 
-        are added for transparency and tracking purposes. 
+        "Download the working dataset as a .xlsx file. Original data are preserved with
+        the original column names. This tool creates copies of any columns that are
+        modified and adds the TADA. prefix to those. In addition, new TADA-only flag columns
+        are added for transparency and tracking purposes.
         An overall summary <i>Remove</i> column (far right in output) is also added
-        to track decisions you make within this app to include or exclude results 
-        throughout the process. The <i>Removal Reason</i> column may also be included 
-        in this output but is only available here after running the 'Load Review Data' 
+        to track decisions you make within this app to include or exclude results
+        throughout the process. The <i>Removal Reason</i> column may also be included
+        in this output but is only available here after running the 'Load Review Data'
         button on the 'Review' tab.<br><br>"
       ),
       shiny::fluidRow(column(
@@ -103,26 +103,49 @@ mod_TADA_summary_server <- function(id, tadat) {
       }
     })
 
+    # Function to determine the download path based on OS
+    get_download_path <- function() {
+      if (.Platform$OS.type == "windows") {
+        # For Windows, get the Downloads directory from the USERPROFILE environment variable
+        return(file.path(Sys.getenv("USERPROFILE"), "Downloads"))
+      } else {
+        # For macOS/Linux, get the Downloads directory from the HOME environment variable
+        return(file.path(Sys.getenv("HOME"), "Downloads"))
+      }
+    }
+
     shiny::observeEvent(input$download_working_button, {
       tryCatch(
         {
-          tmpdir <- base::tempdir()
-          setwd(base::tempdir())
-          datafile_name <- base::paste0(tadat$default_outfile, "_working", ".xlsx")
-          progress_file_name <- base::paste0(tadat$default_outfile, "_prog.RData")
-          desc <- writeNarrativeDataFrame(tadat)
+          # Determine the path to use
+          target_path <- get_download_path()
+
+          # Prepare filenames with full paths
+          datafile_name <- file.path(target_path, paste0(tadat$default_outfile, "_working", ".xlsx"))
+          progress_file_name <- file.path(target_path, paste0(tadat$default_outfile, "_prog.RData"))
+
+          # Show progress spinner
           shinybusy::show_modal_spinner(
             spin = "double-bounce",
             color = "#0071bc",
             text = "Preparing files for download...",
             session = shiny::getDefaultReactiveDomain()
           )
+
+          # Process data
           out_data <- EPATADA::TADA_OrderCols(tadat$raw)
           summary_things$temp_files <- c(datafile_name, progress_file_name)
+          desc <- writeNarrativeDataFrame(tadat)
           dfs <- list(Data = out_data, Parameterization = desc)
+
+          # Write files
           writeFile(tadat, progress_file_name)
           writexl::write_xlsx(dfs, path = datafile_name, use_zip64 = TRUE)
+
+          # Remove progress spinner
           shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+
+          # Trigger download action
           shinyjs::click("dwn_working")
         },
         error = function(e) {
@@ -139,31 +162,43 @@ mod_TADA_summary_server <- function(id, tadat) {
     shiny::observeEvent(input$download_final_button, {
       tryCatch(
         {
-          tmpdir <- base::tempdir()
-          setwd(base::tempdir())
-          datafile_name <- base::paste0(tadat$default_outfile, "_final", ".xlsx")
-          progress_file_name <- base::paste0(tadat$default_outfile, "_prog.RData")
-          desc <- writeNarrativeDataFrame(tadat)
+          # Determine the path to use
+          target_path <- get_download_path()
+
+          # Prepare filenames with full paths
+          datafile_name <- file.path(target_path, paste0(tadat$default_outfile, "_final", ".xlsx"))
+          progress_file_name <- file.path(target_path, paste0(tadat$default_outfile, "_prog.RData"))
+
+          # Show progress spinner
           shinybusy::show_modal_spinner(
             spin = "double-bounce",
             color = "#0071bc",
             text = "Preparing files for download...",
             session = shiny::getDefaultReactiveDomain()
           )
+
+          # Process data
           out_data <- EPATADA::TADA_OrderCols(tadat$raw[!tadat$raw$TADA.Remove, ])
           summary_things$temp_files <- c(datafile_name, progress_file_name)
+          desc <- writeNarrativeDataFrame(tadat)
           dfs <- list(Data = out_data, Parameterization = desc)
+
+          # Write files
           writeFile(tadat, progress_file_name)
           writexl::write_xlsx(dfs, path = datafile_name, use_zip64 = TRUE)
+
+          # Remove progress spinner
           shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+
+          # Trigger download action
           shinyjs::click("dwn_final")
         },
         error = function(e) {
-          shiny::showNotification("Error writing output files")
+          shiny::showNotification("Error writing final files. Please submit an issue with a reproducible example: https://github.com/USEPA/TADAShiny/issues")
           print(e)
         },
         warning = function(w) {
-          shiny::showNotification("Warning writing output files")
+          shiny::showNotification("Warning writing final files. Please submit an issue with a reproducible example: https://github.com/USEPA/TADAShiny/issues")
           print(w)
         }
       )
@@ -188,9 +223,6 @@ mod_TADA_summary_server <- function(id, tadat) {
       },
       contentType = "application/zip"
     )
-
-
-
 
     # calculate the stats needed to fill the summary box
     shiny::observe({

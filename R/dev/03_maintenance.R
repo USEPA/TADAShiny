@@ -11,38 +11,40 @@
 #### CURRENT FILE: MAINTENANCE SCRIPT #######
 #############################################
 
-# Check renv lock file ----
-renv::status()
-# See `?renv::status` for advice on resolving issues
-# If you have multiple packages in an inconsistent state, we recommend
-# renv::restore(), then renv::install(), then renv::snapshot(),
-# but that also suggests you should be running status more frequently.
+# No longer using RENV, using packrat instead, see 04_deploy.R
+# # Check renv lock file ----
+# renv::status()
+# # See `?renv::status` for advice on resolving issues
+# # If you have multiple packages in an inconsistent state, we recommend
+# # renv::restore(), then renv::install(), then renv::snapshot(),
+# # but that also suggests you should be running status more frequently.
 
-# spell check
+# Spell check
 spelling::spell_check_package(
   pkg = ".",
   vignettes = TRUE
 )
-# run to update spelling word list
+# Run to update spelling word list
 spelling::get_wordlist()
 spelling::update_wordlist()
 
-# # Run styler to style code
-# # https://style.tidyverse.org/
-# # See: https://styler.r-lib.org/reference/style_pkg.html
-# # Run the following with defaults
-# library(styler)
-# styler::style_pkg()
+# Run styler to style code with default
+# https://style.tidyverse.org/
+# https://styler.r-lib.org/reference/style_pkg.html
+styler::style_pkg()
 
 ## Run checks ----
-## Check the package before sending to prod
-## Run devtools test, check and build
+# Check the package before sending to prod
+# Run devtools load_all, document, test, check and build
+devtools::load_all()
 devtools::document() # make sure all dependencies are listed in description file
-devtools::test()
-# more robust test for releases (includes broken link check)
+# This may not be working correctly
+# devtools::test()
+# More robust test for releases (includes broken link check)
 devtools::check(manual = FALSE, remote = TRUE, incoming = TRUE)
+# Not always necessary to run build
 # devtools::build()
 
-# # You're now set! ----
-# # go to dev/04_maintenance.R
+# You're now set! ----
+# Go to dev/04_maintenance.R
 rstudioapi::navigateToFile("R/dev/04_deploy.R")
