@@ -5,9 +5,12 @@
 #' @noRd
 #'
 
-# Below increases the max data upload size from the Shiny default of 5MB per file
-# to 30MB for file
+# Increase the max data upload size from the Shiny default of 5MB per file to 400MB
 options(shiny.maxRequestSize = 400 * 1024^2)
+
+# Increase the timeout duration to 3600 seconds (1 hour)
+options(shiny.timeout = 3600)
+
 options(warn = 2)
 app_server <- function(input, output, session) {
   # Your application server logic
