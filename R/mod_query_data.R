@@ -6,28 +6,17 @@
 #'
 #' @noRd
 #'
-# Load the input data
-data_path1 <- app_sys("extdata/statecodes_df.Rdata")
-load(data_path1)
 
-data_path2 <- app_sys("extdata/query_choices.Rdata")
-load(data_path2)
-
-data_path3 <- app_sys("extdata/tribal_boundary.RData")
-load(data_path3)
-
-data_path4 <- app_sys("extdata/TADA_Download_Temp.RData")
-load(data_path4)
-
-# Create a function that performs the EPATADA::TADA_DataRetrieval with purrr::possibly
-# to handle the error case when downloading tribal data
-poss_TADA_DataRetrieval <- EPATADA::TADA_DataRetrieval %>%
-  purrr::possibly(otherwise = TADA_download_temp)
-
-# Create a function that performs the dataRetrieval::whatWQPdata with purrr::possibly
-# to handle the error case
-poss_whatWQPdata <- dataRetrieval::whatWQPdata %>%
-  purrr::possibly(otherwise = NULL)
+# # commented out 9/16/25 - does not look like these are used anywhere?
+# # Create a function that performs the EPATADA::TADA_DataRetrieval with purrr::possibly
+# # to handle the error case when downloading tribal data
+# poss_TADA_DataRetrieval <- EPATADA::TADA_DataRetrieval %>%
+#   purrr::possibly(otherwise = TADA_download_temp)
+#
+# # Create a function that performs the dataRetrieval::whatWQPdata with purrr::possibly
+# # to handle the error case
+# poss_whatWQPdata <- dataRetrieval::whatWQPdata %>%
+#   purrr::possibly(otherwise = NULL)
 
 # A function to return the tribal data frame with tribal name as an sf object
 return_tribal_sf <- function(tribal_layer, tribal_name, tribal_list = tribal_list) {
@@ -38,7 +27,21 @@ return_tribal_sf <- function(tribal_layer, tribal_name, tribal_list = tribal_lis
   return(tribal_data2)
 }
 
-# new (2024-05-23) list for new Country/Ocean(s) Query the Water Quality Portal option. Not included in saved query_choices file
+# Load the input data
+data_path1 <- app_sys("extdata/statecodes_df.Rdata")
+load(data_path1)
+
+# See 03_maintenance.R to update monitoring location IDs in query_choices.Rdata
+data_path2 <- app_sys("extdata/query_choices.Rdata")
+load(data_path2)
+
+data_path3 <- app_sys("extdata/tribal_boundary.RData")
+load(data_path3)
+
+data_path4 <- app_sys("extdata/TADA_Download_Temp.RData")
+load(data_path4)
+
+# Fetch Country/Ocean(s) choice list, not included in saved query_choices file
 countrycode_url <- "https://www.waterqualitydata.us/Codes/countrycode?mimeType=json"
 countryocean_source <- jsonlite::fromJSON(txt = countrycode_url)
 countryocean_source <- countryocean_source$codes %>% dplyr::select(-one_of("providers"))
@@ -46,18 +49,48 @@ countryocean_source <- countryocean_source[order(countryocean_source$desc), ]
 countryocean_choices <- countryocean_source$value
 names(countryocean_choices) <- countryocean_source$desc
 
-# # Last run by CAM on 09/16/24
-# county = readr::read_tsv(url("https://www2.census.gov/geo/docs/reference/codes/files/national_county.txt"), col_names = FALSE)
-# county = county%>%tidyr::separate(X1,into = c("STUSAB","STATE","COUNTY","COUNTY_NAME","COUNTY_ID"), sep=",")
-# orgs = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/Organization.CSV"))$ID)
-# chars = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/Characteristic.CSV"))$Name)
-# chargroup = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/CharacteristicGroup.CSV"))$Name)
-# media = c(unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/ActivityMedia.CSV"))$Name),"water","Biological Tissue","No media")
-# # sitetype = unique(utils::read.csv(url("https://cdx.epa.gov/wqx/download/DomainValues/MonitoringLocationType.CSV"))$Name)
-# sitetype = c("Aggregate groundwater use","Aggregate surface-water-use","Aggregate water-use establishment","Atmosphere","Estuary","Facility","Glacier","Lake, Reservoir, Impoundment","Land","Not Assigned","Ocean","Spring","Stream","Subsurface","Well","Wetland")
-# projects = unique(data.table::fread("https://www.waterqualitydata.us/data/Project/search?mimeType=csv&zip=no&providers=NWIS&providers=STORET")$ProjectIdentifier)
-# mlids = unique(data.table::fread("https://www.waterqualitydata.us/data/Station/search?mimeType=csv&zip=no")$MonitoringLocationIdentifier)
-# save(orgs, chars, chargroup, media, county, sitetype, projects, mlids2, file = "inst/extdata/query_choices.Rdata")
+# Fetch Project choices
+project_url <- "https://www.waterqualitydata.us/data/Project/search?mimeType=csv&zip=no&providers=NWIS&providers=STORET"
+# Create a request object for the project data
+project_request <- httr2::request(project_url)
+# Perform the GET request and extract the content
+project_response <- project_request %>%
+  httr2::req_perform() %>%
+  httr2::resp_body_string()
+# Read the CSV content into a data table
+projects <- data.table::fread(project_response)$ProjectIdentifier
+
+# Fetch County choices
+# Beware that some of the counties are historic, see: https://github.com/DOI-USGS/dataRetrieval/issues/711
+# Using USGS counties from dataRetrieval does not resolve https://github.com/USEPA/TADAShiny/issues/231
+county <- utils::read.csv(
+  file = "https://www2.census.gov/geo/docs/reference/codes/files/national_county.txt",
+  header = FALSE,
+  col.names = c("STUSAB", "STATE", "COUNTY", "COUNTY_NAME", "COUNTY_ID")
+  )
+
+# Fetch orgs, chars, chargroup, media, sitetype choices
+orgs <- unique(utils::read.csv(url(
+      "https://cdx.epa.gov/wqx/download/DomainValues/Organization.CSV"
+    ))$ID)
+chars <- unique(utils::read.csv(url(
+      "https://cdx.epa.gov/wqx/download/DomainValues/Characteristic.CSV"
+    ))$Name)
+chargroup <- unique(utils::read.csv(url(
+      "https://cdx.epa.gov/wqx/download/DomainValues/CharacteristicGroup.CSV"
+    ))$Name)
+media <- c(
+      unique(utils::read.csv(url(
+        "https://cdx.epa.gov/wqx/download/DomainValues/ActivityMedia.CSV"
+      ))$Name),
+      "water", "Biological Tissue", "No media"
+    )
+sitetype <- c(
+      unique(utils::read.csv(url(
+        "https://cdx.epa.gov/wqx/download/DomainValues/MonitoringLocationType.CSV"
+      ))$Name),
+      "Glacier", "Aggregate water-use establishment", "Not Assigned", "Subsurface"
+      )
 
 mod_query_data_ui <- function(id) {
   ns <- NS(id)
@@ -322,7 +355,6 @@ mod_query_data_ui <- function(id) {
 mod_query_data_server <- function(id, tadat) {
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
-    # loadingReady <- shiny::reactiveValues(ok = TRUE)
 
     # Call the bbox map module and capture its return value
     bbox_data <- mod_map_bboxServer("BBox_map")
@@ -535,7 +567,7 @@ mod_query_data_server <- function(id, tadat) {
     shiny::updateSelectizeInput(
       session,
       "siteid",
-      choices = c(mlids2),
+      choices = c(mlids),
       options = list(placeholder = "Start typing or use drop down menu"),
       server = TRUE
     )
@@ -1015,9 +1047,6 @@ initializeTable <- function(tadat, raw) {
     # Set flagging column to FALSE
     raw$TADA.Remove <- FALSE
   }
-
-
-
 
   removals <- data.frame(matrix(nrow = nrow(raw), ncol = 0))
   tadat$raw <- raw
