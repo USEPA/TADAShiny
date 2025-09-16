@@ -48,10 +48,10 @@ Imports:
     httr,
     jsonlite,
     data.table,
-    stats
-Suggests:
+    stats,
     pkgload,
-    config,
+    config
+Suggests:
     covr,
     devtools,
     knitr,
