@@ -41,90 +41,56 @@ load(data_path3)
 data_path4 <- app_sys("extdata/TADA_Download_Temp.RData")
 load(data_path4)
 
-# Fetch Country/Ocean(s) data
-tryCatch(
-  {
-    countrycode_url <- "https://www.waterqualitydata.us/Codes/countrycode?mimeType=json"
-    response <- httr::GET(countrycode_url)
-    httr::stop_for_status(response)
-    countryocean_source <- httr::content(response, as = "text", encoding = "UTF-8")
-    countryocean_data <- jsonlite::fromJSON(countryocean_source)$codes
+# Fetch Country/Ocean(s) choice list, not included in saved query_choices file
+countrycode_url <- "https://www.waterqualitydata.us/Codes/countrycode?mimeType=json"
+countryocean_source <- jsonlite::fromJSON(txt = countrycode_url)
+countryocean_source <- countryocean_source$codes %>% dplyr::select(-one_of("providers"))
+countryocean_source <- countryocean_source[order(countryocean_source$desc), ]
+countryocean_choices <- countryocean_source$value
+names(countryocean_choices) <- countryocean_source$desc
 
-    # Convert the named vector to a named list
-    countryocean_choices <- stats::setNames(
-      as.list(countryocean_data$value),
-      countryocean_data$desc
-    )
-  },
-  error = function(e) {
-    message("Error fetching WQP country/ocean query filter options: ", e$message)
-    countryocean_choices <- NULL
-  }
-)
+# Fetch Project choices
+project_url <- "https://www.waterqualitydata.us/data/Project/search?mimeType=csv&zip=no&providers=NWIS&providers=STORET"
+# Create a request object for the project data
+project_request <- httr2::request(project_url)
+# Perform the GET request and extract the content
+project_response <- project_request %>%
+  httr2::req_perform() %>%
+  httr2::resp_body_string()
+# Read the CSV content into a data table
+projects <- data.table::fread(project_response)$ProjectIdentifier
 
-# Fetch Project data
-tryCatch(
-  {
-    project_url <- "https://www.waterqualitydata.us/data/Project/search?mimeType=csv&zip=no&providers=NWIS&providers=STORET"
-    response <- httr::GET(project_url)
-    httr::stop_for_status(response)
-    project_data <- httr::content(response, as = "text", encoding = "UTF-8")
-    projects <- data.table::fread(project_data)$ProjectIdentifier
-    unique_projects <- unique(projects)
-  },
-  error = function(e) {
-    message("Error fetching WQP projects: ", e$message)
-    unique_projects <- NULL
-  }
-)
-
-# Fetch County data
+# Fetch County choices
 # Beware that some of the counties are historic, see: https://github.com/DOI-USGS/dataRetrieval/issues/711
 # Using USGS counties from dataRetrieval does not resolve https://github.com/USEPA/TADAShiny/issues/231
-tryCatch(
-  {
-    county <- utils::read.csv(
-      file = "https://www2.census.gov/geo/docs/reference/codes/files/national_county.txt",
-      header = FALSE,
-      col.names = c("STUSAB", "STATE", "COUNTY", "COUNTY_NAME", "COUNTY_ID")
-    )
-  },
-  error = function(e) {
-    message("Error fetching WQP county query filter options: ", e$message)
-    county <- NULL
-  }
-)
+county <- utils::read.csv(
+  file = "https://www2.census.gov/geo/docs/reference/codes/files/national_county.txt",
+  header = FALSE,
+  col.names = c("STUSAB", "STATE", "COUNTY", "COUNTY_NAME", "COUNTY_ID")
+  )
 
-# Fetch orgs, chars, chargroup, media, sitetype
-tryCatch(
-  {
-    orgs <- unique(utils::read.csv(url(
+# Fetch orgs, chars, chargroup, media, sitetype choices
+orgs <- unique(utils::read.csv(url(
       "https://cdx.epa.gov/wqx/download/DomainValues/Organization.CSV"
     ))$ID)
-    chars <- unique(utils::read.csv(url(
+chars <- unique(utils::read.csv(url(
       "https://cdx.epa.gov/wqx/download/DomainValues/Characteristic.CSV"
     ))$Name)
-    chargroup <- unique(utils::read.csv(url(
+chargroup <- unique(utils::read.csv(url(
       "https://cdx.epa.gov/wqx/download/DomainValues/CharacteristicGroup.CSV"
     ))$Name)
-    media <- c(
+media <- c(
       unique(utils::read.csv(url(
         "https://cdx.epa.gov/wqx/download/DomainValues/ActivityMedia.CSV"
       ))$Name),
       "water", "Biological Tissue", "No media"
     )
-    sitetype <- c(
+sitetype <- c(
       unique(utils::read.csv(url(
         "https://cdx.epa.gov/wqx/download/DomainValues/MonitoringLocationType.CSV"
       ))$Name),
       "Glacier", "Aggregate water-use establishment", "Not Assigned", "Subsurface"
-    )
-  },
-  error = function(e) {
-    message("Error fetching WQP query filter options: ", e$message)
-    orgs <- chars <- chargroup <- media <- sitetype <- NULL
-  }
-)
+      )
 
 mod_query_data_ui <- function(id) {
   ns <- NS(id)
