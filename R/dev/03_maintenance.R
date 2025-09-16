@@ -20,30 +20,21 @@
 # # but that also suggests you should be running status more frequently.
 
 ##############
-# Update extdata/query_choices.Rdata for WQP ML drop down mod_query_data.R
 
+# Update extdata/query_choices.Rdata for WQP ML drop down mod_query_data.R
 # Define the URL of the web service
 url <- "https://www.waterqualitydata.us/data/Station/search?mimeType=csv&zip=no"
-
 # Use httr::GET to make a GET request to the web service
 response <- httr::GET(url)
+# Use httr::content to parse the CSV content from the response
+csv_content <- httr::content(response, "text")
+# Use base::read.csv to read the CSV content into a data frame
+data <- read.csv(text = csv_content, stringsAsFactors = FALSE)
+# Extract unique monitoring location identifiers
+mlids <- unique(data$MonitoringLocationIdentifier)
+# Save the unique monitoring location identifiers
+save(mlids, file = "inst/extdata/query_choices.Rdata")
 
-# Check if the request was successful
-if (httr::status_code(response) == 200) {
-  # Use httr::content to parse the CSV content from the response
-  csv_content <- httr::content(response, "text")
-  # Use base::read.csv to read the CSV content into a data frame
-  data <- read.csv(text = csv_content, stringsAsFactors = FALSE)
-  # Use base::head to display the first few rows of the data
-  print(head(data))
-  # Extract unique monitoring location identifiers
-  mlids <- unique(data$MonitoringLocationIdentifier)
-  # Save the unique monitoring location identifiers
-  save(mlids, file = "inst/extdata/query_choices.Rdata")
-} else {
-  # Use base::print to print an error message if the request was not successful
-  print(paste("Error:", httr::status_code(response)))
-}
 ##############
 
 # Spell check
