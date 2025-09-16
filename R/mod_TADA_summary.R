@@ -107,11 +107,11 @@ mod_TADA_summary_server <- function(id, tadat) {
           # Use tempdir() for a safe temporary file path
           tmpdir <- base::tempdir()
           setwd(base::tempdir())
-          
+
           # Prepare filenames with full paths
           datafile_name <- base::paste0(tadat$default_outfile, "_working", ".xlsx")
           progress_file_name <- base::paste0(tadat$default_outfile, "_prog.RData")
-          
+
           # Show progress spinner
           shinybusy::show_modal_spinner(
             spin = "double-bounce",
@@ -132,7 +132,7 @@ mod_TADA_summary_server <- function(id, tadat) {
 
           # Remove progress spinner
           shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
-          
+
           # Trigger download action
           shinyjs::click("dwn_working")
         },
@@ -153,11 +153,11 @@ mod_TADA_summary_server <- function(id, tadat) {
           # Use tempdir() for a safe temporary file path
           tmpdir <- base::tempdir()
           setwd(base::tempdir())
-          
+
           # Prepare filenames with full paths
           datafile_name <- base::paste0(tadat$default_outfile, "_final", ".xlsx")
           progress_file_name <- base::paste0(tadat$default_outfile, "_prog.RData")
-          
+
           shinybusy::show_modal_spinner(
             spin = "double-bounce",
             color = "#0071bc",
