@@ -44,7 +44,11 @@ Imports:
     utils,
     writexl,
     stringr,
-    dataRetrieval (>= 2.7.21)
+    dataRetrieval (>= 2.7.21),
+    httr,
+    jsonlite,
+    data.table,
+    stats
 Suggests:
     pkgload,
     config,
@@ -57,9 +61,7 @@ Suggests:
     roxygen2,
     rsconnect,
     rstudioapi,
-    renv,
-    jsonlite,
-    data.table
+    renv
 Remotes:
     USEPA/EPATADA@develop
 Depends: 
