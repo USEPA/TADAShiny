@@ -12,11 +12,35 @@ options(shiny.maxRequestSize = 400 * 1024^2)
 options(shiny.timeout = 3600)
 
 options(warn = 2)
+
 app_server <- function(input, output, session) {
-  # Your application server logic
-  tadat <- shiny::reactiveValues() # create a list object that holds reactive values passed between modules
+  # Create a reactiveValues object to hold shared data between modules
+  tadat <- shiny::reactiveValues()
+  
+  # Initialize reactive values
+  shiny::observeEvent(tadat$raw, {
+    if (!is.null(tadat$raw) && is.null(tadat$removals)) {
+      # Initialize removals with the same number of rows as raw data, all FALSE
+      tadat$removals <- data.frame(matrix(FALSE, nrow = nrow(tadat$raw), ncol = 0))
+    }
+  })
+  
+  # Update the master 'Remove' column anytime data is added to the 'removals' table
+  shiny::observeEvent(tadat$removals, {
+    if (dim(tadat$removals)[2] > 0) {
+      # Ensure tadat$removals contains logical (TRUE/FALSE) values for each record
+      tadat$raw$TADA.Remove <- apply(tadat$removals, 1, any)
+      # # Debugging: Print the removals table and the resulting TADA.Remove column
+      # print("Removals Table:")
+      # print(tadat$removals)
+      # print("Updated TADA.Remove:")
+      # print(tadat$raw$TADA.Remove)
+    }
+  })
+  
+  # Module server calls
   mod_filtering_server("filtering_1", tadat)
-  mod_query_data_server("query_data_1", tadat) # server call to the module servers with the name of the module and any dependencies (this one uses the tadat reactive values object)
+  mod_query_data_server("query_data_1", tadat)
   mod_data_flagging_server("data_flagging_1", tadat)
   mod_summary_server("summary_1", tadat)
   mod_overview_server("overview_1", tadat)
@@ -25,8 +49,8 @@ app_server <- function(input, output, session) {
   mod_review_data_server("review_data_1", tadat)
   mod_figures_server("figures_1", tadat)
   mod_TADA_summary_server("TADA_summary_1", tadat)
-
-  # this ensures all tabs except Upload are disabled upon app start
+  
+  # Disable all tabs except Upload upon app start
   shinyjs::disable(selector = '.nav li a[data-value="Overview"]')
   shinyjs::disable(selector = '.nav li a[data-value="Flag"]')
   shinyjs::disable(selector = '.nav li a[data-value="Filter"]')
@@ -34,17 +58,16 @@ app_server <- function(input, output, session) {
   shinyjs::disable(selector = '.nav li a[data-value="Harmonize"]')
   shinyjs::disable(selector = '.nav li a[data-value="Figures"]')
   shinyjs::disable(selector = '.nav li a[data-value="Review"]')
-
-  # switch that indicates when a file is being loaded
+  
+  # Initialize other reactive values and configurations
   tadat$load_progress_file <- NA
   tadat$save_progress_file <- NA
   tadat$flags_present <- FALSE
   job_id <- base::paste0("ts", format(Sys.time(), "%y%m%d%H%M%S"))
   tadat$default_outfile <- base::paste0("tada_output_", job_id)
   tadat$job_id <- job_id
-
-  # switch to overview tab when tadat$new changes and provide user with window letting them know how many records were automatically flagged for removal upon upload
-  # move this to query_data?
+  
+  # Switch to overview tab when tadat$new changes and show a modal dialog
   shiny::observeEvent(tadat$new, {
     shiny::showModal(shiny::modalDialog(
       title = "Data Loaded",
@@ -60,14 +83,7 @@ app_server <- function(input, output, session) {
     shiny::updateTabsetPanel(session = session, inputId = "tabbar", selected = "Overview")
     tadat$new <- NULL
   })
-
-  # update the master 'Remove' column anytime data is added to the 'remove' table
-  shiny::observeEvent(tadat$removals, {
-    if (dim(tadat$removals)[2] > 0) {
-      tadat$raw$TADA.Remove <- apply(tadat$removals, 1, any)
-    }
-  })
-
+  
   shiny::observe({
     tadat$tab <- input$tabbar
   })
