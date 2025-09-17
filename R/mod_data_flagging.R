@@ -9,6 +9,14 @@
 mod_data_flagging_ui <- function(id) {
   ns <- NS(id)
   tagList(
+    # Add CSS directly in the UI module to disable interaction for required switches
+    tags$style(HTML("
+      .disabled-switch {
+        pointer-events: none; /* Disable mouse events */
+        opacity: 0.5; /* Make it visually clear it's disabled */
+      }
+    ")),
+    
     tags$div(
       style = "display: none;",
       shinyWidgets::prettySwitch("dummy", label = NULL)
@@ -21,8 +29,8 @@ mod_data_flagging_ui <- function(id) {
     shiny::fluidRow(column(
       3,
       shiny::actionButton(ns("runFlags"),
-        "Run Tests",
-        style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
+                          "Run Tests",
+                          style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
       )
     )),
     htmltools::div(style = "margin-bottom:10px"),
@@ -54,7 +62,8 @@ mod_data_flagging_server <- function(id, tadat) {
     tadat$selected_flags <- character()
     tadat$switch_defaults <- prompt_table$Level != "Optional"
     switch_disabled <- prompt_table$Level == "Required"
-
+    
+    # Function to create toggle switches for each flag
     flagSwitch <- function(len) {
       inputs <- character(len)
       for (i in seq_len(len)) {
@@ -70,12 +79,23 @@ mod_data_flagging_server <- function(id, tadat) {
             )
           )
         } else {
-          inputs[i] <- "n/a"
+          inputs[i] <- as.character(
+            shinyWidgets::prettySwitch(
+              ns(switch_name),
+              label = NULL,
+              value = TRUE, # Required flags are always TRUE
+              status = "primary",
+              fill = TRUE
+            )
+          )
+          # Use JavaScript to add a CSS class that disables interaction
+          shinyjs::runjs(sprintf("$('#%s').addClass('disabled-switch');", ns(switch_name)))
         }
       }
       inputs
     }
-
+    
+    # Function to get the current state of each switch
     shinyValue <- function(id, len) {
       unlist(lapply(seq_len(len), function(i) {
         value <- input[[base::paste0(id, i)]]
@@ -86,7 +106,32 @@ mod_data_flagging_server <- function(id, tadat) {
         }
       }))
     }
-
+    
+    # Update removals based on the state of the switches
+    shiny::observe({
+      switch_id <- "switch_"
+      tadat$selected_flags <- flag_types[shinyValue(switch_id, n_switches)]
+      
+      # Ensure tadat$raw is not NULL
+      shiny::req(tadat$raw)
+      
+      # Initialize or clear removals for each flag
+      for (i in seq_len(n_switches)) {
+        flag <- flag_types[i]
+        switch_name <- base::paste0(switch_id, i)
+        
+        if (!is.null(input[[switch_name]])) {
+          if (input[[switch_name]]) {
+            # If the switch is on, update removals with the test results
+            tadat$removals[[flag]] <- values$testResults[[flag]]
+          } else {
+            # If the switch is off, set removals for this flag to FALSE
+            tadat$removals[[flag]] <- rep(FALSE, nrow(tadat$raw))
+          }
+        }
+      }
+    })
+    
     # Runs whenever selected flags are changed
     shiny::observeEvent(tadat$selected_flags, {
       if (!is.null(tadat$removals)) {
@@ -100,26 +145,16 @@ mod_data_flagging_server <- function(id, tadat) {
         # If not all the values are NA, add the test results to removals
         if (!is.null(tadat$removals)) {
           if (!all(is.na(values$testResults[flag]))) {
-            # Problem here?
             tadat$removals[base::paste0(flag_prefix, flag)] <- values$testResults[flag]
           }
         }
-        # If the switch corresponding to this flag isn't on, switch it on
-        # Checking a random switch to make sure they've been initialized
         pos <- match(flag, flag_types)
-        # # testing
-        # print(111)
-        # print(flag)
-        # print(prompts)
-        # print(pos)
-        # print(tadat$switch_defaults[pos])
         tadat$switch_defaults[pos] <- TRUE
         if (!is.null(input[[base::paste0("switch_", pos)]])) {
           switch_name <- base::paste0("switch_", pos)
           if (is.na(pos)) {
             invalidFile("flagging")
           } else if (!isTRUE(input[[switch_name]])) {
-            # Turn the switch on if it isn't already
             shinyWidgets::updatePrettySwitch(
               inputId = switch_name,
               value = TRUE
@@ -128,21 +163,17 @@ mod_data_flagging_server <- function(id, tadat) {
         }
       }
     })
-
+    
     # Any time tadat$raw is changed, check to see if the flagging fields are present
     shiny::observeEvent(tadat$raw, {
       tadat$flags_present <- checkFlagColumns(tadat$raw)
     })
-
+    
     shiny::observeEvent(tadat$flags_present, {
       if (tadat$flags_present) {
-        # A table (raw rows, flags) indicating whether each record passes each test
         values$testResults <- flagCensus(tadat$raw)
-
-        # The number of records failing each test
         values$n_fails <- colSums(values$testResults)
-
-        # Runs when any of the flag switches are changed
+        
         shiny::observe({
           switch_id <- "switch_"
           tadat$selected_flags <- flag_types[shinyValue(switch_id, n_switches)]
@@ -150,7 +181,7 @@ mod_data_flagging_server <- function(id, tadat) {
             shinyjs::disable(base::paste0(switch_id, i))
           }
         })
-
+        
         switchTable <- shiny::reactive({
           df <- data.frame(
             Reason = prompts,
@@ -159,7 +190,7 @@ mod_data_flagging_server <- function(id, tadat) {
             Decision = flagSwitch(n_switches)
           )
         })
-
+        
         output$flagTable <- DT::renderDT(
           shiny::isolate(switchTable()),
           escape = FALSE,
@@ -174,7 +205,7 @@ mod_data_flagging_server <- function(id, tadat) {
           options = list(
             dom = "t",
             paging = FALSE,
-            ordering = TRUE, # this adds ordering to the DT
+            ordering = TRUE,
             preDrawCallback = DT::JS(
               "function() { Shiny.unbindAll(this.api().table().node()); }"
             ),
@@ -183,7 +214,7 @@ mod_data_flagging_server <- function(id, tadat) {
             )
           )
         )
-
+        
         shinyjs::enable(selector = '.nav li a[data-value="Filter"]')
         shinyjs::enable(selector = '.nav li a[data-value="Censored"]')
         shinyjs::enable(selector = '.nav li a[data-value="Harmonize"]')
@@ -191,8 +222,7 @@ mod_data_flagging_server <- function(id, tadat) {
         shinyjs::enable(selector = '.nav li a[data-value="Review"]')
       }
     })
-
-    # Runs when the flag button (tab 3. Flag, button 'Run Tests') is clicked
+    
     shiny::observeEvent(input$runFlags, {
       shinybusy::show_modal_spinner(
         spin = "double-bounce",
@@ -200,22 +230,15 @@ mod_data_flagging_server <- function(id, tadat) {
         text = "Running flagging functions...",
         session = shiny::getDefaultReactiveDomain()
       )
-
-      # Add flagging columns to raw table, make sure line below is
-      # not commented out once done with testing
+      
       tadat$raw <- applyFlags(tadat$raw, tadat$orgs)
-
-      # utils::write.csv(tadat$raw, "flagged.csv") # FOR TESTING
-      # tadat$raw = utils::read.csv("flagged.csv") # FOR TESTING
-
-      # Remove progress bar and display instructions
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
     })
-
+    
     shiny::observeEvent(tadat$m2f, {
       shiny::updateRadioButtons(session, "m2f", selected = tadat$m2f)
     })
-
+    
     shiny::observeEvent(input$m2f, {
       tadat$m2f <- input$m2f
       shiny::req(tadat$raw)
@@ -226,8 +249,7 @@ mod_data_flagging_server <- function(id, tadat) {
           text = "Converting depth units to feet...",
           session = shiny::getDefaultReactiveDomain()
         )
-        tadat$raw <-
-          EPATADA::TADA_ConvertDepthUnits(tadat$raw, unit = "ft")
+        tadat$raw <- EPATADA::TADA_ConvertDepthUnits(tadat$raw, unit = "ft")
       }
       if (input$m2f == "inches") {
         shinybusy::show_modal_spinner(
@@ -236,9 +258,7 @@ mod_data_flagging_server <- function(id, tadat) {
           text = "Converting depth units to inches...",
           session = shiny::getDefaultReactiveDomain()
         )
-
-        tadat$raw <-
-          EPATADA::TADA_ConvertDepthUnits(tadat$raw, unit = "in")
+        tadat$raw <- EPATADA::TADA_ConvertDepthUnits(tadat$raw, unit = "in")
       }
       if (input$m2f == "meters") {
         shinybusy::show_modal_spinner(
@@ -247,8 +267,7 @@ mod_data_flagging_server <- function(id, tadat) {
           text = "Converting depth units to meters...",
           session = shiny::getDefaultReactiveDomain()
         )
-        tadat$raw <-
-          EPATADA::TADA_ConvertDepthUnits(tadat$raw, unit = "m")
+        tadat$raw <- EPATADA::TADA_ConvertDepthUnits(tadat$raw, unit = "m")
       }
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
     })
