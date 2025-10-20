@@ -73,9 +73,14 @@ county <- utils::read.csv(
 orgs <- unique(utils::read.csv(url(
       "https://cdx.epa.gov/wqx/download/DomainValues/Organization.CSV"
     ))$ID)
-chars <- unique(utils::read.csv(url(
+
+characteristic_list <- unique(utils::read.csv(url(
       "https://cdx.epa.gov/wqx/download/DomainValues/Characteristic.CSV"
     ))$Name)
+# # this could be loaded from a local file in much less time
+# characteristic_table <- utils::read.csv("inst/Characteristic.CSV")
+# characteristic_list <- characteristic_table$Name
+
 chargroup <- unique(utils::read.csv(url(
       "https://cdx.epa.gov/wqx/download/DomainValues/CharacteristicGroup.CSV"
     ))$Name)
@@ -83,7 +88,8 @@ media <- c(
       unique(utils::read.csv(url(
         "https://cdx.epa.gov/wqx/download/DomainValues/ActivityMedia.CSV"
       ))$Name),
-      "water", "Biological Tissue", "No media"
+      # removed "water" and added code below to insert it as needed
+      "Biological Tissue", "No media"
     )
 sitetype <- c(
       unique(utils::read.csv(url(
@@ -91,9 +97,17 @@ sitetype <- c(
       ))$Name),
       "Glacier", "Aggregate water-use establishment", "Not Assigned", "Subsurface"
       )
+# these are the types of text matches used in searching the Characteristic(s) list
+match_types <- c(
+  "Starts With" = 'starts_with',
+  "Ends With" = 'ends_with',
+  "Contains" = 'contains',
+  "Equals" = 'matches'
+)
 
 mod_query_data_ui <- function(id) {
   ns <- NS(id)
+  
   tagList(
     shiny::fluidRow(
       htmltools::h3("Option A: Use example data"),
@@ -240,18 +254,33 @@ mod_query_data_ui <- function(id) {
             )
           ),
           choices = c("", media),
-          selected = c("Water", "water"),
+          selected = c("Water"), # "water" gets added automatically if Water is included.  This is for older USGS data
           multiple = TRUE
         )
       ),
       column(
         4,
-        shiny::selectizeInput(
-          ns("characteristic"),
-          "Characteristic(s)",
-          choices = NULL,
-          options = list(placeholder = "Start typing or use drop down menu"),
-          multiple = TRUE
+        shiny::fluidRow( # this is what allows both widgets to be side-by-side
+          column(width = 4,
+           shiny::selectizeInput(
+              inputId = ns("match_type_select"),
+              label = "Match type:",
+              choices = match_types, # Choices are populated on client
+              selected = 'contains',
+              multiple = FALSE
+            )
+           ),
+          column(width = 8,
+            shiny::selectizeInput(
+              ns("characteristic_select"),
+              "Characteristic(s)",
+              choices = NULL,
+              options = list(
+                  placeholder = "Start typing or use drop down menu"
+              ),
+              multiple = TRUE
+            )
+          )
         )
       ),
       column(
@@ -353,7 +382,9 @@ mod_query_data_ui <- function(id) {
 #'
 #' @noRd
 mod_query_data_server <- function(id, tadat) {
+
   shiny::moduleServer(id, function(input, output, session) {
+
     ns <- session$ns
 
     # Call the bbox map module and capture its return value
@@ -553,11 +584,27 @@ mod_query_data_server <- function(id, tadat) {
       options = list(placeholder = "Start typing or use drop down menu"),
       server = TRUE
     )
-    shiny::updateSelectizeInput(session,
-      "characteristic",
-      choices = c(chars),
+    
+    # this has custom code to allow starts_with(), ends_with(), contains(), and match() filtering
+    # browser()
+    # Set up server-side selectize
+    shiny::updateSelectizeInput(
+      session,
+      "characteristic_select",
+      choices = characteristic_list,
+
+      # there is a more robust way to get the module Id required in setInputValue()
+      # but I wasted time trying to get it working. This does work here.
+      options = list(
+        searchField = "value",
+        onType = I('
+             text => Shiny.setInputValue("query_data_1-characteristic_select_search", text)
+          ')
+      ),
       server = TRUE
     )
+    
+    
     shiny::updateSelectizeInput(session,
       "project",
       choices = c(projects),
@@ -620,6 +667,59 @@ mod_query_data_server <- function(id, tadat) {
       )
     })
 
+    # reset the server-size selectize when 'Match type' changes
+    shiny::observeEvent(input$match_type_select, {
+      shiny::updateSelectizeInput(
+        session = session,
+        inputId = "characteristic_select",
+        choices = characteristic_list,
+        server = TRUE
+      )
+    }, ignoreInit = TRUE)
+  
+  # Reactive observer to listen for changes in the selectize input text string
+  shiny::observeEvent(input$characteristic_select_search, {
+
+    query <- input$characteristic_select_search
+
+    if (nchar(query) > 0) {
+          match_type <- 'contains'
+          if (input$match_type_select != '') {
+            match_type <- input$match_type_select
+          }
+          # set the grep pattern for each match type
+          if (match_type == 'starts_with') {
+            grep_pattern <- paste0("^", query)
+          }
+          else if (match_type == 'ends_with') {
+            grep_pattern <- paste0(query, "$")
+          }
+          else if (match_type == 'matches') {
+            grep_pattern <- paste0("^", query, "$")
+          }
+          else { # contains
+            grep_pattern <- query
+          }
+          filtered_characteristics <- characteristic_list[grep(
+            grep_pattern,
+            characteristic_list,
+            ignore.case = TRUE
+          )]
+    } 
+    else {
+      filtered_characteristics <- characteristic_list
+    }
+
+    shiny::updateSelectizeInput(
+      session = session,
+      inputId = "characteristic_select",
+      choices = filtered_characteristics,
+      server = TRUE
+    )
+  })
+    
+    
+    
     # remove the modal once the dataset has been pulled
     shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
 
@@ -669,15 +769,24 @@ mod_query_data_server <- function(id, tadat) {
       } else {
         tadat$characteristicType <- input$chargroup
       }
-      if (is.null(input$characteristic)) {
+      
+      # changed the name of the input$ variable here
+      if (is.null(input$characteristic_select)) {
         tadat$characteristicName <- "null"
       } else {
-        tadat$characteristicName <- input$characteristic
+        tadat$characteristicName <- input$characteristic_select
       }
+      
       if (is.null(input$media)) {
         tadat$sampleMedia <- "null"
       } else {
         tadat$sampleMedia <- input$media
+        
+        # "If 'Water' found in input$media then add 'water' to tadat$sampleMedia
+        # this is used for some older USGS data only
+        if (sum(grep('Water', input$media)) > 0) {
+          tadat$sampleMedia <- append(tadat$sampleMedia, 'water')
+        }
       }
       if (is.null(input$project)) {
         tadat$project <- "null"
@@ -768,8 +877,53 @@ mod_query_data_server <- function(id, tadat) {
         bBox = bbox_reactive()
       )
 
-      # Get the data summary
-      result_summary <- dataRetrieval::whatWQPdata(args_temp)
+      # added a tryCatch() to prevent ad-hoc WQX 500 errors while downloading data
+      
+      success <- FALSE # Flag to track if the process completes successfully
+            
+      tryCatch(
+        {
+          # Temporarily treat warnings as errors
+          old_warn <- options("warn")
+          options(warn = 2)
+
+          # Get the data summary
+          result_summary <- dataRetrieval::whatWQPdata(args_temp)
+
+          success <- TRUE # Set flag to true if all operations succeed
+
+          # Restore warning options
+          options(old_warn)
+        },
+        error = function(e) {
+          # Restore warning options in case of error
+          options(old_warn)
+
+          # Log error details for debugging
+          cat("Error: ", e$message, "\n")
+
+          # Show error notification to the user
+          shiny::showNotification(
+            ui = tagList(
+              htmltools::h4(htmltools::strong("WQP Error")),
+              htmltools::hr(style = "margin-top: 5px; margin-bottom: 5px;"), # Adds a separator line
+              paste(e$message),
+              paste("An error occurred while querying the Water Quality Portal.  Check your filter values and try again.")
+            ),
+            type = "error",
+            duration = NULL,
+            id = "uploadError"
+          )
+        }
+      )
+
+      # Ensure spinner is removed regardless of success or error
+      shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+      # end new
+      if (success == FALSE) {
+        return()
+      }
+      
 
       # Check if anything is outside the tribal's shapefile boundary
       if (inherits(tadat$tribal_boundary, "sf")) {
@@ -1012,7 +1166,7 @@ mod_query_data_server <- function(id, tadat) {
           shiny::updateSelectizeInput(session, "county", selected = tadat$countycode)
           shiny::updateSelectizeInput(session, "siteid", selected = tadat$siteid)
           shiny::updateSelectizeInput(session, "type", selected = tadat$siteType)
-          shiny::updateSelectizeInput(session, "characteristic", selected = tadat$characteristicName)
+          shiny::updateSelectizeInput(session, "characteristic_select", selected = tadat$characteristicName)
           shiny::updateSelectizeInput(session, "chargroup", selected = tadat$characteristicType)
           shiny::updateSelectizeInput(session, "media", selected = tadat$sampleMedia)
           shiny::updateSelectizeInput(session, "project", selected = tadat$project)

@@ -20,3 +20,8 @@
 _snaps
 .Ruserdata
 .vscode/
+tests/match_types.R
+inst/Characteristic.CSV
+tests/Characteristic.CSV
+tests/states.R
+tests/fruits.R
