@@ -20,12 +20,12 @@ mod_map_bboxServer <- function(id) {
     ns <- session$ns
 
     # Initialize reactive values FIRST
-    bbox_reVal <- shiny::reactiveValues(bbox = NULL)
+    bbox_reVal <- shiny::reactiveValues(bBox = NULL)
 
     # Render base map
     output$map_bbox <- leaflet::renderLeaflet({
       # Create the map
-      m <- leaflet::leaflet() %>%
+      m <- leaflet::leaflet() |>
         leaflet.extras::addDrawToolbar(
           targetGroup = "drawn_items",
           polylineOptions = FALSE,
@@ -33,10 +33,14 @@ mod_map_bboxServer <- function(id) {
           markerOptions = FALSE,
           circleMarkerOptions = FALSE,
           polygonOptions = FALSE,
-          rectangleOptions = leaflet.extras::drawRectangleOptions(),
+          rectangleOptions = leaflet.extras::drawRectangleOptions(
+            shapeOptions = leaflet.extras::drawShapeOptions(),
+            showArea = FALSE
+          ),
           singleFeature = TRUE
-        ) %>%
-        add_USGS_base() %>%
+        ) |>
+        leafem::addMouseCoordinates() |>
+        add_USGS_base() |>
         leaflet::setView(lng = -114, lat = 42, zoom = 3)
 
       return(m)
@@ -46,16 +50,16 @@ mod_map_bboxServer <- function(id) {
     shiny::observeEvent(input$clear_map, {
       proxy <- leaflet::leafletProxy("map_bbox", session = session)
       # remove both the toolbar and any drawn features
-      proxy %>% leaflet.extras::removeDrawToolbar(clearFeatures = TRUE)
+      proxy |> leaflet.extras::removeDrawToolbar(clearFeatures = TRUE)
       # immediately re-add the toolbar so the user can draw again
-      proxy %>% leaflet.extras::addDrawToolbar(
+      proxy |> leaflet.extras::addDrawToolbar(
         targetGroup = "drawn_items",
         polylineOptions = FALSE,
         polygonOptions = FALSE,
         circleOptions = FALSE,
         markerOptions = FALSE,
         circleMarkerOptions = FALSE,
-        rectangleOptions = leaflet.extras::drawRectangleOptions(),
+        rectangleOptions = leaflet.extras2::drawRectangleOptions(),
         singleFeature = TRUE
       )
       bbox_reVal$bBox <- NULL
