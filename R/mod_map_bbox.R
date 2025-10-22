@@ -59,7 +59,7 @@ mod_map_bboxServer <- function(id) {
         circleOptions = FALSE,
         markerOptions = FALSE,
         circleMarkerOptions = FALSE,
-        rectangleOptions = leaflet.extras2::drawRectangleOptions(),
+        rectangleOptions = leaflet.extras::drawRectangleOptions(),
         singleFeature = TRUE
       )
       bbox_reVal$bBox <- NULL
