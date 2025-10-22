@@ -10,8 +10,77 @@
 mod_map_bboxUI <- function(id, label = "Clear Drawing") {
   ns <- NS(id)
   tagList(
-    leaflet::leafletOutput(ns("map_bbox")),
-    shiny::actionButton(inputId = ns("clear_map"), label = label)
+    fluidRow(
+      column(width = 6,
+             leaflet::leafletOutput(ns("map_bbox"))
+      ),
+      # Bounding box inputs on the right (takes 4 columns)
+      column(
+        width = 6,
+        h4("Bounding Box Latitude and Longitude"),
+        
+        fluidRow(
+          column(
+            width = 3,
+            br(),
+            br(),
+            # West coordinate
+            numericInput(
+              inputId = ns("bb_W"),
+              label = "West:",
+              value = NULL,
+              min = -180,
+              max = 180,
+              step = 0.00001
+            )
+          ),
+          column(
+            width = 3,
+            # North coordinate
+            numericInput(
+              inputId = ns("bb_N"),
+              label = "North:",
+              value = NULL,
+              min = -90,
+              max = 90,
+              step = 0.00001
+            ),
+            br(),
+            br(),
+            # South coordinate
+            numericInput(
+              inputId = ns("bb_S"),
+              label = "South:",
+              value = NULL,
+              min = -90,
+              max = 90,
+              step = 0.00001
+            )
+          ),
+          column(
+            width = 3,
+            br(),
+            br(),
+            # East coordinate
+            numericInput(
+              inputId = ns("bb_E"),
+              label = "East:",
+              value = NULL,
+              min = -180,
+              max = 180,
+              step = 0.00001
+            )
+          )
+        ),
+        # Clear button
+        br(),
+        fluidRow(
+          column(width = 3,
+                 shiny::actionButton(inputId = ns("clear_map"), label = label, width = "100%")
+                 )
+        )
+    )
+    )
   )
 }
 

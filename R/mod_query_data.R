@@ -177,7 +177,7 @@ mod_query_data_ui <- function(id) {
     ),
     shiny::fluidRow(
       column(
-        6,
+        12,
         shiny::strong("Provide the latitude and longitude by drawing a rectangle on the map"),
         htmltools::br(),
         mod_map_bboxUI(ns("BBox_map"))
