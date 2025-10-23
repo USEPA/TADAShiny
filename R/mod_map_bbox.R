@@ -131,7 +131,13 @@ mod_map_bboxServer <- function(id) {
         rectangleOptions = leaflet.extras::drawRectangleOptions(),
         singleFeature = TRUE
       )
+      
       bbox_reVal$bBox <- NULL
+      
+      shiny::updateNumericInput(session = session, inputId = "bb_W", value = NA)
+      shiny::updateNumericInput(session = session, inputId = "bb_S", value = NA)
+      shiny::updateNumericInput(session = session, inputId = "bb_E", value = NA)
+      shiny::updateNumericInput(session = session, inputId = "bb_N", value = NA)
     })
 
     # Handle new drawings
@@ -147,10 +153,26 @@ mod_map_bboxServer <- function(id) {
       # Store as bbox object
       bbox_reVal$bBox <- bbox_temp
     })
-
-    # Handle deleted drawings
-    shiny::observeEvent(input$map_bbox_draw_deleted_features, {
-      bbox_reVal$bBox <- NULL
+    
+    # Update numeric inputs when bbox changes: Map to inputs
+    shiny::observe({
+      if (!is.null(bbox_reVal$bBox)) {
+        shiny::updateNumericInput(session = session, 
+                                  inputId = "bb_W", 
+                                  value = bbox_reVal$bBox[1])  # xmin = West
+        
+        shiny::updateNumericInput(session = session, 
+                                  inputId = "bb_S", 
+                                  value = bbox_reVal$bBox[2])  # ymin = South
+        
+        shiny::updateNumericInput(session = session, 
+                                  inputId = "bb_E", 
+                                  value = bbox_reVal$bBox[3])  # xmax = East
+        
+        shiny::updateNumericInput(session = session, 
+                                  inputId = "bb_N", 
+                                  value = bbox_reVal$bBox[4])  # ymax = North
+      }
     })
 
     return(bbox_reVal)
