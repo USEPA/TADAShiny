@@ -178,7 +178,7 @@ mod_query_data_ui <- function(id) {
     shiny::fluidRow(
       column(
         12,
-        shiny::strong("Provide the latitude and longitude by drawing a rectangle on the map or the numeric inputs"),
+        shiny::strong("Provide the latitude and longitude by drawing a rectangle on the map or typing in the coordinates in the input fields"),
         htmltools::br(),
         htmltools::br(),
         mod_map_bboxUI(ns("BBox_map"))
@@ -789,12 +789,12 @@ mod_query_data_server <- function(id, tadat) {
 
       # A warning section to show if the sample size is zero
       if (nrow(result_summary) == 0) {
-        shinyalert::shinyalert(
-          title = "Empty Query",
-          text = "Your query returned zero results. Please adjust your search inputs and try again. Remember to update the start and end dates.",
-          type = "warning"
+        shiny::showModal(
+          shiny::modalDialog(
+            title = "Empty Query",
+            "Your query returned zero results. Please adjust your search inputs and try again. Remember to update the start and end dates."
+          )
         )
-        shiny::removeModal()
         return()
       }
 
@@ -806,12 +806,12 @@ mod_query_data_server <- function(id, tadat) {
 
       # A warning section to show if the sample size is zero
       if (nrow(tot_sites) == 0) {
-        shinyalert::shinyalert(
-          title = "Empty Query",
-          text = "Your query returned zero results. Please adjust your search inputs and try again. Remember to update the start and end dates.",
-          type = "warning"
+        shiny::showModal(
+          shiny::modalDialog(
+            title = "Empty Query",
+            "Your query returned zero results. Please adjust your search inputs and try again. Remember to update the start and end dates."
+          )
         )
-        shiny::removeModal()
         return()
       }
 
