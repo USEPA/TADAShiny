@@ -184,6 +184,8 @@ mod_query_data_ui <- function(id) {
         mod_map_bboxUI(ns("BBox_map"))
       )
     ),
+    htmltools::br(),
+    htmltools::br(),
     shiny::fluidRow(
       column(
         4,
