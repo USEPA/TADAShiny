@@ -85,12 +85,18 @@ media <- c(
       ))$Name),
       "water", "Biological Tissue", "No media"
     )
+# sitetype <- c(
+#       unique(utils::read.csv(url(
+#         "https://cdx.epa.gov/wqx/download/DomainValues/MonitoringLocationType.CSV"
+#       ))$Name),
+#       "Glacier", "Aggregate water-use establishment", "Not Assigned", "Subsurface"
+#       )
+
 sitetype <- c(
-      unique(utils::read.csv(url(
-        "https://cdx.epa.gov/wqx/download/DomainValues/MonitoringLocationType.CSV"
-      ))$Name),
-      "Glacier", "Aggregate water-use establishment", "Not Assigned", "Subsurface"
-      )
+  "Aggregate groundwater use", "Aggregate surface-water-use", "Aggregate water-use establishment",
+  "Atmosphere", "Estuary", "Facility", "Glacier", "Lake, Reservoir, Impoundment", "Land",
+  "Not Assigned", "Ocean", "Spring", "Stream", "Subsurface", "Well", "Wetland"
+)
 
 mod_query_data_ui <- function(id) {
   ns <- NS(id)
