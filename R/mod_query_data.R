@@ -18,6 +18,9 @@
 # poss_whatWQPdata <- dataRetrieval::whatWQPdata %>%
 #   purrr::possibly(otherwise = NULL)
 
+# Increase timeout to 5 minutes
+options(timeout = 300)
+
 # A function to return the tribal data frame with tribal name as an sf object
 return_tribal_sf <- function(tribal_layer, tribal_name, tribal_list = tribal_list) {
   tribal_data2 <- tribal_list %>%
