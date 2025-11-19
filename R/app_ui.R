@@ -11,8 +11,13 @@ css <- "
 .nav li a.disabled {
   background-color: #F5F5F5 !important;
   color: #333 !important;
+  pointer-events: none; /* added 2025-Nov-17 Disable mouse events */
   cursor: not-allowed !important;
   border-color: #F5F5F5 !important;
+}
+/* This displays the custom cursor on the disabled anchor.  It gets overwritten when the nav li is activated. */
+.nav li {
+  cursor: not-allowed !important;
 }
 
 .row {

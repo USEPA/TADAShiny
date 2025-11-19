@@ -1,4 +1,10 @@
 library(shiny)
+library(shinyjs)
+
+# this snippet runs the Characteristics search using a selectable 'match type'.
+# It uses a separate 'text_input' widget to search the values
+# to simplify the reactive behavior.  It might be possible to collapse
+# the widgets and search directly in the drop-down list, but I was not able to get that to work.
 
 match_types <- c(
   "Starts With" = 'starts_with',
@@ -9,9 +15,12 @@ match_types <- c(
 characteristic_list <- unique(utils::read.csv(url(
       "https://cdx.epa.gov/wqx/download/DomainValues/Characteristic.CSV"
     ))$Name)
+# # this can be loaded from a local file in much less time
+# characteristic_table <- utils::read.csv("../inst/Characteristic.CSV")
+# characteristic_list <- characteristic_table$Name
 
 ui <- fluidPage(
-  titlePanel("Selectize 'Starts With' Filter"),
+  titlePanel("Selectize with 'Match Type' Search"),
   
   fluidRow(
       column(4,
@@ -23,88 +32,81 @@ ui <- fluidPage(
           multiple = FALSE
         )
       ),
-      column(8,
+      column(4,
+        # Input for the user to type their search string
+        textInput(
+          inputId = "text_sring", 
+          label = "Search string:", 
+          value = ""
+        )
+      ),
+      column(4,
         selectizeInput(
           inputId = "characteristic_select", 
           label = "Select one or more Characteristic:", 
           choices = NULL, 
-          multiple = TRUE
+          multiple = TRUE,
+          options = list(
+            openOnFocus = TRUE
+          )
         )
       )
   )
 )
 
 server <- function(input, output, session) {
-  # All possible choices
-  all_characteristics <- characteristic_list
-  
-  # Set up server-side selectize
-  updateSelectizeInput(
-    session = session,
-    inputId = "characteristic_select",
-    choices = all_characteristics,
-    server = TRUE,
-    options = list(
-      placeholder = "Start typing to search...",
-      # The searchField option allows customization of the search behavior,
-      # but for a simple list, the default behavior is sufficient for 'starts with'.
-      searchField = "value",
-      onType = I('
-           text => Shiny.setInputValue("characteristic_select_search", text)
-        ')
-    )
-  )
-  
-  # reset the server-size selectize when 'Match type' changes
-  observeEvent(input$match_type_selector, {
-      updateSelectizeInput(
-        session = session,
-        inputId = "characteristic_select",
-        choices = characteristic_list,
-        server = TRUE
+
+  # A reactive expression that filters the choices based on the input pattern
+  filtered_list <- reactive({
+    text_sring <- input$text_sring
+    if (text_sring == "") {
+      # If the text string is empty, return all choices
+      return(characteristic_list)
+    } 
+    else {
+      match_type <- 'contains'
+      if (input$match_type_selector != '') {
+        match_type = input$match_type_selector
+      }
+      # set the grep pattern for each match type
+      if (match_type == 'starts_with') {
+        grep_pattern <- paste0("^", text_sring)
+      }
+      else if (match_type == 'ends_with') {
+        grep_pattern <- paste0(text_sring, "$")
+      }
+      else if (match_type == 'matches') {
+        grep_pattern <- paste0("^", text_sring, "$")
+      }
+      else { # contains
+        grep_pattern <- text_sring
+      }
+      return(characteristic_list[grep(
+                                      grep_pattern,
+                                      characteristic_list,
+                                      ignore.case = TRUE
+                                    )
+                                 ]
       )
-  }, ignoreInit = TRUE)
-  
-  # Reactive observer to listen for changes in the selectize input text string
-  observeEvent(input$characteristic_select_search, {
-    query <- input$characteristic_select_search
-    
-    if (nchar(query) > 0) {
-          match_type <- 'contains'
-          if (input$match_type_selector != '') {
-            match_type = input$match_type_selector
-          }
-          # set the grep pattern for each match type
-          if (match_type == 'starts_with') {
-            grep_pattern <- paste0("^", query)
-          }
-          else if (match_type == 'ends_with') {
-            grep_pattern <- paste0(query, "$")
-          }
-          else if (match_type == 'matches') {
-            grep_pattern <- paste0("^", query, "$")
-          }
-          else { # contains
-            grep_pattern <- query
-          }
-          filtered_characteristics <- all_characteristics[grep(
-            grep_pattern,
-            all_characteristics,
-            ignore.case = TRUE
-          )]
-    } else {
-      filtered_characteristics <- all_characteristics
     }
+  })
+  
+  # Observer to update the selectizeInput choices whenever the filtered_list changes
+  observe({
+    # using isolate() here is key to this whole thing working.
+    # the value would be subject to an event when the updateSelectizeInput() happens below,
+    # so you need to 'isolate' the current value before you run the update
+    previous_selected <- isolate(input$characteristic_select)
     
     updateSelectizeInput(
-      session = session,
-      inputId = "characteristic_select",
-      choices = filtered_characteristics,
-      server = TRUE
+      session,
+      "characteristic_select",
+      choices = c(filtered_list(), previous_selected),
+      server = TRUE,
+      selected = previous_selected
     )
-    
-  }, ignoreInit = TRUE)
-  
-} # end server function
+  })
+}
+
 
 shinyApp(ui, server)

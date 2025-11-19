@@ -134,6 +134,7 @@ mod_data_flagging_server <- function(id, tadat) {
     
     # Runs whenever selected flags are changed
     shiny::observeEvent(tadat$selected_flags, {
+      
       if (!is.null(tadat$removals)) {
         tadat$removals <- dplyr::select(tadat$removals, -(dplyr::starts_with(flag_prefix)))
       }
@@ -162,6 +163,29 @@ mod_data_flagging_server <- function(id, tadat) {
           }
         }
       }
+      
+      # start - create a column providing a text description of why the row is flagged for removal
+      # this is moved from mod_review_data.R
+      if (is.null(tadat$raw) == FALSE) {
+        removals <- tadat$removals
+        sel <- which(removals == TRUE, arr.ind = TRUE)
+        # todo might need to make sure sel is not NULL
+        if (length(sel) > 0) {
+          removals[sel] <- names(removals)[sel[, "col"]]
+          removals[removals == FALSE] <- ""
+          tadat$raw$TADA.RemovalReason <- apply(
+            removals, 1,
+            function(row) {
+              paste(row[nzchar(row)], collapse = ", ")
+            }
+          )
+        } else {
+          tadat$raw$TADA.RemovalReason <- NA
+        }
+      }
+      # end
+      
+      
     })
     
     # Any time tadat$raw is changed, check to see if the flagging fields are present

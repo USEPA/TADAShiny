@@ -284,6 +284,14 @@ mod_filtering_server <- function(id, tadat) {
           dplyr::select(tadat$removals, -(dplyr::starts_with(prefix)))
       }
 
+      # New: Remove all the filter columns from the filters table (start fresh)
+      # if (!is.null(tadat$filters)) {
+      #   tadat$filters <-
+      #     dplyr::select(tadat$filters, -(dplyr::starts_with(prefix)))
+      # }
+      
+      
+      
       # Only proceed if filters have been selected
       if (!(is.null(tadat$raw))) {
         # Enable the filtering tab. Usually happens when filters are loaded from a progress file
@@ -321,6 +329,8 @@ mod_filtering_server <- function(id, tadat) {
                 all_vals
               )
             tadat$removals[label] <- as.logical(results)
+            # new column with just filter information
+            # tadat$filters[label] <- as.logical(results)
           }
         }
 

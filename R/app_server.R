@@ -22,6 +22,8 @@ app_server <- function(input, output, session) {
     if (!is.null(tadat$raw) && is.null(tadat$removals)) {
       # Initialize removals with the same number of rows as raw data, all FALSE
       tadat$removals <- data.frame(matrix(FALSE, nrow = nrow(tadat$raw), ncol = 0))
+      # # 2025-11-17 consider making a parallel data for 'filtered' rows
+      # tadat$filters <- data.frame(matrix(FALSE, nrow = nrow(tadat$raw), ncol = 0))
     }
   })
   
@@ -37,6 +39,14 @@ app_server <- function(input, output, session) {
       # print(tadat$raw$TADA.Remove)
     }
   })
+  
+  # # New: Update the master 'Filter' column anytime data is added to the 'filters' table
+  # shiny::observeEvent(tadat$filters, {
+  #   if (dim(tadat$filters)[2] > 0) {
+  #     # 2025-11-17 consider making a parallel data for 'filtered' rows
+  #     tadat$raw$TADA.Filter <- apply(tadat$filters, 1, any)
+  #   }
+  # })
   
   # Module server calls
   mod_filtering_server("filtering_1", tadat)
@@ -64,7 +74,11 @@ app_server <- function(input, output, session) {
   tadat$save_progress_file <- NA
   tadat$flags_present <- FALSE
   job_id <- base::paste0("ts", format(Sys.time(), "%y%m%d%H%M%S"))
-  tadat$default_outfile <- base::paste0("tada_output_", job_id)
+  # note: this causes all excel files to have the same time stamp even if the user has been working for a long time.
+  # this prevents users from being able to compare excel files during the same session 
+  # since the 2 files with the same name can't be opened at the same time
+  # todo: consider creating the output file name at runtime
+  tadat$default_outfile <- base::paste0("tada_output_", job_id) 
   tadat$job_id <- job_id
   
   # Switch to overview tab when tadat$new changes and show a modal dialog

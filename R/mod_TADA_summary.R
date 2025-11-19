@@ -166,7 +166,13 @@ mod_TADA_summary_server <- function(id, tadat) {
           )
           
           # Filter data to exclude flagged removals for final dataset
+          # remove all rows where TADA.Remove is TRUE
           out_data <- EPATADA::TADA_OrderCols(tadat$raw[!tadat$raw$TADA.Remove, ])
+          
+          # remove these 2 columns since they are always FALSE and blank in that order
+          out_data <- subset(out_data, select = -TADA.Remove)
+          out_data <- subset(out_data, select = -TADA.RemovalReason)
+          
           summary_things$temp_files <- c(datafile_name, progress_file_name)
           desc <- writeNarrativeDataFrame(tadat)
           dfs <- list(Data = out_data, Parameterization = desc)

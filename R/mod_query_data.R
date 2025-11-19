@@ -596,7 +596,6 @@ mod_query_data_server <- function(id, tadat) {
       # there is a more robust way to get the module Id required in setInputValue()
       # but I wasted time trying to get it working. This does work here.
       options = list(
-        searchField = "value",
         onType = I('
              text => Shiny.setInputValue("query_data_1-characteristic_select_search", text)
           ')
@@ -668,55 +667,87 @@ mod_query_data_server <- function(id, tadat) {
     })
 
     # reset the server-size selectize when 'Match type' changes
-    shiny::observeEvent(input$match_type_select, {
-      shiny::updateSelectizeInput(
-        session = session,
-        inputId = "characteristic_select",
-        choices = characteristic_list,
-        server = TRUE
-      )
-    }, ignoreInit = TRUE)
+    # shiny::observeEvent(input$match_type_select, {
+    #   
+    #   # TODO need to retain previous selection
+    #   previous_selected <- c(input$characteristic_select, input$characteristic_select_search)
+    #   
+    #   shiny::updateSelectizeInput(
+    #     session = session,
+    #     inputId = "characteristic_select",
+    #     choices = characteristic_list,
+    #     selected = previous_selected,
+    #     server = TRUE
+    #   )
+    # }, ignoreInit = TRUE)
   
+    
+      # shiny::observeEvent(input$characteristic_select, {
+      #   print(paste0('string: ', input$characteristic_select_search))
+      # })
+    
+    shiny::observeEvent(input$characteristic_select_blur, {
+      browser()
+      print(
+        "characteristic_select has blurred again!"
+      )
+    })
+    
+    
   # Reactive observer to listen for changes in the selectize input text string
-  shiny::observeEvent(input$characteristic_select_search, {
-
-    query <- input$characteristic_select_search
-
-    if (nchar(query) > 0) {
-          match_type <- 'contains'
-          if (input$match_type_select != '') {
-            match_type <- input$match_type_select
-          }
-          # set the grep pattern for each match type
-          if (match_type == 'starts_with') {
-            grep_pattern <- paste0("^", query)
-          }
-          else if (match_type == 'ends_with') {
-            grep_pattern <- paste0(query, "$")
-          }
-          else if (match_type == 'matches') {
-            grep_pattern <- paste0("^", query, "$")
-          }
-          else { # contains
-            grep_pattern <- query
-          }
-          filtered_characteristics <- characteristic_list[grep(
-            grep_pattern,
-            characteristic_list,
-            ignore.case = TRUE
-          )]
-    } 
-    else {
-      filtered_characteristics <- characteristic_list
-    }
-
-    shiny::updateSelectizeInput(
-      session = session,
-      inputId = "characteristic_select",
-      choices = filtered_characteristics,
-      server = TRUE
-    )
-  })
+  # shiny::observeEvent(input$characteristic_select_search, {
+  # # browser()
+  #   # TODO need to retain previous selection
+  #   previous_selected <- c(input$characteristic_select, input$characteristic_select_search)
+  #     
+  #   query <- input$characteristic_select_search
+  # 
+  #   if (nchar(query) > 0) {
+  #         match_type <- 'contains'
+  #         if (input$match_type_select != '') {
+  #           match_type <- input$match_type_select
+  #         }
+  #         # set the grep pattern for each match type
+  #         if (match_type == 'starts_with') {
+  #           grep_pattern <- paste0("^", query)
+  #         }
+  #         else if (match_type == 'ends_with') {
+  #           grep_pattern <- paste0(query, "$")
+  #         }
+  #         else if (match_type == 'matches') {
+  #           grep_pattern <- paste0("^", query, "$")
+  #         }
+  #         else { # contains
+  #           grep_pattern <- query
+  #         }
+  #         filtered_characteristics <- characteristic_list[grep(
+  #           grep_pattern,
+  #           characteristic_list,
+  #           ignore.case = TRUE
+  #         )]
+  #   } 
+  #   else {
+  #     filtered_characteristics <- characteristic_list
+  #   }
+  #   
+  #   # shiny::freezeReactiveValue(input, "characteristic_select_search")
+  #   
+  #   shiny::updateSelectizeInput(
+  #     session = session,
+  #     inputId = "characteristic_select",
+  #     choices = filtered_characteristics,
+  #     selected = c(input$characteristic_select, input$characteristic_select_search),
+  #     options = list(
+  #       # searchField = "value",
+  #       onType = I('
+  #            text => Shiny.setInputValue("query_data_1-characteristic_select_search", text)
+  #         '),
+  #        onBlur = I('function() { Shiny.setInputValue("query_data_1-characteristic_select_blur", true); }')
+  #     
+  #     ),      
+  #     server = TRUE
+  #   )
+  # })
     
     
     

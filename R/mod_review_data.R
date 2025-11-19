@@ -40,21 +40,25 @@ mod_review_data_server <- function(id, tadat) {
     review_things <- shiny::reactiveValues()
 
     shiny::observeEvent(input$review_go, {
-      removals <- tadat$removals
-      sel <- which(removals == TRUE, arr.ind = TRUE)
-      # Bombing here
-      if (length(sel) > 0) {
-        removals[sel] <- names(removals)[sel[, "col"]]
-        removals[removals == FALSE] <- ""
-        tadat$raw$TADA.RemovalReason <- apply(
-          removals, 1,
-          function(row) {
-            paste(row[nzchar(row)], collapse = ", ")
-          }
-        )
-      } else {
-        tadat$raw$TADA.RemovalReason <- NA
-      }
+      
+      ## this is moved to mod_data_flagging.R and not needed here.
+      # # start this column is going to be added in the step where the removals are first applied
+      # removals <- tadat$removals
+      # sel <- which(removals == TRUE, arr.ind = TRUE)
+      # # Bombing here
+      # if (length(sel) > 0) {
+      #   removals[sel] <- names(removals)[sel[, "col"]]
+      #   removals[removals == FALSE] <- ""
+      #   tadat$raw$TADA.RemovalReason <- apply(
+      #     removals, 1,
+      #     function(row) {
+      #       paste(row[nzchar(row)], collapse = ", ")
+      #     }
+      #   )
+      # } else {
+      #   tadat$raw$TADA.RemovalReason <- NA
+      # }
+      # # end
 
       # data for bar chart - this is real rough
       step_rems <- sort_removals(tadat$removals)
