@@ -1,6 +1,3 @@
-library(shiny)
-library(shinyjs)
-
 # this snippet runs the Characteristics search using a selectable 'match type'.
 # It uses a separate 'text_input' widget to search the values
 # to simplify the reactive behavior.  It might be possible to collapse
