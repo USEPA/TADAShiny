@@ -10,22 +10,22 @@
 mod_map_bboxUI <- function(id, label = "Clear Drawing") {
   ns <- NS(id)
   tagList(
-    fluidRow(
+    shiny::fluidRow(
       column(width = 6,
              leaflet::leafletOutput(ns("map_bbox"))
       ),
       # Bounding box inputs on the right (takes 4 columns)
       column(
         width = 6,
-        h4("Bounding Box Latitude and Longitude"),
+        htmltools::h4("Bounding Box Latitude and Longitude"),
         
-        fluidRow(
+        shiny::fluidRow(
           column(
             width = 3,
             htmltools::br(),
             htmltools::br(),
             # West coordinate
-            numericInput(
+            shiny::numericInput(
               inputId = ns("bb_W"),
               label = "West:",
               value = NULL,
@@ -37,7 +37,7 @@ mod_map_bboxUI <- function(id, label = "Clear Drawing") {
           column(
             width = 3,
             # North coordinate
-            numericInput(
+            shiny::numericInput(
               inputId = ns("bb_N"),
               label = "North:",
               value = NULL,
@@ -48,7 +48,7 @@ mod_map_bboxUI <- function(id, label = "Clear Drawing") {
             htmltools::br(),
             htmltools::br(),
             # South coordinate
-            numericInput(
+            shiny::numericInput(
               inputId = ns("bb_S"),
               label = "South:",
               value = NULL,
@@ -59,10 +59,10 @@ mod_map_bboxUI <- function(id, label = "Clear Drawing") {
           ),
           column(
             width = 3,
-            br(),
-            br(),
+            htmltools::br(),
+            htmltools::br(),
             # East coordinate
-            numericInput(
+            shiny::numericInput(
               inputId = ns("bb_E"),
               label = "East:",
               value = NULL,
@@ -73,8 +73,8 @@ mod_map_bboxUI <- function(id, label = "Clear Drawing") {
           )
         ),
         # Clear button
-        br(),
-        fluidRow(
+        htmltools::br(),
+        shiny::fluidRow(
           column(width = 3,
                  shiny::actionButton(inputId = ns("clear_map"), label = label, width = "100%")
                  )
@@ -199,10 +199,10 @@ mod_map_bboxServer <- function(id) {
     })
     
     # Create debounced inputs to avoid excessive updates
-    bb_W_debounce <- shiny::debounce(reactive(input$bb_W), 1000)
-    bb_S_debounce <- shiny::debounce(reactive(input$bb_S), 1000)
-    bb_E_debounce <- shiny::debounce(reactive(input$bb_E), 1000)
-    bb_N_debounce <- shiny::debounce(reactive(input$bb_N), 1000)
+    bb_W_debounce <- shiny::debounce(shiny::reactive(input$bb_W), 1000)
+    bb_S_debounce <- shiny::debounce(shiny::reactive(input$bb_S), 1000)
+    bb_E_debounce <- shiny::debounce(shiny::reactive(input$bb_E), 1000)
+    bb_N_debounce <- shiny::debounce(shiny::reactive(input$bb_N), 1000)
     
     # Update map when numeric inputs change: Inputs → Map
     shiny::observe({

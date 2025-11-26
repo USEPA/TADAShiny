@@ -50,7 +50,8 @@ Imports:
     data.table,
     stats,
     pkgload,
-    config
+    config,
+    leafem
 Suggests:
     covr,
     devtools,
