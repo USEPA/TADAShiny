@@ -13,6 +13,7 @@ License: CC0
 Copyright: This software is in the public domain because it contains materials that originally came from the U.S. Environmental Protection Agency.
 Imports: 
     EPATADA,
+    rExpertQuery,
     golem,
     magrittr,
     shiny,
@@ -64,7 +65,8 @@ Suggests:
     rstudioapi,
     renv
 Remotes:
-    USEPA/EPATADA@develop
+    USEPA/EPATADA@develop,
+    USEPA/rExpertQuery
 Depends: 
     R (>= 4.1.0)
 Encoding: UTF-8
