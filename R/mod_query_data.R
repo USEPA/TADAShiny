@@ -18,6 +18,9 @@
 # poss_whatWQPdata <- dataRetrieval::whatWQPdata %>%
 #   purrr::possibly(otherwise = NULL)
 
+# Increase timeout to 5 minutes
+options(timeout = 300)
+
 # A function to return the tribal data frame with tribal name as an sf object
 return_tribal_sf <- function(tribal_layer, tribal_name, tribal_list = tribal_list) {
   tribal_data2 <- tribal_list %>%
@@ -67,30 +70,36 @@ county <- utils::read.csv(
   file = "https://www2.census.gov/geo/docs/reference/codes/files/national_county.txt",
   header = FALSE,
   col.names = c("STUSAB", "STATE", "COUNTY", "COUNTY_NAME", "COUNTY_ID")
-  )
+)
 
 # Fetch orgs, chars, chargroup, media, sitetype choices
 orgs <- unique(utils::read.csv(url(
-      "https://cdx.epa.gov/wqx/download/DomainValues/Organization.CSV"
-    ))$ID)
+  "https://cdx.epa.gov/wqx/download/DomainValues/Organization.CSV"
+))$ID)
 chars <- unique(utils::read.csv(url(
-      "https://cdx.epa.gov/wqx/download/DomainValues/Characteristic.CSV"
-    ))$Name)
+  "https://cdx.epa.gov/wqx/download/DomainValues/Characteristic.CSV"
+))$Name)
 chargroup <- unique(utils::read.csv(url(
-      "https://cdx.epa.gov/wqx/download/DomainValues/CharacteristicGroup.CSV"
-    ))$Name)
+  "https://cdx.epa.gov/wqx/download/DomainValues/CharacteristicGroup.CSV"
+))$Name)
 media <- c(
-      unique(utils::read.csv(url(
-        "https://cdx.epa.gov/wqx/download/DomainValues/ActivityMedia.CSV"
-      ))$Name),
-      "water", "Biological Tissue", "No media"
-    )
+  unique(utils::read.csv(url(
+    "https://cdx.epa.gov/wqx/download/DomainValues/ActivityMedia.CSV"
+  ))$Name),
+  "water", "Biological Tissue", "No media"
+)
+# sitetype <- c(
+#       unique(utils::read.csv(url(
+#         "https://cdx.epa.gov/wqx/download/DomainValues/MonitoringLocationType.CSV"
+#       ))$Name),
+#       "Glacier", "Aggregate water-use establishment", "Not Assigned", "Subsurface"
+#       )
+
 sitetype <- c(
-      unique(utils::read.csv(url(
-        "https://cdx.epa.gov/wqx/download/DomainValues/MonitoringLocationType.CSV"
-      ))$Name),
-      "Glacier", "Aggregate water-use establishment", "Not Assigned", "Subsurface"
-      )
+  "Aggregate groundwater use", "Aggregate surface-water-use", "Aggregate water-use establishment",
+  "Atmosphere", "Estuary", "Facility", "Glacier", "Lake, Reservoir, Impoundment", "Land",
+  "Not Assigned", "Ocean", "Spring", "Stream", "Subsurface", "Well", "Wetland"
+)
 
 mod_query_data_ui <- function(id) {
   ns <- NS(id)
@@ -177,12 +186,15 @@ mod_query_data_ui <- function(id) {
     ),
     shiny::fluidRow(
       column(
-        6,
-        shiny::strong("Provide the latitude and longitude by drawing a rectangle on the map"),
+        12,
+        shiny::strong("Provide the latitude and longitude by drawing a rectangle on the map or typing in the coordinates in the input fields"),
+        htmltools::br(),
         htmltools::br(),
         mod_map_bboxUI(ns("BBox_map"))
       )
     ),
+    htmltools::br(),
+    htmltools::br(),
     shiny::fluidRow(
       column(
         4,
@@ -788,12 +800,12 @@ mod_query_data_server <- function(id, tadat) {
 
       # A warning section to show if the sample size is zero
       if (nrow(result_summary) == 0) {
-        shinyalert::shinyalert(
-          title = "Empty Query",
-          text = "Your query returned zero results. Please adjust your search inputs and try again. Remember to update the start and end dates.",
-          type = "warning"
+        shiny::showModal(
+          shiny::modalDialog(
+            title = "Empty Query",
+            "Your query returned zero results. Please adjust your search inputs and try again. Remember to update the start and end dates."
+          )
         )
-        shiny::removeModal()
         return()
       }
 
@@ -805,12 +817,12 @@ mod_query_data_server <- function(id, tadat) {
 
       # A warning section to show if the sample size is zero
       if (nrow(tot_sites) == 0) {
-        shinyalert::shinyalert(
-          title = "Empty Query",
-          text = "Your query returned zero results. Please adjust your search inputs and try again. Remember to update the start and end dates.",
-          type = "warning"
+        shiny::showModal(
+          shiny::modalDialog(
+            title = "Empty Query",
+            "Your query returned zero results. Please adjust your search inputs and try again. Remember to update the start and end dates."
+          )
         )
-        shiny::removeModal()
         return()
       }
 

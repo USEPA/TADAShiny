@@ -16,7 +16,6 @@ mod_data_flagging_ui <- function(id) {
         opacity: 0.5; /* Make it visually clear it's disabled */
       }
     ")),
-    
     tags$div(
       style = "display: none;",
       shinyWidgets::prettySwitch("dummy", label = NULL)
@@ -29,8 +28,8 @@ mod_data_flagging_ui <- function(id) {
     shiny::fluidRow(column(
       3,
       shiny::actionButton(ns("runFlags"),
-                          "Run Tests",
-                          style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
+        "Run Tests",
+        style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
       )
     )),
     htmltools::div(style = "margin-bottom:10px"),
@@ -62,7 +61,7 @@ mod_data_flagging_server <- function(id, tadat) {
     tadat$selected_flags <- character()
     tadat$switch_defaults <- prompt_table$Level != "Optional"
     switch_disabled <- prompt_table$Level == "Required"
-    
+
     # Function to create toggle switches for each flag
     flagSwitch <- function(len) {
       inputs <- character(len)
@@ -94,7 +93,7 @@ mod_data_flagging_server <- function(id, tadat) {
       }
       inputs
     }
-    
+
     # Function to get the current state of each switch
     shinyValue <- function(id, len) {
       unlist(lapply(seq_len(len), function(i) {
@@ -106,20 +105,20 @@ mod_data_flagging_server <- function(id, tadat) {
         }
       }))
     }
-    
+
     # Update removals based on the state of the switches
     shiny::observe({
       switch_id <- "switch_"
       tadat$selected_flags <- flag_types[shinyValue(switch_id, n_switches)]
-      
+
       # Ensure tadat$raw is not NULL
       shiny::req(tadat$raw)
-      
+
       # Initialize or clear removals for each flag
       for (i in seq_len(n_switches)) {
         flag <- flag_types[i]
         switch_name <- base::paste0(switch_id, i)
-        
+
         if (!is.null(input[[switch_name]])) {
           if (input[[switch_name]]) {
             # If the switch is on, update removals with the test results
@@ -131,7 +130,7 @@ mod_data_flagging_server <- function(id, tadat) {
         }
       }
     })
-    
+
     # Runs whenever selected flags are changed
     shiny::observeEvent(tadat$selected_flags, {
       if (!is.null(tadat$removals)) {
@@ -163,17 +162,17 @@ mod_data_flagging_server <- function(id, tadat) {
         }
       }
     })
-    
+
     # Any time tadat$raw is changed, check to see if the flagging fields are present
     shiny::observeEvent(tadat$raw, {
       tadat$flags_present <- checkFlagColumns(tadat$raw)
     })
-    
+
     shiny::observeEvent(tadat$flags_present, {
       if (tadat$flags_present) {
         values$testResults <- flagCensus(tadat$raw)
         values$n_fails <- colSums(values$testResults)
-        
+
         shiny::observe({
           switch_id <- "switch_"
           tadat$selected_flags <- flag_types[shinyValue(switch_id, n_switches)]
@@ -181,7 +180,7 @@ mod_data_flagging_server <- function(id, tadat) {
             shinyjs::disable(base::paste0(switch_id, i))
           }
         })
-        
+
         switchTable <- shiny::reactive({
           df <- data.frame(
             Reason = prompts,
@@ -190,7 +189,7 @@ mod_data_flagging_server <- function(id, tadat) {
             Decision = flagSwitch(n_switches)
           )
         })
-        
+
         output$flagTable <- DT::renderDT(
           shiny::isolate(switchTable()),
           escape = FALSE,
@@ -214,7 +213,7 @@ mod_data_flagging_server <- function(id, tadat) {
             )
           )
         )
-        
+
         shinyjs::enable(selector = '.nav li a[data-value="Filter"]')
         shinyjs::enable(selector = '.nav li a[data-value="Censored"]')
         shinyjs::enable(selector = '.nav li a[data-value="Harmonize"]')
@@ -222,7 +221,7 @@ mod_data_flagging_server <- function(id, tadat) {
         shinyjs::enable(selector = '.nav li a[data-value="Review"]')
       }
     })
-    
+
     shiny::observeEvent(input$runFlags, {
       shinybusy::show_modal_spinner(
         spin = "double-bounce",
@@ -230,15 +229,15 @@ mod_data_flagging_server <- function(id, tadat) {
         text = "Running flagging functions...",
         session = shiny::getDefaultReactiveDomain()
       )
-      
+
       tadat$raw <- applyFlags(tadat$raw, tadat$orgs)
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
     })
-    
+
     shiny::observeEvent(tadat$m2f, {
       shiny::updateRadioButtons(session, "m2f", selected = tadat$m2f)
     })
-    
+
     shiny::observeEvent(input$m2f, {
       tadat$m2f <- input$m2f
       shiny::req(tadat$raw)

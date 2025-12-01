@@ -53,7 +53,6 @@ mod_filtering_ui <- function(id) {
 }
 
 
-
 mod_filtering_server <- function(id, tadat) {
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns

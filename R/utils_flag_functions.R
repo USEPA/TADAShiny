@@ -38,9 +38,7 @@ flagCensus <- function(raw) {
           }
           if (tests[row, "keep"]) {
             test_results <- !test_results
-          } else {
-
-          }
+          } else {}
           results <- results + test_results
         }
         tabular_results[flag] <- (results > 0)
