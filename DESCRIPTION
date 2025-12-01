@@ -62,7 +62,8 @@ Suggests:
     roxygen2,
     rsconnect,
     rstudioapi,
-    renv
+    renv,
+    geojsonsf
 Remotes:
     USEPA/EPATADA@develop,
     USEPA/rExpertQuery
