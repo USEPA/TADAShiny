@@ -70,24 +70,24 @@ county <- utils::read.csv(
   file = "https://www2.census.gov/geo/docs/reference/codes/files/national_county.txt",
   header = FALSE,
   col.names = c("STUSAB", "STATE", "COUNTY", "COUNTY_NAME", "COUNTY_ID")
-  )
+)
 
 # Fetch orgs, chars, chargroup, media, sitetype choices
 orgs <- unique(utils::read.csv(url(
-      "https://cdx.epa.gov/wqx/download/DomainValues/Organization.CSV"
-    ))$ID)
+  "https://cdx.epa.gov/wqx/download/DomainValues/Organization.CSV"
+))$ID)
 chars <- unique(utils::read.csv(url(
-      "https://cdx.epa.gov/wqx/download/DomainValues/Characteristic.CSV"
-    ))$Name)
+  "https://cdx.epa.gov/wqx/download/DomainValues/Characteristic.CSV"
+))$Name)
 chargroup <- unique(utils::read.csv(url(
-      "https://cdx.epa.gov/wqx/download/DomainValues/CharacteristicGroup.CSV"
-    ))$Name)
+  "https://cdx.epa.gov/wqx/download/DomainValues/CharacteristicGroup.CSV"
+))$Name)
 media <- c(
-      unique(utils::read.csv(url(
-        "https://cdx.epa.gov/wqx/download/DomainValues/ActivityMedia.CSV"
-      ))$Name),
-      "water", "Biological Tissue", "No media"
-    )
+  unique(utils::read.csv(url(
+    "https://cdx.epa.gov/wqx/download/DomainValues/ActivityMedia.CSV"
+  ))$Name),
+  "water", "Biological Tissue", "No media"
+)
 # sitetype <- c(
 #       unique(utils::read.csv(url(
 #         "https://cdx.epa.gov/wqx/download/DomainValues/MonitoringLocationType.CSV"

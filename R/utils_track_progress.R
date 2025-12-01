@@ -80,9 +80,7 @@ readFile <- function(tadat, filename) {
   }
 
   # Enable tabs if certain fields are not null
-  if (!is.null(selected_filters)) {
-
-  }
+  if (!is.null(selected_filters)) {}
 
   newVals$original_source <- original_source
   newVals$job_id <- load_attribute(job_id, "job_id")
@@ -193,7 +191,6 @@ writeNarrativeDataFrame <- function(tadat) {
   for (row in 1:nrow(tadat$org_table)) {
     df[nrow(df) + 1, ] <- c(base::paste0("Organization Rank ", row), tadat$org_table[row, "OrganizationFormalName"])
   }
-
 
 
   # Flagging Tab
