@@ -102,6 +102,14 @@ sitetype <- c(
   "Not Assigned", "Ocean", "Spring", "Stream", "Subsurface", "Well", "Wetland"
 )
 
+# these are the types of text matches used in searching the Characteristic(s) list
+match_types <- c(
+  "Starts With" = 'starts_with',
+  "Ends With" = 'ends_with',
+  "Contains" = 'contains',
+  "Equals" = 'matches'
+)
+
 mod_query_data_ui <- function(id) {
   ns <- NS(id)
   tagList(
@@ -209,7 +217,7 @@ mod_query_data_ui <- function(id) {
     htmltools::h4("Metadata Filters"),
     shiny::fluidRow(
       column(
-        4,
+        3,
         shiny::selectizeInput(
           ns("org"),
           "Organization(s)",
@@ -219,7 +227,7 @@ mod_query_data_ui <- function(id) {
         )
       ),
       column(
-        4,
+        5,
         shiny::selectizeInput(
           ns("project"),
           "Project(s)",
@@ -241,7 +249,7 @@ mod_query_data_ui <- function(id) {
     ),
     shiny::fluidRow(
       column(
-        4,
+        3,
         shiny::selectizeInput(
           ns("media"),
           tags$span(
@@ -258,13 +266,41 @@ mod_query_data_ui <- function(id) {
         )
       ),
       column(
-        4,
-        shiny::selectizeInput(
-          ns("characteristic"),
-          "Characteristic(s)",
-          choices = NULL,
-          options = list(placeholder = "Start typing or use drop down menu"),
-          multiple = TRUE
+        5,
+        shiny::fluidRow( # this is what allows both widgets to be side-by-side
+          htmltools::h3("Characteristic(s)", style="margin-bottom: 3px; font-size: 16px;"),
+          htmltools::hr(style="margin-bottom: 0px; margin-top: 0px;"),
+          column(width = 3,
+           style="margin-left: -15px;",
+           shiny::selectizeInput(
+              inputId = ns("match_type_selector"),
+              label = "Match type:",
+              choices = match_types, # Choices are populated on client
+              selected = 'contains',
+              multiple = FALSE
+            )
+           ),
+          column(width = 3,
+            # Input for the user to type their search string
+            shiny::textInput(
+              inputId = ns("text_string"), 
+              label = "Search string:", 
+              value = ""
+            )
+          ),
+          column(width = 6,
+            shiny::selectizeInput(
+              inputId = ns("characteristic_select"),
+              label = "Select matching characteristics",
+              choices = NULL,
+              multiple = TRUE,
+              options = list(
+                  placeholder = "Start typing or use drop down menu",
+                  openOnFocus = TRUE,
+                  plugins = list('remove_button')
+              )
+            )
+          )
         )
       ),
       column(
@@ -420,6 +456,9 @@ mod_query_data_server <- function(id, tadat) {
             stop("No file uploaded.")
           }
 
+          # added this to make sure it is not null later
+          tadat$original_source <- "Upload"
+
           # user uploaded data
           raw <- readxl::read_excel(input$file$datapath, sheet = 1, col_types = "text")
 
@@ -566,6 +605,62 @@ mod_query_data_server <- function(id, tadat) {
       options = list(placeholder = "Start typing or use drop down menu"),
       server = TRUE
     )
+    
+    # A reactive expression that filters the choices based on the input pattern
+    filtered_list <- shiny::reactive({
+      
+      text_string <- input$text_string
+      
+      if (is.null(text_string) || text_string == "") {
+        # If the text string is empty, return all choices
+        return(chars)
+      } 
+      else {
+        match_type <- 'contains'
+        if (input$match_type_selector != '') {
+          match_type = input$match_type_selector
+        }
+        # set the grep pattern for each match type
+        if (match_type == 'starts_with') {
+          grep_pattern <- paste0("^", text_string)
+        }
+        else if (match_type == 'ends_with') {
+          grep_pattern <- paste0(text_string, "$")
+        }
+        else if (match_type == 'matches') {
+          grep_pattern <- paste0("^", text_string, "$")
+        }
+        else { # contains
+          grep_pattern <- text_string
+        }
+        
+        my_filtered_list <- chars[grep(
+                                        grep_pattern,
+                                        chars,
+                                        ignore.case = TRUE
+                                      )
+                                   ]
+
+        return(my_filtered_list)
+      }
+    })    
+
+    # Observer to update the selectizeInput choices whenever the filtered_list changes
+    shiny::observe({
+      # using isolate() here is key to this whole thing working.
+      # the value would be subject to an event when the updateSelectizeInput() happens below,
+      # so you need to 'isolate' the current value before you run the update
+      previous_selected <- shiny::isolate(input$characteristic_select)
+      
+      shiny::updateSelectizeInput(
+        session,
+        "characteristic_select",
+        choices = c(filtered_list(), previous_selected),
+        server = TRUE,
+        selected = previous_selected
+      )
+    })
+    
     shiny::updateSelectizeInput(session,
       "characteristic",
       choices = c(chars),
@@ -682,10 +777,10 @@ mod_query_data_server <- function(id, tadat) {
       } else {
         tadat$characteristicType <- input$chargroup
       }
-      if (is.null(input$characteristic)) {
+      if (is.null(input$characteristic_select)) {
         tadat$characteristicName <- "null"
       } else {
-        tadat$characteristicName <- input$characteristic
+        tadat$characteristicName <- input$characteristic_select
       }
       if (is.null(input$media)) {
         tadat$sampleMedia <- "null"
