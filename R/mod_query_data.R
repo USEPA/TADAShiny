@@ -86,7 +86,8 @@ media <- c(
   unique(utils::read.csv(url(
     "https://cdx.epa.gov/wqx/download/DomainValues/ActivityMedia.CSV"
   ))$Name),
-  "water", "Biological Tissue", "No media"
+  # "water", # removed water and added it in manually below
+  "Biological Tissue", "No media"
 )
 # sitetype <- c(
 #       unique(utils::read.csv(url(
@@ -252,7 +253,7 @@ mod_query_data_ui <- function(id) {
             )
           ),
           choices = c("", media),
-          selected = c("Water", "water"),
+          selected = c("Water"), # "water" gets added automatically if Water is included.  This is for older USGS data
           multiple = TRUE
         )
       ),
@@ -690,6 +691,11 @@ mod_query_data_server <- function(id, tadat) {
         tadat$sampleMedia <- "null"
       } else {
         tadat$sampleMedia <- input$media
+        # "If 'Water' found in input$media then add 'water' to tadat$sampleMedia
+        # this is used for some older USGS data only
+        if (sum(grep('Water', input$media)) > 0) {
+          tadat$sampleMedia <- append(tadat$sampleMedia, 'water')
+        }
       }
       if (is.null(input$project)) {
         tadat$project <- "null"
