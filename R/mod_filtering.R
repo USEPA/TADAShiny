@@ -80,6 +80,10 @@ mod_filtering_server <- function(id, tadat) {
             "No description available",
             Description
           ))
+        
+        # add Description for Fields equal 'TADA.Media.Flag'
+        tables$filter_fields[tables$filter_fields$Fields == "TADA.Media.Flag", 
+                                                     "Description"] <- "TADA-standardized media fields"
       }
     })
 

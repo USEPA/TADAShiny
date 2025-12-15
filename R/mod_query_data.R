@@ -535,6 +535,9 @@ mod_query_data_server <- function(id, tadat) {
         # add empty TADA.Remove column
         raw$TADA.Remove <- NULL
 
+        # 2025-12-15 add column with TADA.Media.Flag
+        raw = EPATADA::TADA_AnalysisDataFilter(raw, clean=FALSE)
+        
         initializeTable(tadat, raw)
 
         if (!is.null(tadat$original_source)) {
@@ -575,6 +578,10 @@ mod_query_data_server <- function(id, tadat) {
       if (input$example_data == "Nutrients Utah (15k results)") {
         raw <- EPATADA::Data_Nutrients_UT
       }
+      
+      # 2025-12-15 adding column TADA.Media.Flag
+      raw <- EPATADA::TADA_AnalysisDataFilter(raw, clean=FALSE)
+      
       initializeTable(tadat, raw)
 
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
@@ -1106,6 +1113,10 @@ mod_query_data_server <- function(id, tadat) {
           )
         )
       } else {
+        
+        # 2025-12-15 adding column TADA.Media.Flag
+        raw <- EPATADA::TADA_AnalysisDataFilter(raw, clean=FALSE)
+        
         initializeTable(tadat, raw)
       }
     })
