@@ -19,7 +19,11 @@ mod_filtering_ui <- function(id) {
     DT::dataTableOutput(ns("filterStep1")),
     htmltools::br(),
     shiny::htmlOutput(ns("promptStep2")),
-    DT::DTOutput(ns("filterStep2")),
+    htmltools::br(),
+    shiny::fluidRow(
+      column(4, shiny::plotOutput(ns("filter_pie_chart"), height = "500px")),
+      column( 8, DT::DTOutput(ns("filterStep2")))
+    ),
     htmltools::br(),
     shiny::fluidRow(
       column(
@@ -92,6 +96,40 @@ mod_filtering_server <- function(id, tadat) {
       )
     )
 
+    getValues <- function(.data, field) {
+      counts <- table(.data[[field]], useNA = "ifany")
+      if (length(rownames(counts) > 0)) {
+        value_table <-
+          data.frame(Value = names(counts), Count = as.vector(counts))
+      } else {
+        value_table <- data.frame(Value = character(), Count = integer())
+      }
+      return(value_table)
+    }
+    # shiny::observeEvent(tables$dat, {
+    #       # 2025-11-21 create pie chart for selected Filter field
+    #   output$filter_pie_chart <- shiny::renderPlot({
+    #     shiny::req(values$selected_field)
+    #     EPATADA::TADA_FieldValuesPie(tables$dat, field = values$selected_field)
+    #   })
+    # })
+    shiny::observeEvent(tables$dat, {
+      # 2025-11-21 create pie chart for selected Filter field
+      output$filter_pie_chart <- shiny::renderPlot({
+        shiny::req(values$selected_field)
+        pie_data <- tables$dat
+        if (!is.null(tadat$selected_filters) && nrow(tadat$selected_filters) > 0) {
+          #TODO further filter the data for the pie chart
+          # browser()
+          EPATADA::TADA_FieldValuesPie(pie_data, field = values$selected_field)
+        }
+        else {
+          EPATADA::TADA_FieldValuesPie(pie_data, field = values$selected_field)
+        }
+
+      })
+    })
+
     # When key column selected, get unique values for that column
     shiny::observeEvent(input$filterStep1_rows_selected, {
       # Get the name of the selected field
@@ -104,8 +142,13 @@ mod_filtering_server <- function(id, tadat) {
         base::paste0(
           "<h3>Filter by '",
           values$selected_field,
-          "'</h3>
-               <p>In this table, you may either exclude selected values, or ONLY include selected values and exclude all other non-selected values. Use the buttons at the bottom of this table to make your decisions. Note that once you select a filtering type (Exclude or Include), the other filtering type button is disabled for that field. <b>Note:</b> If any results are NA, they will be represented by a blank (empty) row in this table.</p>"
+          "'</h3>",
+           "<p>In this table, you may either exclude selected values,
+          or ONLY include selected values and exclude all other non-selected values.
+          Use the buttons at the bottom of this table to make your decisions.
+          Note that once you select a filtering type (Exclude or Include),
+          the other filtering type button is disabled for that field.
+          <b>Note:</b> If any results are NA, they will be represented by a blank (empty) row in this table.</p>"
         )
       ))
       shinyjs::show("addOnlys")
@@ -134,7 +177,7 @@ mod_filtering_server <- function(id, tadat) {
         dimnames = list(NULL, c("Field", "Value", "Filter")) # count
       ))
 
-    # selected table at bottom
+    # 'Selected filters' table at bottom
     output$selectedFilters <- DT::renderDT(
       tadat$selected_filters,
       escape = FALSE,
@@ -146,6 +189,22 @@ mod_filtering_server <- function(id, tadat) {
         language = list(zeroRecords = "No filters selected")
       )
     )
+
+    # Called whenever a "Include" or "Exclude" button is clicked
+    selectFilters <- function(Filter) {
+      # Locks the value of the selected field to "Include" or "Exclude"
+      values$locked[values$selected_field] <- Filter
+      # Initializes a table for the newly selected values
+      rows <- input$filterStep2_rows_selected
+      Field <- values$selected_field
+      Value <- tables$filter_values[rows, "Value"]
+      Count <- rep(0, length(rows))
+      new_rows <- data.frame(Field, Value, Filter, Count)
+      # Adds the newly selected field/vals to the Selected table
+      tadat$selected_filters <- rbind(tadat$selected_filters, new_rows)
+      tadat$selected_filters <-
+        tadat$selected_filters %>% dplyr::distinct(Field, Value, .keep_all = TRUE)
+    }
 
     # what happens when you click "Include Only Selected Values"
     shiny::observeEvent(input$addOnlys, {
@@ -277,7 +336,7 @@ mod_filtering_server <- function(id, tadat) {
       names(values$locked) <- field_filters$Field
       prefix <- "Filter: "
 
-      # Remove all the filter columns from the removals table (start fresh)
+      # Remove all the 'Filter: ' values columns from the removals table (start fresh)
       if (!is.null(tadat$removals)) {
         tadat$removals <-
           dplyr::select(tadat$removals, -(dplyr::starts_with(prefix)))
