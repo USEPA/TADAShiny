@@ -36,11 +36,13 @@ mod_figures_ui <- function(id) {
       shiny::tabPanel(
         "Single Characteristic Figures",
         htmltools::br(),
+        shiny::uiOutput(ns("benchmarktext")),
+        htmltools::br(),
         htmltools::HTML("Benchmark values appear as horizontal lines on the single-characteristic scatterplot figure, below. Benchmarks may reflect established or proposed water quality criteria, important physical/chemical/biological thresholds, or any other values relevant to your use case."),
         htmltools::br(),
         shiny::uiOutput(ns("benchmarks")),
         htmltools::br(),
-        shiny::uiOutput(ns("benchmarktext")),
+        shiny::fluidRow(DT::DTOutput(ns("explore_sumtable")), width = 600),
         htmltools::br(),
         shiny::fluidRow(plotly::plotlyOutput(ns("scatter"))),
         htmltools::br(),
@@ -121,6 +123,13 @@ mod_figures_server <- function(id, tadat) {
         dplyr::mutate(groupname = gsub("_NA", "", group)) %>%
         dplyr::mutate(groupname = gsub("_", " ", groupname)) %>%
         dplyr::select(selcols)
+
+      # need all the columns for Stats table
+      react$full_data <- tadat$raw %>%
+        dplyr::filter(TADA.Remove == FALSE, !is.na(TADA.ResultMeasureValue)) %>%
+        tidyr::unite("group", input$groupingcols, sep = "_", remove = FALSE) %>%
+        dplyr::mutate(groupname = gsub("_NA", "", group)) %>%
+        dplyr::mutate(groupname = gsub("_", " ", groupname))
     })
 
     # select 1-2 unique groups drop down menu AND button to display on map and plots
@@ -165,7 +174,10 @@ mod_figures_server <- function(id, tadat) {
       react$plotdataset <- groupdata
       react$mapdata <- groupdata %>%
         dplyr::group_by(OrganizationFormalName, MonitoringLocationIdentifier, MonitoringLocationName, MonitoringLocationTypeName, TADA.LatitudeMeasure, TADA.LongitudeMeasure) %>%
-        dplyr::summarise(Ncount = length(ResultIdentifier), MeanV = mean(TADA.ResultMeasureValue), GroupID = base::paste0(unique(sort(groupname)), collapse = ";"), DateRange = base::paste0(min(lubridate::year(as.Date(ActivityStartDate, "%Y-%m-%d"))), " - ", max(lubridate::year(as.Date(ActivityStartDate, "%Y-%m-%d")))))
+        dplyr::summarise(Ncount = length(ResultIdentifier),
+            MeanV = mean(TADA.ResultMeasureValue),
+            GroupID = base::paste0(unique(sort(groupname)), collapse = ";"),
+            DateRange = base::paste0(min(lubridate::year(as.Date(ActivityStartDate, "%Y-%m-%d"))), " - ", max(lubridate::year(as.Date(ActivityStartDate, "%Y-%m-%d")))))
     })
 
     # taken from this stackoverflow: https://stackoverflow.com/questions/58505589/circles-in-legend-for-leaflet-map-with-addcirclemarkers-in-r-without-shiny
@@ -320,13 +332,94 @@ mod_figures_server <- function(id, tadat) {
       )
     })
 
+    # 2025-11-20 initial place to start inserting table of STATS
     output$benchmarktext <- shiny::renderUI({
-      shiny::req(input$benchmark1)
-      vals <- subset(react$plotdata, react$plotdata$groupname == react$groups[1])$TADA.ResultMeasureValue
-      exc1 <- length(vals[vals > input$benchmark1])
-      exc2 <- length(vals[vals > input$benchmark2])
-      tot <- length(vals)
-      shiny::wellPanel(htmltools::strong(base::paste0(exc1, " out of ", tot, " measurements (", round(exc1 / tot * 100, digits = 1), "%) exceed benchmark 1, while ", exc2, " out of ", tot, " measurements (", round(exc2 / tot * 100, digits = 1), "%) exceed benchmark 2.")))
+      shiny::req(react$plotdata)
+
+      success <- FALSE # Flag to track if the process completes successfully
+
+      tryCatch(
+        {
+          # Temporarily treat warnings as errors
+          old_warn <- options("warn")
+          options(warn = 2)
+
+          # Get the data summary
+          selected_groups <- input$mapplotgroup
+  
+          groupdata <- subset(react$full_data, react$full_data$groupname %in% c(react$groups))
+  
+          stat_table_data <- EPATADA::TADA_Stats(groupdata, group_cols = c("TADA.ComparableDataIdentifier"))
+  
+          react$summary <-
+            stat_table_data [, names(stat_table_data) %in% c(
+              "TADA.ComparableDataIdentifier",
+              "Mean",
+              "Min",
+              "Max",
+              "Percentile_5th",
+              "Percentile_10th",
+              "Percentile_15th",
+              "Percentile_25th",
+              "Percentile_50th_Median",
+              "Percentile_75th",
+              "Percentile_85th",
+              "Percentile_95th",
+              "Percentile_98th",
+              "Non_Detect_Pct"
+            )]
+          success <- TRUE # Set flag to true if all operations succeed
+
+          # Restore warning options
+          options(old_warn)
+        },
+        error = function(e) {
+          # Restore warning options in case of error
+          options(old_warn)
+
+          # Log error details for debugging
+          cat("Error: ", e$message, "\n")
+
+          # Show error notification to the user
+          shiny::showNotification(
+            ui = tagList(
+              htmltools::h4(htmltools::strong("WQP Error")),
+              htmltools::hr(style = "margin-top: 5px; margin-bottom: 5px;"), # Adds a separator line
+              paste(e$message),
+              paste("An error occurred while generating stats.  Check your filter values and try again.")
+            ),
+            type = "error",
+            duration = NULL,
+            id = "uploadError"
+          )
+        }
+      )
+
+      # Ensure spinner is removed regardless of success or error
+      shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+      # end new
+      if (success == FALSE) {
+        return()
+      }
+      # creates summary table complete with csv button in case someone wants to
+      # download the summary table
+      DT::renderDT({
+        DT::datatable(
+          react$summary,
+          extensions = "Buttons",
+          caption="Summary Statistics",
+          options = list(
+            dom = "lftiB", # this is depreciated
+            scrollX = TRUE,
+            pageLength = 10,
+            searching = FALSE,
+            paging = FALSE,
+            buttons = c("csv")
+          ),
+          selection = "none",
+          rownames = FALSE
+        )
+      })
     })
 
     # for plotting benchmarks
