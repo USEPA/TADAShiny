@@ -143,6 +143,7 @@ mod_data_flagging_server <- function(id, tadat) {
       for (flag in tadat$selected_flags) {
         # If not all the values are NA, add the test results to removals
         if (!is.null(tadat$removals)) {
+          browser()
           if (!all(is.na(values$testResults[flag]))) {
             tadat$removals[base::paste0(flag_prefix, flag)] <- values$testResults[flag]
           }
@@ -161,6 +162,31 @@ mod_data_flagging_server <- function(id, tadat) {
           }
         }
       }
+      
+      # 2025-12-17 moved from mod_review_data.R
+      # the duplicate are already in tada$removals by this point.  One version with prefix and one without
+      # start
+      if (is.null(tadat$raw) == FALSE) {
+        # removals <- tadat$removals
+        # only take removals that have the flag_prefix
+        removals <- dplyr::select(tadat$removals, (dplyr::starts_with(flag_prefix)))
+        sel <- which(removals == TRUE, arr.ind = TRUE)
+        # Bombing here
+        if (length(sel) > 0) {
+          removals[sel] <- names(removals)[sel[, "col"]]
+          removals[removals == FALSE] <- ""
+          tadat$raw$TADA.RemovalReason <- apply(
+            removals, 1,
+            function(row) {
+              paste(row[nzchar(row)], collapse = ", ")
+            }
+          )
+        } else {
+          tadat$raw$TADA.RemovalReason <- NA
+        }
+      }
+      # end
+      
     })
 
     # Any time tadat$raw is changed, check to see if the flagging fields are present

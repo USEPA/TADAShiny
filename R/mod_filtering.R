@@ -401,6 +401,24 @@ mod_filtering_server <- function(id, tadat) {
           }
           tadat$selected_filters <- new_selected_filters
         }
+        
+        # 2025-12-18 update the TADA.RemovalReason field
+        removals <- tadat$removals
+        sel <- which(removals == TRUE, arr.ind = TRUE)
+        # todo might need to make sure sel is not NULL
+        if (length(sel) > 0) {
+          removals[sel] <- names(removals)[sel[, "col"]]
+          removals[removals == FALSE] <- ""
+          tadat$raw$TADA.RemovalReason <- apply(
+            removals, 1,
+            function(row) {
+              paste(row[nzchar(row)], collapse = ", ")
+            }
+          )
+        } else {
+          tadat$raw$TADA.RemovalReason <- NA
+        }
+        
       }
     })
 
@@ -415,5 +433,8 @@ mod_filtering_server <- function(id, tadat) {
       }
       return(value_table)
     }
+    
+    
+    
   })
 }
