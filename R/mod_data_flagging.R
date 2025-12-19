@@ -143,7 +143,7 @@ mod_data_flagging_server <- function(id, tadat) {
       for (flag in tadat$selected_flags) {
         # If not all the values are NA, add the test results to removals
         if (!is.null(tadat$removals)) {
-          browser()
+          # browser()
           if (!all(is.na(values$testResults[flag]))) {
             tadat$removals[base::paste0(flag_prefix, flag)] <- values$testResults[flag]
           }

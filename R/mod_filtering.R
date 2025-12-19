@@ -123,7 +123,7 @@ mod_filtering_server <- function(id, tadat) {
         shiny::req(values$selected_field)
         pie_data <- tables$dat
         if (!is.null(tadat$selected_filters) && nrow(tadat$selected_filters) > 0) {
-          #TODO further filter the data for the pie chart
+          # TODO further filter the data for the pie chart
           # browser()
           EPATADA::TADA_FieldValuesPie(pie_data, field = values$selected_field)
         }
