@@ -5,7 +5,7 @@ test_table <- utils::read.csv("inst/flag_tests.csv")
 # test_table = utils::read.csv(app_sys("flag_tests.csv"))
 prompt_table <- prompt_table[order(prompt_table$Order), ]
 prompts <- prompt_table$Prompt
-active_flags <- unique(merge(prompt_table, test_table)$columnName)
+active_flags <- unique(test_table$columnName[test_table$remove == 1])
 levs <- prompt_table$Level
 n_switches <- length(prompts)
 flag_types <- prompt_table$flagType
@@ -40,7 +40,7 @@ flagCensus <- function(raw) {
           } else {}
           results <- results + test_results
         }
-        tabular_results[flag] <- (results > 0)
+        tabular_results[[flag]] <- (results > 0)
       }
     } else {
       print(base::paste0("No tests found for flag ", flag))

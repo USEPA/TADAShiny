@@ -106,26 +106,27 @@ mod_data_flagging_server <- function(id, tadat) {
       }))
     }
 
-    # Update removals based on the state of the switches
+    # Update removals based on the state of the switches (write prefixed columns only)
     shiny::observe({
       switch_id <- "switch_"
       tadat$selected_flags <- flag_types[shinyValue(switch_id, n_switches)]
 
-      # Ensure tadat$raw is not NULL
+      # Ensure required data is present
       shiny::req(tadat$raw)
+      shiny::req(values$testResults)
 
-      # Initialize or clear removals for each flag
       for (i in seq_len(n_switches)) {
         flag <- flag_types[i]
         switch_name <- base::paste0(switch_id, i)
+        col_name <- base::paste0(flag_prefix, flag)
 
         if (!is.null(input[[switch_name]])) {
-          if (input[[switch_name]]) {
-            # If the switch is on, update removals with the test results
-            tadat$removals[[flag]] <- values$testResults[[flag]]
+          if (isTRUE(input[[switch_name]])) {
+            # If the switch is on, update removals with the test results (prefixed)
+            tadat$removals[[col_name]] <- values$testResults[[flag]]
           } else {
-            # If the switch is off, set removals for this flag to FALSE
-            tadat$removals[[flag]] <- rep(FALSE, nrow(tadat$raw))
+            # If the switch is off, set removals for this flag to FALSE (prefixed)
+            tadat$removals[[col_name]] <- rep(FALSE, nrow(tadat$raw))
           }
         }
       }
@@ -133,21 +134,13 @@ mod_data_flagging_server <- function(id, tadat) {
 
     # Runs whenever selected flags are changed
     shiny::observeEvent(tadat$selected_flags, {
-      if (!is.null(tadat$removals)) {
-        tadat$removals <- dplyr::select(tadat$removals, -(dplyr::starts_with(flag_prefix)))
-      }
+      # Do not mutate tadat$removals here; the switch observer handles it.
       if ((!is.null(tadat$raw)) & (!is.null(tadat$selected_flags))) {
         shinyjs::enable(selector = '.nav li a[data-value="Flag"]')
       }
-      # Loop through the flags
+
+      # Sync UI: force selected flags to ON in the UI
       for (flag in tadat$selected_flags) {
-        # If not all the values are NA, add the test results to removals
-        if (!is.null(tadat$removals)) {
-          # browser()
-          if (!all(is.na(values$testResults[flag]))) {
-            tadat$removals[base::paste0(flag_prefix, flag)] <- values$testResults[flag]
-          }
-        }
         pos <- match(flag, flag_types)
         tadat$switch_defaults[pos] <- TRUE
         if (!is.null(input[[base::paste0("switch_", pos)]])) {
@@ -163,15 +156,10 @@ mod_data_flagging_server <- function(id, tadat) {
         }
       }
 
-      # 2025-12-17 moved from mod_review_data.R
-      # the duplicate are already in tada$removals by this point.  One version with prefix and one without
-      # start
+      # Build RemovalReason from prefixed columns only
       if (is.null(tadat$raw) == FALSE) {
-        # removals <- tadat$removals
-        # only take removals that have the flag_prefix
         removals <- dplyr::select(tadat$removals, (dplyr::starts_with(flag_prefix)))
         sel <- which(removals == TRUE, arr.ind = TRUE)
-        # Bombing here
         if (length(sel) > 0) {
           removals[sel] <- names(removals)[sel[, "col"]]
           removals[removals == FALSE] <- ""
@@ -185,7 +173,6 @@ mod_data_flagging_server <- function(id, tadat) {
           tadat$raw$TADA.RemovalReason <- NA
         }
       }
-      # end
     })
 
     # Any time tadat$raw is changed, check to see if the flagging fields are present
@@ -207,7 +194,7 @@ mod_data_flagging_server <- function(id, tadat) {
         })
 
         switchTable <- shiny::reactive({
-          df <- data.frame(
+          data.frame(
             Reason = prompts,
             Results = values$n_fails,
             Required = levs,
