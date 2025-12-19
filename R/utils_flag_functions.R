@@ -12,7 +12,6 @@ flag_types <- prompt_table$flagType
 flag_prefix <- "Flag: "
 
 flagCensus <- function(raw) {
-  # JCH - seems like there are NA values here that aren't getting counted right
   tabular_results <-
     data.frame(matrix(ncol = length(flag_types), nrow = nrow(raw)))
   colnames(tabular_results) <- flag_types

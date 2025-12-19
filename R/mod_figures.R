@@ -174,10 +174,12 @@ mod_figures_server <- function(id, tadat) {
       react$plotdataset <- groupdata
       react$mapdata <- groupdata %>%
         dplyr::group_by(OrganizationFormalName, MonitoringLocationIdentifier, MonitoringLocationName, MonitoringLocationTypeName, TADA.LatitudeMeasure, TADA.LongitudeMeasure) %>%
-        dplyr::summarise(Ncount = length(ResultIdentifier),
-            MeanV = mean(TADA.ResultMeasureValue),
-            GroupID = base::paste0(unique(sort(groupname)), collapse = ";"),
-            DateRange = base::paste0(min(lubridate::year(as.Date(ActivityStartDate, "%Y-%m-%d"))), " - ", max(lubridate::year(as.Date(ActivityStartDate, "%Y-%m-%d")))))
+        dplyr::summarise(
+          Ncount = length(ResultIdentifier),
+          MeanV = mean(TADA.ResultMeasureValue),
+          GroupID = base::paste0(unique(sort(groupname)), collapse = ";"),
+          DateRange = base::paste0(min(lubridate::year(as.Date(ActivityStartDate, "%Y-%m-%d"))), " - ", max(lubridate::year(as.Date(ActivityStartDate, "%Y-%m-%d"))))
+        )
     })
 
     # taken from this stackoverflow: https://stackoverflow.com/questions/58505589/circles-in-legend-for-leaflet-map-with-addcirclemarkers-in-r-without-shiny
@@ -346,13 +348,13 @@ mod_figures_server <- function(id, tadat) {
 
           # Get the data summary
           selected_groups <- input$mapplotgroup
-  
+
           groupdata <- subset(react$full_data, react$full_data$groupname %in% c(react$groups))
-  
+
           stat_table_data <- EPATADA::TADA_Stats(groupdata, group_cols = c("TADA.ComparableDataIdentifier"))
-  
+
           react$summary <-
-            stat_table_data [, names(stat_table_data) %in% c(
+            stat_table_data[, names(stat_table_data) %in% c(
               "TADA.ComparableDataIdentifier",
               "Mean",
               "Min",
@@ -407,7 +409,7 @@ mod_figures_server <- function(id, tadat) {
         DT::datatable(
           react$summary,
           extensions = "Buttons",
-          caption="Summary Statistics",
+          caption = "Summary Statistics",
           options = list(
             dom = "lftiB", # this is depreciated
             scrollX = TRUE,

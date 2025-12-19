@@ -22,7 +22,7 @@ mod_filtering_ui <- function(id) {
     htmltools::br(),
     shiny::fluidRow(
       column(4, shiny::plotOutput(ns("filter_pie_chart"), height = "500px")),
-      column( 8, DT::DTOutput(ns("filterStep2")))
+      column(8, DT::DTOutput(ns("filterStep2")))
     ),
     htmltools::br(),
     shiny::fluidRow(
@@ -80,10 +80,12 @@ mod_filtering_server <- function(id, tadat) {
             "No description available",
             Description
           ))
-        
+
         # add Description for Fields equal 'TADA.Media.Flag'
-        tables$filter_fields[tables$filter_fields$Fields == "TADA.Media.Flag", 
-                                                     "Description"] <- "TADA-standardized media fields"
+        tables$filter_fields[
+          tables$filter_fields$Fields == "TADA.Media.Flag",
+          "Description"
+        ] <- "TADA-standardized media fields"
       }
     })
 
@@ -126,11 +128,9 @@ mod_filtering_server <- function(id, tadat) {
           # TODO further filter the data for the pie chart
           # browser()
           EPATADA::TADA_FieldValuesPie(pie_data, field = values$selected_field)
-        }
-        else {
+        } else {
           EPATADA::TADA_FieldValuesPie(pie_data, field = values$selected_field)
         }
-
       })
     })
 
@@ -147,7 +147,7 @@ mod_filtering_server <- function(id, tadat) {
           "<h3>Filter by '",
           values$selected_field,
           "'</h3>",
-           "<p>In this table, you may either exclude selected values,
+          "<p>In this table, you may either exclude selected values,
           or ONLY include selected values and exclude all other non-selected values.
           Use the buttons at the bottom of this table to make your decisions.
           Note that once you select a filtering type (Exclude or Include),
@@ -401,7 +401,7 @@ mod_filtering_server <- function(id, tadat) {
           }
           tadat$selected_filters <- new_selected_filters
         }
-        
+
         # 2025-12-18 update the TADA.RemovalReason field
         removals <- tadat$removals
         sel <- which(removals == TRUE, arr.ind = TRUE)
@@ -418,7 +418,6 @@ mod_filtering_server <- function(id, tadat) {
         } else {
           tadat$raw$TADA.RemovalReason <- NA
         }
-        
       }
     })
 
@@ -433,8 +432,5 @@ mod_filtering_server <- function(id, tadat) {
       }
       return(value_table)
     }
-    
-    
-    
   })
 }

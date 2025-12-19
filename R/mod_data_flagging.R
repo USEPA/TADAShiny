@@ -162,7 +162,7 @@ mod_data_flagging_server <- function(id, tadat) {
           }
         }
       }
-      
+
       # 2025-12-17 moved from mod_review_data.R
       # the duplicate are already in tada$removals by this point.  One version with prefix and one without
       # start
@@ -186,7 +186,6 @@ mod_data_flagging_server <- function(id, tadat) {
         }
       }
       # end
-      
     })
 
     # Any time tadat$raw is changed, check to see if the flagging fields are present

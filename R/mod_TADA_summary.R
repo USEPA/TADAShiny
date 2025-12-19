@@ -170,7 +170,7 @@ mod_TADA_summary_server <- function(id, tadat) {
           # remove columns
           out_data <- subset(out_data, select = -TADA.Remove)
           out_data <- subset(out_data, select = -TADA.RemovalReason)
-          
+
           summary_things$temp_files <- c(datafile_name, progress_file_name)
           desc <- writeNarrativeDataFrame(tadat)
           dfs <- list(Data = out_data, Parameterization = desc)

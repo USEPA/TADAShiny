@@ -104,10 +104,10 @@ sitetype <- c(
 
 # these are the types of text matches used in searching the Characteristic(s) list
 match_types <- c(
-  "Starts With" = 'starts_with',
-  "Ends With" = 'ends_with',
-  "Contains" = 'contains',
-  "Equals" = 'matches'
+  "Starts With" = "starts_with",
+  "Ends With" = "ends_with",
+  "Contains" = "contains",
+  "Equals" = "matches"
 )
 
 mod_query_data_ui <- function(id) {
@@ -268,36 +268,39 @@ mod_query_data_ui <- function(id) {
       column(
         5,
         shiny::fluidRow( # this is what allows both widgets to be side-by-side
-          htmltools::h3("Characteristic(s)", style="margin-bottom: 3px; font-size: 16px;"),
-          htmltools::hr(style="margin-bottom: 0px; margin-top: 0px;"),
-          column(width = 3,
-           style="margin-left: -15px;",
-           shiny::selectizeInput(
+          htmltools::h3("Characteristic(s)", style = "margin-bottom: 3px; font-size: 16px;"),
+          htmltools::hr(style = "margin-bottom: 0px; margin-top: 0px;"),
+          column(
+            width = 3,
+            style = "margin-left: -15px;",
+            shiny::selectizeInput(
               inputId = ns("match_type_selector"),
               label = "Match type:",
               choices = match_types, # Choices are populated on client
-              selected = 'contains',
+              selected = "contains",
               multiple = FALSE
             )
-           ),
-          column(width = 3,
+          ),
+          column(
+            width = 3,
             # Input for the user to type their search string
             shiny::textInput(
-              inputId = ns("text_string"), 
-              label = "Search string:", 
+              inputId = ns("text_string"),
+              label = "Search string:",
               value = ""
             )
           ),
-          column(width = 6,
+          column(
+            width = 6,
             shiny::selectizeInput(
               inputId = ns("characteristic_select"),
               label = "Select matching characteristics",
               choices = NULL,
               multiple = TRUE,
               options = list(
-                  placeholder = "Start typing or use drop down menu",
-                  openOnFocus = TRUE,
-                  plugins = list('remove_button')
+                placeholder = "Start typing or use drop down menu",
+                openOnFocus = TRUE,
+                plugins = list("remove_button")
               )
             )
           )
@@ -536,8 +539,8 @@ mod_query_data_server <- function(id, tadat) {
         raw$TADA.Remove <- NULL
 
         # 2025-12-15 add column with TADA.Media.Flag
-        raw = EPATADA::TADA_AnalysisDataFilter(raw, clean=FALSE)
-        
+        raw <- EPATADA::TADA_AnalysisDataFilter(raw, clean = FALSE)
+
         initializeTable(tadat, raw)
 
         if (!is.null(tadat$original_source)) {
@@ -578,10 +581,10 @@ mod_query_data_server <- function(id, tadat) {
       if (input$example_data == "Nutrients Utah (15k results)") {
         raw <- EPATADA::Data_Nutrients_UT
       }
-      
+
       # 2025-12-15 adding column TADA.Media.Flag
-      raw <- EPATADA::TADA_AnalysisDataFilter(raw, clean=FALSE)
-      
+      raw <- EPATADA::TADA_AnalysisDataFilter(raw, clean = FALSE)
+
       initializeTable(tadat, raw)
 
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
@@ -612,45 +615,39 @@ mod_query_data_server <- function(id, tadat) {
       options = list(placeholder = "Start typing or use drop down menu"),
       server = TRUE
     )
-    
+
     # A reactive expression that filters the choices based on the input pattern
     filtered_list <- shiny::reactive({
-      
       text_string <- input$text_string
-      
+
       if (is.null(text_string) || text_string == "") {
         # If the text string is empty, return all choices
         return(chars)
-      } 
-      else {
-        match_type <- 'contains'
-        if (input$match_type_selector != '') {
-          match_type = input$match_type_selector
+      } else {
+        match_type <- "contains"
+        if (input$match_type_selector != "") {
+          match_type <- input$match_type_selector
         }
         # set the grep pattern for each match type
-        if (match_type == 'starts_with') {
+        if (match_type == "starts_with") {
           grep_pattern <- paste0("^", text_string)
-        }
-        else if (match_type == 'ends_with') {
+        } else if (match_type == "ends_with") {
           grep_pattern <- paste0(text_string, "$")
-        }
-        else if (match_type == 'matches') {
+        } else if (match_type == "matches") {
           grep_pattern <- paste0("^", text_string, "$")
-        }
-        else { # contains
+        } else { # contains
           grep_pattern <- text_string
         }
-        
+
         my_filtered_list <- chars[grep(
-                                        grep_pattern,
-                                        chars,
-                                        ignore.case = TRUE
-                                      )
-                                   ]
+          grep_pattern,
+          chars,
+          ignore.case = TRUE
+        )]
 
         return(my_filtered_list)
       }
-    })    
+    })
 
     # Observer to update the selectizeInput choices whenever the filtered_list changes
     shiny::observe({
@@ -658,7 +655,7 @@ mod_query_data_server <- function(id, tadat) {
       # the value would be subject to an event when the updateSelectizeInput() happens below,
       # so you need to 'isolate' the current value before you run the update
       previous_selected <- shiny::isolate(input$characteristic_select)
-      
+
       shiny::updateSelectizeInput(
         session,
         "characteristic_select",
@@ -667,7 +664,7 @@ mod_query_data_server <- function(id, tadat) {
         selected = previous_selected
       )
     })
-    
+
     shiny::updateSelectizeInput(session,
       "characteristic",
       choices = c(chars),
@@ -795,8 +792,8 @@ mod_query_data_server <- function(id, tadat) {
         tadat$sampleMedia <- input$media
         # "If 'Water' found in input$media then add 'water' to tadat$sampleMedia
         # this is used for some older USGS data only
-        if (sum(grep('Water', input$media)) > 0) {
-          tadat$sampleMedia <- append(tadat$sampleMedia, 'water')
+        if (sum(grep("Water", input$media)) > 0) {
+          tadat$sampleMedia <- append(tadat$sampleMedia, "water")
         }
       }
       if (is.null(input$project)) {
@@ -1113,10 +1110,9 @@ mod_query_data_server <- function(id, tadat) {
           )
         )
       } else {
-        
         # 2025-12-15 adding column TADA.Media.Flag
-        raw <- EPATADA::TADA_AnalysisDataFilter(raw, clean=FALSE)
-        
+        raw <- EPATADA::TADA_AnalysisDataFilter(raw, clean = FALSE)
+
         initializeTable(tadat, raw)
       }
     })
