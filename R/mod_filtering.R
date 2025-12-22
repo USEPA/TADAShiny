@@ -16,21 +16,21 @@ mod_filtering_ui <- function(id) {
       selected = "key",
       inline = TRUE
     ),
-    DT::dataTableOutput(ns("filterStep1")),
+    DT::DTOutput(ns("filterStep1")),
     htmltools::br(),
     shiny::htmlOutput(ns("promptStep2")),
     htmltools::br(),
     shiny::fluidRow(
-      column(4, shiny::plotOutput(ns("filter_pie_chart"), height = "500px")),
-      column(8, DT::DTOutput(ns("filterStep2")))
+      shiny::column(4, shiny::plotOutput(ns("filter_pie_chart"), height = "500px")),
+      shiny::column(8, DT::DTOutput(ns("filterStep2")))
     ),
     htmltools::br(),
     shiny::fluidRow(
-      column(
+      shiny::column(
         3,
         shiny::actionButton(ns("addOnlys"), "Include Only Selected Values", style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
       ),
-      column(
+      shiny::column(
         3,
         shiny::actionButton(ns("addExcludes"), "Exclude Selected Values", style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
       )
@@ -44,18 +44,17 @@ mod_filtering_ui <- function(id) {
     DT::DTOutput(ns("selectedFilters")),
     htmltools::br(),
     shiny::fluidRow(
-      column(
+      shiny::column(
         3,
         shiny::actionButton(ns("removeFilters"), "Reset Selected Filters", style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
       ),
-      column(
+      shiny::column(
         3,
         shiny::actionButton(ns("resetFilters"), "Reset All Filters", style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
       )
     )
   )
 }
-
 
 mod_filtering_server <- function(id, tadat) {
   shiny::moduleServer(id, function(input, output, session) {
@@ -66,154 +65,172 @@ mod_filtering_server <- function(id, tadat) {
     values$selected_field <- NULL
     shinyjs::hide("addOnlys")
     shinyjs::hide("addExcludes")
-
-    # make sure dataset being used to create filters is only REMOVE = FALSE
+    
+    # Value counting with NA and literal "NA" unified to "[NA]" label
+    getValues <- function(.data, field) {
+      if (is.null(.data) || is.null(field) || !(field %in% names(.data))) {
+        return(data.frame(
+          Value_label = character(),
+          Count       = integer(),
+          IsNA        = logical(),
+          stringsAsFactors = FALSE
+        ))
+      }
+      x <- .data[[field]]
+      x_chr <- as.character(x)
+      # Map both true NA and literal "NA" to "[NA]"
+      lbl <- ifelse(is.na(x) | x_chr == "NA", "[NA]", x_chr)
+      tab <- as.data.frame(table(lbl), stringsAsFactors = FALSE)
+      names(tab) <- c("Value_label", "Count")
+      tab$IsNA <- tab$Value_label == "[NA]"
+      tab
+    }
+    
+    # Initialize when Filter tab activates
     shiny::observeEvent(tadat$tab, {
-      if (tadat$tab == "Filter") {
-        # only show unique values from data that have not been flagged for removal
-        tables$dat <-
-          subset(tadat$raw, tadat$raw$TADA.Remove == FALSE)
+      if (identical(tadat$tab, "Filter")) {
+        # Use only rows not flagged for removal
+        tables$dat <- dplyr::filter(tadat$raw, TADA.Remove == FALSE)
+        
         tables$filter_fields <-
           EPATADA::TADA_FieldCounts(tables$dat, display = "key") %>%
-          dplyr::left_join(filter_dat, by = c("Fields")) %>%
+          dplyr::left_join(filter_dat, by = "Fields") %>%
           dplyr::mutate(Description = ifelse(is.na(Description),
-            "No description available",
-            Description
-          ))
-
-        # add Description for Fields equal 'TADA.Media.Flag'
+                                             "No description available",
+                                             Description))
+        
         tables$filter_fields[
           tables$filter_fields$Fields == "TADA.Media.Flag",
           "Description"
         ] <- "TADA-standardized media fields"
       }
     })
-
-    # First data table with key columns
-    output$filterStep1 <- DT::renderDT(
-      tables$filter_fields,
-      escape = FALSE,
-      selection = "single",
-      rownames = FALSE,
-      options = list(
-        dom = "t",
-        pageLength = dim(tables$filter_fields)[1],
-        paging = FALSE
-      )
-    )
-
-    getValues <- function(.data, field) {
-      counts <- table(.data[[field]], useNA = "ifany")
-      if (length(rownames(counts) > 0)) {
-        value_table <-
-          data.frame(Value = names(counts), Count = as.vector(counts))
-      } else {
-        value_table <- data.frame(Value = character(), Count = integer())
+    
+    # Step 1: field list
+    output$filterStep1 <- DT::renderDT({
+      shiny::req(tables$filter_fields)
+      tables$filter_fields
+    },
+    escape = FALSE,
+    selection = "single",
+    rownames = FALSE,
+    options = list(
+      dom = "t",
+      pageLength = nrow(tables$filter_fields),
+      paging = FALSE
+    ))
+    
+    # Pie chart for selected field
+    output$filter_pie_chart <- shiny::renderPlot({
+      shiny::req(values$selected_field)
+      shiny::req(tadat$raw)
+      pie_data <- tadat$raw
+      pie_data <- pie_data[pie_data$TADA.Remove == FALSE, , drop = FALSE]
+      shiny::req(values$selected_field %in% names(pie_data))
+      # Exclude current removals
+      if (!is.null(tadat$removals) && is.data.frame(tadat$removals) && ncol(tadat$removals) > 0) {
+        keep <- rowSums(tadat$removals) == 0
+        pie_data <- pie_data[keep, , drop = FALSE]
       }
-      return(value_table)
-    }
-    # shiny::observeEvent(tables$dat, {
-    #       # 2025-11-21 create pie chart for selected Filter field
-    #   output$filter_pie_chart <- shiny::renderPlot({
-    #     shiny::req(values$selected_field)
-    #     EPATADA::TADA_FieldValuesPie(tables$dat, field = values$selected_field)
-    #   })
-    # })
-    shiny::observeEvent(tables$dat, {
-      # 2025-11-21 create pie chart for selected Filter field
-      output$filter_pie_chart <- shiny::renderPlot({
-        shiny::req(values$selected_field)
-        pie_data <- tables$dat
-        if (!is.null(tadat$selected_filters) && nrow(tadat$selected_filters) > 0) {
-          # TODO further filter the data for the pie chart
-          # browser()
-          EPATADA::TADA_FieldValuesPie(pie_data, field = values$selected_field)
-        } else {
-          EPATADA::TADA_FieldValuesPie(pie_data, field = values$selected_field)
-        }
-      })
+      EPATADA::TADA_FieldValuesPie(pie_data, field = values$selected_field)
     })
-
-    # When key column selected, get unique values for that column
+    
+    # Step 1 selection => Step 2 values
     shiny::observeEvent(input$filterStep1_rows_selected, {
-      # Get the name of the selected field
-      values$selected_field <-
-        tables$filter_fields[input$filterStep1_rows_selected, ]$Field
+      sel <- input$filterStep1_rows_selected
+      shiny::req(!is.null(sel))
+      field_name <- tables$filter_fields[sel, "Fields"]
+      if (is.null(field_name) || is.na(field_name) || !nzchar(field_name) || !(field_name %in% names(tables$dat))) {
+        values$selected_field <- NULL
+        tables$filter_values <- NULL
+        shinyjs::hide("addOnlys")
+        shinyjs::hide("addExcludes")
+        output$promptStep2 <- shiny::renderUI(htmltools::HTML("<p>No valid field selected.</p>"))
+        return(NULL)
+      }
+      values$selected_field <- field_name
       applyLocks()
-      tables$filter_values <-
-        data.frame(getValues(tables$dat, values$selected_field))
-      output$promptStep2 <- shiny::renderUI(HTML(
-        base::paste0(
-          "<h3>Filter by '",
-          values$selected_field,
-          "'</h3>",
-          "<p>In this table, you may either exclude selected values,
-          or ONLY include selected values and exclude all other non-selected values.
-          Use the buttons at the bottom of this table to make your decisions.
-          Note that once you select a filtering type (Exclude or Include),
-          the other filtering type button is disabled for that field.
-          <b>Note:</b> If any results are NA, they will be represented by a blank (empty) row in this table.</p>"
+      tables$filter_values <- getValues(tables$dat, values$selected_field)
+      output$promptStep2 <- shiny::renderUI(htmltools::HTML(
+        paste0(
+          "<h3>Filter by '", values$selected_field, "'</h3>",
+          "<p>Select one or more values below, including the special <b>[NA]</b> value if present. ",
+          "Then choose whether to exclude those values, or keep only those values.</p>"
         )
       ))
       shinyjs::show("addOnlys")
       shinyjs::show("addExcludes")
     })
-
-
-    # show unique values for selected column
-    output$filterStep2 <- DT::renderDT(
-      tables$filter_values,
-      escape = FALSE,
-      selection = "multiple",
-      rownames = FALSE,
-      options = list(
-        dom = "t",
-        pageLength = dim(tables$filter_values)[1]
+    
+    # Step 2: values list (show label and counts; "[NA]" is clickable)
+    output$filterStep2 <- DT::renderDT({
+      shiny::req(tables$filter_values)
+      data.frame(
+        Value = tables$filter_values$Value_label,
+        Count = tables$filter_values$Count,
+        stringsAsFactors = FALSE
       )
+    },
+    escape = FALSE,
+    selection = "multiple",
+    rownames = FALSE,
+    options = list(
+      dom = "t",
+      pageLength = nrow(tables$filter_values)
+    ))
+    
+    # Initialize selected filters (track IsNA)
+    tadat$selected_filters <- data.frame(
+      Fields = character(),
+      Value  = character(),  # displayed label (includes "[NA]" for NA and "NA")
+      Filter = character(),
+      Count  = integer(),
+      IsNA   = logical(),
+      stringsAsFactors = FALSE
     )
-
-    # empty selected table on open
-    tadat$selected_filters <-
-      data.frame(matrix(
-        ncol = 3,
-        # 4 with count
-        nrow = 0,
-        dimnames = list(NULL, c("Field", "Value", "Filter")) # count
-      ))
-
-    # 'Selected filters' table at bottom
-    output$selectedFilters <- DT::renderDT(
-      tadat$selected_filters,
-      escape = FALSE,
-      selection = "multiple",
-      rownames = FALSE,
-      options = list(
-        dom = "t",
-        paging = FALSE,
-        language = list(zeroRecords = "No filters selected")
-      )
-    )
-
-    # Called whenever a "Include" or "Exclude" button is clicked
+    
+    # Selected filters table (hide IsNA in display)
+    output$selectedFilters <- DT::renderDT({
+      shiny::req(tadat$selected_filters)
+      tadat$selected_filters[, c("Fields", "Value", "Filter", "Count"), drop = FALSE]
+    },
+    escape = FALSE,
+    selection = "multiple",
+    rownames = FALSE,
+    options = list(
+      dom = "t",
+      paging = FALSE,
+      language = list(zeroRecords = "No filters selected")
+    ))
+    
+    # Add selections from Step 2
     selectFilters <- function(Filter) {
-      # Locks the value of the selected field to "Include" or "Exclude"
+      if (is.null(values$selected_field) || !(values$selected_field %in% names(tables$dat))) {
+        shiny::showModal(shiny::modalDialog(
+          title = "Invalid selection",
+          "Please select a valid field before choosing values."
+        ))
+        return(invisible(NULL))
+      }
       values$locked[values$selected_field] <- Filter
-      # Initializes a table for the newly selected values
       rows <- input$filterStep2_rows_selected
-      Field <- values$selected_field
-      Value <- tables$filter_values[rows, "Value"]
-      Count <- rep(0, length(rows))
-      new_rows <- data.frame(Field, Value, Filter, Count)
-      # Adds the newly selected field/vals to the Selected table
-      tadat$selected_filters <- rbind(tadat$selected_filters, new_rows)
-      tadat$selected_filters <-
-        tadat$selected_filters %>% dplyr::distinct(Field, Value, .keep_all = TRUE)
+      if (is.null(rows) || length(rows) == 0) return(invisible(NULL))
+      
+      Fields <- rep(values$selected_field, length(rows))
+      Value  <- tables$filter_values$Value_label[rows]
+      IsNA   <- tables$filter_values$IsNA[rows]
+      Count  <- rep(0L, length(rows))
+      
+      new_rows <- data.frame(Fields, Value, Filter, Count, IsNA, stringsAsFactors = FALSE)
+      tadat$selected_filters <- dplyr::distinct(
+        rbind(tadat$selected_filters, new_rows),
+        Fields, Value, .keep_all = TRUE
+      )
     }
-
-    # what happens when you click "Include Only Selected Values"
+    
+    # Include Only
     shiny::observeEvent(input$addOnlys, {
       if (is.null(input$filterStep2_rows_selected)) {
-        # make sure something is selected
         shiny::showModal(
           shiny::modalDialog(
             title = "Select Field Values",
@@ -224,11 +241,10 @@ mod_filtering_server <- function(id, tadat) {
         selectFilters("Keep only")
       }
     })
-
-    # what happens when you click "Exclude Selected Values"
+    
+    # Exclude
     shiny::observeEvent(input$addExcludes, {
       if (is.null(input$filterStep2_rows_selected)) {
-        # make sure something is selected
         shiny::showModal(
           shiny::modalDialog(
             title = "Select Field Values",
@@ -239,36 +255,41 @@ mod_filtering_server <- function(id, tadat) {
         selectFilters("Exclude")
       }
     })
-
+    
+    # Radio for fields display
     shiny::observeEvent(input$field_sel, {
       tadat$field_sel <- input$field_sel
     })
-
+    
     shiny::observeEvent(tadat$field_sel, {
       shiny::updateRadioButtons(session, "field_sel", selected = tadat$field_sel)
       if (!is.null(tables$dat)) {
         tables$filter_fields <-
           EPATADA::TADA_FieldCounts(tables$dat, display = tadat$field_sel) %>%
-          dplyr::left_join(filter_dat, by = c("Fields")) %>%
+          dplyr::left_join(filter_dat, by = "Fields") %>%
           dplyr::mutate(Description = ifelse(is.na(Description),
-            "No description available",
-            Description
-          ))
+                                             "No description available",
+                                             Description))
+        tables$filter_fields[
+          tables$filter_fields$Fields == "TADA.Media.Flag",
+          "Description"
+        ] <- "TADA-standardized media fields"
       }
     })
-
-    # reset all filters in bottom table
+    
+    # Reset all filters
     shiny::observeEvent(input$resetFilters, {
-      # empty selected table on open
-      tadat$selected_filters <-
-        data.frame(matrix(
-          ncol = 4,
-          nrow = 0,
-          dimnames = list(NULL, c("Field", "Value", "Filter", "Count"))
-        ))
+      tadat$selected_filters <- data.frame(
+        Fields = character(),
+        Value  = character(),
+        Filter = character(),
+        Count  = integer(),
+        IsNA   = logical(),
+        stringsAsFactors = FALSE
+      )
     })
-
-    # reset selected filters in bottom table
+    
+    # Remove selected filters
     shiny::observeEvent(input$removeFilters, {
       if (is.null(input$selectedFilters_rows_selected)) {
         shiny::showModal(
@@ -281,156 +302,114 @@ mod_filtering_server <- function(id, tadat) {
         tadat$selected_filters <- tadat$selected_filters[-input$selectedFilters_rows_selected, ]
       }
     })
-
-    # Called whenever a "Include" or "Exclude" button is clicked
-    selectFilters <- function(Filter) {
-      # Locks the value of the selected field to "Include" or "Exclude"
-      values$locked[values$selected_field] <- Filter
-      # Initializes a table for the newly selected values
-      rows <- input$filterStep2_rows_selected
-      Field <- values$selected_field
-      Value <- tables$filter_values[rows, "Value"]
-      Count <- rep(0, length(rows))
-      new_rows <- data.frame(Field, Value, Filter, Count)
-      # Adds the newly selected field/vals to the Selected table
-      tadat$selected_filters <- rbind(tadat$selected_filters, new_rows)
-      tadat$selected_filters <-
-        tadat$selected_filters %>% dplyr::distinct(Field, Value, .keep_all = TRUE)
-    }
-
-    #####
-    # These functions are used to lock fields to "Include or Exclude"
-    # This is necessary because including ONLY certain values from a field
-    # will inherently exclude all others, so there can't be mixing
-    shiny::observeEvent(tables$selected, {
-      still_present <-
-        intersect(names(values$locked), unique(tables$selected$Field))
+    
+    # Maintain locks
+    shiny::observeEvent(tadat$selected_filters, {
+      still_present <- intersect(names(values$locked), unique(tadat$selected_filters$Fields))
       values$locked <- values$locked[still_present]
     })
-
+    
     applyLocks <- function() {
-      if (!is.null(values$selected_field)) {
+      if (!is.null(values$selected_field) && values$selected_field %in% names(tables$dat)) {
         active_lock <- values$locked[values$selected_field]
         if (is.na(active_lock)) {
-          shinyjs::enable("addOnlys")
-          shinyjs::enable("addExcludes")
+          shinyjs::enable("addOnlys"); shinyjs::enable("addExcludes")
         } else if (active_lock == "Keep only") {
-          shinyjs::enable("addOnlys")
-          shinyjs::disable("addExcludes")
+          shinyjs::enable("addOnlys"); shinyjs::disable("addExcludes")
         } else {
-          shinyjs::disable("addOnlys")
-          shinyjs::enable("addExcludes")
+          shinyjs::disable("addOnlys"); shinyjs::enable("addExcludes")
         }
       } else {
-        shinyjs::disable("addOnlys")
-        shinyjs::disable("addExcludes")
+        shinyjs::disable("addOnlys"); shinyjs::disable("addExcludes")
       }
     }
-
+    
     shiny::observeEvent(values$locked, {
       applyLocks()
     })
-    #####
-
-    # This gets run whenever a change in selected filters happens
+    
+    # Apply filters, update counts, and removal reasons
     shiny::observeEvent(tadat$selected_filters, {
-      # Apply field locks
-      field_filters <- dplyr::distinct(tadat$selected_filters, Field, Filter)
+      # Update lock state per field
+      field_filters <- dplyr::distinct(tadat$selected_filters, Fields, Filter)
       values$locked <- field_filters$Filter
-      names(values$locked) <- field_filters$Field
+      names(values$locked) <- field_filters$Fields
       prefix <- "Filter: "
-
-      # Remove all the 'Filter: ' values columns from the removals table (start fresh)
-      if (!is.null(tadat$removals)) {
-        tadat$removals <-
-          dplyr::select(tadat$removals, -(dplyr::starts_with(prefix)))
+      
+      # Initialize/remake removals frame
+      if (is.null(tadat$removals) && !is.null(tadat$raw)) {
+        tadat$removals <- data.frame(matrix(nrow = nrow(tadat$raw), ncol = 0))
+      } else if (!is.null(tadat$removals)) {
+        tadat$removals <- dplyr::select(tadat$removals, -(dplyr::starts_with(prefix)))
       }
-
-      # Only proceed if filters have been selected
-      if (!(is.null(tadat$raw))) {
-        # Enable the filtering tab. Usually happens when filters are loaded from a progress file
+      
+      if (!is.null(tadat$raw)) {
         shinyjs::enable(selector = '.nav li a[data-value="Filter"]')
+        
         if (nrow(tadat$selected_filters) > 0) {
-          # Since filters have been added, enable the ability to reset them
           shinyjs::enable("resetFilters")
           shinyjs::enable("removeFilters")
-
-          # Loop through the filters field-by-field
-          for (active_field in unique(tadat$selected_filters$Field))
-          {
+          
+          # Apply per-field filters
+          for (active_field in unique(tadat$selected_filters$Fields)) {
+            if (!(active_field %in% names(tadat$raw))) next
             filter_type <- values$locked[active_field]
-            field_filters <-
-              tadat$selected_filters[tadat$selected_filters == active_field, ]
+            field_filters <- tadat$selected_filters[tadat$selected_filters$Fields == active_field, , drop = FALSE]
+            
             results <- rep(FALSE, nrow(tadat$raw))
-            for (row in 1:nrow(field_filters))
-            {
-              sel <- (tadat$raw[[active_field]] == field_filters[row, "Value"])
+            for (row_idx in seq_len(nrow(field_filters))) {
+              is_na_sel <- isTRUE(field_filters[row_idx, "IsNA"])
+              if (is_na_sel) {
+                # Select rows that are either true NA or literal "NA"
+                sel <- is.na(tadat$raw[[active_field]]) |
+                  (as.character(tadat$raw[[active_field]]) == "NA")
+              } else {
+                sel <- (as.character(tadat$raw[[active_field]]) == field_filters[row_idx, "Value"])
+              }
               sel[is.na(sel)] <- FALSE
               results <- results | sel
             }
-            # Get the intersection of all the places where True
-            if (filter_type == "Keep only") {
+            # Keep only: remove rows not selected
+            if (identical(filter_type, "Keep only")) {
               results <- !results
             }
             all_vals <- paste(field_filters$Value, collapse = " or ")
-            label <-
-              base::paste0(
-                prefix,
-                filter_type,
-                " ",
-                active_field,
-                " is ",
-                all_vals
-              )
-            tadat$removals[label] <- as.logical(results)
+            label <- paste0(prefix, filter_type, " ", active_field, " is ", all_vals)
+            tadat$removals[[label]] <- as.logical(results)
           }
         }
-
-        # Get counts for the filters
-        if (!is.null(tables$dat) & nrow(tadat$selected_filters > 0)) {
-          # Refresh the 'count' field
+        
+        # Update counts in selected_filters
+        if (!is.null(tables$dat) && nrow(tadat$selected_filters) > 0) {
           new_selected_filters <- tadat$selected_filters
-          new_selected_filters$Count <- NULL
-          new_selected_filters <-
-            cbind(new_selected_filters, Count = 0)
-          for (i in 1:nrow(new_selected_filters)) {
+          for (i in seq_len(nrow(new_selected_filters))) {
             row <- new_selected_filters[i, ]
-            values <- getValues(tables$dat, row$Field)
-            new_selected_filters[i, "Count"] <-
-              sum(values[(values$Value == row$Value), "Count"], na.rm = TRUE)
+            vals <- getValues(tables$dat, row$Fields)
+            if (isTRUE(row$IsNA)) {
+              new_selected_filters[i, "Count"] <- sum(vals$Count[vals$IsNA], na.rm = TRUE)
+            } else {
+              new_selected_filters[i, "Count"] <- sum(vals$Count[vals$Value_label == row$Value], na.rm = TRUE)
+            }
           }
           tadat$selected_filters <- new_selected_filters
         }
-
-        # 2025-12-18 update the TADA.RemovalReason field
+        
+        # Update TADA.RemovalReason
         removals <- tadat$removals
-        sel <- which(removals == TRUE, arr.ind = TRUE)
-        # todo might need to make sure sel is not NULL
-        if (length(sel) > 0) {
-          removals[sel] <- names(removals)[sel[, "col"]]
-          removals[removals == FALSE] <- ""
-          tadat$raw$TADA.RemovalReason <- apply(
-            removals, 1,
-            function(row) {
-              paste(row[nzchar(row)], collapse = ", ")
-            }
-          )
-        } else {
-          tadat$raw$TADA.RemovalReason <- NA
+        if (is.data.frame(removals) && nrow(removals) == nrow(tadat$raw)) {
+          sel <- which(removals == TRUE, arr.ind = TRUE)
+          if (length(sel) > 0) {
+            removals[sel] <- names(removals)[sel[, "col"]]
+            removals[removals == FALSE] <- ""
+            tadat$raw$TADA.RemovalReason <- apply(
+              removals, 1,
+              function(row) paste(row[nzchar(row)], collapse = ", ")
+            )
+          } else {
+            tadat$raw$TADA.RemovalReason <- NA
+          }
         }
       }
     })
-
-
-    getValues <- function(.data, field) {
-      counts <- table(.data[[field]], useNA = "ifany")
-      if (length(rownames(counts) > 0)) {
-        value_table <-
-          data.frame(Value = names(counts), Count = as.vector(counts))
-      } else {
-        value_table <- data.frame(Value = character(), Count = integer())
-      }
-      return(value_table)
-    }
   })
 }
