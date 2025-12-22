@@ -356,38 +356,51 @@ mod_filtering_server <- function(id, tadat) {
       )
     )
 
-    # Include Only: store complement labels as 'Exclude'
+    # Add selections from Step 2: Include Only (stored as complement 'Exclude')
     add_filters_include_only <- function() {
       fld <- values$selected_field
       if (is.null(fld)) {
-        shiny::showModal(shiny::modalDialog(title = "Invalid selection", "Please select a valid field before choosing values."))
-        return(invisible(NULL))
-      }
-      rows <- input$filterStep2_rows_selected
-      if (is.null(rows) || length(rows) == 0) {
-        shiny::showModal(shiny::modalDialog(title = "Select Field Values", "You must select the field value(s) to include."))
+        shiny::showModal(shiny::modalDialog(
+          title = "Invalid selection",
+          "Please select a valid field before choosing values."
+        ))
         return(invisible(NULL))
       }
 
+      rows <- input$filterStep2_rows_selected
+      if (is.null(rows) || length(rows) == 0) {
+        shiny::showModal(shiny::modalDialog(
+          title = "Select Field Values",
+          "You must select the field value(s) to include."
+        ))
+        return(invisible(NULL))
+      }
+
+      # Selected labels (already labelized via filter_values -> getValues -> labelize)
       vals <- filter_values()
       selected_labels <- unique(vals$Value_label[rows])
 
+      # Universe: ALL labels in raw for this field (labelized), not just those kept by other filters
       base <- tadat$raw
       if (is.null(base) || !(fld %in% names(base))) {
-        shiny::showModal(shiny::modalDialog(title = "Invalid selection", "Selected field is not present in the current dataset."))
+        shiny::showModal(shiny::modalDialog(
+          title = "Invalid selection",
+          "Selected field is not present in the current dataset."
+        ))
         return(invisible(NULL))
       }
-      base <- base[keep_mask_for(fld), , drop = FALSE]
-
       all_labels <- unique(labelize(base[[fld]]))
+
+      # Complement = everything except the selected labels
       complement_labels <- setdiff(all_labels, selected_labels)
 
+      # Replace any existing filters for this field, then store complement as 'Exclude' rows
       tadat$selected_filters <- tadat$selected_filters[!(tadat$selected_filters$Fields == fld), , drop = FALSE]
 
       if (length(complement_labels) > 0) {
         new_rows <- data.frame(
           Fields = rep(fld, length(complement_labels)),
-          Value = complement_labels,
+          Value = complement_labels, # labelized
           Filter = rep("Exclude", length(complement_labels)),
           Count = integer(length(complement_labels)),
           stringsAsFactors = FALSE
@@ -399,7 +412,9 @@ mod_filtering_server <- function(id, tadat) {
         )
       }
 
-      shiny::showNotification(sprintf("Applied 'Include Only' to %d value(s) for %s", length(selected_labels), fld), type = "message", duration = 3)
+      shiny::showNotification(sprintf("Applied 'Include Only' to %d value(s) for %s", length(selected_labels), fld),
+        type = "message", duration = 3
+      )
     }
 
     # Exclude: union with existing
