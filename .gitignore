@@ -16,6 +16,9 @@
 .httr-oauth
 .DS_Store
 
+# .Rbuildignore
+manifest.json
+
 # Other
 _snaps
 .Ruserdata
