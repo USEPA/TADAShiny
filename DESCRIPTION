@@ -35,7 +35,6 @@ Imports:
     readxl,
     scales,
     sf,
-    shinyalert,
     shinybusy,
     shinycssloaders,
     shinyjs,
@@ -49,7 +48,6 @@ Imports:
     jsonlite,
     data.table,
     stats,
-    pkgload,
     config,
     leafem,
     graphics

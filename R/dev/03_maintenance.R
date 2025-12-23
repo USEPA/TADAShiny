@@ -11,16 +11,6 @@
 #### CURRENT FILE: MAINTENANCE SCRIPT #######
 #############################################
 
-# No longer using RENV, using packrat instead, see 04_deploy.R
-# # Check renv lock file ----
-# renv::status()
-# # See `?renv::status` for advice on resolving issues
-# # If you have multiple packages in an inconsistent state, we recommend
-# # renv::restore(), then renv::install(), then renv::snapshot(),
-# # but that also suggests you should be running status more frequently.
-
-##############
-
 # Update extdata/query_choices.Rdata for WQP ML drop down mod_query_data.R
 # Define the URL of the web service
 url <- "https://www.waterqualitydata.us/data/Station/search?mimeType=csv&zip=no"

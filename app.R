@@ -1,11 +1,6 @@
-# Launch the ShinyApp (Do not remove this file)
-# Or use the blue button on top of this file
+# app.R
+options(golem.app.prod = TRUE)
+options(warn = 2)
 
-pkgload::load_all(export_all = FALSE,
-                  helpers = FALSE,
-                  attach_testthat = FALSE)
-options( "golem.app.prod" = TRUE)
-options(warn=2)
-run_app() # add parameters here (if any)
-
-# hit republish 
+# replace mypkg with your package name
+TADAShiny::run_app()
