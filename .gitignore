@@ -23,3 +23,4 @@ manifest.json
 _snaps
 .Ruserdata
 .vscode/
+packrat/lib*/
