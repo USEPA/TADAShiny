@@ -7,7 +7,7 @@
 #' @noRd
 #'
 mod_data_flagging_ui <- function(id) {
-  ns <- NS(id)
+  ns <- shiny::NS(id)
   tagList(
     # Add CSS directly in the UI module to disable interaction for required switches
     tags$style(HTML("

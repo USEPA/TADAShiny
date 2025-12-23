@@ -6,7 +6,7 @@
 #'
 #' @noRd
 mod_figures_ui <- function(id) {
-  ns <- NS(id)
+  ns <- shiny::NS(id)
   tagList(
     htmltools::h3("1. Determine Characteristic Groups of Interest"),
     htmltools::HTML("First, pick the columns you'd like to use to group your data. You can stick with 'TADA.ComparableDataIdentifier' (where each group of data represents one unique characteristic-unit-fraction-speciation combination), or you can add other columns that will help you divide and review your data most effectively. For example, you may also want to divide up your data based on monitoring location type, or hydrologic condition. Once you've decided on your grouping columns, click 'Generate Groups' below to group data. It is <B>optional</B> to add more grouping columns."),

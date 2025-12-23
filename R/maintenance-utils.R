@@ -16,7 +16,7 @@ utils::globalVariables(c(
   "nd_method", "nd_mult", "num", "num_chr", "od_method", "od_mult", "org_table",
   "organization", "original_source", "project", "resultCount", "sampleMedia",
   "selected_filters", "selected_flags", "siteType", "siteid", "startDate", "statecode",
-  "tot_n"
+  "tot_n", "TADA.RemovalReason", "Fields", "Value"
 ))
 
 # Auto generates or updates TADAShiny-package.R file

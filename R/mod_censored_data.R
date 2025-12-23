@@ -14,7 +14,7 @@ nd_method_options <-
 od_method_options <- c("Multiply detection limit by x", "No change")
 
 mod_censored_data_ui <- function(id) {
-  ns <- NS(id)
+  ns <- shiny::NS(id)
   tagList(
     shiny::fluidRow(htmltools::h3("Censored Data Categories")),
     shiny::fluidRow(

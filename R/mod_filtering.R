@@ -3,7 +3,7 @@ data_path1 <- app_sys("extdata/filter_descriptions.RData")
 load(data_path1)
 
 mod_filtering_ui <- function(id) {
-  ns <- NS(id)
+  ns <- shiny::NS(id)
   tagList(
     shinyjs::useShinyjs(),
     htmltools::HTML("<h3>Select field to filter on:</h3>"),
@@ -210,14 +210,14 @@ mod_filtering_server <- function(id, tadat) {
       shiny::req(!is.null(fld))
       d <- tadat$raw
       if (is.null(d) || nrow(d) == 0 || !(fld %in% names(d))) {
-        plot.new()
-        title("No data to display")
+        graphics::plot.new()
+        graphics::title("No data to display")
         return(invisible())
       }
       d2 <- pie_source()
       if (nrow(d2) == 0) {
-        plot.new()
-        title("No data to display")
+        graphics::plot.new()
+        graphics::title("No data to display")
         return(invisible())
       }
       EPATADA::TADA_FieldValuesPie(d2, field = fld)
@@ -293,7 +293,7 @@ mod_filtering_server <- function(id, tadat) {
     # Init selected filters if absent
     shiny::observeEvent(TRUE,
       {
-        if (is.null(isolate(tadat$selected_filters))) {
+        if (is.null(shiny::isolate(tadat$selected_filters))) {
           tadat$selected_filters <- data.frame(
             Fields = character(),
             Value = character(),
@@ -328,7 +328,7 @@ mod_filtering_server <- function(id, tadat) {
         field_values <- sf$Value[idx]
         removed_mask <- data_labels %in% field_values
         removed_tbl <- table(data_labels[removed_mask])
-        removed_map <- setNames(as.integer(removed_tbl), names(removed_tbl))
+        removed_map <- stats::setNames(as.integer(removed_tbl), names(removed_tbl))
         counts <- as.integer(removed_map[field_values])
         counts[is.na(counts)] <- 0L
         out[idx] <- counts

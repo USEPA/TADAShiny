@@ -7,7 +7,7 @@
 #' @noRd
 #'
 mod_TADA_summary_ui <- function(id) {
-  ns <- NS(id)
+  ns <- shiny::NS(id)
   tagList(shiny::fluidRow(
     # column(
     # 6,

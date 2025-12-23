@@ -52,7 +52,8 @@ Imports:
     stats,
     pkgload,
     config,
-    leafem
+    leafem,
+    graphics
 Suggests:
     covr,
     devtools,
