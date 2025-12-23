@@ -46,7 +46,6 @@ Imports:
     writexl,
     stringr,
     dataRetrieval (>= 2.7.21),
-    httr,
     jsonlite,
     data.table,
     stats,
@@ -55,6 +54,7 @@ Imports:
     leafem,
     graphics
 Suggests:
+    httr,
     covr,
     devtools,
     knitr,
