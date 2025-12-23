@@ -11,7 +11,9 @@ options(shiny.maxRequestSize = 400 * 1024^2)
 # Increase the timeout duration to 3600 seconds (1 hour)
 options(shiny.timeout = 3600)
 
-options(warn = 2)
+# Do NOT set options(warn=2) here for production
+# If you really want warn = 2 during interactive development, guard it:
+# if (interactive()) options(warn = 2)
 
 app_server <- function(input, output, session) {
   # Create a reactiveValues object to hold shared data between modules
