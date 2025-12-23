@@ -50,7 +50,8 @@ Imports:
     stats,
     config,
     leafem,
-    graphics
+    graphics,
+    withr
 Suggests:
     httr,
     covr,
