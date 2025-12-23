@@ -18,9 +18,6 @@
 # poss_whatWQPdata <- dataRetrieval::whatWQPdata %>%
 #   purrr::possibly(otherwise = NULL)
 
-# Increase timeout to 5 minutes
-options(timeout = 300)
-
 # A function to return the tribal data frame with tribal name as an sf object
 return_tribal_sf <- function(tribal_layer, tribal_name, tribal_list = tribal_list) {
   tribal_data2 <- tribal_list %>%
@@ -46,9 +43,9 @@ load(data_path4)
 
 # Fetch Country/Ocean(s) choice list, not included in saved query_choices file
 countrycode_url <- "https://www.waterqualitydata.us/Codes/countrycode?mimeType=json"
-countryocean_source <- jsonlite::fromJSON(txt = countrycode_url)
-countryocean_source <- countryocean_source$codes %>% dplyr::select(-one_of("providers"))
-countryocean_source <- countryocean_source[order(countryocean_source$desc), ]
+countryocean_source <- jsonlite::fromJSON(txt = countrycode_url)$codes
+countryocean_source <- dplyr::select(countryocean_source, -dplyr::any_of("providers"))
+countryocean_source <- dplyr::arrange(countryocean_source, desc)
 countryocean_choices <- countryocean_source$value
 names(countryocean_choices) <- countryocean_source$desc
 
@@ -407,7 +404,10 @@ mod_query_data_ui <- function(id) {
 mod_query_data_server <- function(id, tadat) {
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
-
+    
+    # Increase timeout to 5 minutes
+    withr::local_options(list(timeout = max(getOption("timeout"), 300)))
+    
     # Call the bbox map module and capture its return value
     bbox_data <- mod_map_bboxServer("BBox_map")
 
@@ -450,9 +450,8 @@ mod_query_data_server <- function(id, tadat) {
 
       tryCatch(
         {
-          # Temporarily treat warnings as errors
-          old_warn <- options("warn")
-          options(warn = 2)
+          # only in interactive dev
+          if (interactive()) withr::local_options(list(warn = 2))
 
           # Validate file input
           if (is.null(input$file)) {
