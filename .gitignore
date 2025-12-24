@@ -1,6 +1,7 @@
 # RStudio files
 .Rproj.user
 .Rprofile
+!inst/app/.Rprofile
 
 # History files
 .Rhistory

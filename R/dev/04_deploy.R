@@ -36,9 +36,10 @@ golem::document_and_reload()
 # Deploy app to staging
 # https://rstudio-connect.dmap-stage.aws.epa.gov/content/ca684b5d-fa77-4ac3-aacf-966b92d84e13/
 # do not edit below
+install.packages("rsconnect") # update to latest
+
 rsconnect::deployApp(
-  appDir = getwd(),
-  appFiles = c("app.R", "DESCRIPTION", "NAMESPACE", "R/", "inst/"),
+  appDir = "inst/app",
   appName = "TADAShiny",
   appTitle = "TADAShiny Module 1 WQP Data Discovery and Cleaning",
   launch.browser = TRUE,
