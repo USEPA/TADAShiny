@@ -18,3 +18,4 @@ dev_history.R
 _disable_autoload.R
 ^packrat/
 ^\.Rprofile$
+^\.rscignore$
