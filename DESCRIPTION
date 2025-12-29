@@ -64,7 +64,8 @@ Suggests:
     rsconnect,
     rstudioapi,
     geojsonsf,
-    packrat
+    packrat,
+    remotes
 Remotes:
     USEPA/EPATADA@develop,
     USEPA/rExpertQuery
