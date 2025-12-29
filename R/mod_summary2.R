@@ -7,7 +7,7 @@
 #' @noRd
 #'
 mod_TADA_summary_ui <- function(id) {
-  ns <- NS(id)
+  ns <- shiny::NS(id)
   tagList(shiny::fluidRow(
     # column(
     # 6,
@@ -167,6 +167,10 @@ mod_TADA_summary_server <- function(id, tadat) {
 
           # Filter data to exclude flagged removals for final dataset
           out_data <- EPATADA::TADA_OrderCols(tadat$raw[!tadat$raw$TADA.Remove, ])
+          # remove columns
+          out_data <- subset(out_data, select = -TADA.Remove)
+          out_data <- subset(out_data, select = -TADA.RemovalReason)
+
           summary_things$temp_files <- c(datafile_name, progress_file_name)
           desc <- writeNarrativeDataFrame(tadat)
           dfs <- list(Data = out_data, Parameterization = desc)

@@ -16,3 +16,6 @@ dev_history.R
 .devcontainer
 ^codecov\.yml$
 _disable_autoload.R
+^packrat/
+^\.Rprofile$
+^\.rscignore$

@@ -1,6 +1,7 @@
 # RStudio files
 .Rproj.user
 .Rprofile
+!inst/app/.Rprofile
 
 # History files
 .Rhistory
@@ -16,7 +17,11 @@
 .httr-oauth
 .DS_Store
 
+# .Rbuildignore
+manifest.json
+
 # Other
 _snaps
 .Ruserdata
 .vscode/
+packrat/lib*/

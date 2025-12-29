@@ -35,7 +35,6 @@ Imports:
     readxl,
     scales,
     sf,
-    shinyalert,
     shinybusy,
     shinycssloaders,
     shinyjs,
@@ -46,14 +45,16 @@ Imports:
     writexl,
     stringr,
     dataRetrieval (>= 2.7.21),
-    httr,
     jsonlite,
     data.table,
     stats,
-    pkgload,
     config,
-    leafem
+    leafem,
+    graphics,
+    withr,
+    pkgload
 Suggests:
+    httr,
     covr,
     devtools,
     knitr,
@@ -63,8 +64,9 @@ Suggests:
     roxygen2,
     rsconnect,
     rstudioapi,
-    renv,
-    geojsonsf
+    geojsonsf,
+    packrat,
+    remotes
 Remotes:
     USEPA/EPATADA@develop,
     USEPA/rExpertQuery
@@ -79,4 +81,3 @@ URL: https://github.com/USEPA/TADAShiny
 BugReports: https://github.com/USEPA/TADAShiny/issues
 RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)
-StagedInstall: FALSE

@@ -14,7 +14,7 @@ nd_method_options <-
 od_method_options <- c("Multiply detection limit by x", "No change")
 
 mod_censored_data_ui <- function(id) {
-  ns <- NS(id)
+  ns <- shiny::NS(id)
   tagList(
     shiny::fluidRow(htmltools::h3("Censored Data Categories")),
     shiny::fluidRow(
@@ -93,7 +93,8 @@ mod_censored_data_ui <- function(id) {
         )
       ))
     )),
-    shiny::fluidRow(DT::DTOutput(ns("cens_sumtable")), width = 600)
+    # Wrap the summary table output in a column instead of using an unsupported width argument on fluidRow
+    shiny::fluidRow(shiny::column(12, DT::DTOutput(ns("cens_sumtable"))))
   )
 }
 
@@ -113,28 +114,21 @@ mod_censored_data_server <- function(id, tadat) {
     shiny::observeEvent(tadat$tab, {
       shiny::req(tadat$raw)
       if (tadat$tab == "Censored") {
-        # dat = subset(tadat$raw, tadat$raw$TADA.Remove==FALSE) # first, get rid of anything that has removed=FALSE flag
-        # dat$TADA.Remove = ifelse(!dat$TADA.CensoredData.Flag%in%c("Non-Detect","Over-Detect","Uncensored", "Other Condition/Limit Populated"),TRUE,dat$TADA.Remove)
-        # if(any(dat$TADA.Remove==TRUE)){ # let users know when there are "problem" censored data results that will be flagged for removal.
-        #   shiny::showModal(shiny::modalDialog(
-        #     title = "Detection Limit Data Warning",
-        #     base::paste0(length(dat$ResultIdentifier[dat$TADA.Remove==TRUE])," results were flagged for removal because they have conflicting, ambiguous and/or unfamiliar detection limits and conditions. These will show up in the pie chart, but only 'Non-Detect', 'Over-Detect', and 'Uncensored' results will be used in the sections below. You may download your dataset for review at any time using the 'Download Working Dataset' button at the bottom of the page.")
-        #   ))
-        # }
         censdat$dat <-
-          subset(tadat$raw, tadat$raw$TADA.Remove == FALSE) # however, this reactive object has all of the data that were not previously removed and do not have ambiguous detection limit data. This is the "clean" dataset
+          subset(tadat$raw, tadat$raw$TADA.Remove == FALSE)
       }
     })
 
-    # column bar chart showing breakdown of censored/uncensored data passed through idCensoredData function
+    # column bar chart showing breakdown of censored/uncensored data
     output$id_censplot <- shiny::renderPlot({
       shiny::req(censdat$dat)
-      bardat <- censdat$dat %>%
-        dplyr::group_by(TADA.CensoredData.Flag) %>%
-        dplyr::summarise(num = length(ResultIdentifier)) %>%
+      bardat <- censdat$dat |>
+        dplyr::group_by(TADA.CensoredData.Flag) |>
+        dplyr::summarise(num = dplyr::n()) |>
         dplyr::mutate(
           num_chr = base::paste0("n = ", num),
-          flag_simple = dplyr::case_when(TADA.CensoredData.Flag == "Non-Detect" ~ "Non-Detect",
+          flag_simple = dplyr::case_when(
+            TADA.CensoredData.Flag == "Non-Detect" ~ "Non-Detect",
             TADA.CensoredData.Flag == "Over-Detect" ~ "Over-Detect",
             TADA.CensoredData.Flag == "Uncensored" ~ "Uncensored",
             TADA.CensoredData.Flag == "Other Condition/Limit Populated" ~ "Other",
@@ -142,11 +136,10 @@ mod_censored_data_server <- function(id, tadat) {
             TADA.CensoredData.Flag == "Detection condition or detection limit is not documented in TADA reference tables." ~ "Not documented",
             TADA.CensoredData.Flag == "Detection condition is missing and required for censored data ID." ~ "Missing",
             (TADA.CensoredData.Flag == "" | is.na(TADA.CensoredData.Flag)) ~ "Mixed",
-            .default = "Unknown Shiny Category"
+            TRUE ~ "Unknown Shiny Category"
           )
         )
 
-      # basic column bar chart
       ggplot2::ggplot(bardat, ggplot2::aes(x = flag_simple, y = num, fill = flag_simple)) +
         ggplot2::geom_col(
           width = 0.75,
@@ -204,9 +197,7 @@ mod_censored_data_server <- function(id, tadat) {
       }
     })
 
-
     # initialize global variables for saving/loading
-
     tadat$censor_applied <- FALSE
 
     shiny::observeEvent(tadat$load_progress_file, {
@@ -226,7 +217,7 @@ mod_censored_data_server <- function(id, tadat) {
       }
     })
 
-    # Make this part more concise?
+    # Enable/disable apply button based on selections
     shiny::observeEvent(input$nd_method, {
       tadat$nd_method <- input$nd_method
 
@@ -269,7 +260,6 @@ mod_censored_data_server <- function(id, tadat) {
       }
     })
 
-
     # Button to apply the simple methods to the nd and od results in the dataset.
     shiny::observeEvent(input$apply_methods, {
       shinybusy::show_modal_spinner(
@@ -279,16 +269,15 @@ mod_censored_data_server <- function(id, tadat) {
         session = shiny::getDefaultReactiveDomain()
       )
       removed <-
-        subset(tadat$raw, tadat$raw$TADA.Remove == TRUE) # first, remove results we dont want to handle at all
+        subset(tadat$raw, tadat$raw$TADA.Remove == TRUE)
       good <-
-        subset(tadat$raw, tadat$raw$TADA.Remove == FALSE) # keep the "goods" that will be run through the simpleCensoredMethods function
+        subset(tadat$raw, tadat$raw$TADA.Remove == FALSE)
       trans <-
         data.frame(
           input = nd_method_options,
           actual = c("multiplier", "randombelowlimit", "as-is")
         )
       if (is.null(input$nd_mult)) {
-        # these if's get the reactive inputs into a format that the TADA function will understand
         nd_multiplier <- "null"
       } else {
         nd_multiplier <- input$nd_mult
@@ -307,7 +296,7 @@ mod_censored_data_server <- function(id, tadat) {
           od_multiplier = od_multiplier
         )
       tadat$raw <-
-        plyr::rbind.fill(removed, good) # stitch good and removed datasets back together in tadat$raw
+        plyr::rbind.fill(removed, good)
       tadat$raw <- EPATADA::TADA_OrderCols(tadat$raw)
 
       # create dataset displayed in table below
@@ -328,11 +317,6 @@ mod_censored_data_server <- function(id, tadat) {
           "TADA.ResultMeasure.MeasureUnitCode"
         )]
 
-      # COMMENT out for now to discuss later
-      # this does not work as is... the idea is to select just the rows where
-      # limit has been changed because others are not really relevant.  Right?
-      # dat <- dat %>% dplyr::filter(DetectionQuantitationLimitMeasure.MeasureValue != TADA.ResultMeasureValue)
-
       dat <-
         dat %>% dplyr::rename(
           "Original Detection Limit Value" = DetectionQuantitationLimitMeasure.MeasureValue,
@@ -342,7 +326,7 @@ mod_censored_data_server <- function(id, tadat) {
         )
 
       # create censored data table
-      censdat$exdat <- dat # [1:10, ] # just show the first 10 records so user can see what happened to data
+      censdat$exdat <- dat
 
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
       tadat$censor_applied <- TRUE
@@ -374,9 +358,9 @@ mod_censored_data_server <- function(id, tadat) {
           tadat$raw$TADA.ResultMeasureValueDataTypes.Flag == "Result Value/Unit Estimated from Detection Limit",
           tadat$raw$TADA.DetectionQuantitationLimitMeasure.MeasureValue,
           tadat$raw$TADA.ResultMeasureValue
-        ) # reset to detection quantitation limit value
+        )
       tadat$raw$TADA.ResultMeasureValueDataTypes.Flag[tadat$raw$TADA.ResultMeasureValueDataTypes.Flag == "Result Value/Unit Estimated from Detection Limit"] <-
-        "Result Value/Unit Copied from Detection Limit" # reset data types flag to what it was before simpleCensoredMethods function run
+        "Result Value/Unit Copied from Detection Limit"
       tadat$raw <- tadat$raw %>% dplyr::select(-TADA.CensoredMethod)
       tadat$censor_applied <- FALSE
 
@@ -392,19 +376,18 @@ mod_censored_data_server <- function(id, tadat) {
     output$see_det <- DT::renderDT({
       shiny::req(censdat$exdat)
       DT::datatable(
-        censdat$exdat, # [1:10, ], #cm removed on 12/26/24, limits table to 10 results
+        censdat$exdat,
         class = "cell-border stripe",
         filter = "top",
         options = list(
-          dom = "Blftipr", # "t",#cm updated to match harmonization table on 12/26/24
+          dom = "Blftipr",
           scrollX = TRUE,
           pageLength = 10
-          # searching = FALSE #cm updated to TRUE (default) on 12/26/24
         ),
         selection = "none",
         rownames = FALSE
-      ) %>%
-        DT::formatStyle(columns = names(censdat$exdat), `font-size` = "12px") %>%
+      ) |>
+        DT::formatStyle(columns = names(censdat$exdat), `font-size` = "12px") |>
         DT::formatStyle(
           columns = c("Estimated Detection Limit Value", "Estimated Unit"),
           backgroundColor = "#2e6da4",
@@ -412,7 +395,7 @@ mod_censored_data_server <- function(id, tadat) {
         )
     })
 
-    # from the clean dataset, get all of the column names someone might want to group by when summarizing their data for use in more advanced censored data methods.
+    # from the clean dataset, get all of the column names someone might want to group by
     output$cens_groups <- shiny::renderUI({
       shiny::req(censdat$dat)
       ccols <- names(tadat$raw)[!names(tadat$raw) %in% c(
@@ -423,13 +406,10 @@ mod_censored_data_server <- function(id, tadat) {
         "ResultIdentifier",
         "TADA.DetectionQuantitationLimitMeasure.MeasureValue",
         "DetectionQuantitationLimitMeasure.MeasureValue"
-      )] # remove the columns that are generally unique to each result from consideration. Why would someone want to group by result value or identifier? Then every summary would be unique to one value...not a "summary"
-      tcols <-
-        ccols[grepl("TADA.", ccols)] # put all of the TADA columns at the top of the selection drop down
-      ucols <-
-        ccols[!grepl("TADA.", ccols)] # then have the WQP columns
-      ccols <-
-        c(tcols, ucols) # string them back together in one vector used in the selection widget below
+      )]
+      tcols <- ccols[grepl("TADA.", ccols)]
+      ucols <- ccols[!grepl("TADA.", ccols)]
+      ccols <- c(tcols, ucols)
       shiny::selectizeInput(
         ns("cens_groups"),
         label = "Select Grouping Columns for Summarization",
@@ -462,8 +442,7 @@ mod_censored_data_server <- function(id, tadat) {
         )]
     })
 
-    # creates summary table complete with csv button in case someone wants to
-    # download the summary table
+    # creates summary table complete with csv button
     output$cens_sumtable <- DT::renderDT({
       DT::datatable(
         censdat$summary,
@@ -473,9 +452,7 @@ mod_censored_data_server <- function(id, tadat) {
           scrollX = TRUE,
           pageLength = 10,
           searching = FALSE,
-          order = list(list(length(
-            input$cens_groups
-          ), "desc")),
+          order = list(list(length(input$cens_groups), "desc")),
           buttons = c("csv")
         ),
         selection = "none",

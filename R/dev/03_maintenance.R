@@ -7,33 +7,9 @@
 # 03_maintenance.R should be used to test and maintain the app before deployment.
 # 04_deploy.R should be used to document your deployment process.
 
-#############################################
-#### CURRENT FILE: MAINTENANCE SCRIPT #######
-#############################################
-
-# No longer using RENV, using packrat instead, see 04_deploy.R
-# # Check renv lock file ----
-# renv::status()
-# # See `?renv::status` for advice on resolving issues
-# # If you have multiple packages in an inconsistent state, we recommend
-# # renv::restore(), then renv::install(), then renv::snapshot(),
-# # but that also suggests you should be running status more frequently.
-
 ##############
 
-# Update extdata/query_choices.Rdata for WQP ML drop down mod_query_data.R
-# Define the URL of the web service
-url <- "https://www.waterqualitydata.us/data/Station/search?mimeType=csv&zip=no"
-# Use httr::GET to make a GET request to the web service
-response <- httr::GET(url)
-# Use httr::content to parse the CSV content from the response
-csv_content <- httr::content(response, "text")
-# Use base::read.csv to read the CSV content into a data frame
-data <- read.csv(text = csv_content, stringsAsFactors = FALSE)
-# Extract unique monitoring location identifiers
-mlids <- unique(data$MonitoringLocationIdentifier)
-# Save the unique monitoring location identifiers
-save(mlids, file = "inst/extdata/query_choices.Rdata")
+# Update extdata files, see make_extdata.R
 
 ##############
 

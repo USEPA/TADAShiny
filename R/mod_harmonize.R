@@ -114,24 +114,30 @@ mod_harmonize_np_server <- function(id, tadat) {
     # when user hits harm go button, runs TADA_GetSynonymRef and makes friendly column names for table.
     shiny::observeEvent(input$harm_go, {
       ref <- EPATADA::TADA_GetSynonymRef(tadat$raw[tadat$raw$TADA.Remove == FALSE, ])
-      ref <- ref %>% dplyr::arrange(Target.TADA.CharacteristicName, Target.TADA.ResultSampleFractionText, Target.TADA.MethodSpeciationName)
+      ref <- ref |>
+        dplyr::arrange(
+          Target.TADA.CharacteristicName,
+          Target.TADA.ResultSampleFractionText,
+          Target.TADA.MethodSpeciationName
+        )
       colns <- names(ref)
-      harm$colns <- colns %>% dplyr::recode(
-        TADA.CharacteristicName = "Characteristic",
-        Target.TADA.CharacteristicName = "Target Characteristic",
-        TADA.CharacteristicNameAssumptions = "Characteristic Assumptions",
-        TADA.ResultSampleFractionText = "Fraction",
-        Target.TADA.ResultSampleFractionText = "Target Fraction",
-        TADA.FractionAssumptions = "Fraction Assumptions",
-        TADA.MethodSpeciationName = "Speciation",
-        Target.TADA.MethodSpeciationName = "Target Speciation",
-        TADA.SpeciationAssumptions = "Speciation Assumptions",
-        Target.TADA.SpeciationConversionFactor = "Speciation Conversion Factor (to AS N or AS P)",
-        # TADA.ResultMeasure.MeasureUnitCode = "Unit",
-        # Target.TADA.ResultMeasure.MeasureUnitCode = "Target Unit",
-        # Target.TADA.UnitConversionFactor = "Unit Conversion Factor",
-        HarmonizationGroup = "Harmonization Group"
-      )
+      harm$colns <- colns |>
+        dplyr::recode(
+          TADA.CharacteristicName = "Characteristic",
+          Target.TADA.CharacteristicName = "Target Characteristic",
+          TADA.CharacteristicNameAssumptions = "Characteristic Assumptions",
+          TADA.ResultSampleFractionText = "Fraction",
+          Target.TADA.ResultSampleFractionText = "Target Fraction",
+          TADA.FractionAssumptions = "Fraction Assumptions",
+          TADA.MethodSpeciationName = "Speciation",
+          Target.TADA.MethodSpeciationName = "Target Speciation",
+          TADA.SpeciationAssumptions = "Speciation Assumptions",
+          Target.TADA.SpeciationConversionFactor = "Speciation Conversion Factor (to AS N or AS P)",
+          # TADA.ResultMeasure.MeasureUnitCode = "Unit",
+          # Target.TADA.ResultMeasure.MeasureUnitCode = "Target Unit",
+          # Target.TADA.UnitConversionFactor = "Unit Conversion Factor",
+          HarmonizationGroup = "Harmonization Group"
+        )
       harm$ref <- ref
       shinyjs::disable("harm_go")
     })
