@@ -51,7 +51,8 @@ Imports:
     config,
     leafem,
     graphics,
-    withr
+    withr,
+    pkgload
 Suggests:
     httr,
     covr,
