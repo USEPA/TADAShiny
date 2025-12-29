@@ -30,19 +30,19 @@ golem::detach_all_attached()
 # Document and reload your package
 golem::document_and_reload()
 
-# Use packrat
-# options(rsconnect.packrat = TRUE) # already done
-setwd("inst/app")
-# Initialize packrat for this launcher directory
-packrat::init(infer.dependencies = FALSE)  # we’ll explicitly install and snapshot
-# Ensure remotes is available so we can install from GitHub
-install.packages("remotes")
-# Pin a specific commit or tag of USEPA/TADAShiny for reproducible builds
-# Replace <commit-sha> with the specific branch to deploy from (required)
-remotes::install_github("USEPA/EPATADA@develop")
-remotes::install_github("USEPA/rExpertQuery@develop")
-# Snapshot all runtime dependencies (your golem package + its Imports)
-packrat::snapshot()
+# # Use packrat
+# # options(rsconnect.packrat = TRUE) # already done
+# setwd("inst/app")
+# # Initialize packrat for this launcher directory
+# packrat::init(infer.dependencies = FALSE)  # we’ll explicitly install and snapshot
+# # Ensure remotes is available so we can install from GitHub
+# install.packages("remotes")
+# # Pin a specific commit or tag of USEPA/TADAShiny for reproducible builds
+# # Replace <commit-sha> with the specific branch to deploy from (required)
+# remotes::install_github("USEPA/EPATADA@develop")
+# remotes::install_github("USEPA/rExpertQuery@develop")
+# # Snapshot all runtime dependencies (your golem package + its Imports)
+# packrat::snapshot()
 
 # Deploy app to staging
 # https://rstudio-connect.dmap-stage.aws.epa.gov/content/ca684b5d-fa77-4ac3-aacf-966b92d84e13/
@@ -50,7 +50,8 @@ packrat::snapshot()
 install.packages("rsconnect") # update to latest
 
 rsconnect::deployApp(
-  appDir = "inst/app",
+  appDir = getwd(), # or try this? appDir = "inst/app",
+  # appFiles = c("app.R", "DESCRIPTION", "NAMESPACE", "R/", "inst/"),
   appName = "TADAShiny",
   appTitle = "TADAShiny Module 1 WQP Data Discovery and Cleaning",
   launch.browser = TRUE,
