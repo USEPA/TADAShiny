@@ -1,3 +1,6 @@
+TADA_download_temp <- readRDS(system.file("extdata", "TADA_download_temp.rds", package = "TADAShiny"))
+tribal_list <- readRDS(system.file("extdata", "tribal_list.rds", package = "TADAShiny"))
+
 # A function to return the tribal data frame with tribal name as an sf object
 return_tribal_sf <- function(tribal_layer, tribal_name, tribal_list = tribal_list) {
   tribal_data2 <- tribal_list |>
@@ -7,27 +10,8 @@ return_tribal_sf <- function(tribal_layer, tribal_name, tribal_list = tribal_lis
   return(tribal_data2)
 }
 
-# Load the input data
-data_path1 <- app_sys("extdata/statecodes_df.Rdata")
-load(data_path1)
-
-# See 03_maintenance.R to update monitoring location IDs in query_choices.Rdata
-data_path2 <- app_sys("extdata/query_choices.Rdata")
-load(data_path2)
-
-data_path3 <- app_sys("extdata/tribal_boundary.RData")
-load(data_path3)
-
-data_path4 <- app_sys("extdata/TADA_Download_Temp.RData")
-load(data_path4)
-
-# Fetch Country/Ocean(s) choice list, not included in saved query_choices file
-countrycode_url <- "https://www.waterqualitydata.us/Codes/countrycode?mimeType=json"
-countryocean_source <- jsonlite::fromJSON(txt = countrycode_url)$codes
-countryocean_source <- dplyr::select(countryocean_source, -dplyr::any_of("providers"))
-countryocean_source <- dplyr::arrange(countryocean_source, desc)
-countryocean_choices <- countryocean_source$value
-names(countryocean_choices) <- countryocean_source$desc
+# Load Country/Ocean(s) choice list
+countryocean_choices <- readRDS(system.file("extdata", "countryocean.rds",  package = "TADAShiny"))
 
 # Fetch Project choices
 project_url <- "https://www.waterqualitydata.us/data/Project/search?mimeType=csv&zip=no&providers=NWIS&providers=STORET"
@@ -571,6 +555,8 @@ mod_query_data_server <- function(id, tadat) {
       disableLoading(session)
     })
 
+    statecodes_df <- readRDS(system.file("extdata", "statecodes_df.rds", package = "TADAShiny"))
+    
     # this section has widget update commands for the selectizeinputs that have a lot of possible selections - shiny suggested hosting the choices server-side rather than ui-side
     shiny::updateSelectizeInput(
       session,
@@ -655,6 +641,7 @@ mod_query_data_server <- function(id, tadat) {
       options = list(placeholder = "Start typing or use drop down menu"),
       server = TRUE
     )
+    mlids <- readRDS(system.file("extdata", "mlids.rds", package = "TADAShiny"))
     shiny::updateSelectizeInput(
       session,
       "siteid",
@@ -1064,6 +1051,7 @@ mod_query_data_server <- function(id, tadat) {
       raw <- raw |>
         dplyr::mutate(dplyr::across(tidyselect::everything(), ~ {
           col_name <- dplyr::cur_column()
+          TADA_download_temp_type <- readRDS(system.file("extdata", "TADA_download_temp_type.rds", package = "TADAShiny"))
           target_class <- class(TADA_download_temp_type[[col_name]])[1]
           switch(target_class,
             "integer" = as.integer(.x),

@@ -1,7 +1,3 @@
-# Load the input data (keep your package's app_sys)
-data_path1 <- app_sys("extdata/filter_descriptions.RData")
-load(data_path1)
-
 mod_filtering_ui <- function(id) {
   ns <- shiny::NS(id)
   tagList(
@@ -73,10 +69,7 @@ mod_filtering_server <- function(id, tadat) {
     values <- shiny::reactiveValues()
     values$selected_field <- NULL
 
-    # Ensure filter_dat exists
-    if (!exists("filter_dat", inherits = TRUE)) {
-      filter_dat <- data.frame(Fields = character(), Description = character(), stringsAsFactors = FALSE)
-    }
+    filter_dat <- readRDS(system.file("extdata", "filter_descriptions.rds", package = "TADAShiny"))
 
     # Prefix for module-generated removals
     prefix <- "Filter (module): "
