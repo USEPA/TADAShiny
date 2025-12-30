@@ -36,7 +36,7 @@ mod_figures_ui <- function(id) {
       shiny::tabPanel(
         "Single Characteristic Figures",
         htmltools::br(),
-        shiny::uiOutput(ns("benchmarktext")),
+        shiny::uiOutput(ns("tada_stats_table")),
         htmltools::br(),
         htmltools::HTML("Benchmark values appear as horizontal lines on the single-characteristic scatterplot figure, below. Benchmarks may reflect established or proposed water quality criteria, important physical/chemical/biological thresholds, or any other values relevant to your use case."),
         htmltools::br(),
@@ -335,7 +335,7 @@ mod_figures_server <- function(id, tadat) {
     })
 
     # 2025-11-20 initial place to start inserting table of STATS
-    output$benchmarktext <- shiny::renderUI({
+    output$tada_stats_table <- shiny::renderUI({
       shiny::req(react$plotdata)
 
       success <- FALSE # Flag to track if the process completes successfully
@@ -351,13 +351,14 @@ mod_figures_server <- function(id, tadat) {
 
           groupdata <- subset(react$full_data, react$full_data$groupname %in% c(react$groups))
 
-          stat_table_data <- EPATADA::TADA_Stats(groupdata, group_cols = c("TADA.ComparableDataIdentifier"))
+          tada_stats_data <- EPATADA::TADA_Stats(groupdata, group_cols = c("TADA.ComparableDataIdentifier"))
 
-          react$summary <-
-            stat_table_data[, names(stat_table_data) %in% c(
+          react$tada_stats_data <-
+            tada_stats_data[, names(tada_stats_data) %in% c(
               "TADA.ComparableDataIdentifier",
-              "Mean",
+              "Non_Detect_Pct",
               "Min",
+              "Mean",
               "Max",
               "Percentile_5th",
               "Percentile_10th",
@@ -367,8 +368,7 @@ mod_figures_server <- function(id, tadat) {
               "Percentile_75th",
               "Percentile_85th",
               "Percentile_95th",
-              "Percentile_98th",
-              "Non_Detect_Pct"
+              "Percentile_98th"
             )]
           success <- TRUE # Set flag to true if all operations succeed
 
@@ -406,8 +406,26 @@ mod_figures_server <- function(id, tadat) {
       # creates summary table complete with csv button in case someone wants to
       # download the summary table
       DT::renderDT({
+        dt_tada_stats_table = react$tada_stats_data
+        colnames(dt_tada_stats_table) = c(
+              "TADA.ComparableDataIdentifier",
+              'Non-Detect %',
+              "Min",
+              "Mean",
+              "Max",
+              'P5',
+              'P10',
+              'P15',
+              'P25',
+              'P50',
+              'P75',
+              'P85',
+              'P95',
+              'P98'
+          )
+                  
         DT::datatable(
-          react$summary,
+          dt_tada_stats_table,
           extensions = "Buttons",
           caption = "Summary Statistics",
           options = list(

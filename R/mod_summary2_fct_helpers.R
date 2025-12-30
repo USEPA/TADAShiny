@@ -17,7 +17,7 @@ writeFile <- function(tadat, filename) {
   org_table <- tadat$org_table
   selected_flags <- tadat$selected_flags
   m2f <- tadat$m2f
-  selected_filters <- tadat$selected_filters[c("Field", "Value", "Filter")]
+  selected_filters <- tadat$selected_filters[c("Fields", "Value", "Filter")] # was crashing here.  Changed string 'Field' to 'Fields'
   nd_method <- tadat$nd_method
   od_method <- tadat$od_method
   nd_mult <- tadat$nd_mult
