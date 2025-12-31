@@ -30,8 +30,8 @@ golem::detach_all_attached()
 # Document and reload your package
 golem::document_and_reload()
 
-# Use packrat
-# options(rsconnect.packrat = TRUE) # already done
+# # Use packrat
+# # options(rsconnect.packrat = TRUE) # already done
 
 # Deploy app to staging
 # https://rstudio-connect.dmap-stage.aws.epa.gov/content/ca684b5d-fa77-4ac3-aacf-966b92d84e13/
@@ -39,7 +39,8 @@ golem::document_and_reload()
 install.packages("rsconnect") # update to latest
 
 rsconnect::deployApp(
-  appDir = "inst/app",
+  appDir = getwd(), # or try this? appDir = "inst/app",
+  # appFiles = c("app.R", "DESCRIPTION", "NAMESPACE", "R/", "inst/"),
   appName = "TADAShiny",
   appTitle = "TADAShiny Module 1 WQP Data Discovery and Cleaning",
   launch.browser = TRUE,

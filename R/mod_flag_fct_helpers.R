@@ -1,8 +1,6 @@
 # Read in the tables
 prompt_table <- utils::read.csv("inst/flag_prompts.csv")
 test_table <- utils::read.csv("inst/flag_tests.csv")
-# prompt_table = utils::read.csv(app_sys("flag_prompts.csv"))
-# test_table = utils::read.csv(app_sys("flag_tests.csv"))
 prompt_table <- prompt_table[order(prompt_table$Order), ]
 prompts <- prompt_table$Prompt
 active_flags <- unique(test_table$columnName[test_table$remove == 1])

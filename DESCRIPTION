@@ -51,7 +51,8 @@ Imports:
     config,
     leafem,
     graphics,
-    withr
+    withr,
+    pkgload
 Suggests:
     httr,
     covr,
@@ -64,7 +65,8 @@ Suggests:
     rsconnect,
     rstudioapi,
     geojsonsf,
-    packrat
+    packrat,
+    remotes
 Remotes:
     USEPA/EPATADA@develop,
     USEPA/rExpertQuery
@@ -79,4 +81,3 @@ URL: https://github.com/USEPA/TADAShiny
 BugReports: https://github.com/USEPA/TADAShiny/issues
 RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)
-StagedInstall: FALSE

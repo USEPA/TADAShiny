@@ -13,6 +13,7 @@
 #' @importFrom shiny column HTML NS shinyApp tagAppendAttributes tagList tags
 #' @importFrom data.table data.table as.data.table setDT fread rbindlist
 #' @importFrom jsonlite fromJSON
+#' @importFrom pkgload load_all
 #' @import rExpertQuery
 NULL
 
