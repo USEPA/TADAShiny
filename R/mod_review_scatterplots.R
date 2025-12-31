@@ -351,7 +351,7 @@ mod_figures_server <- function(id, tadat) {
 
           groupdata <- subset(react$full_data, react$full_data$groupname %in% c(react$groups))
 
-          tada_stats_data <- EPATADA::TADA_Stats(groupdata, group_cols = c("TADA.ComparableDataIdentifier"))
+          tada_stats_data <- EPATADA::TADA_Stats(groupdata)
 
           react$tada_stats_data <-
             tada_stats_data[, names(tada_stats_data) %in% c(
