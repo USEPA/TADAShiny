@@ -349,14 +349,17 @@ mod_harmonize_np_server <- function(id, tadat) {
       tadat$removals <- plyr::rbind.fill(tadat$removals, new_df)
       tadat$raw <- plyr::rbind.fill(dat, rem)
       tadat$raw <- EPATADA::TADA_OrderCols(tadat$raw)
-      nitrolen <- length(dat$TADA.NutrientSummation.Flag[dat$TADA.NutrientSummation.Flag %in% c("Nutrient summation from one or more subspecies.")])
-      phoslen <- length(dat$TADA.NutrientSummation.Flag[dat$TADA.NutrientSummation.Flag %in% c("Nutrient summation from one subspecies.")])
+      # Need to update TADA.NutrientSummation.Flag outputs in EPATADA R package function to differentiate TN and TP
+      # nitrolen <- length(dat$TADA.NutrientSummation.Flag[dat$TADA.NutrientSummation.Flag %in% c("New row added: Nutrient summation from one or more subspecies.")])
+      # phoslen <- length(dat$TADA.NutrientSummation.Flag[dat$TADA.NutrientSummation.Flag %in% c("New row added: Nutrient summation from one or more subspecies.")])
+      newrowlen <- length(dat$TADA.NutrientSummation.Flag[dat$TADA.NutrientSummation.Flag %in% c("New row added: Nutrient summation from one or more subspecies.")])
       # remove the modal once the dataset has been harmonized
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
 
       shiny::showModal(shiny::modalDialog(
         title = "Success! Calculations Complete.",
-        base::paste0(scales::comma(nitrolen), " Total Nitrogen results calculated and ", scales::comma(phoslen), " Total Phosphorus results calculated.")
+        # base::paste0(scales::comma(nitrolen), " Total Nitrogen results calculated and ", scales::comma(phoslen), " Total Phosphorus results calculated.")
+        base::paste0(scales::comma(newrowlen), " Total Nitrogen and/or Total Phosphorus results calculated.")
       ))
       shinyjs::disable("sum_apply")
     })
