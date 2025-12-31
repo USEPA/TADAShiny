@@ -502,7 +502,7 @@ mod_query_data_server <- function(id, tadat) {
         raw$TADA.Remove <- NULL
 
         # 2025-12-15 add column with TADA.Media.Flag
-        raw <- EPATADA::TADA_AnalysisDataFilter(raw, clean = FALSE)
+        # raw <- EPATADA::TADA_AnalysisDataFilter(raw, clean = FALSE)
 
         initializeTable(tadat, raw)
 
@@ -546,7 +546,7 @@ mod_query_data_server <- function(id, tadat) {
       }
 
       # 2025-12-15 adding column TADA.Media.Flag
-      raw <- EPATADA::TADA_AnalysisDataFilter(raw, clean = FALSE)
+      # raw <- EPATADA::TADA_AnalysisDataFilter(raw, clean = FALSE)
 
       initializeTable(tadat, raw)
 
@@ -1078,7 +1078,7 @@ mod_query_data_server <- function(id, tadat) {
         )
       } else {
         # 2025-12-15 adding column TADA.Media.Flag
-        raw <- EPATADA::TADA_AnalysisDataFilter(raw, clean = FALSE)
+        # raw <- EPATADA::TADA_AnalysisDataFilter(raw, clean = FALSE)
 
         initializeTable(tadat, raw)
       }
