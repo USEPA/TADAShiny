@@ -337,22 +337,24 @@ mod_figures_server <- function(id, tadat) {
     # 2025-11-20 initial place to start inserting table of STATS
     output$tada_stats_table <- shiny::renderUI({
       shiny::req(react$plotdata)
-
+      
       success <- FALSE # Flag to track if the process completes successfully
-
+      
       tryCatch(
         {
-          # Temporarily treat warnings as errors
-          old_warn <- options("warn")
-          options(warn = 2)
-
+          # Temporarily treat warnings as errors; withr will auto-restore
+          withr::local_options(list(warn = 2))
+          
           # Get the data summary
           selected_groups <- input$mapplotgroup
-
-          groupdata <- subset(react$full_data, react$full_data$groupname %in% c(react$groups))
-
+          
+          groupdata <- subset(
+            react$full_data,
+            react$full_data$groupname %in% c(react$groups)
+          )
+          
           tada_stats_data <- EPATADA::TADA_Stats(groupdata)
-
+          
           react$tada_stats_data <-
             tada_stats_data[, names(tada_stats_data) %in% c(
               "TADA.ComparableDataIdentifier",
@@ -370,25 +372,20 @@ mod_figures_server <- function(id, tadat) {
               "Percentile_95th",
               "Percentile_98th"
             )]
-          success <- TRUE # Set flag to true if all operations succeed
-
-          # Restore warning options
-          options(old_warn)
+          
+          success <- TRUE
         },
         error = function(e) {
-          # Restore warning options in case of error
-          options(old_warn)
-
           # Log error details for debugging
           cat("Error: ", e$message, "\n")
-
+          
           # Show error notification to the user
           shiny::showNotification(
             ui = tagList(
               htmltools::h4(htmltools::strong("WQP Error")),
-              htmltools::hr(style = "margin-top: 5px; margin-bottom: 5px;"), # Adds a separator line
+              htmltools::hr(style = "margin-top: 5px; margin-bottom: 5px;"),
               paste(e$message),
-              paste("An error occurred while generating stats.  Check your filter values and try again.")
+              paste("An error occurred while generating stats. Check your filter values and try again.")
             ),
             type = "error",
             duration = NULL,
@@ -396,50 +393,45 @@ mod_figures_server <- function(id, tadat) {
           )
         }
       )
-
-      # Ensure spinner is removed regardless of success or error
-      shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
-      # end new
-      if (success == FALSE) {
-        return()
+      
+      if (!isTRUE(success)) {
+        return(NULL)
       }
-      # creates summary table complete with csv button in case someone wants to
-      # download the summary table
-      DT::renderDT({
-        dt_tada_stats_table = react$tada_stats_data
-        colnames(dt_tada_stats_table) = c(
-              "TADA.ComparableDataIdentifier",
-              'Non-Detect %',
-              "Min",
-              "Mean",
-              "Max",
-              'P5',
-              'P10',
-              'P15',
-              'P25',
-              'P50',
-              'P75',
-              'P85',
-              'P95',
-              'P98'
-          )
-                  
-        DT::datatable(
-          dt_tada_stats_table,
-          extensions = "Buttons",
-          caption = "Summary Statistics",
-          options = list(
-            dom = "lftiB", # this is depreciated
-            scrollX = TRUE,
-            pageLength = 10,
-            searching = FALSE,
-            paging = FALSE,
-            buttons = c("csv")
-          ),
-          selection = "none",
-          rownames = FALSE
-        )
-      })
+      
+      # Return the datatable widget (renderUI should return UI/htmlwidgets, not renderDT)
+      dt_tada_stats_table <- react$tada_stats_data
+      colnames(dt_tada_stats_table) <- c(
+        "TADA.ComparableDataIdentifier",
+        "Non-Detect %",
+        "Min",
+        "Mean",
+        "Max",
+        "P5",
+        "P10",
+        "P15",
+        "P25",
+        "P50",
+        "P75",
+        "P85",
+        "P95",
+        "P98"
+      )
+      
+      DT::datatable(
+        dt_tada_stats_table,
+        extensions = "Buttons",
+        caption = "Summary Statistics",
+        options = list(
+          dom = "lftiB",
+          scrollX = TRUE,
+          pageLength = 10,
+          searching = FALSE,
+          paging = FALSE,
+          buttons = c("csv")
+        ),
+        selection = "none",
+        rownames = FALSE
+      )
     })
 
     # for plotting benchmarks
