@@ -327,7 +327,7 @@ mod_harmonize_np_server <- function(id, tadat) {
     })
 
     shiny::observeEvent(input$sum_apply, {
-      # a modal that pops up showing it's working on harmonizing
+      # a modal that pops up showing it's working on calculating Total N and P
       shinybusy::show_modal_spinner(
         spin = "double-bounce",
         color = "#0071bc",
