@@ -131,12 +131,12 @@ applyFlags <- function(in_table, orgs) {
       clean_imprecise = FALSE,
       flaggedonly = FALSE
     )
-  
-  out <- 
+
+  out <-
     EPATADA::TADA_MediaFilter(
-      out, 
+      out,
       clean = FALSE
-  )
+    )
 
   return(out)
 }

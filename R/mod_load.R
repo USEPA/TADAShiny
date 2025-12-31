@@ -11,7 +11,7 @@ return_tribal_sf <- function(tribal_layer, tribal_name, tribal_list = tribal_lis
 }
 
 # Load Country/Ocean(s) choice list
-countryocean_choices <- readRDS(system.file("extdata", "countryocean.rds",  package = "TADAShiny"))
+countryocean_choices <- readRDS(system.file("extdata", "countryocean.rds", package = "TADAShiny"))
 
 # Fetch Project choices
 project_url <- "https://www.waterqualitydata.us/data/Project/search?mimeType=csv&zip=no&providers=NWIS&providers=STORET"
@@ -399,7 +399,7 @@ mod_query_data_server <- function(id, tadat) {
     })
 
     ####################
-    
+
     # handles option C user data uploads
     shiny::observeEvent(input$file, {
       # extra safeguard for spinner removal even in unexpected control-flow issues
@@ -411,36 +411,36 @@ mod_query_data_server <- function(id, tadat) {
         text = "Uploading dataset from excel file ...",
         session = shiny::getDefaultReactiveDomain()
       )
-      
+
       success <- FALSE # Flag to track if the process completes successfully
-      
+
       tryCatch(
         {
           # only in interactive dev — withr will auto-restore at the end of this block
           # Consider whether you want warn = 2 to apply in Shiny deployments. If yes, remove the interactive() guard
           if (interactive()) withr::local_options(list(warn = 2))
-          
+
           # Validate file input
           if (is.null(input$file)) {
             stop("No file uploaded.")
           }
-          
+
           # added this to make sure it is not null later
           tadat$original_source <- "Upload"
-          
+
           # user uploaded data
           raw <- readxl::read_excel(input$file$datapath, sheet = 1, col_types = "text")
-          
+
           # Validate data structure
           if (!is.data.frame(raw)) {
             stop("Uploaded file is not a valid data frame.")
           }
-          
+
           # Check for multiple rows
           if (nrow(raw) <= 1) {
             stop("The uploaded file must contain more than one row.")
           }
-          
+
           # Define the required columns
           required_cols <- c(
             "ActivityMediaName", "ResultMeasureValue", "ResultMeasure.MeasureUnitCode",
@@ -449,10 +449,10 @@ mod_query_data_server <- function(id, tadat) {
             "ResultIdentifier", "DetectionQuantitationLimitMeasure.MeasureValue",
             "LatitudeMeasure", "LongitudeMeasure"
           )
-          
+
           # Check for missing columns
           missing_cols <- setdiff(required_cols, names(raw))
-          
+
           # If any required columns are missing, stop processing and show an error
           if (length(missing_cols) > 0) {
             stop(paste(
@@ -461,21 +461,21 @@ mod_query_data_server <- function(id, tadat) {
               paste(missing_cols, collapse = ", ")
             ))
           }
-          
+
           # run autoclean
           raw <- EPATADA::TADA_AutoClean(raw)
-          
+
           # check for ALL required fields (after autoclean is run)
           if (!EPATADA::TADA_CheckRequiredFields(raw)) {
             stop("The uploaded file is missing required columns.")
           }
-          
+
           success <- TRUE # Set flag to true if all operations succeed
         },
         error = function(e) {
           # Log error details for debugging
           cat("Error: ", e$message, "\n")
-          
+
           # Show error notification to the user
           shiny::showNotification(
             ui = tagList(
@@ -489,26 +489,26 @@ mod_query_data_server <- function(id, tadat) {
           )
         }
       )
-      
+
       # Ensure spinner is removed regardless of success or error
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
-      
+
       # If successful, initialize table and add blank TADA.Remove column
       if (success == TRUE) {
         # add empty TADA.Remove column
         raw$TADA.Remove <- NULL
-        
+
         initializeTable(tadat, raw)
-        
+
         tadat$original_source <- "Upload"
-        
+
         # Clear any existing notification with the same ID
         shiny::removeNotification("uploadError")
       }
     })
-    
+
     ####################
-    
+
     # Read the TADA progress file
     shiny::observe({
       shiny::req(input$progress_file)
@@ -545,7 +545,7 @@ mod_query_data_server <- function(id, tadat) {
     })
 
     statecodes_df <- readRDS(system.file("extdata", "statecodes_df.rds", package = "TADAShiny"))
-    
+
     # this section has widget update commands for the selectizeinputs that have a lot of possible selections - shiny suggested hosting the choices server-side rather than ui-side
     shiny::updateSelectizeInput(
       session,

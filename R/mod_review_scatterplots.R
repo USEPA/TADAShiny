@@ -337,24 +337,24 @@ mod_figures_server <- function(id, tadat) {
     # 2025-11-20 initial place to start inserting table of STATS
     output$tada_stats_table <- shiny::renderUI({
       shiny::req(react$plotdata)
-      
+
       success <- FALSE # Flag to track if the process completes successfully
-      
+
       tryCatch(
         {
           # Temporarily treat warnings as errors; withr will auto-restore
           withr::local_options(list(warn = 2))
-          
+
           # Get the data summary
           selected_groups <- input$mapplotgroup
-          
+
           groupdata <- subset(
             react$full_data,
             react$full_data$groupname %in% c(react$groups)
           )
-          
+
           tada_stats_data <- EPATADA::TADA_Stats(groupdata)
-          
+
           react$tada_stats_data <-
             tada_stats_data[, names(tada_stats_data) %in% c(
               "TADA.ComparableDataIdentifier",
@@ -372,13 +372,13 @@ mod_figures_server <- function(id, tadat) {
               "Percentile_95th",
               "Percentile_98th"
             )]
-          
+
           success <- TRUE
         },
         error = function(e) {
           # Log error details for debugging
           cat("Error: ", e$message, "\n")
-          
+
           # Show error notification to the user
           shiny::showNotification(
             ui = tagList(
@@ -393,11 +393,11 @@ mod_figures_server <- function(id, tadat) {
           )
         }
       )
-      
+
       if (!isTRUE(success)) {
         return(NULL)
       }
-      
+
       # Return the datatable widget (renderUI should return UI/htmlwidgets, not renderDT)
       dt_tada_stats_table <- react$tada_stats_data
       colnames(dt_tada_stats_table) <- c(
@@ -416,7 +416,7 @@ mod_figures_server <- function(id, tadat) {
         "P95",
         "P98"
       )
-      
+
       DT::datatable(
         dt_tada_stats_table,
         extensions = "Buttons",
