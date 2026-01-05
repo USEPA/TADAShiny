@@ -9,6 +9,9 @@
 #' @importFrom shiny NS tagList
 mod_map_bboxUI <- function(id, label = "Clear Drawing") {
   ns <- NS(id)
+  
+  bbox_increment <- 1
+  
   tagList(
     shiny::fluidRow(
       column(
@@ -31,7 +34,7 @@ mod_map_bboxUI <- function(id, label = "Clear Drawing") {
               value = NULL,
               min = -180,
               max = 180,
-              step = 0.00001
+              step = bbox_increment
             )
           ),
           column(
@@ -43,7 +46,7 @@ mod_map_bboxUI <- function(id, label = "Clear Drawing") {
               value = NULL,
               min = -90,
               max = 90,
-              step = 0.00001
+              step = bbox_increment
             ),
             htmltools::br(),
             htmltools::br(),
@@ -54,7 +57,7 @@ mod_map_bboxUI <- function(id, label = "Clear Drawing") {
               value = NULL,
               min = -90,
               max = 90,
-              step = 0.00001
+              step = bbox_increment
             )
           ),
           column(
@@ -68,7 +71,7 @@ mod_map_bboxUI <- function(id, label = "Clear Drawing") {
               value = NULL,
               min = -180,
               max = 180,
-              step = 0.00001
+              step = bbox_increment
             )
           )
         ),
