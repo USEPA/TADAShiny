@@ -5,32 +5,45 @@
 }
 
 .safe_req_string <- function(u, timeout = 30, max_tries = 3) {
-  if (.tadas_offline()) return(NULL)
-  tryCatch({
-    httr2::request(u) |>
-      httr2::req_timeout(timeout) |>
-      httr2::req_retry(max_tries = max_tries) |>
-      httr2::req_error(is_error = function(resp) FALSE) |>
-      httr2::req_perform() |>
-      httr2::resp_body_string()
-  }, error = function(e) NULL)
+  if (.tadas_offline()) {
+    return(NULL)
+  }
+  tryCatch(
+    {
+      httr2::request(u) |>
+        httr2::req_timeout(timeout) |>
+        httr2::req_retry(max_tries = max_tries) |>
+        httr2::req_error(is_error = function(resp) FALSE) |>
+        httr2::req_perform() |>
+        httr2::resp_body_string()
+    },
+    error = function(e) NULL
+  )
 }
 
 # Generic: fetch a CSV and return a unique vector from a column; else default
 .safe_fetch_csv_column <- function(u, column, default = character()) {
   txt <- .safe_req_string(u)
-  if (is.null(txt)) return(default)
+  if (is.null(txt)) {
+    return(default)
+  }
   dt <- tryCatch(data.table::fread(txt, showProgress = FALSE), error = function(e) NULL)
-  if (is.null(dt) || !column %in% names(dt)) return(default)
+  if (is.null(dt) || !column %in% names(dt)) {
+    return(default)
+  }
   unique(dt[[column]])
 }
 
 # Projects: return ProjectIdentifier vector; else empty
 .safe_fetch_projects <- function(u) {
   txt <- .safe_req_string(u)
-  if (is.null(txt)) return(character())
+  if (is.null(txt)) {
+    return(character())
+  }
   dt <- tryCatch(data.table::fread(txt, showProgress = FALSE), error = function(e) NULL)
-  if (is.null(dt) || !"ProjectIdentifier" %in% names(dt)) return(character())
+  if (is.null(dt) || !"ProjectIdentifier" %in% names(dt)) {
+    return(character())
+  }
   unique(dt$ProjectIdentifier)
 }
 
@@ -84,20 +97,24 @@ county <- .safe_fetch_county("https://www2.census.gov/geo/docs/reference/codes/f
 
 # Fetch orgs, chars, chargroup, media choices (safe)
 orgs <- .safe_fetch_csv_column(
-  "https://cdx.epa.gov/wqx/download/DomainValues/Organization.CSV", "ID", default = character()
+  "https://cdx.epa.gov/wqx/download/DomainValues/Organization.CSV", "ID",
+  default = character()
 )
 
 chars <- .safe_fetch_csv_column(
-  "https://cdx.epa.gov/wqx/download/DomainValues/Characteristic.CSV", "Name", default = character()
+  "https://cdx.epa.gov/wqx/download/DomainValues/Characteristic.CSV", "Name",
+  default = character()
 )
 
 chargroup <- .safe_fetch_csv_column(
-  "https://cdx.epa.gov/wqx/download/DomainValues/CharacteristicGroup.CSV", "Name", default = character()
+  "https://cdx.epa.gov/wqx/download/DomainValues/CharacteristicGroup.CSV", "Name",
+  default = character()
 )
 
 media <- c(
   .safe_fetch_csv_column(
-    "https://cdx.epa.gov/wqx/download/DomainValues/ActivityMedia.CSV", "Name", default = character()
+    "https://cdx.epa.gov/wqx/download/DomainValues/ActivityMedia.CSV", "Name",
+    default = character()
   ),
   "Biological Tissue", "No media"
 )
