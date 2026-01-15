@@ -132,6 +132,12 @@ applyFlags <- function(in_table, orgs) {
       flaggedonly = FALSE
     )
 
+  out <-
+    EPATADA::TADA_MediaFilter(
+      out,
+      clean = FALSE
+    )
+
   return(out)
 }
 
