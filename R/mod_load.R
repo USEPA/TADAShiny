@@ -11,7 +11,7 @@ return_tribal_sf <- function(tribal_layer, tribal_name, tribal_list = tribal_lis
 }
 
 # Load Country/Ocean(s) choice list
-countryocean_choices <- readRDS(system.file("extdata", "countryocean.rds",  package = "TADAShiny"))
+countryocean_choices <- readRDS(system.file("extdata", "countryocean.rds", package = "TADAShiny"))
 
 # Fetch Project choices
 project_url <- "https://www.waterqualitydata.us/data/Project/search?mimeType=csv&zip=no&providers=NWIS&providers=STORET"
@@ -402,6 +402,8 @@ mod_query_data_server <- function(id, tadat) {
 
     # handles option C user data uploads
     shiny::observeEvent(input$file, {
+      # extra safeguard for spinner removal even in unexpected control-flow issues
+      on.exit(shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain()), add = TRUE)
       # a modal that pops up showing it's working on uploading the dataset from the users file
       shinybusy::show_modal_spinner(
         spin = "double-bounce",
@@ -414,7 +416,8 @@ mod_query_data_server <- function(id, tadat) {
 
       tryCatch(
         {
-          # only in interactive dev
+          # only in interactive dev — withr will auto-restore at the end of this block
+          # Consider whether you want warn = 2 to apply in Shiny deployments. If yes, remove the interactive() guard
           if (interactive()) withr::local_options(list(warn = 2))
 
           # Validate file input
@@ -468,14 +471,8 @@ mod_query_data_server <- function(id, tadat) {
           }
 
           success <- TRUE # Set flag to true if all operations succeed
-
-          # Restore warning options
-          options(old_warn)
         },
         error = function(e) {
-          # Restore warning options in case of error
-          options(old_warn)
-
           # Log error details for debugging
           cat("Error: ", e$message, "\n")
 
@@ -483,7 +480,7 @@ mod_query_data_server <- function(id, tadat) {
           shiny::showNotification(
             ui = tagList(
               htmltools::h4(htmltools::strong("Error")),
-              htmltools::hr(style = "margin-top: 5px; margin-bottom: 5px;"), # Adds a separator line
+              htmltools::hr(style = "margin-top: 5px; margin-bottom: 5px;"),
               paste(e$message)
             ),
             type = "error",
@@ -501,14 +498,9 @@ mod_query_data_server <- function(id, tadat) {
         # add empty TADA.Remove column
         raw$TADA.Remove <- NULL
 
-        # 2025-12-15 add column with TADA.Media.Flag
-        # raw <- EPATADA::TADA_AnalysisDataFilter(raw, clean = FALSE)
-
         initializeTable(tadat, raw)
 
-        if (!is.null(tadat$original_source)) {
-          tadat$original_source <- "Upload"
-        }
+        tadat$original_source <- "Upload"
 
         # Clear any existing notification with the same ID
         shiny::removeNotification("uploadError")
@@ -545,9 +537,6 @@ mod_query_data_server <- function(id, tadat) {
         raw <- EPATADA::Data_Nutrients_UT
       }
 
-      # 2025-12-15 adding column TADA.Media.Flag
-      # raw <- EPATADA::TADA_AnalysisDataFilter(raw, clean = FALSE)
-
       initializeTable(tadat, raw)
 
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
@@ -556,7 +545,7 @@ mod_query_data_server <- function(id, tadat) {
     })
 
     statecodes_df <- readRDS(system.file("extdata", "statecodes_df.rds", package = "TADAShiny"))
-    
+
     # this section has widget update commands for the selectizeinputs that have a lot of possible selections - shiny suggested hosting the choices server-side rather than ui-side
     shiny::updateSelectizeInput(
       session,
@@ -1077,9 +1066,6 @@ mod_query_data_server <- function(id, tadat) {
           )
         )
       } else {
-        # 2025-12-15 adding column TADA.Media.Flag
-        # raw <- EPATADA::TADA_AnalysisDataFilter(raw, clean = FALSE)
-
         initializeTable(tadat, raw)
       }
     })

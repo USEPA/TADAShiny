@@ -118,7 +118,7 @@ mod_data_flagging_server <- function(id, tadat) {
       # 2023-12-29 this needs to be run in here because the number of rows might have changed
       # for example if Perform Total N and P Summation was run and rows were added
       values$testResults <- flagCensus(tadat$raw)
-      
+
       for (i in seq_len(n_switches)) {
         flag <- flag_types[i]
         switch_name <- base::paste0(switch_id, i)

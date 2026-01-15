@@ -19,3 +19,4 @@ _disable_autoload.R
 ^packrat/
 ^\.Rprofile$
 ^\.rscignore$
+^dev$
