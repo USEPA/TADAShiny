@@ -13,35 +13,33 @@
 
 ##############
 
-# Spell check
-spelling::spell_check_package(
-  pkg = ".",
-  vignettes = TRUE
-)
-# Run to update spelling word list
+# spell check
+library(spelling)
+spelling::spell_check_package(pkg = ".", vignettes = TRUE)
 spelling::get_wordlist()
-spelling::update_wordlist()
+# # run to update spelling word list
+# spelling::update_wordlist() # do not run until after checking wordlist & fixing spelling issues!
 
 ##############
 
-# Run styler to style code with default
-# https://style.tidyverse.org/
-# https://styler.r-lib.org/reference/style_pkg.html
-styler::style_pkg()
+library(styler)
+# Recommended styler setup to approximate air.toml
+style_pkg(
+  transformers = tidyverse_style(
+    scope = I(c("tokens", "indention")), # let air handle the rest
+    indent_by = 2,
+    strict = FALSE # turn off aggressive alignment
+  )
+)
 
 ##############
 
-## Run checks ----
-# Check the package before sending to prod
-# Run devtools load_all, document, test, check and build
-devtools::load_all()
-devtools::document() # make sure all dependencies are listed in description file
-# This may not be working correctly
-# devtools::test()
-# More robust test for releases (includes broken link check)
+library(devtools)
+# Run devtools check and test
+devtools::test()
+# devtools::check()
+# more robust test for releases (includes broken link check)
 devtools::check(manual = FALSE, remote = TRUE, incoming = TRUE)
-# Not always necessary to run build
-# devtools::build()
 
 ##############
 
