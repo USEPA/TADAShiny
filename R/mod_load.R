@@ -909,7 +909,7 @@ mod_query_data_server <- function(id, tadat) {
           dplyr::mutate(group = MESS::cumsumbinning(
             x = tot_n,
             threshold = maxrecs,
-            maxgroupsize = 300
+            maxgroupsize = 100 # changed from 300 after hitting error HTTP 413 Payload Too Large.
           ))
 
         smallsites_list <- list()
@@ -934,28 +934,12 @@ mod_query_data_server <- function(id, tadat) {
 
             args_temp_small[["siteid"]] <- small_site_chunk
 
-            # Download the result data
-            smallsites_result_temp <- dataRetrieval::readWQPdata(args_temp_small,
-              dataProfile = "resultPhysChem",
+            # Download the WQP data using the WQX3 and the full Physical Chemistry profile
+            TADAprofile_smallsites_temp <- dataRetrieval::readWQPdata(args_temp_small,
+              service = 'ResultWQX3',
+              dataProfile = "fullPhysChem",
               ignore_attributes = TRUE
             )
-
-            # Download the site data
-            smallsites_site_temp <- dataRetrieval::whatWQPsites(args_temp_small)
-
-            # Download the project data
-            smallsites_project_temp <- dataRetrieval::readWQPdata(args_temp_small,
-              service = "Project",
-              ignore_attributes = TRUE
-            )
-
-            # Create TADA data frame
-            TADAprofile_smallsites_temp <- EPATADA::TADA_JoinWQPProfiles(
-              FullPhysChem = smallsites_result_temp,
-              Sites = smallsites_site_temp,
-              Projects = smallsites_project_temp
-            ) |>
-              dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
 
             # Assign the data to the list
             smallsites_list[[i]] <- TADAprofile_smallsites_temp
@@ -965,8 +949,10 @@ mod_query_data_server <- function(id, tadat) {
         # Combine the data
         TADA_smallsites <- dplyr::bind_rows(smallsites_list)
 
+        TADA_smallsites_legacynames <- EPATADA::TADA_RenametoLegacy(TADA_smallsites)
+        
         # Apply TADA_autoclean
-        TADA_smallsites_clean <- EPATADA::TADA_AutoClean(TADA_smallsites) |>
+        TADA_smallsites_clean <- EPATADA::TADA_AutoClean(TADA_smallsites_legacynames) |>
           dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
       } else {
         TADA_smallsites_clean <- TADA_download_temp
@@ -979,7 +965,7 @@ mod_query_data_server <- function(id, tadat) {
         bsitesvec <- unique(bigsites$MonitoringLocationIdentifier)
 
         big_title <- base::paste0(
-          "Downloading data from sites with greater than ", pretty_maxrecs,
+          "Downloading data from ", nrow(bigsites), " sites with greater than ", pretty_maxrecs,
           " results."
         )
 
@@ -993,28 +979,12 @@ mod_query_data_server <- function(id, tadat) {
 
             args_temp_big[["siteid"]] <- bsitesvec[i]
 
-            # Download the result data
-            bigsites_result_temp <- dataRetrieval::readWQPdata(args_temp_big,
-              dataProfile = "resultPhysChem",
+            # Download the WQP data using the WQX3 using the new profile
+            TADAprofile_bigsites_temp <- dataRetrieval::readWQPdata(args_temp_big,
+              service = 'ResultWQX3',
+              dataProfile = "fullPhysChem",
               ignore_attributes = TRUE
             )
-
-            # Download the site data
-            bigsites_site_temp <- dataRetrieval::whatWQPsites(args_temp_big)
-
-            # Download the project data
-            bigsites_project_temp <- dataRetrieval::readWQPdata(args_temp_big,
-              service = "Project",
-              ignore_attributes = TRUE
-            )
-
-            # Create TADA data frame
-            TADAprofile_bigsites_temp <- EPATADA::TADA_JoinWQPProfiles(
-              FullPhysChem = bigsites_result_temp,
-              Sites = bigsites_site_temp,
-              Projects = bigsites_project_temp
-            ) |>
-              dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
 
             # Assign the data to the list
             bigsites_list[[i]] <- TADAprofile_bigsites_temp
@@ -1024,8 +994,11 @@ mod_query_data_server <- function(id, tadat) {
         # Combine the data
         TADA_bigsites <- dplyr::bind_rows(bigsites_list)
 
+        # change the column names to use the 'legacy names'
+        TADA_bigsites_legacynames <- EPATADA::TADA_RenametoLegacy(TADA_bigsites)
+        
         # Apply TADA_autoclean
-        TADA_bigsites_clean <- EPATADA::TADA_AutoClean(TADA_bigsites) |>
+        TADA_bigsites_clean <- EPATADA::TADA_AutoClean(TADA_bigsites_legacynames) |>
           dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
       } else {
         TADA_bigsites_clean <- TADA_download_temp
