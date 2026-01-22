@@ -9,9 +9,9 @@
 #' @importFrom shiny NS tagList
 mod_map_bboxUI <- function(id, label = "Clear Drawing") {
   ns <- NS(id)
-  
+
   bbox_increment <- 1
-  
+
   tagList(
     shiny::fluidRow(
       column(
