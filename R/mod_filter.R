@@ -511,7 +511,7 @@ mod_filtering_server <- function(id, tadat) {
 
     # button: Reset all Filters
     shiny::observeEvent(input$removeAllFilters, {
-      # remove row filters added via tadat$selected_filters
+      # remove all row filters added via tadat$selected_filters
       for (fld in unique(tadat$selected_filters$Fields)) {
         if (!(fld %in% names(tadat$raw))) next
 
@@ -521,16 +521,6 @@ mod_filtering_server <- function(id, tadat) {
         if (length(drop_idx) > 0) {
           tadat$removals <- tadat$removals[, -drop_idx, drop = FALSE]
         }
-
-        field_filters <- tadat$selected_filters[tadat$selected_filters$Fields == fld, , drop = FALSE]
-        data_labels <- labelize(tadat$raw[[fld]])
-        sel_labels <- unique(field_filters$Value)
-
-        to_remove <- data_labels %in% sel_labels
-        all_vals <- paste(sel_labels, collapse = " or ")
-        label <- paste0(prefix, "Exclude ", fld, " is ", all_vals)
-
-        tadat$removals[[label]] <- as.logical(to_remove)
       }
 
       tadat$selected_filters <- data.frame(
