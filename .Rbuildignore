@@ -20,3 +20,4 @@ _disable_autoload.R
 ^\.Rprofile$
 ^\.rscignore$
 ^dev$
+^air\.toml$
