@@ -35,7 +35,7 @@ golem::document_and_reload()
 
 # Deploy app to staging
 # https://rstudio-connect.dmap-stage.aws.epa.gov/content/ca684b5d-fa77-4ac3-aacf-966b92d84e13/
-install.packages("rsconnect") # update to latest
+# install.packages("rsconnect") # update to latest
 # do not edit below
 rsconnect::deployApp(
   appDir = getwd(), # or try this? appDir = "inst/app",
