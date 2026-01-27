@@ -95,7 +95,7 @@ mod_filtering_server <- function(id, tadat) {
     }, error = function(e) {
       data.frame(Fields = character(), Description = character(), stringsAsFactors = FALSE)
     })
-    
+
     # Prefix for module-generated removals
     prefix <- "Filter (module): "
 
@@ -115,7 +115,7 @@ mod_filtering_server <- function(id, tadat) {
       chr[is_missing] <- na_label
       chr
     }
-    
+
     # Robust logical converter (fix TADA.Remove and removals columns)
     to_logical <- function(x) {
       if (is.logical(x)) return(x)
@@ -164,7 +164,7 @@ mod_filtering_server <- function(id, tadat) {
         }
         keep_rem <- if (ncol(rem) == 0) rep(TRUE, nrow(d)) else rowSums(rem, na.rm = TRUE) == 0
       }
-      
+
       keep_tada & keep_rem
     }
 
@@ -420,7 +420,7 @@ mod_filtering_server <- function(id, tadat) {
         ))
         return(invisible(NULL))
       }
-      
+
       # Determine selected rows
       if (is.null(rows)) rows <- input$filterStep2_rows_selected
       if (is.null(rows) || length(rows) == 0) {
@@ -430,11 +430,11 @@ mod_filtering_server <- function(id, tadat) {
         ))
         return(invisible(NULL))
       }
-      
+
       # Selected labels (already labelized via filter_values -> getValues -> labelize)
       vals <- shiny::isolate(filter_values())
       selected_labels <- unique(vals$Value_label[rows])
-      
+
       # Universe: ALL labels in raw for this field (labelized), not just those kept by other filters
       base <- tadat$raw
       if (is.null(base) || !(fld %in% names(base))) {
@@ -445,13 +445,13 @@ mod_filtering_server <- function(id, tadat) {
         return(invisible(NULL))
       }
       all_labels <- unique(labelize(base[[fld]]))
-      
+
       # Complement = everything except the selected labels
       complement_labels <- setdiff(all_labels, selected_labels)
-      
+
       # Replace any existing filters for this field, then store complement as 'Exclude' rows
       tadat$selected_filters <- tadat$selected_filters[!(tadat$selected_filters$Fields == fld), , drop = FALSE]
-      
+
       if (length(complement_labels) > 0) {
         new_rows <- data.frame(
           Fields = rep(fld, length(complement_labels)),
@@ -466,7 +466,7 @@ mod_filtering_server <- function(id, tadat) {
           .keep_all = TRUE
         )
       }
-      
+
       shiny::showNotification(
         sprintf("Applied 'Include Only' to %d value(s) for %s", length(selected_labels), fld),
         type = "message", duration = 3
@@ -483,7 +483,7 @@ mod_filtering_server <- function(id, tadat) {
         ))
         return(invisible(NULL))
       }
-      
+
       # Determine selected rows
       if (is.null(rows)) rows <- input$filterStep2_rows_selected
       if (is.null(rows) || length(rows) == 0) {
@@ -493,19 +493,19 @@ mod_filtering_server <- function(id, tadat) {
         ))
         return(invisible(NULL))
       }
-      
+
       # Get selected labels (labelized)
       vals <- shiny::isolate(filter_values())
       selected_labels <- unique(vals$Value_label[rows])
-      
+
       # Merge with existing excludes for this field
       existing_field <- tadat$selected_filters[tadat$selected_filters$Fields == fld, , drop = FALSE]
       existing_vals <- if (nrow(existing_field) > 0) unique(existing_field$Value) else character(0)
       updated_excluded_vals <- sort(unique(c(existing_vals, selected_labels)))
-      
+
       # Remove prior rows for this field and add updated
       tadat$selected_filters <- tadat$selected_filters[tadat$selected_filters$Fields != fld, , drop = FALSE]
-      
+
       if (length(updated_excluded_vals) > 0) {
         new_rows <- data.frame(
           Fields = rep(fld, length(updated_excluded_vals)),
@@ -520,7 +520,7 @@ mod_filtering_server <- function(id, tadat) {
           .keep_all = TRUE
         )
       }
-      
+
       shiny::showNotification(
         sprintf("Excluded %d value(s) for %s", length(selected_labels), fld),
         type = "message", duration = 3
@@ -550,11 +550,11 @@ mod_filtering_server <- function(id, tadat) {
     shiny::observeEvent(input$removeAllFilters, {
       # remove all row filters added via tadat$selected_filters
       if (is.data.frame(tadat$removals) &&
-          nrow(tadat$removals) == nrow(tadat$raw) &&
-          ncol(tadat$removals) > 0) {
+        nrow(tadat$removals) == nrow(tadat$raw) &&
+        ncol(tadat$removals) > 0) {
         for (fld in unique(tadat$selected_filters$Fields)) {
           if (!(fld %in% names(tadat$raw))) next
-          
+
           # Drop this field's prior module columns
           prior_prefix <- paste0(prefix, "Exclude ", fld, " is ")
           drop_idx <- which(startsWith(colnames(tadat$removals), prior_prefix))
@@ -563,7 +563,7 @@ mod_filtering_server <- function(id, tadat) {
           }
         }
       }
-      
+
       # Clear all selected filters
       tadat$selected_filters <- data.frame(
         Fields = character(),
@@ -572,11 +572,11 @@ mod_filtering_server <- function(id, tadat) {
         Count = integer(),
         stringsAsFactors = FALSE
       )
-      
+
       # Recompute TADA.RemovalReason for remaining removals (if any)
       if (is.data.frame(tadat$removals) &&
-          nrow(tadat$removals) == nrow(tadat$raw) &&
-          ncol(tadat$removals) > 0) {
+        nrow(tadat$removals) == nrow(tadat$raw) &&
+        ncol(tadat$removals) > 0) {
         # use to_logical when computing TADA.RemovalReason so NA is handled consistently
         rem_log <- as.data.frame(lapply(tadat$removals, function(col) {
           lc <- to_logical(col)
@@ -596,7 +596,7 @@ mod_filtering_server <- function(id, tadat) {
       } else {
         tadat$raw$TADA.RemovalReason <- NA_character_
       }
-      
+
       shinyjs::hide("includeOnlySelectedValues")
       shinyjs::hide("excludeSelectedValues")
     })
@@ -663,22 +663,22 @@ mod_filtering_server <- function(id, tadat) {
 
               for (fld in unique(tadat$selected_filters$Fields)) {
                 if (!(fld %in% names(tadat$raw))) next
-                
+
                 # Drop this field's prior module columns
                 prior_prefix <- paste0(prefix, "Exclude ", fld, " is ")
                 drop_idx <- which(startsWith(colnames(tadat$removals), prior_prefix))
                 if (length(drop_idx) > 0) {
                   tadat$removals <- tadat$removals[, -drop_idx, drop = FALSE]
                 }
-                
+
                 field_filters <- tadat$selected_filters[tadat$selected_filters$Fields == fld, , drop = FALSE]
                 data_labels <- labelize(tadat$raw[[fld]])
                 sel_labels <- unique(field_filters$Value)
-                
+
                 to_remove <- data_labels %in% sel_labels
                 all_vals <- paste(sel_labels, collapse = " or ")
                 label <- paste0(prefix, "Exclude ", fld, " is ", all_vals)
-                
+
                 # to_remove is already logical
                 tadat$removals[[label]] <- to_remove
               }
@@ -686,11 +686,11 @@ mod_filtering_server <- function(id, tadat) {
               # Drop ALL module-generated removal columns (current and legacy prefixes)
               prefixes <- c(paste0(prefix, "Exclude "), "Filter: Exclude ")
               if (is.data.frame(tadat$removals) &&
-                  nrow(tadat$removals) == nrow(tadat$raw) &&
-                  ncol(tadat$removals) > 0) {
+                nrow(tadat$removals) == nrow(tadat$raw) &&
+                ncol(tadat$removals) > 0) {
                 drop_idx <- vapply(colnames(tadat$removals),
-                                   function(nm) any(startsWith(nm, prefixes)),
-                                   logical(1))
+                  function(nm) any(startsWith(nm, prefixes)),
+                  logical(1))
                 tadat$removals <- tadat$removals[, !drop_idx, drop = FALSE]
               }
               shinyjs::disable("removeAllFilters")

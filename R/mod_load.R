@@ -1005,7 +1005,7 @@ mod_query_data_server <- function(id, tadat) {
 
             # Download the WQP data using the WQX3 and the full Physical Chemistry profile
             TADAprofile_smallsites_temp <- dataRetrieval::readWQPdata(args_temp_small,
-              service = 'ResultWQX3',
+              service = "ResultWQX3",
               dataProfile = "fullPhysChem",
               ignore_attributes = TRUE
             )
@@ -1019,7 +1019,7 @@ mod_query_data_server <- function(id, tadat) {
         TADA_smallsites <- dplyr::bind_rows(smallsites_list)
 
         TADA_smallsites_legacynames <- EPATADA::TADA_RenametoLegacy(TADA_smallsites)
-        
+
         # Apply TADA_autoclean
         TADA_smallsites_clean <- EPATADA::TADA_AutoClean(TADA_smallsites_legacynames) |>
           dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
@@ -1050,7 +1050,7 @@ mod_query_data_server <- function(id, tadat) {
 
             # Download the WQP data using the WQX3 using the new profile
             TADAprofile_bigsites_temp <- dataRetrieval::readWQPdata(args_temp_big,
-              service = 'ResultWQX3',
+              service = "ResultWQX3",
               dataProfile = "fullPhysChem",
               ignore_attributes = TRUE
             )
@@ -1065,7 +1065,7 @@ mod_query_data_server <- function(id, tadat) {
 
         # change the column names to use the 'legacy names'
         TADA_bigsites_legacynames <- EPATADA::TADA_RenametoLegacy(TADA_bigsites)
-        
+
         # Apply TADA_autoclean
         TADA_bigsites_clean <- EPATADA::TADA_AutoClean(TADA_bigsites_legacynames) |>
           dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
