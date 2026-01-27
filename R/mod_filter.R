@@ -87,7 +87,7 @@ mod_filtering_server <- function(id, tadat) {
     filter_dat <- readRDS(system.file("extdata", "filter_descriptions.rds", package = "TADAShiny"))
 
     # Prefix for module-generated removals
-    prefix <- "Filter (module): "
+    prefix <- "Filter: "
 
     # Unified UI label for missing values
     na_label <- "NA - Not Available"
@@ -648,11 +648,15 @@ mod_filtering_server <- function(id, tadat) {
 
             # Update TADA.RemovalReason (fast guard paths)
             removals_df <- tadat$removals
+
+            # sets the values shown in TADA.RemovalReason
             if (is.data.frame(removals_df) &&
               nrow(removals_df) == nrow(tadat$raw) &&
               ncol(removals_df) > 0) {
               # Coerce to logical to avoid surprises
-              rem_log <- as.data.frame(lapply(removals_df, function(col) if (is.logical(col)) col else as.logical(col)))
+              rem_log <- as.data.frame(lapply(removals_df, 
+                                              function(col) if (is.logical(col)) col else as.logical(col)), 
+                                       optional = TRUE) # added this to preserve column names for use in TADA.RemovalReason
               cn <- colnames(rem_log)
               mat <- as.matrix(rem_log)
 
@@ -661,7 +665,9 @@ mod_filtering_server <- function(id, tadat) {
               if (any(any_true)) {
                 idx_list <- apply(mat[any_true, , drop = FALSE], 1L, function(row) which(row))
                 if (is.integer(idx_list)) idx_list <- list(idx_list)
-                reasons[any_true] <- vapply(idx_list, function(idx) paste(cn[idx], collapse = ", "), character(1))
+                # joins the strings using a semi-colon, which (I think) is not a valid character in
+                # the field names
+                reasons[any_true] <- vapply(idx_list, function(idx) paste(cn[idx], collapse = "; "), character(1))
               }
               tadat$raw$TADA.RemovalReason <- reasons
             } else if (is.data.frame(removals_df)) {

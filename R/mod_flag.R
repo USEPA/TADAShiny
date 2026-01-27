@@ -160,21 +160,34 @@ mod_data_flagging_server <- function(id, tadat) {
         }
       }
 
-      # Build RemovalReason from prefixed columns only
+      # Build TADA.RemovalReason
       if (is.null(tadat$raw) == FALSE) {
-        removals <- dplyr::select(tadat$removals, (dplyr::starts_with(flag_prefix)))
-        sel <- which(removals == TRUE, arr.ind = TRUE)
-        if (length(sel) > 0) {
-          removals[sel] <- names(removals)[sel[, "col"]]
-          removals[removals == FALSE] <- ""
-          tadat$raw$TADA.RemovalReason <- apply(
-            removals, 1,
-            function(row) {
-              paste(row[nzchar(row)], collapse = ", ")
-            }
-          )
-        } else {
-          tadat$raw$TADA.RemovalReason <- NA
+        # Update TADA.RemovalReason (fast guard paths)
+        # this is the code cut-and-pasted from mod_filter.R - it should be the same process        
+        removals_df <- tadat$removals
+
+        if (is.data.frame(removals_df) &&
+          nrow(removals_df) == nrow(tadat$raw) &&
+          ncol(removals_df) > 0) {
+          # Coerce to logical to avoid surprises
+          rem_log <- as.data.frame(lapply(removals_df, 
+                                          function(col) if (is.logical(col)) col else as.logical(col)), 
+                                   optional = TRUE) # added this to preserve column names for use in TADA.RemovalReason
+          cn <- colnames(rem_log)
+          mat <- as.matrix(rem_log)
+
+          any_true <- rowSums(mat, na.rm = TRUE) > 0
+          reasons <- rep(NA_character_, nrow(mat))
+          if (any(any_true)) {
+            idx_list <- apply(mat[any_true, , drop = FALSE], 1L, function(row) which(row))
+            if (is.integer(idx_list)) idx_list <- list(idx_list)
+            # joins the strings using a semi-colon, which (I think) is not a valid character in
+            # the field names so they can be parsed more easily by users
+            reasons[any_true] <- vapply(idx_list, function(idx) paste(cn[idx], collapse = "; "), character(1))
+          }
+          tadat$raw$TADA.RemovalReason <- reasons
+        } else if (is.data.frame(removals_df)) {
+          tadat$raw$TADA.RemovalReason <- NA_character_
         }
       }
     })
