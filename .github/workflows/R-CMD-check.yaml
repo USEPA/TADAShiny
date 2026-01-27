@@ -4,11 +4,17 @@ on:
   push:
     branches: [develop]
   pull_request:
-    branches: [develop]
-  # Allow manual action trigger
+    branches: develop
+  # allow manual action trigger
   workflow_dispatch:
 
 name: R-CMD-check
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# Also, cancel in-progress runs.
+# concurrency:
+#   group: "R-CMD-check"
+#  cancel-in-progress: true
 
 jobs:
   R-CMD-check:
@@ -20,21 +26,15 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - os: macos-latest
-            r: 'release'
-          - os: windows-latest
-            r: 'release'
-            http-user-agent: 'release'
-          - os: ubuntu-latest
-            r: 'release'
-          - os: ubuntu-latest
-            r: 'oldrel-1'
+          - {os: macos-latest,   r: 'release'}
+          - {os: windows-latest, r: 'release'}
+          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
+          - {os: ubuntu-latest,   r: 'release'}
+          - {os: ubuntu-latest,   r: 'oldrel-1'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
-      # Prevent network fetches during install/lazy load/check
-      TADAS_OFFLINE: true
 
     steps:
       - uses: actions/checkout@v6
