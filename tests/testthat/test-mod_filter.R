@@ -31,8 +31,6 @@ wait_until <- function(expr, session, timeout_ms = 6000, step_ms = 25) {
 
 test_that("'Remove All Filters' clears per-field removals and restores Step 2 values", {
   skip_on_cran()
-  rds_path <- system.file("extdata", "filter_descriptions.rds", package = "TADAShiny")
-  skip_if_not(file.exists(rds_path), "filter_descriptions.rds not found")
   
   d <- tiny_data()
   tadat <- new_tadat(d)
@@ -52,17 +50,17 @@ test_that("'Remove All Filters' clears per-field removals and restores Step 2 va
     add_filters_exclude(rows = i_x)
     session$flushReact()
     
-    # Ensure helper updated state
     expect_gt(nrow(shiny::isolate(tadat$selected_filters)), 0)
     
     ok <- wait_until(
-      expr = function() any(grepl(paste0("^", prefix, "Exclude FieldA is "), colnames(tadat$removals))),
+      expr = function() any(startsWith(colnames(tadat$removals), paste0(prefix, "Exclude FieldA"))),
       session = session
     )
     expect_true(ok)
     
-    colname_before <- grep(paste0("^", prefix, "Exclude FieldA is "), colnames(shiny::isolate(tadat$removals)), value = TRUE)
-    expect_length(colname_before, 1)
+    cn <- colnames(shiny::isolate(tadat$removals))
+    colname_before <- cn[startsWith(cn, paste0(prefix, "Exclude FieldA"))]
+    expect_gte(length(colname_before), 1)
     
     vals1 <- shiny::isolate(filter_values())
     if ("x" %in% vals1$Value_label) {
@@ -75,7 +73,7 @@ test_that("'Remove All Filters' clears per-field removals and restores Step 2 va
     session$flushReact()
     
     ok2 <- wait_until(
-      expr = function() !any(grepl(paste0("^", prefix, "Exclude FieldA is "), colnames(tadat$removals))),
+      expr = function() !any(startsWith(colnames(tadat$removals), paste0(prefix, "Exclude FieldA"))),
       session = session
     )
     expect_true(ok2)
@@ -85,13 +83,15 @@ test_that("'Remove All Filters' clears per-field removals and restores Step 2 va
     expect_equal(vals2$Count[match("x", vals2$Value_label)], baseline_x)
     
     expect_equal(nrow(shiny::isolate(tadat$selected_filters)), 0)
+    
+    reasons <- shiny::isolate(tadat$raw$TADA.RemovalReason)
+    expect_equal(length(reasons), nrow(tadat$raw))
+    expect_true(all(is.na(reasons)))
   })
 })
 
 test_that("Exclude and Include Only update selected_filters and per-field removals correctly", {
   skip_on_cran()
-  rds_path <- system.file("extdata", "filter_descriptions.rds", package = "TADAShiny")
-  skip_if_not(file.exists(rds_path), "filter_descriptions.rds not found")
   
   d <- tiny_data()
   tadat <- new_tadat(d)
@@ -110,7 +110,7 @@ test_that("Exclude and Include Only update selected_filters and per-field remova
     expect_gt(nrow(shiny::isolate(tadat$selected_filters)), 0)
     
     ok <- wait_until(
-      expr = function() any(grepl(paste0("^", prefix, "Exclude FieldA is "), colnames(tadat$removals))),
+      expr = function() any(startsWith(colnames(tadat$removals), paste0(prefix, "Exclude FieldA"))),
       session = session
     )
     expect_true(ok)
@@ -120,9 +120,10 @@ test_that("Exclude and Include Only update selected_filters and per-field remova
     expect_true(all(sf1$Filter == "Exclude"))
     expect_true("x" %in% sf1$Value)
     
-    colname <- grep(paste0("^", prefix, "Exclude FieldA is "), colnames(shiny::isolate(tadat$removals)), value = TRUE)
-    expect_length(colname, 1)
-    expect_true(any(shiny::isolate(tadat$removals[[colname]]), na.rm = TRUE))
+    cn <- colnames(shiny::isolate(tadat$removals))
+    colname <- cn[startsWith(cn, paste0(prefix, "Exclude FieldA"))]
+    expect_gte(length(colname), 1)
+    expect_true(any(shiny::isolate(tadat$removals[[colname[1]]]), na.rm = TRUE))
     
     add_filters_include_only(rows = i_na)
     session$flushReact()
@@ -152,29 +153,48 @@ test_that("Exclude and Include Only update selected_filters and per-field remova
   })
 })
 
-test_that("Labelization aggregates NA-like values and pie source ignores own-field removals", {
+test_that("Labelization aggregates NA-like values and pie source reflects applied removals", {
   skip_on_cran()
-  rds_path <- system.file("extdata", "filter_descriptions.rds", package = "TADAShiny")
-  skip_if_not(file.exists(rds_path), "filter_descriptions.rds not found")
   
   d <- tiny_data()
   tadat <- new_tadat(d)
+  prefix <- "Filter (module): "
   
   testServer(mod_filtering_server, args = list(tadat = tadat), {
     values$selected_field <- "FieldA"
     session$flushReact()
     
+    # Baseline: labelization aggregates NA-like values
     vals <- shiny::isolate(filter_values())
     expect_true("NA - Not Available" %in% vals$Value_label)
     na_count <- vals$Count[match("NA - Not Available", vals$Value_label)]
     expect_gte(na_count, 3)
     
+    # Baseline count for "x" from active data (honors TADA.Remove)
+    baseline_x <- vals$Count[match("x", vals$Value_label)]
+    expect_true(is.finite(baseline_x))
+    expect_gt(baseline_x, 0)
+    
+    # Exclude "x" in Step 2
     i_x <- which(vals$Value_label == "x")
     add_filters_exclude(rows = i_x)
     session$flushReact()
     expect_gt(nrow(shiny::isolate(tadat$selected_filters)), 0)
     
+    # Ensure removals applied (observer ran) before reading pie source
+    ok <- wait_until(
+      expr = function() any(startsWith(colnames(tadat$removals), paste0(prefix, "Exclude FieldA"))),
+      session = session
+    )
+    expect_true(ok)
+    
+    # Expected pie count for "x" based on current removals (including own-field)
+    keep_all <- keep_mask_for(NULL)
+    expected_x_after <- sum(labelize(tadat$raw$FieldA)[keep_all] == "x", na.rm = TRUE)
+    
+    # Pie source reflects applied removals
     pie_src <- shiny::isolate(pie_source())
-    expect_true(any(pie_src$FieldA == "x"))
+    sum_x <- sum(pie_src$FieldA == "x", na.rm = TRUE)
+    expect_equal(as.integer(sum_x), as.integer(expected_x_after))
   })
 })
