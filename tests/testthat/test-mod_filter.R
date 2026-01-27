@@ -1,8 +1,3 @@
-# tests/testthat/test-mod_filtering.R
-
-library(testthat)
-library(shiny)
-
 # Helpers
 new_tadat <- function(raw_df) {
   rv <- reactiveValues()
@@ -47,7 +42,7 @@ test_that("'Remove All Filters' clears per-field removals and restores Step 2 va
     values$selected_field <- "FieldA"
     session$flushReact()
     
-    vals0 <- isolate(filter_values())
+    vals0 <- shiny::isolate(filter_values())
     expect_true("x" %in% vals0$Value_label)
     baseline_x <- vals0$Count[match("x", vals0$Value_label)]
     expect_true(is.finite(baseline_x))
@@ -58,7 +53,7 @@ test_that("'Remove All Filters' clears per-field removals and restores Step 2 va
     session$flushReact()
     
     # Ensure helper updated state
-    expect_gt(nrow(isolate(tadat$selected_filters)), 0)
+    expect_gt(nrow(shiny::isolate(tadat$selected_filters)), 0)
     
     ok <- wait_until(
       expr = function() any(grepl(paste0("^", prefix, "Exclude FieldA is "), colnames(tadat$removals))),
@@ -66,10 +61,10 @@ test_that("'Remove All Filters' clears per-field removals and restores Step 2 va
     )
     expect_true(ok)
     
-    colname_before <- grep(paste0("^", prefix, "Exclude FieldA is "), colnames(isolate(tadat$removals)), value = TRUE)
+    colname_before <- grep(paste0("^", prefix, "Exclude FieldA is "), colnames(shiny::isolate(tadat$removals)), value = TRUE)
     expect_length(colname_before, 1)
     
-    vals1 <- isolate(filter_values())
+    vals1 <- shiny::isolate(filter_values())
     if ("x" %in% vals1$Value_label) {
       expect_equal(vals1$Count[match("x", vals1$Value_label)], 0)
     } else {
@@ -85,11 +80,11 @@ test_that("'Remove All Filters' clears per-field removals and restores Step 2 va
     )
     expect_true(ok2)
     
-    vals2 <- isolate(filter_values())
+    vals2 <- shiny::isolate(filter_values())
     expect_true("x" %in% vals2$Value_label)
     expect_equal(vals2$Count[match("x", vals2$Value_label)], baseline_x)
     
-    expect_equal(nrow(isolate(tadat$selected_filters)), 0)
+    expect_equal(nrow(shiny::isolate(tadat$selected_filters)), 0)
   })
 })
 
@@ -106,13 +101,13 @@ test_that("Exclude and Include Only update selected_filters and per-field remova
     values$selected_field <- "FieldA"
     session$flushReact()
     
-    vals <- isolate(filter_values())
+    vals <- shiny::isolate(filter_values())
     i_x  <- which(vals$Value_label == "x")
     i_na <- which(vals$Value_label == "NA - Not Available")
     
     add_filters_exclude(rows = i_x)
     session$flushReact()
-    expect_gt(nrow(isolate(tadat$selected_filters)), 0)
+    expect_gt(nrow(shiny::isolate(tadat$selected_filters)), 0)
     
     ok <- wait_until(
       expr = function() any(grepl(paste0("^", prefix, "Exclude FieldA is "), colnames(tadat$removals))),
@@ -120,18 +115,18 @@ test_that("Exclude and Include Only update selected_filters and per-field remova
     )
     expect_true(ok)
     
-    sf1 <- isolate(tadat$selected_filters)
+    sf1 <- shiny::isolate(tadat$selected_filters)
     expect_true(nrow(sf1) >= 1)
     expect_true(all(sf1$Filter == "Exclude"))
     expect_true("x" %in% sf1$Value)
     
-    colname <- grep(paste0("^", prefix, "Exclude FieldA is "), colnames(isolate(tadat$removals)), value = TRUE)
+    colname <- grep(paste0("^", prefix, "Exclude FieldA is "), colnames(shiny::isolate(tadat$removals)), value = TRUE)
     expect_length(colname, 1)
-    expect_true(any(isolate(tadat$removals[[colname]]), na.rm = TRUE))
+    expect_true(any(shiny::isolate(tadat$removals[[colname]]), na.rm = TRUE))
     
     add_filters_include_only(rows = i_na)
     session$flushReact()
-    expect_gt(nrow(isolate(tadat$selected_filters)), 0)
+    expect_gt(nrow(shiny::isolate(tadat$selected_filters)), 0)
     
     ok2 <- wait_until(
       expr = function() nrow(tadat$selected_filters) > 0 &&
@@ -141,7 +136,7 @@ test_that("Exclude and Include Only update selected_filters and per-field remova
     )
     expect_true(ok2)
     
-    sf2 <- isolate(tadat$selected_filters)
+    sf2 <- shiny::isolate(tadat$selected_filters)
     expect_false("NA - Not Available" %in% sf2$Value)
     
     ok3 <- wait_until(
@@ -151,7 +146,7 @@ test_that("Exclude and Include Only update selected_filters and per-field remova
     )
     expect_true(ok3)
     
-    reasons <- isolate(tadat$raw$TADA.RemovalReason)
+    reasons <- shiny::isolate(tadat$raw$TADA.RemovalReason)
     expect_true(any(is.na(reasons)))
     expect_true(any(!is.na(reasons)))
   })
@@ -169,7 +164,7 @@ test_that("Labelization aggregates NA-like values and pie source ignores own-fie
     values$selected_field <- "FieldA"
     session$flushReact()
     
-    vals <- isolate(filter_values())
+    vals <- shiny::isolate(filter_values())
     expect_true("NA - Not Available" %in% vals$Value_label)
     na_count <- vals$Count[match("NA - Not Available", vals$Value_label)]
     expect_gte(na_count, 3)
@@ -177,9 +172,9 @@ test_that("Labelization aggregates NA-like values and pie source ignores own-fie
     i_x <- which(vals$Value_label == "x")
     add_filters_exclude(rows = i_x)
     session$flushReact()
-    expect_gt(nrow(isolate(tadat$selected_filters)), 0)
+    expect_gt(nrow(shiny::isolate(tadat$selected_filters)), 0)
     
-    pie_src <- isolate(pie_source())
+    pie_src <- shiny::isolate(pie_source())
     expect_true(any(pie_src$FieldA == "x"))
   })
 })

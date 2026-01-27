@@ -84,8 +84,18 @@ mod_filtering_server <- function(id, tadat) {
     values <- shiny::reactiveValues()
     values$selected_field <- NULL # this holds the selected row in the 'Selected filters' table
 
-    filter_dat <- readRDS(system.file("extdata", "filter_descriptions.rds", package = "TADAShiny"))
-
+    # Include tryCatch and file check
+    filter_dat <- tryCatch({
+      fp <- system.file("extdata", "filter_descriptions.rds", package = "TADAShiny")
+      if (!nzchar(fp) || !file.exists(fp)) {
+        data.frame(Fields = character(), Description = character(), stringsAsFactors = FALSE)
+      } else {
+        readRDS(fp)
+      }
+    }, error = function(e) {
+      data.frame(Fields = character(), Description = character(), stringsAsFactors = FALSE)
+    })
+    
     # Prefix for module-generated removals
     prefix <- "Filter (module): "
 
@@ -105,6 +115,19 @@ mod_filtering_server <- function(id, tadat) {
       chr[is_missing] <- na_label
       chr
     }
+    
+    # Robust logical converter (fix TADA.Remove and removals columns)
+    to_logical <- function(x) {
+      if (is.logical(x)) return(x)
+      if (is.numeric(x)) return(x != 0)
+      x_chr <- trimws(tolower(as.character(x)))
+      true_vals  <- c("true", "t", "1", "yes", "y")
+      false_vals <- c("false", "f", "0", "no", "n", "")
+      res <- rep(NA, length(x_chr))
+      res[x_chr %in% true_vals]  <- TRUE
+      res[x_chr %in% false_vals] <- FALSE
+      res
+    }
 
     # Keep mask honoring TADA.Remove and all removals; optionally ignore this field's own removal columns
     keep_mask_for <- function(fld = NULL) {
@@ -116,16 +139,21 @@ mod_filtering_server <- function(id, tadat) {
       # TADA.Remove mask
       keep_tada <- rep(TRUE, nrow(d))
       if ("TADA.Remove" %in% names(d)) {
-        rmv <- suppressWarnings(as.logical(d$TADA.Remove))
+        rmv <- to_logical(d$TADA.Remove)
         rmv[is.na(rmv)] <- FALSE
         keep_tada <- !rmv
       }
 
+      # Removals coercion
       rem <- tadat$removals
       if (!is.data.frame(rem) || ncol(rem) == 0 || nrow(rem) != nrow(d)) {
         keep_rem <- rep(TRUE, nrow(d))
       } else {
-        rem <- as.data.frame(lapply(rem, function(col) if (is.logical(col)) col else as.logical(col)))
+        rem <- as.data.frame(lapply(rem, function(col) {
+          lc <- to_logical(col)
+          lc[is.na(lc)] <- FALSE
+          lc
+        }))
         if (!is.null(fld)) {
           prefixes <- c(
             paste0("Filter (module): Exclude ", fld, " is "),
@@ -136,7 +164,7 @@ mod_filtering_server <- function(id, tadat) {
         }
         keep_rem <- if (ncol(rem) == 0) rep(TRUE, nrow(d)) else rowSums(rem, na.rm = TRUE) == 0
       }
-
+      
       keep_tada & keep_rem
     }
 
@@ -404,7 +432,7 @@ mod_filtering_server <- function(id, tadat) {
       }
       
       # Selected labels (already labelized via filter_values -> getValues -> labelize)
-      vals <- isolate(filter_values())
+      vals <- shiny::isolate(filter_values())
       selected_labels <- unique(vals$Value_label[rows])
       
       # Universe: ALL labels in raw for this field (labelized), not just those kept by other filters
@@ -467,7 +495,7 @@ mod_filtering_server <- function(id, tadat) {
       }
       
       # Get selected labels (labelized)
-      vals <- isolate(filter_values())
+      vals <- shiny::isolate(filter_values())
       selected_labels <- unique(vals$Value_label[rows])
       
       # Merge with existing excludes for this field
@@ -521,14 +549,18 @@ mod_filtering_server <- function(id, tadat) {
     # button: Reset all Filters
     shiny::observeEvent(input$removeAllFilters, {
       # remove all row filters added via tadat$selected_filters
-      for (fld in unique(tadat$selected_filters$Fields)) {
-        if (!(fld %in% names(tadat$raw))) next
-
-        # Drop this field's prior module columns
-        prior_prefix <- paste0(prefix, "Exclude ", fld, " is ")
-        drop_idx <- which(startsWith(colnames(tadat$removals), prior_prefix))
-        if (length(drop_idx) > 0) {
-          tadat$removals <- tadat$removals[, -drop_idx, drop = FALSE]
+      if (is.data.frame(tadat$removals) &&
+          nrow(tadat$removals) == nrow(tadat$raw) &&
+          ncol(tadat$removals) > 0) {
+        for (fld in unique(tadat$selected_filters$Fields)) {
+          if (!(fld %in% names(tadat$raw))) next
+          
+          # Drop this field's prior module columns
+          prior_prefix <- paste0(prefix, "Exclude ", fld, " is ")
+          drop_idx <- which(startsWith(colnames(tadat$removals), prior_prefix))
+          if (length(drop_idx) > 0) {
+            tadat$removals <- tadat$removals[, -drop_idx, drop = FALSE]
+          }
         }
       }
       
@@ -545,8 +577,12 @@ mod_filtering_server <- function(id, tadat) {
       if (is.data.frame(tadat$removals) &&
           nrow(tadat$removals) == nrow(tadat$raw) &&
           ncol(tadat$removals) > 0) {
-        rem_log <- as.data.frame(lapply(tadat$removals, function(col)
-          if (is.logical(col)) col else as.logical(col)))
+        # use to_logical when computing TADA.RemovalReason so NA is handled consistently
+        rem_log <- as.data.frame(lapply(tadat$removals, function(col) {
+          lc <- to_logical(col)
+          lc[is.na(lc)] <- FALSE
+          lc
+        }))
         cn <- colnames(rem_log)
         mat <- as.matrix(rem_log)
         any_true <- rowSums(mat, na.rm = TRUE) > 0
@@ -627,23 +663,24 @@ mod_filtering_server <- function(id, tadat) {
 
               for (fld in unique(tadat$selected_filters$Fields)) {
                 if (!(fld %in% names(tadat$raw))) next
-
+                
                 # Drop this field's prior module columns
                 prior_prefix <- paste0(prefix, "Exclude ", fld, " is ")
                 drop_idx <- which(startsWith(colnames(tadat$removals), prior_prefix))
                 if (length(drop_idx) > 0) {
                   tadat$removals <- tadat$removals[, -drop_idx, drop = FALSE]
                 }
-
+                
                 field_filters <- tadat$selected_filters[tadat$selected_filters$Fields == fld, , drop = FALSE]
                 data_labels <- labelize(tadat$raw[[fld]])
                 sel_labels <- unique(field_filters$Value)
-
+                
                 to_remove <- data_labels %in% sel_labels
                 all_vals <- paste(sel_labels, collapse = " or ")
                 label <- paste0(prefix, "Exclude ", fld, " is ", all_vals)
-
-                tadat$removals[[label]] <- as.logical(to_remove)
+                
+                # to_remove is already logical
+                tadat$removals[[label]] <- to_remove
               }
             } else {
               # Drop ALL module-generated removal columns (current and legacy prefixes)
@@ -665,8 +702,12 @@ mod_filtering_server <- function(id, tadat) {
             if (is.data.frame(removals_df) &&
               nrow(removals_df) == nrow(tadat$raw) &&
               ncol(removals_df) > 0) {
-              # Coerce to logical to avoid surprises
-              rem_log <- as.data.frame(lapply(removals_df, function(col) if (is.logical(col)) col else as.logical(col)))
+              # Use robust to_logical converter to avoid surprises
+              rem_log <- as.data.frame(lapply(removals_df, function(col) {
+                lc <- to_logical(col)
+                lc[is.na(lc)] <- FALSE
+                lc
+              }))
               cn <- colnames(rem_log)
               mat <- as.matrix(rem_log)
 
