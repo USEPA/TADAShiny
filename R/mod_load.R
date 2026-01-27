@@ -1,3 +1,75 @@
+# Minimal safe helpers to avoid failing on install/lazy load/CI
+
+.tadas_offline <- function() {
+  nzchar(Sys.getenv("TADAS_OFFLINE", "")) # set TADAS_OFFLINE=true in CI to force offline
+}
+
+.safe_req_string <- function(u, timeout = 30, max_tries = 3) {
+  if (.tadas_offline()) {
+    return(NULL)
+  }
+  tryCatch(
+    {
+      httr2::request(u) |>
+        httr2::req_timeout(timeout) |>
+        httr2::req_retry(max_tries = max_tries) |>
+        httr2::req_error(is_error = function(resp) FALSE) |>
+        httr2::req_perform() |>
+        httr2::resp_body_string()
+    },
+    error = function(e) NULL
+  )
+}
+
+# Generic: fetch a CSV and return a unique vector from a column; else default
+.safe_fetch_csv_column <- function(u, column, default = character()) {
+  txt <- .safe_req_string(u)
+  if (is.null(txt)) {
+    return(default)
+  }
+  dt <- tryCatch(data.table::fread(txt, showProgress = FALSE), error = function(e) NULL)
+  if (is.null(dt) || !column %in% names(dt)) {
+    return(default)
+  }
+  unique(dt[[column]])
+}
+
+# Projects: return ProjectIdentifier vector; else empty
+.safe_fetch_projects <- function(u) {
+  txt <- .safe_req_string(u)
+  if (is.null(txt)) {
+    return(character())
+  }
+  dt <- tryCatch(data.table::fread(txt, showProgress = FALSE), error = function(e) NULL)
+  if (is.null(dt) || !"ProjectIdentifier" %in% names(dt)) {
+    return(character())
+  }
+  unique(dt$ProjectIdentifier)
+}
+
+# County: census file has no header; on failure return empty data.frame with expected columns
+.safe_fetch_county <- function(u) {
+  txt <- .safe_req_string(u)
+  cols <- c("STUSAB", "STATE", "COUNTY", "COUNTY_NAME", "COUNTY_ID")
+  if (is.null(txt)) {
+    return(data.frame(
+      STUSAB = character(), STATE = character(), COUNTY = character(),
+      COUNTY_NAME = character(), COUNTY_ID = character(), stringsAsFactors = FALSE
+    ))
+  }
+  dt <- tryCatch(
+    data.table::fread(txt, header = FALSE, col.names = cols, showProgress = FALSE),
+    error = function(e) NULL
+  )
+  if (is.null(dt)) {
+    return(data.frame(
+      STUSAB = character(), STATE = character(), COUNTY = character(),
+      COUNTY_NAME = character(), COUNTY_ID = character(), stringsAsFactors = FALSE
+    ))
+  }
+  as.data.frame(dt)
+}
+
 TADA_download_temp <- readRDS(system.file("extdata", "TADA_download_temp.rds", package = "TADAShiny"))
 tribal_list <- readRDS(system.file("extdata", "tribal_list.rds", package = "TADAShiny"))
 
@@ -13,43 +85,40 @@ return_tribal_sf <- function(tribal_layer, tribal_name, tribal_list = tribal_lis
 # Load Country/Ocean(s) choice list
 countryocean_choices <- readRDS(system.file("extdata", "countryocean.rds", package = "TADAShiny"))
 
-# Fetch Project choices
+# Fetch Project choices (safe)
 project_url <- "https://www.waterqualitydata.us/data/Project/search?mimeType=csv&zip=no&providers=NWIS&providers=STORET"
-# Create a request object for the project data
-project_request <- httr2::request(project_url)
-# Perform the GET request and extract the content
-project_response <- project_request |>
-  httr2::req_perform() |>
-  httr2::resp_body_string()
-# Read the CSV content into a data table
-projects <- data.table::fread(project_response)$ProjectIdentifier
+projects <- .safe_fetch_projects(project_url)
 
 # Fetch County choices
 # Beware that some of the counties are historic, see: https://github.com/DOI-USGS/dataRetrieval/issues/711
 # Using USGS counties from dataRetrieval does not resolve https://github.com/USEPA/TADAShiny/issues/231
-county <- utils::read.csv(
-  file = "https://www2.census.gov/geo/docs/reference/codes/files/national_county.txt",
-  header = FALSE,
-  col.names = c("STUSAB", "STATE", "COUNTY", "COUNTY_NAME", "COUNTY_ID")
+# Fetch County choices (safe)
+county <- .safe_fetch_county("https://www2.census.gov/geo/docs/reference/codes/files/national_county.txt")
+
+# Fetch orgs, chars, chargroup, media choices (safe)
+orgs <- .safe_fetch_csv_column(
+  "https://cdx.epa.gov/wqx/download/DomainValues/Organization.CSV", "ID",
+  default = character()
 )
 
-# Fetch orgs, chars, chargroup, media, sitetype choices
-orgs <- unique(utils::read.csv(url(
-  "https://cdx.epa.gov/wqx/download/DomainValues/Organization.CSV"
-))$ID)
-chars <- unique(utils::read.csv(url(
-  "https://cdx.epa.gov/wqx/download/DomainValues/Characteristic.CSV"
-))$Name)
-chargroup <- unique(utils::read.csv(url(
-  "https://cdx.epa.gov/wqx/download/DomainValues/CharacteristicGroup.CSV"
-))$Name)
+chars <- .safe_fetch_csv_column(
+  "https://cdx.epa.gov/wqx/download/DomainValues/Characteristic.CSV", "Name",
+  default = character()
+)
+
+chargroup <- .safe_fetch_csv_column(
+  "https://cdx.epa.gov/wqx/download/DomainValues/CharacteristicGroup.CSV", "Name",
+  default = character()
+)
+
 media <- c(
-  unique(utils::read.csv(url(
-    "https://cdx.epa.gov/wqx/download/DomainValues/ActivityMedia.CSV"
-  ))$Name),
-  # "water", # removed water and added it in manually below
+  .safe_fetch_csv_column(
+    "https://cdx.epa.gov/wqx/download/DomainValues/ActivityMedia.CSV", "Name",
+    default = character()
+  ),
   "Biological Tissue", "No media"
 )
+
 # sitetype <- c(
 #       unique(utils::read.csv(url(
 #         "https://cdx.epa.gov/wqx/download/DomainValues/MonitoringLocationType.CSV"
