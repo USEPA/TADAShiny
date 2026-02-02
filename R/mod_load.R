@@ -909,8 +909,56 @@ mod_query_data_server <- function(id, tadat) {
         bBox = bbox_reactive()
       )
 
-      # Get the data summary
-      result_summary <- dataRetrieval::whatWQPdata(args_temp)
+      # # Get the data summary
+      # result_summary <- dataRetrieval::whatWQPdata(args_temp)
+      
+      # added a tryCatch() to prevent ad-hoc WQX 500 errors while downloading data
+      
+      success <- FALSE # Flag to track if the process completes successfully
+            
+      tryCatch(
+        {
+          # Temporarily treat warnings as errors
+          old_warn <- options("warn")
+          options(warn = 2)
+
+          # Get the data summary
+          result_summary <- dataRetrieval::whatWQPdata(args_temp)
+
+          success <- TRUE # Set flag to true if all operations succeed
+
+          # Restore warning options
+          options(old_warn)
+        },
+        error = function(e) {
+          # Restore warning options in case of error
+          options(old_warn)
+
+          # Log error details for debugging
+          cat("Error: ", e$message, "\n")
+
+          # Show error notification to the user
+          shiny::showNotification(
+            ui = tagList(
+              htmltools::h4(htmltools::strong("WQP Error")),
+              htmltools::hr(style = "margin-top: 5px; margin-bottom: 5px;"), # Adds a separator line
+              paste(e$message),
+              paste("An error occurred while querying the Water Quality Portal.  Check your filter values and try again.")
+            ),
+            type = "error",
+            duration = NULL,
+            id = "uploadError"
+          )
+        }
+      )
+
+      # Ensure spinner is removed regardless of success or error
+      shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+      # end new
+      if (success == FALSE) {
+        return()
+      }
+            
 
       # Check if anything is outside the tribal's shapefile boundary
       if (inherits(tadat$tribal_boundary, "sf")) {
@@ -1020,6 +1068,9 @@ mod_query_data_server <- function(id, tadat) {
 
         TADA_smallsites_legacynames <- EPATADA::TADA_RenametoLegacy(TADA_smallsites)
 
+        # Apply TADA_CorrectColType to prevent type errors
+        TADA_smallsites_legacynames <- EPATADA::TADA_CorrectColType(TADA_smallsites_legacynames)
+        
         # Apply TADA_autoclean
         TADA_smallsites_clean <- EPATADA::TADA_AutoClean(TADA_smallsites_legacynames) |>
           dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
@@ -1066,6 +1117,9 @@ mod_query_data_server <- function(id, tadat) {
         # change the column names to use the 'legacy names'
         TADA_bigsites_legacynames <- EPATADA::TADA_RenametoLegacy(TADA_bigsites)
 
+        # Apply TADA_CorrectColType to prevent type errors
+        TADA_bigsites_legacynames <- EPATADA::TADA_CorrectColType(TADA_bigsites_legacynames)
+        
         # Apply TADA_autoclean
         TADA_bigsites_clean <- EPATADA::TADA_AutoClean(TADA_bigsites_legacynames) |>
           dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
