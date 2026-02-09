@@ -192,26 +192,50 @@ mod_filtering_server <- function(id, tadat) {
     # Step 1: field list
     shiny::observeEvent(list(active_data(), input$field_sel), {
       d <- active_data()
-      shiny::req(d)
+      shiny::req(d)  # d is a data frame; can be 0 rows
+      
       display_mode <- if (!is.null(input$field_sel)) input$field_sel else "key"
-
-      tables$filter_fields <-
-        EPATADA::TADA_FieldCounts(d, display = display_mode) |>
-        dplyr::left_join(filter_dat, by = "Fields") |>
-        dplyr::mutate(Description = ifelse(is.na(Description), "No description available", Description))
-
+      
+      # Safe call to TADA_FieldCounts; return an empty data frame with a Fields column if it fails
+      fc <- tryCatch({
+        if (nrow(d) == 0) {
+          data.frame(Fields = character(), stringsAsFactors = FALSE)
+        } else {
+          out <- EPATADA::TADA_FieldCounts(d, display = display_mode)
+          # Ensure a data frame with a Fields column
+          if (!is.data.frame(out) || !"Fields" %in% names(out)) {
+            data.frame(Fields = character(), stringsAsFactors = FALSE)
+          } else {
+            out
+          }
+        }
+      }, error = function(e) {
+        data.frame(Fields = character(), stringsAsFactors = FALSE)
+      })
+      
+      # Join with filter descriptions; guarantee a Description column exists
+      ff <- dplyr::left_join(fc, filter_dat, by = "Fields")
+      if (!"Description" %in% names(ff)) {
+        ff$Description <- character(nrow(ff))
+      }
+      ff$Description[is.na(ff$Description) | ff$Description == ""] <- "No description available"
+      
+      tables$filter_fields <- ff
+      
       tables$filter_fields[
         tables$filter_fields$Fields == "TADA.Media.Flag",
         "Description"
       ] <- "TADA-standardized media fields"
-
+      
+      # Clear selection if previously selected field no longer exists
       if (!is.null(values$selected_field) && !(values$selected_field %in% names(d))) {
         values$selected_field <- NULL
         shinyjs::hide("includeOnlySelectedValues")
         shinyjs::hide("excludeSelectedValues")
         output$promptStep2 <- shiny::renderUI(htmltools::HTML("<p>No valid field selected.</p>"))
       }
-      # table: 'Select field to filter on:'
+      
+      # Clear any selection in the Fields table
       DT::selectRows(DT::dataTableProxy("filterStep1", session = session), NULL)
     })
 
