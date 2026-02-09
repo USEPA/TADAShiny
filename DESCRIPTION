@@ -67,7 +67,8 @@ Suggests:
     rstudioapi,
     geojsonsf,
     packrat,
-    remotes
+    remotes,
+    rprojroot
 Remotes:
     USEPA/EPATADA@develop,
     USEPA/rExpertQuery

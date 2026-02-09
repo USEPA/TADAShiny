@@ -1,6 +1,6 @@
 # Helpers
 new_tadat <- function(raw_df) {
-  rv <- reactiveValues()
+  rv <- shiny::reactiveValues()
   rv$raw <- raw_df
   rv$removals <- data.frame(matrix(nrow = nrow(raw_df), ncol = 0))
   rv$selected_filters <- data.frame(
@@ -36,7 +36,7 @@ test_that("'Remove All Filters' clears per-field removals and restores Step 2 va
   tadat <- new_tadat(d)
   prefix <- "Filter (module): "
 
-  testServer(mod_filtering_server, args = list(tadat = tadat), {
+  shiny::testServer(mod_filtering_server, args = list(tadat = tadat), {
     values$selected_field <- "FieldA"
     session$flushReact()
 
@@ -97,7 +97,7 @@ test_that("Exclude and Include Only update selected_filters and per-field remova
   tadat <- new_tadat(d)
   prefix <- "Filter (module): "
 
-  testServer(mod_filtering_server, args = list(tadat = tadat), {
+  shiny::testServer(mod_filtering_server, args = list(tadat = tadat), {
     values$selected_field <- "FieldA"
     session$flushReact()
 
@@ -160,7 +160,7 @@ test_that("Labelization aggregates NA-like values and pie source reflects applie
   tadat <- new_tadat(d)
   prefix <- "Filter (module): "
 
-  testServer(mod_filtering_server, args = list(tadat = tadat), {
+  shiny::testServer(mod_filtering_server, args = list(tadat = tadat), {
     values$selected_field <- "FieldA"
     session$flushReact()
 
