@@ -198,3 +198,65 @@ test_that("Labelization aggregates NA-like values and pie source reflects applie
     expect_equal(as.integer(sum_x), as.integer(expected_x_after))
   })
 })
+
+test_that("mod_filtering_server: field list observer is robust to empty/missing FieldCounts", {
+
+  # Helper to extract the underlying data.frame from a DT htmlwidget
+  extract_dt_data <- function(widget) {
+    if (is.list(widget) && !is.null(widget$x) && is.list(widget$x) && !is.null(widget$x$data)) {
+      widget$x$data
+    } else {
+      NULL
+    }
+  }
+  
+  # Case 1: Empty dataset (nrow = 0) -> should not call FieldCounts and should not error
+  tadat1 <- shiny::reactiveValues(
+    raw = data.frame(),            # 0-row df
+    removals = NULL,
+    selected_filters = NULL,
+    field_sel = NULL
+  )
+  
+  expect_silent(
+    shiny::testServer(mod_filtering_server, args = list(tadat = tadat1), {
+      session$setInputs(field_sel = "key")
+      session$flushReact()
+      
+      # The DT should render without error
+      expect_false(is.null(output$filterStep1))
+      
+      # If the widget exposes data, it should have Fields + Description columns
+      dt_data <- extract_dt_data(output$filterStep1)
+      if (!is.null(dt_data)) {
+        expect_true(all(c("Fields", "Description") %in% names(dt_data)))
+        # empty dataset => likely 0 rows
+        expect_equal(nrow(dt_data), 0)
+      }
+    })
+  )
+  
+  # Case 2: Non-empty dataset but EPATADA::TADA_FieldCounts likely unavailable
+  # The tryCatch should yield an empty 'Fields' data frame with a Description column.
+  tadat2 <- shiny::reactiveValues(
+    raw = data.frame(A = c(1, 2)), # non-empty
+    removals = NULL,
+    selected_filters = NULL,
+    field_sel = NULL
+  )
+  
+  expect_silent(
+    shiny::testServer(mod_filtering_server, args = list(tadat = tadat2), {
+      session$setInputs(field_sel = "most")
+      session$flushReact()
+      
+      expect_false(is.null(output$filterStep1))
+      dt_data <- extract_dt_data(output$filterStep1)
+      if (!is.null(dt_data)) {
+        expect_true(all(c("Fields", "Description") %in% names(dt_data)))
+        # Without EPATADA available, tryCatch path returns 0-row data
+        expect_equal(nrow(dt_data), 0)
+      }
+    })
+  )
+})
