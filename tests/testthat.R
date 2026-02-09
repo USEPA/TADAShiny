@@ -6,4 +6,7 @@
 # * https://r-pkgs.org/tests.html
 # * https://testthat.r-lib.org/reference/test_package.html#special-files
 
-# devtools::test()
+library(testthat)
+library(TADAShiny)
+
+test_check("TADAShiny")

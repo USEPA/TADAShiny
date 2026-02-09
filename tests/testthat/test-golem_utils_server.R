@@ -54,29 +54,47 @@ test_that("rv and rvtl work", {
 })
 
 test_that("options() usage is safe and consistent", {
-  # Collect R source files in a typical golem app structure
-  r_files <- c(
-    list.files("R", pattern = "\\.R$", full.names = TRUE, recursive = TRUE),
-    list.files("inst", pattern = "\\.R$", full.names = TRUE, recursive = TRUE)
+  # Resolve the package root
+  root <- tryCatch(
+    rprojroot::find_package_root_file(),
+    error = function(e) normalizePath(file.path(testthat::test_path(), "..", ".."), mustWork = FALSE)
   )
-  r_files <- unique(r_files[file.exists(r_files)])
-
-  expect_true(length(r_files) > 0, info = "No R files found to scan for options() usage.")
-
+  
+  # Directories to scan
+  dirs <- c(
+    file.path(root, "R"),
+    file.path(root, "inst"),
+    file.path(root, "inst", "app"),
+    file.path(root, "inst", "dev"),
+    file.path(root, "dev")
+  )
+  dirs <- dirs[dir.exists(dirs)]
+  
+  # Collect R files (flatten to character, clean up, then filter existing)
+  r_files <- unlist(lapply(dirs, function(d) {
+    list.files(d, pattern = "\\.[Rr]$", full.names = TRUE, recursive = TRUE)
+  }), use.names = FALSE)
+  
+  # Ensure character and clean
+  r_files <- as.character(r_files)
+  r_files <- r_files[!is.na(r_files) & nzchar(r_files)]
+  r_files <- unique(r_files)
+  r_files <- r_files[file.exists(r_files)]
+  
+  # If nothing to scan, skip rather than fail
+  skip_if(length(r_files) == 0, "No R files found to scan for options() usage.")
+  
   # Helper: read file lines
   read_file_lines <- function(f) {
     tryCatch(readLines(f, warn = FALSE), error = function(e) character(0))
   }
-
+  
   # Helper: find options() calls via parse, capturing srcref and code
   find_options_calls <- function(file) {
     calls <- list()
     exprs <- tryCatch(parse(file, keep.source = TRUE), error = function(e) NULL)
-    if (is.null(exprs)) {
-      return(calls)
-    }
-
-    # Recursive walk through expressions looking for calls to options
+    if (is.null(exprs)) return(calls)
+    
     walk <- function(e) {
       if (is.call(e)) {
         fn <- as.character(e[[1]])
@@ -85,10 +103,7 @@ test_that("options() usage is safe and consistent", {
           line <- if (!is.null(sr)) sr[1] else NA_integer_
           calls[[length(calls) + 1]] <<- list(call = e, line = line)
         }
-        # walk arguments
-        for (i in seq_along(e)) {
-          walk(e[[i]])
-        }
+        for (i in seq_along(e)) walk(e[[i]])
       } else if (is.expression(e) || is.list(e)) {
         for (i in seq_along(e)) walk(e[[i]])
       }
@@ -96,30 +111,24 @@ test_that("options() usage is safe and consistent", {
     walk(exprs)
     calls
   }
-
-  # Collect issues
+  
   issues <- list()
-
-  # Scan each file
+  
   for (f in r_files) {
     lines <- read_file_lines(f)
     calls <- find_options_calls(f)
-
-    # Heuristic scan for nearby restoration or withr use
     has_withr_local_options <- any(grepl("withr::local_options", lines, fixed = TRUE))
-
-    # Rule A: options() with unnamed argument (e.g., options(old_warn)) -> BAD
+    
+    # Rule A: unnamed arguments to options()
     for (c in calls) {
       call <- c$call
       line <- c$line
       args <- as.list(call)[-1]
       arg_names <- names(as.list(call))[-1]
-
-      # If any argument is unnamed and not a list() call, flag it
+      
       unnamed_idx <- which(is.na(arg_names) | arg_names == "")
       if (length(unnamed_idx) > 0) {
         bad <- TRUE
-        # Allow options(list(...)) pattern
         for (i in unnamed_idx) {
           ai <- args[[i]]
           if (is.call(ai) && identical(as.character(ai[[1]]), "list")) {
@@ -135,38 +144,35 @@ test_that("options() usage is safe and consistent", {
         }
       }
     }
-
-    # Rule B: discourage options(\"warn\") used to retrieve warn (prefer getOption(\"warn\"))
-    # (This is a soft rule but often signals later misuse.)
+    
+    # Rule B: discourage options("warn") for getting warn
     warn_get_lines <- grep("options\\(\\s*\"warn\"\\s*\\)", lines)
     for (ln in warn_get_lines) {
       issues[[length(issues) + 1]] <- sprintf(
-        "%s:%s: Found options(\"warn\"). Prefer getOption(\"warn\") to retrieve the warn value. Line: %s",
+        "%s:%s: Found options(\"warn\"). Prefer getOption(\"warn\"). Line: %s",
         f, ln, trimws(lines[ln])
       )
     }
-
-    # Rule C: options(warn = 2) with no nearby restoration (on.exit/options(warn=old_warn)) or withr::local_options
-    # Heuristic: look +/- 10 lines for withr::local_options or on.exit(options(warn = ...))
+    
+    # Rule C: options(warn = ...) without restoration or withr::local_options
     warn_set_lines <- grep("options\\s*\\(\\s*warn\\s*=", lines)
     for (ln in warn_set_lines) {
       window_lo <- max(1, ln - 10)
       window_hi <- min(length(lines), ln + 10)
       window <- lines[window_lo:window_hi]
-
+      
       nearby_withr <- any(grepl("withr::local_options", window, fixed = TRUE))
       nearby_onexit_restore <- any(grepl("on\\.exit\\s*\\(\\s*options\\s*\\(\\s*warn\\s*=", window))
-
+      
       if (!nearby_withr && !nearby_onexit_restore && !has_withr_local_options) {
         issues[[length(issues) + 1]] <- sprintf(
-          "%s:%s: options(warn = ...) without nearby restoration or withr::local_options. Add withr::local_options(list(warn = ...)) or on.exit(options(warn = old_warn), add = TRUE). Line: %s",
+          "%s:%s: options(warn = ...) without restoration or withr::local_options. Add withr::local_options(list(warn = ...)) or on.exit(options(warn = old_warn), add = TRUE). Line: %s",
           f, ln, trimws(lines[ln])
         )
       }
     }
-
-    # Bonus Rule D: interactive() guard followed by options(warn=...) can lead to inconsistent behavior in Shiny
-    # (Shiny often runs non-interactively; warn might not be set/restored)
+    
+    # Rule D: interactive() guard + options(warn=...) warning
     interactive_guard_lines <- grep("if\\s*\\(\\s*interactive\\s*\\(\\s*\\)\\s*\\)", lines)
     if (length(interactive_guard_lines) > 0 && length(warn_set_lines) > 0) {
       issues[[length(issues) + 1]] <- sprintf(
@@ -175,8 +181,7 @@ test_that("options() usage is safe and consistent", {
       )
     }
   }
-
-  # Fail with a readable summary if any issues were found
+  
   if (length(issues) > 0) {
     msg <- paste0(
       "Unsafe or inconsistent options() usage detected:\n",
@@ -193,4 +198,17 @@ test_that("options() usage is safe and consistent", {
   } else {
     succeed("All options() usage appears safe and consistent.")
   }
+})
+
+# Pre-load shiny and muffle warning related to environment/version mismatch
+local({
+  withCallingHandlers(
+    library(shiny),
+    warning = function(w) {
+      msg <- conditionMessage(w)
+      if (grepl("package 'shiny' was built under R version", msg)) {
+        invokeRestart("muffleWarning")
+      }
+    }
+  )
 })

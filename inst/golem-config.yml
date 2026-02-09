@@ -1,8 +1,11 @@
 default:
   golem_name: TADAShiny
-  golem_version: 0.0.0.9000
-  app_prod: no
+  golem_version: 0.5.1
+  app_prod: false
+
 production:
-  app_prod: 'yes'
+  app_prod: true
+
 dev:
   golem_wd: !expr golem::pkg_path()
+  app_prod: false
