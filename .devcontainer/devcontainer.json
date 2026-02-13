@@ -8,7 +8,7 @@
     "image": "ghcr.io/rocker-org/devcontainer/geospatial:4",
     "features": {
         "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
-            "packages": "github::USEPA/EPATADA,config,golem,readxl,writexl,leaflet,shiny,shinyWidgets,shinyjs,shinycssloaders,DT,ggplot2,shinybusy,dplyr,plyr,tidyr,scales,forcats,RColorBrewer,lubridate,plotly",
+            "packages": "USEPA/EPATADA,config,golem,readxl,writexl,leaflet,shiny,shinyWidgets,shinyjs,shinycssloaders,DT,ggplot2,shinybusy,dplyr,plyr,tidyr,scales,forcats,RColorBrewer,lubridate,plotly",
             "installSystemRequirements": true
         }
     },
