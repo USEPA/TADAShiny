@@ -7,10 +7,7 @@
     "name": "R Studio Server",
     "image": "ghcr.io/rocker-org/devcontainer/geospatial:4",
     "features": {
-        "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
-            "packages": "USEPA/EPATADA,config,golem,readxl,writexl,leaflet,shiny,shinyWidgets,shinyjs,shinycssloaders,DT,ggplot2,shinybusy,dplyr,plyr,tidyr,scales,forcats,RColorBrewer,lubridate,plotly",
-            "installSystemRequirements": true
-        }
+        "ghcr.io/rocker-org/devcontainer-features/r-dependent-packages:latest": {}
     },
     "forwardPorts": [
         8787
