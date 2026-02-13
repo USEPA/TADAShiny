@@ -42,20 +42,6 @@ run_app()
 
 Alternatively, you can run the public web version of this application (<https://rconnect-public.epa.gov/TADAShiny/>). Beware that this version is not the most up to date and we recommend running the app from R studio instead if possible.
 
-## Run in GitHub Codespaces
-
-This repository also has devcontainers to allow it to run in GitHub codespaces. To use those:
-
--   Fork the repository to your account
-
--   In the "Code" button on the upper right of your browser, within the Codespaces tab click on the three dots and choose "New with Options", then you will have the choices:
-
-    -   R Studio Server (the default useful for coding; you should set the RSTUDIO_PASSWORD with this option)
-
-    -   Shiny apps for demos (useful for training or demoing)
-
-    -   To stop or delete your codespace when you are done, go to [GitHub Codespaces](https://github.com/codespaces).
-
 ## TADA Background
 
 Tools for Automated Data Analysis, or TADA, is being developed to help States, Tribes (i.e., Tribal Nations, Pueblos, Bands, Rancherias, Communities, Colonies, Towns, Indians, Villages), federal partners, and other [Water Quality Portal (WQP)](https://www.waterqualitydata.us/) users (e.g. researchers) efficiently compile and evaluate WQP data collected from water quality monitoring sites.
