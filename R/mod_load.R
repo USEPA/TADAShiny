@@ -884,7 +884,7 @@ mod_query_data_server <- function(id, tadat) {
           tadat$tribal_bBox
         }
       })
-
+browser()
       if ("STORET" %in% providers_arg) {
         # a modal that pops up showing it's working on querying the portal
         shinybusy::show_modal_spinner(
@@ -894,12 +894,12 @@ mod_query_data_server <- function(id, tadat) {
           session = shiny::getDefaultReactiveDomain()
         )
   
-        # a section to estimate the sample size
-        shiny::showModal(shiny::modalDialog(
-          title =
-            "Downloading the STORET data ...",
-          footer = NULL
-        ))
+        # # a section to estimate the sample size
+        # shiny::showModal(shiny::modalDialog(
+        #   title =
+        #     "Downloading the STORET data ...",
+        #   footer = NULL
+        # ))
   
         # Create the list of input arguments for dataRetrieval::readWQPsummary
         args_temp <- args_create(
@@ -991,7 +991,7 @@ mod_query_data_server <- function(id, tadat) {
             dplyr::mutate(group = MESS::cumsumbinning(
               x = tot_n,
               threshold = maxrecs,
-              maxgroupsize = 300
+              maxgroupsize = 300 # 100 # changed from 300 after hitting error HTTP 413 Payload Too Large.
             ))
   
           smallsites_list <- list()
@@ -1016,28 +1016,40 @@ mod_query_data_server <- function(id, tadat) {
   
               args_temp_small[["siteid"]] <- small_site_chunk
   
-              # Download the result data
-              smallsites_result_temp <- dataRetrieval::readWQPdata(args_temp_small,
-                dataProfile = "resultPhysChem",
+              ## start of changes for using WQX3
+              # Download the WQP data using the WQX3 and the full Physical Chemistry profile
+              TADAprofile_smallsites_temp <- dataRetrieval::readWQPdata(args_temp_small,
+                service = 'ResultWQX3',
+                dataProfile = "fullPhysChem",
                 ignore_attributes = TRUE
               )
-  
-              # Download the site data
-              smallsites_site_temp <- dataRetrieval::whatWQPsites(args_temp_small)
-  
-              # Download the project data
-              smallsites_project_temp <- dataRetrieval::readWQPdata(args_temp_small,
-                service = "Project",
-                ignore_attributes = TRUE
-              )
-  
-              # Create TADA data frame
-              TADAprofile_smallsites_temp <- EPATADA::TADA_JoinWQPProfiles(
-                FullPhysChem = smallsites_result_temp,
-                Sites = smallsites_site_temp,
-                Projects = smallsites_project_temp
-              ) |>
-                dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
+              # revert names to the legacy
+              TADAprofile_smallsites_temp <- EPATADA::TADA_RenametoLegacy(TADAprofile_smallsites_temp)
+              ## end of changes for using WQX3
+              
+              # this is the older version
+              # # Download the result data
+              # smallsites_result_temp <- dataRetrieval::readWQPdata(args_temp_small,
+              #   dataProfile = "resultPhysChem",
+              #   ignore_attributes = TRUE
+              # )
+              # 
+              # # Download the site data
+              # smallsites_site_temp <- dataRetrieval::whatWQPsites(args_temp_small)
+              # 
+              # # Download the project data
+              # smallsites_project_temp <- dataRetrieval::readWQPdata(args_temp_small,
+              #   service = "Project",
+              #   ignore_attributes = TRUE
+              # )
+              # 
+              # # Create TADA data frame
+              # TADAprofile_smallsites_temp <- EPATADA::TADA_JoinWQPProfiles(
+              #   FullPhysChem = smallsites_result_temp,
+              #   Sites = smallsites_site_temp,
+              #   Projects = smallsites_project_temp
+              # ) |>
+              #   dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
   
               # Assign the data to the list
               smallsites_list[[i]] <- TADAprofile_smallsites_temp
@@ -1139,13 +1151,11 @@ mod_query_data_server <- function(id, tadat) {
       }
       
       if ("NWIS" %in% providers_arg) {
-        # a modal that pops up showing it's working on querying the portal
-        shinybusy::show_modal_spinner(
-          spin = "double-bounce",
-          color = "#0071bc",
-          text = "Querying NWIS database...",
-          session = shiny::getDefaultReactiveDomain()
-        )
+
+        browser()
+        
+        # use this to show the user something while they are waiting
+        query_text_string <- NULL
         
         if(input$state == ""){
           state_fips_arg <- NULL
@@ -1155,28 +1165,30 @@ mod_query_data_server <- function(id, tadat) {
           state <- head(counties[counties$STATE_CD == input$state, ], 1)
           state_fips_arg <- paste('US', sprintf("%02d", state$STATE_FIPS), sep = ':')
           county_fips_arg <- NULL
+          query_text_string <- input$state
         } else {
           county <- counties[counties$STATE_CD == input$state & counties$COUNTY_NAME == input$county,]
           state_fips_arg <- paste('US', sprintf("%02d", county$STATE_FIPS), sep = ':')
           county_fips_arg <- paste('US', sprintf("%02d", county$STATE_FIPS), sprintf("%03d", county$COUNTY_FIPS), sep = ':')
+          query_text_string <- paste(input$state, "and", county$COUNTY_NAME, sep=" ")
         }
-
+        # a modal that pops up showing it's working on querying the portal
+        # could include more information query_text_string, 
+        shinybusy::show_modal_spinner(
+          spin = "double-bounce",
+          color = "#0071bc",
+          text = paste('Querying NWIS database', "...", sep = ' '),
+          session = shiny::getDefaultReactiveDomain()
+        )
         
         # Create the list of input arguments for dataRetrieval::read_waterdata_samples
-        
-            # stateFips = state_fips_arg,
-            # countyFips = county_fips_arg,
-            # characteristic = "Phosphorus",
-            # activityStartDateLower = tadat$startDate,
-            # activityStartDateUpper = tadat$endDate,
-            # dataProfile = "fullphyschem"
-        
         args_temp <- nwis_args_create(
           stateFips = state_fips_arg,
           countyFips = county_fips_arg,
           # countrycode = tadat$countrycode,
           # siteid = tadat$siteid,
           # siteType = tadat$siteType,
+          # hydrologicUnit = TBD,
           characteristic = tadat$characteristicName,
           characteristicGroup = tadat$characteristicType,
           activityMediaName = tadat$sampleMedia,
@@ -1185,26 +1197,12 @@ mod_query_data_server <- function(id, tadat) {
           activityStartDateLower = tadat$startDate,
           activityStartDateUpper = tadat$endDate,
           # providers = tadat$providers,
-          # bBox = bbox_reactive(),
-          dataProfile = "fullphyschem"
+          dataType = "results",
+          dataProfile = "fullphyschem",
+          boundingBox = bbox_reactive()
         )
         
-                  # dataRetrieval::read_waterdata_samples(args_temp)
-          #
-        
-        NWIS_results <- 
-          dataRetrieval::read_waterdata_samples(
-            stateFips = state_fips_arg,
-            countyFips = county_fips_arg,
-            characteristic = tadat$characteristicName,
-            # characteristicGroup = tadat$characteristicType,
-            # activityMediaName = tadat$sampleMedia,
-            # projectIdentifier = tadat$project,
-            # organizationIdentifier = tadat$organization,            
-            activityStartDateLower = tadat$startDate,
-            activityStartDateUpper = tadat$endDate,
-            dataProfile = "fullphyschem"
-          )
+        NWIS_results <- do.call(dataRetrieval::read_waterdata_samples, args_temp)
         
         if (nrow(NWIS_results) > 0) {
           NWIS_results_rename <- EPATADA::TADA_RenametoLegacy(NWIS_results)
@@ -1227,9 +1225,6 @@ mod_query_data_server <- function(id, tadat) {
           # his this one later
           # Warning: Error in dplyr::bind_rows: 
           # Can't combine ..1$ActivityStartDate <character> and ..2$ActivityStartDate <date>.
-          
-          
-          browser()
           NWIS_results$ActivityStartDate <- as.character(NWIS_results$ActivityStartDate)
           NWIS_results$ActivityStartDateTime <- as.character(NWIS_results$ActivityStartDateTime)
           NWIS_results$ActivityStartTime.TimeZoneCode_offset <- as.character(NWIS_results$ActivityStartTime.TimeZoneCode_offset)

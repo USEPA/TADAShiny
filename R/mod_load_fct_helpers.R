@@ -52,28 +52,29 @@ args_create <- function(statecode = NULL,
 
 ### A function to construct the argument list for the NWIS function dataRetrieval::read_waterdata_samples(args_temp)
 nwis_args_create <- function(stateFips = NULL,
-                        countyFips = NULL,
-                        # countrycode = NULL,
-                        # huc = NULL,
-                        # siteid = NULL,
-                        # siteType = NULL,
-                        characteristic = NULL,
-                        characteristicGroup = NULL,
-                        activityMediaName = NULL,
-                        projectIdentifier = NULL,
-                        organizationIdentifier = NULL,
-                        activityStartDateLower = NULL,
-                        activityStartDateUpper = NULL,
-                        dataProfile = NULL
-                        # providers = NULL,
-                        # bBox = NULL,
-                        ) {
+                              countyFips = NULL,
+                              # countrycode = NULL,
+                              hydrologicUnit = NULL,
+                              siteid = NULL,
+                              siteType = NULL,
+                              characteristic = NULL,
+                              characteristicGroup = NULL,
+                              activityMediaName = NULL,
+                              projectIdentifier = NULL,
+                              organizationIdentifier = NULL,
+                              activityStartDateLower = NULL,
+                              activityStartDateUpper = NULL,
+                              dataType = NULL,
+                              dataProfile = NULL,
+                              # providers = NULL,
+                              boundingBox = NULL
+                              ) {
   # Construct the arguments for downloads
   args <- list(
     "stateFips" = stateFips,
     "countyFips" = countyFips,
     # "countrycode" = countrycode,
-    # "huc" = huc,
+    "hydrologicUnit" = hydrologicUnit,
     # "siteid" = siteid,
     # "siteType" = siteType,
     "characteristic" = characteristic,
@@ -83,9 +84,10 @@ nwis_args_create <- function(stateFips = NULL,
     "organizationIdentifier" = organizationIdentifier,
     "activityStartDateLower" = activityStartDateLower,
     "activityStartDateUpper" = activityStartDateUpper,
-    "dataProfile" = dataProfile
+    "dataType" = dataType,
+    "dataProfile" = dataProfile,
     # "providers" = providers,
-    # "bBox" = bBox,
+    "boundingBox" = boundingBox
   )
 
   # Replace null with NULL

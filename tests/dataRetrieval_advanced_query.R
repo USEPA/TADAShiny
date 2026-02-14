@@ -50,6 +50,54 @@
   as.data.frame(dt)
 }
 
+### A function to construct the argument list for the NWIS function dataRetrieval::read_waterdata_samples(args_temp)
+nwis_args_create <- function(stateFips = NULL,
+                              countyFips = NULL,
+                              # countrycode = NULL,
+                              # huc = NULL,
+                              # siteid = NULL,
+                              # siteType = NULL,
+                              characteristic = NULL,
+                              characteristicGroup = NULL,
+                              activityMediaName = NULL,
+                              projectIdentifier = NULL,
+                              organizationIdentifier = NULL,
+                              activityStartDateLower = NULL,
+                              activityStartDateUpper = NULL,
+                              dataType = NULL,
+                              dataProfile = NULL,
+                              providers = NULL,
+                              bBox = NULL
+                              ) {
+  # Construct the arguments for downloads
+  args <- list(
+    "stateFips" = stateFips,
+    "countyFips" = countyFips,
+    # "countrycode" = countrycode,
+    # "huc" = huc,
+    # "siteid" = siteid,
+    # "siteType" = siteType,
+    "characteristic" = characteristic,
+    "characteristicGroup" = characteristicGroup,
+    "activityMediaName" = activityMediaName,
+    "projectIdentifier" = projectIdentifier,
+    "organizationIdentifier" = organizationIdentifier,
+    "activityStartDateLower" = activityStartDateLower,
+    "activityStartDateUpper" = activityStartDateUpper,
+    "dataType" = dataType,
+    "dataProfile" = dataProfile,
+    "providers" = providers,
+    "bBox" = bBox
+  )
+
+  # Replace null with NULL
+  args[args %in% "null"] <- list(NULL)
+
+  # Remove NULL attribute
+  args <- args[purrr::map_lgl(args, function(x) !is.null(x))]
+
+  return(args)
+}
 
 counties <- .safe_fetch_county("https://www2.census.gov/geo/docs/reference/codes/files/national_county.txt")
 
@@ -58,7 +106,7 @@ end_date <- "2025-12-01"
 characteristic_name <- "pH"
 state_abbrev = 'CO'
 county_name = 'Chaffee County'
-browser()
+# browser()
 county = counties[counties$STATE_CD == state_abbrev & counties$COUNTY_NAME == county_name,]
 state_fips_arg = paste('US', sprintf("%02d", county$STATE_FIPS), sep = ':')
 county_fips_arg = paste('US', sprintf("%02d", county$STATE_FIPS), sprintf("%03d", county$COUNTY_FIPS), sep = ':')
@@ -67,34 +115,47 @@ county_fips_arg = paste('US', sprintf("%02d", county$STATE_FIPS), sprintf("%03d"
 # this does 2 queries of WQP
 #> GET: https://www.waterqualitydata.us/data/Result/ 
 #> GET: https://www.waterqualitydata.us/data/Station/
-WQP3_results <- 
-  dataRetrieval::readWQPdata(statecode = county$STATE_CD,
-                             countycode = county$COUNTY_NAME,
-                             characteristicName = characteristic_name,
-                             startDate = start_date,
-                             endDate = end_date,
-                             service = "ResultWQX3",
-                             dataProfile = "fullPhysChem",
-                             ignore_attributes = TRUE,
-                             providers = "STORET")
+# WQP3_results <- 
+#   dataRetrieval::readWQPdata(statecode = county$STATE_CD,
+#                              countycode = county$COUNTY_NAME,
+#                              characteristicName = characteristic_name,
+#                              startDate = start_date,
+#                              endDate = end_date,
+#                              service = "ResultWQX3",
+#                              dataProfile = "fullPhysChem",
+#                              ignore_attributes = TRUE,
+#                              providers = "STORET")
 # remove 2 columns that are not found in the NWIS_results (yet)
 # WQP3_results <- WQP3_results[, !(names(WQP3_results) %in% c("Activity_EndTimeZone_offset", "Activity_EndDateTime"))]
 
 # this does not use WQP
 # GET: https://api.waterdata.usgs.gov/samples-data/results/
-NWIS_results <- 
-  dataRetrieval::read_waterdata_samples(stateFips = state_fips_arg,
-                                        countyFips = county_fips_arg,
-                                        characteristic = characteristic_name,
-                                        activityStartDateLower = start_date,
-                                        activityStartDateUpper = end_date,
-                                        dataProfile = "fullphyschem")
-browser()
+
+        args_temp <- nwis_args_create(
+          stateFips = state_fips_arg,
+          countyFips = county_fips_arg,
+          # countrycode = tadat$countrycode,
+          # siteid = tadat$siteid,
+          # siteType = tadat$siteType,
+          characteristic = characteristic_name,
+          # characteristicGroup = tadat$characteristicType,
+          # activityMediaName = tadat$sampleMedia,
+          # projectIdentifier = tadat$project,
+          # organizationIdentifier = tadat$organization,
+          activityStartDateLower = start_date,
+          activityStartDateUpper = end_date,
+          # providers = tadat$providers,
+          # bBox = bbox_reactive(),
+          dataType = "results",
+          dataProfile = "fullphyschem"
+        )
+
+        NWIS_results <- do.call(dataRetrieval::read_waterdata_samples, args_temp)
 
 # this field is all NA but still needs to be recast as date
 NWIS_results$Activity_EndDate <- as.Date(NWIS_results$Activity_EndDate)
-
-All_results <- dplyr::bind_rows(WQP3_results, NWIS_results)
+All_results <- NWIS_results
+# All_results <- dplyr::bind_rows(WQP3_results, NWIS_results)
 
 All_results_rename <- EPATADA::TADA_RenametoLegacy(All_results)
 
