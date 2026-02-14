@@ -53,15 +53,15 @@
 
 counties <- .safe_fetch_county("https://www2.census.gov/geo/docs/reference/codes/files/national_county.txt")
 
-start_date <- "2025-05-01"
+start_date <- "2025-01-01"
 end_date <- "2025-12-01"
-characteristic_name <- "Phosphorus"
-state_abbrev = 'WI'
-county_name = 'Dane County'
-
-county = county[county$STATE_CD == state_abbrev & county$COUNTY_NAME == county_name,]
-state_fips_arg = paste('US', c$STATE_FIPS, sep = ':')
-county_fips_arg = paste('US', c$STATE_FIPS, sprintf("%03d", c$COUNTY_FIPS), sep = ':')
+characteristic_name <- "pH"
+state_abbrev = 'CO'
+county_name = 'Chaffee County'
+browser()
+county = counties[counties$STATE_CD == state_abbrev & counties$COUNTY_NAME == county_name,]
+state_fips_arg = paste('US', sprintf("%02d", county$STATE_FIPS), sep = ':')
+county_fips_arg = paste('US', sprintf("%02d", county$STATE_FIPS), sprintf("%03d", county$COUNTY_FIPS), sep = ':')
 
 
 # this does 2 queries of WQP
@@ -70,7 +70,7 @@ county_fips_arg = paste('US', c$STATE_FIPS, sprintf("%03d", c$COUNTY_FIPS), sep 
 WQP3_results <- 
   dataRetrieval::readWQPdata(statecode = county$STATE_CD,
                              countycode = county$COUNTY_NAME,
-                             characteristicName = "Phosphorus",
+                             characteristicName = characteristic_name,
                              startDate = start_date,
                              endDate = end_date,
                              service = "ResultWQX3",
@@ -78,14 +78,14 @@ WQP3_results <-
                              ignore_attributes = TRUE,
                              providers = "STORET")
 # remove 2 columns that are not found in the NWIS_results (yet)
-WQP3_results <- WQP3_results[, !(names(WQP3_results) %in% c("Activity_EndTimeZone_offset", "Activity_EndDateTime"))]
+# WQP3_results <- WQP3_results[, !(names(WQP3_results) %in% c("Activity_EndTimeZone_offset", "Activity_EndDateTime"))]
 
 # this does not use WQP
 # GET: https://api.waterdata.usgs.gov/samples-data/results/
 NWIS_results <- 
   dataRetrieval::read_waterdata_samples(stateFips = state_fips_arg,
                                         countyFips = county_fips_arg,
-                                        characteristic = "Phosphorus",
+                                        characteristic = characteristic_name,
                                         activityStartDateLower = start_date,
                                         activityStartDateUpper = end_date,
                                         dataProfile = "fullphyschem")
