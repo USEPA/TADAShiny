@@ -451,6 +451,7 @@ mod_query_data_server <- function(id, tadat) {
 
     ## creates download template button used for importing data to TADAShiny - used in option C
     template_data <- shiny::reactive(EPATADA::TADA_GetTemplate())
+    
     # return an ms excel file with the template columns
     output$download_template <- shiny::downloadHandler(
       filename = function() {
@@ -464,6 +465,12 @@ mod_query_data_server <- function(id, tadat) {
       contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 
+    # Reactive values to hold start time and elapsed time
+    timer_data <- shiny::reactiveValues(start = NULL, elapsed = 0)
+    
+    # Timer that triggers every 1 second (1000 milliseconds)
+    autoInvalidate <- shiny::reactiveTimer(1000)
+    
     ## greys out Load button for example data until file has been selected
     # https://stackoverflow.com/questions/24175997/force-no-default-selection-in-selectinput
     shiny::observeEvent(input$example_data, {
@@ -764,6 +771,19 @@ mod_query_data_server <- function(id, tadat) {
     # remove the modal once the dataset has been pulled
     shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
 
+    # Update the elapsed time
+    # shiny::observe({
+    #   autoInvalidate()
+    #   if (!is.null(timer_data$start)) {
+    #     timer_data$elapsed <- round(difftime(Sys.time(), timer_data$start, units = "secs"))
+    #   }
+    # })
+    
+    # # Output the formatted time
+    # output$clock <- shiny::renderText({
+    #   base::paste0("Elapsed time: ", " seconds") # timer_data$elapsed,
+    # })
+    
     # this event observer is triggered when the user hits the "Query Now" button, and then runs the TADAdataRetrieval function
     shiny::observeEvent(input$querynow, {
       tadat$original_source <- "Query"
@@ -884,13 +904,13 @@ mod_query_data_server <- function(id, tadat) {
           tadat$tribal_bBox
         }
       })
-browser()
+# browser()
       if ("STORET" %in% providers_arg) {
         # a modal that pops up showing it's working on querying the portal
         shinybusy::show_modal_spinner(
           spin = "double-bounce",
           color = "#0071bc",
-          text = "Querying STORET database...",
+          text = HTML("Querying Data Source<br>WQX (EPA)"),
           session = shiny::getDefaultReactiveDomain()
         )
   
@@ -985,7 +1005,7 @@ browser()
         args_temp2[["countrycode"]] <- NULL
         args_temp2[["bBox"]] <- NULL
   
-        # Download the data for small sites
+        # Download the data for water quality monitoring locations with less than 'maxrec' records.
         if (nrow(smallsites) > 0) {
           smallsitesgrp <- smallsites |>
             dplyr::mutate(group = MESS::cumsumbinning(
@@ -1017,6 +1037,7 @@ browser()
               args_temp_small[["siteid"]] <- small_site_chunk
   
               ## start of changes for using WQX3
+              
               # Download the WQP data using the WQX3 and the full Physical Chemistry profile
               TADAprofile_smallsites_temp <- dataRetrieval::readWQPdata(args_temp_small,
                 service = 'ResultWQX3',
@@ -1025,6 +1046,7 @@ browser()
               )
               # revert names to the legacy
               TADAprofile_smallsites_temp <- EPATADA::TADA_RenametoLegacy(TADAprofile_smallsites_temp)
+              
               ## end of changes for using WQX3
               
               # this is the older version
@@ -1066,8 +1088,11 @@ browser()
           TADA_smallsites_clean <- TADA_download_temp
         }
   
-        # Download the data for big sites
+        # Download the data for water quality monitoring locations with more than 'maxrec' records.
         if (nrow(bigsites) > 0) {
+          
+          # browser()
+          
           bigsites_list <- list()
   
           bsitesvec <- unique(bigsites$MonitoringLocationIdentifier)
@@ -1086,32 +1111,48 @@ browser()
               args_temp_big <- args_temp2
   
               args_temp_big[["siteid"]] <- bsitesvec[i]
-  
-              # Download the result data
+              
+              ## start of changes for using WQX3
+              
+              # Download the WQP data using the WQX3 and the full Physical Chemistry profile
               bigsites_result_temp <- dataRetrieval::readWQPdata(args_temp_big,
-                dataProfile = "resultPhysChem",
+                service = 'ResultWQX3',
+                dataProfile = "fullPhysChem",
                 ignore_attributes = TRUE
               )
-  
-              # Download the site data
-              bigsites_site_temp <- dataRetrieval::whatWQPsites(args_temp_big)
-  
-              # Download the project data
-              bigsites_project_temp <- dataRetrieval::readWQPdata(args_temp_big,
-                service = "Project",
-                ignore_attributes = TRUE
-              )
-  
-              # Create TADA data frame
-              TADAprofile_bigsites_temp <- EPATADA::TADA_JoinWQPProfiles(
-                FullPhysChem = bigsites_result_temp,
-                Sites = bigsites_site_temp,
-                Projects = bigsites_project_temp
-              ) |>
-                dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
-  
+              # revert names to the legacy
+              TADAprofile_bigsites_temp <- EPATADA::TADA_RenametoLegacy(bigsites_result_temp)
+              
               # Assign the data to the list
               bigsites_list[[i]] <- TADAprofile_bigsites_temp
+              
+              ## end of changes for using WQX3
+              
+              # # Download the result data
+              # bigsites_result_temp <- dataRetrieval::readWQPdata(args_temp_big,
+              #   dataProfile = "resultPhysChem",
+              #   ignore_attributes = TRUE
+              # )
+              # 
+              # # Download the site data
+              # bigsites_site_temp <- dataRetrieval::whatWQPsites(args_temp_big)
+              # 
+              # # Download the project data
+              # bigsites_project_temp <- dataRetrieval::readWQPdata(args_temp_big,
+              #   service = "Project",
+              #   ignore_attributes = TRUE
+              # )
+              # 
+              # # Create TADA data frame
+              # TADAprofile_bigsites_temp <- EPATADA::TADA_JoinWQPProfiles(
+              #   FullPhysChem = bigsites_result_temp,
+              #   Sites = bigsites_site_temp,
+              #   Projects = bigsites_project_temp
+              # ) |>
+              #   dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
+              # 
+              # # Assign the data to the list
+              # bigsites_list[[i]] <- TADAprofile_bigsites_temp
             }
           })
   
@@ -1152,7 +1193,7 @@ browser()
       
       if ("NWIS" %in% providers_arg) {
 
-        browser()
+        # browser()
         
         # use this to show the user something while they are waiting
         query_text_string <- NULL
@@ -1174,10 +1215,13 @@ browser()
         }
         # a modal that pops up showing it's working on querying the portal
         # could include more information query_text_string, 
+        # timer_data$start <- Sys.time()
+        # timer_data$elapsed <- 0
+        # browser()
         shinybusy::show_modal_spinner(
           spin = "double-bounce",
           color = "#0071bc",
-          text = paste('Querying NWIS database', "...", sep = ' '),
+          text = HTML(paste('Querying Data Source<br>NWIS (USGS)<br>')), # TODO: add timer shiny::textOutput("clock"))),
           session = shiny::getDefaultReactiveDomain()
         )
         
@@ -1202,10 +1246,34 @@ browser()
           boundingBox = bbox_reactive()
         )
         
-        NWIS_results <- do.call(dataRetrieval::read_waterdata_samples, args_temp)
+        tryCatch( 
+          {
+            NWIS_results <- do.call(dataRetrieval::read_waterdata_samples, args_temp)
+          },
+          error = function(e) {
+            # Error handling: show error message and re-enable harmonize button
+            shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+            shiny::showModal(shiny::modalDialog(
+              title = "Error",
+              paste("An error occurred while querying NWIS (USGS):", e$message),
+              easyClose = TRUE
+            ))
+            shinyjs::enable("harm_apply")
+            
+            NWIS_results <- NA
+          }
+        )
         
         if (nrow(NWIS_results) > 0) {
           NWIS_results_rename <- EPATADA::TADA_RenametoLegacy(NWIS_results)
+          
+          # TEMP FIX!!!!!!!!!
+          # NWIS uses SampleAquifer and STORET and TADA use AquiferName  Change to AquiferName
+          colnames(NWIS_results_rename)[colnames(NWIS_results_rename) == "SampleAquifer"] <- "AquiferName"
+          
+          # also getting non-fatal error from NWIS only data
+          # [1] "Missing the following fields that are in the csv files:"
+          # [1] "TADA.QAPPDocAvailable"
           
           # this will not run if the df is empty
           NWIS_results_clean <- EPATADA::TADA_AutoClean(NWIS_results_rename)
@@ -1260,6 +1328,10 @@ browser()
       }
     })
 
+
+    
+    
+    
     # Update the run parameters if example data is selected
     shiny::observeEvent(input$example_data_go, {
       tadat$original_source <- "Example"
