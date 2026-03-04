@@ -517,59 +517,6 @@ mod_query_data_server <- function(id, tadat) {
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
-  # start clock bits
-  # reactiveValues to track the timer
-  rv <- shiny::reactiveValues(
-    running = FALSE,
-    start_time = NULL,   # POSIXct when started
-    acc_ms = 0,          # accumulated milliseconds (if we ever support pause)
-    last_reported = NULL # store last elapsed seconds for display outside the modal
-  )
-
-  # Helper: format ms -> HH:MM:SS
-  format_ms_to_hms <- function(ms) {
-    total_sec <- floor(ms / 1000)
-    s <- total_sec %% 60
-    m <- (total_sec %/% 60) %% 60
-    h <- total_sec %/% 3600
-    sprintf("%02d:%02d:%02d", h, m, s)
-  }
-
-  # Render the last recorded elapsed value (outside modal)
-  output$last_elapsed <- shiny::renderText({
-    if (is.null(rv$last_reported)) {
-      "No recorded elapsed time yet."
-    } else {
-      paste0("Last recorded elapsed: ", rv$last_reported, " s (", 
-             format_ms_to_hms(as.numeric(rv$last_reported) * 1000), ")")
-    }
-  })
-
-  # UI output that will be placed inside the modal spinner text
-  output$modal_elapsed_text <- shiny::renderText({
-    browser()
-    # Keep rendering while the modal is expected to be visible or when running
-    # compute current elapsed ms
-    if (is.null(rv$start_time) && !rv$running) {
-      return("Elapsed: 00:00:00")
-    }
-    # force periodic re-evaluation while running
-    if (rv$running) {
-      shiny::invalidateLater(200, session)
-    }
-    acc <- rv$acc_ms
-    if (rv$running && !is.null(rv$start_time)) {
-      acc <- acc + round(as.numeric(Sys.time() - rv$start_time, units = "secs") * 1000)
-    }
-    sprintf("Elapsed: %s", format_ms_to_hms(acc))
-  })
-      # Expose reactives
-    list(
-      elapsed_seconds = shiny::reactive({ rv$last_reported }),
-      is_running = shiny::reactive({ rv$running })
-    )
-  # end clock bits
-    
     # Increase timeout to 5 minutes
     withr::local_options(list(timeout = max(getOption("timeout"), 300)))
 
