@@ -1,5 +1,4 @@
 # Minimal safe helpers to avoid failing on install/lazy load/CI
-
 .tadas_offline <- function() {
   nzchar(Sys.getenv("TADAS_OFFLINE", "")) # set TADAS_OFFLINE=true in CI to force offline
 }
@@ -433,6 +432,81 @@ mod_query_data_ui <- function(id) {
         )
       )
     ),
+    # JavaScript implementing the stopwatch (client-side)
+    tags$script(HTML("
+(function() {
+  // Keep state inside closure so it's fresh per modal instance
+  var running = true;
+  var startTs = performance.now();
+  var acc = 0;         // accumulated ms when paused
+  var rafId = null;
+  var lastSent = 0;
+
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+  function formatMs(ms) {
+    var totalSec = Math.floor(ms / 1000);
+    var s = totalSec % 60;
+    var m = Math.floor(totalSec / 60) % 60;
+    var h = Math.floor(totalSec / 3600);
+    return pad(h) + ':' + pad(m) + ':' + pad(s);
+  }
+
+  function update() {
+    var now = performance.now();
+    var elapsed = acc;
+    if (running && startTs !== null) {
+      elapsed += (now - startTs);
+    }
+    var disp = formatMs(elapsed);
+    var el = document.getElementById('js_time_display');
+    if (el) el.textContent = disp;
+
+    // send integer seconds to Shiny every 500ms
+    if (now - lastSent > 500) {
+      var secondsVal = Math.floor(elapsed / 1000);
+      var hidden = document.getElementById('js_elapsed_seconds');
+      if (hidden) hidden.value = secondsVal;
+      if (window.Shiny && Shiny.setInputValue) {
+        Shiny.setInputValue('js_elapsed_seconds', secondsVal, {priority: 'event'});
+      }
+      lastSent = now;
+    }
+
+    rafId = window.requestAnimationFrame(update);
+  }
+
+  // start the RAF loop
+  rafId = window.requestAnimationFrame(update);
+
+
+  // Observe DOM removals to detect modal closure by other means (e.g., clicking backdrop or ESC)
+  var observer = new MutationObserver(function(muts) {
+    muts.forEach(function(m) {
+      m.removedNodes && m.removedNodes.forEach(function(node) {
+        if (node && node.classList && node.classList.contains('modal')) {
+          // modal removed -> cleanup
+          if (rafId) { window.cancelAnimationFrame(rafId); rafId = null; }
+          if (running && startTs !== null) {
+            var now = performance.now();
+            acc += (now - startTs);
+            startTs = null;
+          }
+          running = false;
+          var finalSeconds = Math.floor(acc / 1000);
+          if (window.Shiny && Shiny.setInputValue) {
+            Shiny.setInputValue('js_elapsed_seconds', finalSeconds, {priority: 'event'});
+          }
+          // reset local accumulators so reopening starts fresh
+          acc = 0;
+          lastSent = 0;
+        }
+      });
+    });
+  });
+  observer.observe(document.body, { childList: true });
+})();
+"))
   )
 }
 
@@ -442,7 +516,60 @@ mod_query_data_ui <- function(id) {
 mod_query_data_server <- function(id, tadat) {
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
+    
+  # start clock bits
+  # reactiveValues to track the timer
+  rv <- shiny::reactiveValues(
+    running = FALSE,
+    start_time = NULL,   # POSIXct when started
+    acc_ms = 0,          # accumulated milliseconds (if we ever support pause)
+    last_reported = NULL # store last elapsed seconds for display outside the modal
+  )
 
+  # Helper: format ms -> HH:MM:SS
+  format_ms_to_hms <- function(ms) {
+    total_sec <- floor(ms / 1000)
+    s <- total_sec %% 60
+    m <- (total_sec %/% 60) %% 60
+    h <- total_sec %/% 3600
+    sprintf("%02d:%02d:%02d", h, m, s)
+  }
+
+  # Render the last recorded elapsed value (outside modal)
+  output$last_elapsed <- shiny::renderText({
+    if (is.null(rv$last_reported)) {
+      "No recorded elapsed time yet."
+    } else {
+      paste0("Last recorded elapsed: ", rv$last_reported, " s (", 
+             format_ms_to_hms(as.numeric(rv$last_reported) * 1000), ")")
+    }
+  })
+
+  # UI output that will be placed inside the modal spinner text
+  output$modal_elapsed_text <- shiny::renderText({
+    browser()
+    # Keep rendering while the modal is expected to be visible or when running
+    # compute current elapsed ms
+    if (is.null(rv$start_time) && !rv$running) {
+      return("Elapsed: 00:00:00")
+    }
+    # force periodic re-evaluation while running
+    if (rv$running) {
+      shiny::invalidateLater(200, session)
+    }
+    acc <- rv$acc_ms
+    if (rv$running && !is.null(rv$start_time)) {
+      acc <- acc + round(as.numeric(Sys.time() - rv$start_time, units = "secs") * 1000)
+    }
+    sprintf("Elapsed: %s", format_ms_to_hms(acc))
+  })
+      # Expose reactives
+    list(
+      elapsed_seconds = shiny::reactive({ rv$last_reported }),
+      is_running = shiny::reactive({ rv$running })
+    )
+  # end clock bits
+    
     # Increase timeout to 5 minutes
     withr::local_options(list(timeout = max(getOption("timeout"), 300)))
 
@@ -596,20 +723,61 @@ mod_query_data_server <- function(id, tadat) {
       # user uploaded data
       readFile(tadat, input$progress_file$datapath)
     })
+    # Update the elapsed time
+    shiny::observe({
+      autoInvalidate()
+      if (!is.null(timer_data$start)) {
+        timer_data$elapsed <- round(difftime(Sys.time(), timer_data$start, units = "secs"))
+      }
+    })
 
+    # Output the formatted time
+    output$clock <- shiny::renderText({
+      base::paste0("Elapsed time: ", timer_data$elapsed, " seconds")
+    })
     # if user presses example data button, make tadat$raw the one of the example_data contained within the TADA package.
     shiny::observeEvent(input$example_data_go, {
-      # a modal that pops up showing it's working on querying the portal
-      shinybusy::show_modal_spinner(
-        spin = "double-bounce",
-        color = "#0071bc",
-        text = "Loading example data...",
-        session = shiny::getDefaultReactiveDomain()
-      )
-
+      # Record the start time
+      # start timer
+      rv$running <- TRUE
+      rv$start_time <- Sys.time()
+    
+      # a modal that pops up showing it's working 
       tadat$example_data <- input$example_data
+      
+      # shinybusy::show_modal_spinner(
+              # spin = "double-bounce",
+        # color = "#0071bc",
+        # text = tagList(shiny::uiOutput(ns("modal_elapsed_text"))),
+      # browser()
+      # shiny::showModal(shiny::modalDialog(
+      # 
+      #   title = "Loading Example Data",
+      #   HTML(paste('Loading example data:<br>', tadat$example_data, '<br>', tagList(shiny::uiOutput(ns("modal_elapsed_text"))))) # shiny::textOutput("clock")
+      # 
+      # ))
+    shiny::showModal(
+      shiny::modalDialog(
+        title = "Loading Example Data",
+        size = "m",
+        footer = NULL, # This removes the default dismiss button
+        easyClose = FALSE, # This prevents closing by clicking outside the modal or pressing Esc        
+        # Modal body: display area for time and some instructions
+        tagList(
+          tags$div(
+            tags$p(paste('Loading example data: ', tadat$example_data)),
+            style = "text-align:center; padding: 12px;",
+                   tags$h3(id = "js_time_display", "00:00:00")
+          ),
+          # Hidden input to hold elapsed seconds for server (JS updates it)
+          tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
+        ),
+      )
+    )      
+
       if (input$example_data == "EPA Region 5 May 1-7 2019 (172k results)") {
-        raw <- EPATADA::TADA_AutoClean(EPATADA::Data_R5_TADAPackageDemo)
+        # raw <- EPATADA::TADA_AutoClean(EPATADA::Data_R5_TADAPackageDemo)
+        raw <- EPATADA::Data_R5_TADAPackageDemo
       }
       if (input$example_data == "Tribal (136k results)") {
         raw <- EPATADA::Data_6Tribes_5y
@@ -619,12 +787,21 @@ mod_query_data_server <- function(id, tadat) {
       }
 
       initializeTable(tadat, raw)
+  
+      raw <- EPATADA::TADA_AutoClean(raw)
 
-      shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+
+
+      # browser()
+
+      shinybusy::remove_modal_spinner() # session = session)  # shiny::getDefaultReactiveDomain())
 
       disableLoading(session)
     })
 
+
+    
+    
     statecodes_df <- readRDS(system.file("extdata", "statecodes_df.rds", package = "TADAShiny"))
 
     # this section has widget update commands for the selectizeinputs that have a lot of possible selections - shiny suggested hosting the choices server-side rather than ui-side
@@ -768,21 +945,11 @@ mod_query_data_server <- function(id, tadat) {
       )
     })
 
+    # not sure why this is here
     # remove the modal once the dataset has been pulled
-    shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+    # shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
 
-    # Update the elapsed time
-    # shiny::observe({
-    #   autoInvalidate()
-    #   if (!is.null(timer_data$start)) {
-    #     timer_data$elapsed <- round(difftime(Sys.time(), timer_data$start, units = "secs"))
-    #   }
-    # })
-    
-    # # Output the formatted time
-    # output$clock <- shiny::renderText({
-    #   base::paste0("Elapsed time: ", " seconds") # timer_data$elapsed,
-    # })
+
     
     # this event observer is triggered when the user hits the "Query Now" button, and then runs the TADAdataRetrieval function
     shiny::observeEvent(input$querynow, {
@@ -907,13 +1074,30 @@ mod_query_data_server <- function(id, tadat) {
 # browser()
       if ("STORET" %in% providers_arg) {
         # a modal that pops up showing it's working on querying the portal
-        shinybusy::show_modal_spinner(
-          spin = "double-bounce",
-          color = "#0071bc",
-          text = HTML("Querying Data Source<br>WQX (EPA)"),
-          session = shiny::getDefaultReactiveDomain()
-        )
-  
+        # shinybusy::show_modal_spinner(
+        #   spin = "double-bounce",
+        #   color = "#0071bc",
+        #   text = HTML("Querying Data Source<br>WQX (EPA)"),
+        #   session = shiny::getDefaultReactiveDomain()
+        # )
+        shiny::showModal(
+          shiny::modalDialog(
+            title = "Loading STORET Data",
+            size = "m",
+            footer = NULL, # This removes the default dismiss button
+            easyClose = FALSE, # This prevents closing by clicking outside the modal or pressing Esc        
+            # Modal body: display area for time and some instructions
+            tagList(
+              tags$div(
+                tags$p('Querying Data Source WQX (EPA)'),
+                style = "text-align:center; padding: 12px;",
+                       tags$h3(id = "js_time_display", "00:00:00")
+              ),
+              # Hidden input to hold elapsed seconds for server (JS updates it)
+              tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
+            ),
+          )
+        )      
         # # a section to estimate the sample size
         # shiny::showModal(shiny::modalDialog(
         #   title =
@@ -1218,13 +1402,30 @@ mod_query_data_server <- function(id, tadat) {
         # timer_data$start <- Sys.time()
         # timer_data$elapsed <- 0
         # browser()
-        shinybusy::show_modal_spinner(
-          spin = "double-bounce",
-          color = "#0071bc",
-          text = HTML(paste('Querying Data Source<br>NWIS (USGS)<br>')), # TODO: add timer shiny::textOutput("clock"))),
-          session = shiny::getDefaultReactiveDomain()
-        )
-        
+        # shinybusy::show_modal_spinner(
+        #   spin = "double-bounce",
+        #   color = "#0071bc",
+        #   text = HTML(paste('Querying Data Source<br>NWIS (USGS)<br>')), # TODO: add timer shiny::textOutput("clock"))),
+        #   session = shiny::getDefaultReactiveDomain()
+        # )
+        shiny::showModal(
+          shiny::modalDialog(
+            title = "Loading NWIS Data",
+            size = "m",
+            footer = NULL, # This removes the default dismiss button
+            easyClose = FALSE, # This prevents closing by clicking outside the modal or pressing Esc        
+            # Modal body: display area for time and some instructions
+            tagList(
+              tags$div(
+                tags$p('Querying Data Source NWIS (USGS)'),
+                style = "text-align:center; padding: 12px;",
+                       tags$h3(id = "js_time_display", "00:00:00")
+              ),
+              # Hidden input to hold elapsed seconds for server (JS updates it)
+              tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
+            ),
+          )
+        )           
         # Create the list of input arguments for dataRetrieval::read_waterdata_samples
         args_temp <- nwis_args_create(
           stateFips = state_fips_arg,
@@ -1271,6 +1472,7 @@ mod_query_data_server <- function(id, tadat) {
           # NWIS uses SampleAquifer and STORET and TADA use AquiferName  Change to AquiferName
           colnames(NWIS_results_rename)[colnames(NWIS_results_rename) == "SampleAquifer"] <- "AquiferName"
           
+
           # also getting non-fatal error from NWIS only data
           # [1] "Missing the following fields that are in the csv files:"
           # [1] "TADA.QAPPDocAvailable"
@@ -1278,15 +1480,8 @@ mod_query_data_server <- function(id, tadat) {
           # this will not run if the df is empty
           NWIS_results_clean <- EPATADA::TADA_AutoClean(NWIS_results_rename)
           
-          NWIS_results <- EPATADA::TADA_OrderCols(NWIS_results_clean)  
-        }
-      }
-
-      if (length(providers_arg) == 2){
-
-        
-        if (nrow(NWIS_results) > 0) {
-          # merge them together
+          NWIS_results <- EPATADA::TADA_OrderCols(NWIS_results_clean)
+          
           # this field is all NA but still needs to be recast as date
           # NWIS_results_ordered$Activity_EndDate <- as.Date(NWIS_results_ordered$Activity_EndDate)
           
@@ -1296,12 +1491,18 @@ mod_query_data_server <- function(id, tadat) {
           NWIS_results$ActivityStartDate <- as.character(NWIS_results$ActivityStartDate)
           NWIS_results$ActivityStartDateTime <- as.character(NWIS_results$ActivityStartDateTime)
           NWIS_results$ActivityStartTime.TimeZoneCode_offset <- as.character(NWIS_results$ActivityStartTime.TimeZoneCode_offset)
-          
+                              
+        }
+      }
+
+      if (length(providers_arg) == 2){
+        if (nrow(NWIS_results) > 0) {
+          # merge them together
           All_results <- dplyr::bind_rows(STORET_results, NWIS_results)
         } else {
+          # if the NWIS query resulted in no rows, then just include these results
           All_results <- STORET_results
         }
-        
         
         All_results_clean <- EPATADA::TADA_AutoClean(All_results)
         
@@ -1382,7 +1583,6 @@ initializeTable <- function(tadat, raw) {
     # Set flagging column to FALSE
     raw$TADA.Remove <- FALSE
   }
-
   removals <- data.frame(matrix(nrow = nrow(raw), ncol = 0))
   tadat$raw <- raw
   tadat$removals <- removals
