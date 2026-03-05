@@ -434,77 +434,147 @@ mod_query_data_ui <- function(id) {
     ),
     # JavaScript implementing the stopwatch (client-side)
     tags$script(HTML("
-(function() {
-  // Keep state inside closure so it's fresh per modal instance
-  var running = true;
-  var startTs = performance.now();
-  var acc = 0;         // accumulated ms when paused
-  var rafId = null;
-  var lastSent = 0;
+(function () {
+    // Keep state inside closure so it's fresh per modal instance
+    var running = false;
+    var startTs = null;
+    var acc = 0;         // accumulated ms when paused / between opens
+    var rafId = null;
+    var lastSent = 0;
 
-  function pad(n) { return (n < 10 ? '0' : '') + n; }
-
-  function formatMs(ms) {
-    var totalSec = Math.floor(ms / 1000);
-    var s = totalSec % 60;
-    var m = Math.floor(totalSec / 60) % 60;
-    var h = Math.floor(totalSec / 3600);
-    return pad(h) + ':' + pad(m) + ':' + pad(s);
-  }
-
-  function update() {
-    var now = performance.now();
-    var elapsed = acc;
-    if (running && startTs !== null) {
-      elapsed += (now - startTs);
-    }
-    var disp = formatMs(elapsed);
-    var el = document.getElementById('js_time_display');
-    if (el) el.textContent = disp;
-
-    // send integer seconds to Shiny every 500ms
-    if (now - lastSent > 500) {
-      var secondsVal = Math.floor(elapsed / 1000);
-      var hidden = document.getElementById('js_elapsed_seconds');
-      if (hidden) hidden.value = secondsVal;
-      if (window.Shiny && Shiny.setInputValue) {
-        Shiny.setInputValue('js_elapsed_seconds', secondsVal, {priority: 'event'});
-      }
-      lastSent = now;
+    function pad(n) {
+        return (n < 10 ? '0' : '') + n;
     }
 
+    function formatMs(ms) {
+        var totalSec = Math.floor(ms / 1000);
+        var s = totalSec % 60;
+        var m = Math.floor(totalSec / 60) % 60;
+        var h = Math.floor(totalSec / 3600);
+        return pad(h) + ':' + pad(m) + ':' + pad(s);
+    }
+
+    function update() {
+        var now = performance.now();
+        var elapsed = acc;
+        if (running && startTs !== null) {
+            elapsed += (now - startTs);
+        }
+        var disp = 'Elapsed Time: ' + formatMs(elapsed);
+        var el = document.getElementById('js_time_display');
+        if (el) el.textContent = disp;
+
+        // send integer seconds to Shiny every 500ms
+        if (now - lastSent > 500) {
+            var secondsVal = Math.floor(elapsed / 1000);
+            var hidden = document.getElementById('js_elapsed_seconds');
+            if (hidden) hidden.value = secondsVal;
+            if (window.Shiny && Shiny.setInputValue) {
+                Shiny.setInputValue('js_elapsed_seconds', secondsVal, {priority: 'event'});
+            }
+            lastSent = now;
+        }
+
+        rafId = window.requestAnimationFrame(update);
+    }
+
+    // start the RAF loop once
     rafId = window.requestAnimationFrame(update);
-  }
 
-  // start the RAF loop
-  rafId = window.requestAnimationFrame(update);
+    // Helper: start timer at this moment (resets display to 00:00:00)
+    function startTimerNow() {
+        acc = 0;
+        startTs = performance.now();
+        running = true;
+        // ensure UI shows 00:00:00 immediately
+        var el = document.getElementById('js_time_display');
+        if (el) el.textContent = 'Elapsed Time: 00:00:00';
+        lastSent = 0;
+    }
 
-
-  // Observe DOM removals to detect modal closure by other means (e.g., clicking backdrop or ESC)
-  var observer = new MutationObserver(function(muts) {
-    muts.forEach(function(m) {
-      m.removedNodes && m.removedNodes.forEach(function(node) {
-        if (node && node.classList && node.classList.contains('modal')) {
-          // modal removed -> cleanup
-          if (rafId) { window.cancelAnimationFrame(rafId); rafId = null; }
-          if (running && startTs !== null) {
+    // Helper: stop timer and accumulate elapsed
+    function stopTimerNow() {
+        if (running && startTs !== null) {
             var now = performance.now();
             acc += (now - startTs);
             startTs = null;
-          }
-          running = false;
-          var finalSeconds = Math.floor(acc / 1000);
-          if (window.Shiny && Shiny.setInputValue) {
-            Shiny.setInputValue('js_elapsed_seconds', finalSeconds, {priority: 'event'});
-          }
-          // reset local accumulators so reopening starts fresh
-          acc = 0;
-          lastSent = 0;
         }
-      });
+        running = false;
+        // final update will be flushed by RAF loop, but you can push final seconds now:
+        var el = document.getElementById('js_time_display');
+        if (el) {
+            var disp = 'Elapsed Time: ' + formatMs(acc);
+            el.textContent = disp;
+        }
+        var secondsVal = Math.floor(acc / 1000);
+        if (window.Shiny && Shiny.setInputValue) {
+            Shiny.setInputValue('js_elapsed_seconds', secondsVal, {priority: 'event'});
+        }
+    }
+
+    // Observe DOM removals to detect modal closure by other means (e.g., clicking backdrop or ESC)
+    var observer = new MutationObserver(function (muts) {
+        muts.forEach(function (m) {
+            m.removedNodes && m.removedNodes.forEach(function (node) {
+                if (node && node.classList && node.classList.contains('modal')) {
+                    // modal removed -> cleanup
+                    if (rafId) {
+                        window.cancelAnimationFrame(rafId);
+                        rafId = null;
+                    }
+                    // finalize accumulated time
+                    stopTimerNow();
+                    // reset local accumulators so reopening starts fresh
+                    acc = 0;
+                    lastSent = 0;
+                    startTs = null;
+                    running = false;
+                    // restart RAF loop so script remains functional for future modals
+                    rafId = window.requestAnimationFrame(update);
+                }
+            });
+            m.addedNodes && m.addedNodes.forEach(function (node) {
+                // If a modal is inserted, and it contains our timer node, start fresh
+                if (node && node.querySelector) {
+                    var timer = node.querySelector('#js_time_display');
+                    if (timer) {
+                        // Start timer when the timer node appears (modal shown/inserted)
+                        startTimerNow();
+                    }
+                }
+            });
+        });
     });
-  });
-  observer.observe(document.body, { childList: true });
+    observer.observe(document.body, {childList: true, subtree: true});
+
+    // Also listen for show/hidden bootstrap events if present (works for show after insertion)
+    if (window.jQuery) {
+        try {
+            window.jQuery(document).on('shown.bs.modal', function (e) {
+                // only start if modal contains our timer
+                if (e.target && e.target.querySelector && e.target.querySelector('#js_time_display')) {
+                    startTimerNow();
+                }
+            });
+            window.jQuery(document).on('hidden.bs.modal', function (e) {
+                if (e.target && e.target.querySelector && e.target.querySelector('#js_time_display')) {
+                    stopTimerNow();
+                    // reset so next open begins at 00:00:00
+                    acc = 0;
+                    lastSent = 0;
+                    startTs = null;
+                    running = false;
+                }
+            });
+        } catch (err) {
+        // ignore if bootstrap/jQuery not available
+        }
+    }
+    
+    // Fallback: if the page already contains the timer element at load (unlikely in your case),
+    // ensure it starts at 00:00:00 until a modal open triggers startTimerNow.
+    var existing = document.getElementById('js_time_display');
+    if (existing) existing.textContent = 'Elapsed Time: 00:00:00';
 })();
 "))
   )
@@ -538,12 +608,6 @@ mod_query_data_server <- function(id, tadat) {
       },
       contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
-
-    # Reactive values to hold start time and elapsed time
-    timer_data <- shiny::reactiveValues(start = NULL, elapsed = 0)
-    
-    # Timer that triggers every 1 second (1000 milliseconds)
-    autoInvalidate <- shiny::reactiveTimer(1000)
     
     ## greys out Load button for example data until file has been selected
     # https://stackoverflow.com/questions/24175997/force-no-default-selection-in-selectinput
@@ -670,58 +734,27 @@ mod_query_data_server <- function(id, tadat) {
       # user uploaded data
       readFile(tadat, input$progress_file$datapath)
     })
-    # Update the elapsed time
-    shiny::observe({
-      autoInvalidate()
-      if (!is.null(timer_data$start)) {
-        timer_data$elapsed <- round(difftime(Sys.time(), timer_data$start, units = "secs"))
-      }
-    })
 
-    # Output the formatted time
-    output$clock <- shiny::renderText({
-      base::paste0("Elapsed time: ", timer_data$elapsed, " seconds")
-    })
     # if user presses example data button, make tadat$raw the one of the example_data contained within the TADA package.
     shiny::observeEvent(input$example_data_go, {
-      # Record the start time
-      # start timer
-      rv$running <- TRUE
-      rv$start_time <- Sys.time()
-    
-      # a modal that pops up showing it's working 
-      tadat$example_data <- input$example_data
-      
-      # shinybusy::show_modal_spinner(
-              # spin = "double-bounce",
-        # color = "#0071bc",
-        # text = tagList(shiny::uiOutput(ns("modal_elapsed_text"))),
-      # browser()
-      # shiny::showModal(shiny::modalDialog(
-      # 
-      #   title = "Loading Example Data",
-      #   HTML(paste('Loading example data:<br>', tadat$example_data, '<br>', tagList(shiny::uiOutput(ns("modal_elapsed_text"))))) # shiny::textOutput("clock")
-      # 
-      # ))
-    shiny::showModal(
-      shiny::modalDialog(
-        title = "Loading Example Data",
-        size = "m",
-        footer = NULL, # This removes the default dismiss button
-        easyClose = FALSE, # This prevents closing by clicking outside the modal or pressing Esc        
-        # Modal body: display area for time and some instructions
-        tagList(
+      # a modal that pops up showing it's working on loading the data
+      shinybusy::show_modal_spinner(
+        spin = "double-bounce",
+        color = "#0071bc",
+        text = tagList(
           tags$div(
-            tags$p(paste('Loading example data: ', tadat$example_data)),
+            tags$p('Loading example data', tags$br(), input$example_data),
             style = "text-align:center; padding: 12px;",
                    tags$h3(id = "js_time_display", "00:00:00")
           ),
           # Hidden input to hold elapsed seconds for server (JS updates it)
           tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
         ),
+        session = shiny::getDefaultReactiveDomain()
       )
-    )      
 
+      tadat$example_data <- input$example_data
+      
       if (input$example_data == "EPA Region 5 May 1-7 2019 (172k results)") {
         # raw <- EPATADA::TADA_AutoClean(EPATADA::Data_R5_TADAPackageDemo)
         raw <- EPATADA::Data_R5_TADAPackageDemo
@@ -1018,40 +1051,24 @@ mod_query_data_server <- function(id, tadat) {
           tadat$tribal_bBox
         }
       })
-# browser()
+
       if ("STORET" %in% providers_arg) {
         # a modal that pops up showing it's working on querying the portal
-        # shinybusy::show_modal_spinner(
-        #   spin = "double-bounce",
-        #   color = "#0071bc",
-        #   text = HTML("Querying Data Source<br>WQX (EPA)"),
-        #   session = shiny::getDefaultReactiveDomain()
-        # )
-        shiny::showModal(
-          shiny::modalDialog(
-            title = "Loading STORET Data",
-            size = "m",
-            footer = NULL, # This removes the default dismiss button
-            easyClose = FALSE, # This prevents closing by clicking outside the modal or pressing Esc        
-            # Modal body: display area for time and some instructions
-            tagList(
-              tags$div(
-                tags$p('Querying Data Source WQX (EPA)'),
-                style = "text-align:center; padding: 12px;",
-                       tags$h3(id = "js_time_display", "00:00:00")
-              ),
-              # Hidden input to hold elapsed seconds for server (JS updates it)
-              tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
+        shinybusy::show_modal_spinner(
+          spin = "double-bounce",
+          color = "#0071bc",
+          text = tagList(
+            tags$div(
+              tags$p('Querying Data Source', tags$br(), 'WQX (EPA)'),
+              style = "text-align:center; padding: 12px;",
+                     tags$h3(id = "js_time_display", "00:00:00")
             ),
-          )
-        )      
-        # # a section to estimate the sample size
-        # shiny::showModal(shiny::modalDialog(
-        #   title =
-        #     "Downloading the STORET data ...",
-        #   footer = NULL
-        # ))
-  
+            # Hidden input to hold elapsed seconds for server (JS updates it)
+            tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
+          ),
+          session = shiny::getDefaultReactiveDomain()
+        )
+        
         # Create the list of input arguments for dataRetrieval::readWQPsummary
         args_temp <- args_create(
           statecode = tadat$statecode,
@@ -1142,7 +1159,7 @@ mod_query_data_server <- function(id, tadat) {
             dplyr::mutate(group = MESS::cumsumbinning(
               x = tot_n,
               threshold = maxrecs,
-              maxgroupsize = 300 # 100 # changed from 300 after hitting error HTTP 413 Payload Too Large.
+              maxgroupsize = 300 # 100 # changed from 300 after Warning: Error in httr2::req_perform: HTTP 414 URI Too Long.
             ))
   
           smallsites_list <- list()
@@ -1167,43 +1184,35 @@ mod_query_data_server <- function(id, tadat) {
   
               args_temp_small[["siteid"]] <- small_site_chunk
   
+              TADAprofile_smallsites_temp <- NULL
+              
               ## start of changes for using WQX3
-              
-              # Download the WQP data using the WQX3 and the full Physical Chemistry profile
-              TADAprofile_smallsites_temp <- dataRetrieval::readWQPdata(args_temp_small,
-                service = 'ResultWQX3',
-                dataProfile = "fullPhysChem",
-                ignore_attributes = TRUE
+              tryCatch( 
+                {
+                    # Download the WQP data using the WQX3 and the full Physical Chemistry profile
+                    TADAprofile_smallsites_temp <- dataRetrieval::readWQPdata(args_temp_small,
+                      service = 'ResultWQX3',
+                      dataProfile = "fullPhysChem",
+                      ignore_attributes = TRUE
+                    )
+                    # revert names to the legacy
+                    TADAprofile_smallsites_temp <- EPATADA::TADA_RenametoLegacy(TADAprofile_smallsites_temp)
+                },
+                error = function(e) {
+                  # Error handling: show error message and re-enable harmonize button
+                  shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+                  shiny::showModal(shiny::modalDialog(
+                    title = "Error",
+                    paste("An error occurred while querying WQX (EPA):", e$message),
+                    easyClose = TRUE
+                  ))
+                  shinyjs::enable("harm_apply")
+                  
+                  
+                }
               )
-              # revert names to the legacy
-              TADAprofile_smallsites_temp <- EPATADA::TADA_RenametoLegacy(TADAprofile_smallsites_temp)
-              
               ## end of changes for using WQX3
-              
-              # this is the older version
-              # # Download the result data
-              # smallsites_result_temp <- dataRetrieval::readWQPdata(args_temp_small,
-              #   dataProfile = "resultPhysChem",
-              #   ignore_attributes = TRUE
-              # )
-              # 
-              # # Download the site data
-              # smallsites_site_temp <- dataRetrieval::whatWQPsites(args_temp_small)
-              # 
-              # # Download the project data
-              # smallsites_project_temp <- dataRetrieval::readWQPdata(args_temp_small,
-              #   service = "Project",
-              #   ignore_attributes = TRUE
-              # )
-              # 
-              # # Create TADA data frame
-              # TADAprofile_smallsites_temp <- EPATADA::TADA_JoinWQPProfiles(
-              #   FullPhysChem = smallsites_result_temp,
-              #   Sites = smallsites_site_temp,
-              #   Projects = smallsites_project_temp
-              # ) |>
-              #   dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
-  
+
               # Assign the data to the list
               smallsites_list[[i]] <- TADAprofile_smallsites_temp
             }
@@ -1258,32 +1267,6 @@ mod_query_data_server <- function(id, tadat) {
               bigsites_list[[i]] <- TADAprofile_bigsites_temp
               
               ## end of changes for using WQX3
-              
-              # # Download the result data
-              # bigsites_result_temp <- dataRetrieval::readWQPdata(args_temp_big,
-              #   dataProfile = "resultPhysChem",
-              #   ignore_attributes = TRUE
-              # )
-              # 
-              # # Download the site data
-              # bigsites_site_temp <- dataRetrieval::whatWQPsites(args_temp_big)
-              # 
-              # # Download the project data
-              # bigsites_project_temp <- dataRetrieval::readWQPdata(args_temp_big,
-              #   service = "Project",
-              #   ignore_attributes = TRUE
-              # )
-              # 
-              # # Create TADA data frame
-              # TADAprofile_bigsites_temp <- EPATADA::TADA_JoinWQPProfiles(
-              #   FullPhysChem = bigsites_result_temp,
-              #   Sites = bigsites_site_temp,
-              #   Projects = bigsites_project_temp
-              # ) |>
-              #   dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
-              # 
-              # # Assign the data to the list
-              # bigsites_list[[i]] <- TADAprofile_bigsites_temp
             }
           })
   
@@ -1323,9 +1306,6 @@ mod_query_data_server <- function(id, tadat) {
       }
       
       if ("NWIS" %in% providers_arg) {
-
-        # browser()
-        
         # use this to show the user something while they are waiting
         query_text_string <- NULL
         
@@ -1345,34 +1325,21 @@ mod_query_data_server <- function(id, tadat) {
           query_text_string <- paste(input$state, "and", county$COUNTY_NAME, sep=" ")
         }
         # a modal that pops up showing it's working on querying the portal
-        # could include more information query_text_string, 
-        # timer_data$start <- Sys.time()
-        # timer_data$elapsed <- 0
-        # browser()
-        # shinybusy::show_modal_spinner(
-        #   spin = "double-bounce",
-        #   color = "#0071bc",
-        #   text = HTML(paste('Querying Data Source<br>NWIS (USGS)<br>')), # TODO: add timer shiny::textOutput("clock"))),
-        #   session = shiny::getDefaultReactiveDomain()
-        # )
-        shiny::showModal(
-          shiny::modalDialog(
-            title = "Loading NWIS Data",
-            size = "m",
-            footer = NULL, # This removes the default dismiss button
-            easyClose = FALSE, # This prevents closing by clicking outside the modal or pressing Esc        
-            # Modal body: display area for time and some instructions
-            tagList(
-              tags$div(
-                tags$p('Querying Data Source NWIS (USGS)'),
-                style = "text-align:center; padding: 12px;",
-                       tags$h3(id = "js_time_display", "00:00:00")
-              ),
-              # Hidden input to hold elapsed seconds for server (JS updates it)
-              tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
+        shinybusy::show_modal_spinner(
+          spin = "double-bounce",
+          color = "#0071bc",
+          text = tagList(
+            tags$div(
+              tags$p('Querying Data Source', tags$br(), 'NWIS (USGS))'),
+              style = "text-align:center; padding: 12px;",
+                     tags$h3(id = "js_time_display", "00:00:00")
             ),
-          )
-        )           
+            # Hidden input to hold elapsed seconds for server (JS updates it)
+            tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
+          ),
+          session = shiny::getDefaultReactiveDomain()
+        )
+       
         # Create the list of input arguments for dataRetrieval::read_waterdata_samples
         args_temp <- nwis_args_create(
           stateFips = state_fips_arg,
