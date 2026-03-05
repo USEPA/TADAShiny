@@ -1159,7 +1159,7 @@ mod_query_data_server <- function(id, tadat) {
             dplyr::mutate(group = MESS::cumsumbinning(
               x = tot_n,
               threshold = maxrecs,
-              maxgroupsize = 300 # 100 # changed from 300 after Warning: Error in httr2::req_perform: HTTP 414 URI Too Long.
+              maxgroupsize = 100 # 100 # changed from 300 after Warning: Error in httr2::req_perform: HTTP 414 URI Too Long.
             ))
   
           smallsites_list <- list()
@@ -1206,9 +1206,6 @@ mod_query_data_server <- function(id, tadat) {
                     paste("An error occurred while querying WQX (EPA):", e$message),
                     easyClose = TRUE
                   ))
-                  shinyjs::enable("harm_apply")
-                  
-                  
                 }
               )
               ## end of changes for using WQX3
