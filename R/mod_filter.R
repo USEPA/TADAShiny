@@ -340,10 +340,11 @@ mod_filtering_server <- function(id, tadat) {
       selection = "multiple",
       rownames = FALSE,
       options = list(
-        dom = "t",
-        ordering = FALSE,
+        dom = "tp",
+        ordering = TRUE,
         paging = TRUE,
-        pageLength = 20
+        pageLength = 20,
+        lengthMenu = list(c(10, 25, 50, -1), c('10', '25', '50', 'All'))
       ),
       server = TRUE
     )
