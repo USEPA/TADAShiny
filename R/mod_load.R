@@ -33,6 +33,15 @@
   unique(dt[[column]])
 }
 
+# Site Types: return SiteType vector; else empty
+.safe_fetch_sitetypes <- function(u) {
+  df <- tryCatch(jsonlite::fromJSON(u), error = function(e) NULL)
+  if (is.null(df)) {
+    return(character())
+  }
+  unique(trimws(df$codes$value))
+}
+
 # Projects: return ProjectIdentifier vector; else empty
 .safe_fetch_projects <- function(u) {
   txt <- .safe_req_string(u)
@@ -123,18 +132,15 @@ media <- c(
   "Biological Tissue", "No media"
 )
 
-# sitetype <- c(
-#       unique(utils::read.csv(url(
-#         "https://cdx.epa.gov/wqx/download/DomainValues/MonitoringLocationType.CSV"
-#       ))$Name),
-#       "Glacier", "Aggregate water-use establishment", "Not Assigned", "Subsurface"
-#       )
+sitetype <- .safe_fetch_sitetypes(
+  "https://www.waterqualitydata.us/Codes/sitetype?mimeType=json"
+      )
 
-sitetype <- c(
-  "Aggregate groundwater use", "Aggregate surface-water-use", "Aggregate water-use establishment",
-  "Atmosphere", "Estuary", "Facility", "Glacier", "Lake, Reservoir, Impoundment", "Land",
-  "Not Assigned", "Ocean", "Spring", "Stream", "Subsurface", "Well", "Wetland"
-)
+# sitetype <- c(
+#   "Aggregate groundwater use", "Aggregate surface-water-use", "Aggregate water-use establishment",
+#   "Atmosphere", "Estuary", "Facility", "Glacier", "Lake, Reservoir, Impoundment", "Land",
+#   "Not Assigned", "Ocean", "Spring", "Stream", "Subsurface", "Well", "Wetland"
+# )
 
 # these are the types of text matches used in searching the Characteristic(s) list
 match_types <- c(
@@ -745,7 +751,7 @@ mod_query_data_server <- function(id, tadat) {
           tags$div(
             tags$p('Loading example data', tags$br(), input$example_data),
             style = "text-align:center; padding: 12px;",
-                   tags$h3(id = "js_time_display", "00:00:00")
+                   tags$p(id = "js_time_display", "00:00:00")
           ),
           # Hidden input to hold elapsed seconds for server (JS updates it)
           tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
@@ -770,18 +776,11 @@ mod_query_data_server <- function(id, tadat) {
   
       raw <- EPATADA::TADA_AutoClean(raw)
 
-
-
-      # browser()
-
       shinybusy::remove_modal_spinner() # session = session)  # shiny::getDefaultReactiveDomain())
 
       disableLoading(session)
     })
 
-
-    
-    
     statecodes_df <- readRDS(system.file("extdata", "statecodes_df.rds", package = "TADAShiny"))
 
     # this section has widget update commands for the selectizeinputs that have a lot of possible selections - shiny suggested hosting the choices server-side rather than ui-side
@@ -1061,7 +1060,7 @@ mod_query_data_server <- function(id, tadat) {
             tags$div(
               tags$p('Querying Data Source', tags$br(), 'WQX (EPA)'),
               style = "text-align:center; padding: 12px;",
-                     tags$h3(id = "js_time_display", "00:00:00")
+                     tags$p(id = "js_time_display", "00:00:00")
             ),
             # Hidden input to hold elapsed seconds for server (JS updates it)
             tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
@@ -1228,8 +1227,6 @@ mod_query_data_server <- function(id, tadat) {
         # Download the data for water quality monitoring locations with more than 'maxrec' records.
         if (nrow(bigsites) > 0) {
           
-          # browser()
-          
           bigsites_list <- list()
   
           bsitesvec <- unique(bigsites$MonitoringLocationIdentifier)
@@ -1327,9 +1324,9 @@ mod_query_data_server <- function(id, tadat) {
           color = "#0071bc",
           text = tagList(
             tags$div(
-              tags$p('Querying Data Source', tags$br(), 'NWIS (USGS))'),
+              tags$p('Querying Data Source', tags$br(), 'NWIS (USGS)'),
               style = "text-align:center; padding: 12px;",
-                     tags$h3(id = "js_time_display", "00:00:00")
+                     tags$p(id = "js_time_display", "00:00:00")
             ),
             # Hidden input to hold elapsed seconds for server (JS updates it)
             tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
@@ -1343,7 +1340,7 @@ mod_query_data_server <- function(id, tadat) {
           countyFips = county_fips_arg,
           # countrycode = tadat$countrycode,
           # siteid = tadat$siteid,
-          # siteType = tadat$siteType,
+          siteTypeName = tadat$siteType,
           # hydrologicUnit = TBD,
           characteristic = tadat$characteristicName,
           characteristicGroup = tadat$characteristicType,
@@ -1358,6 +1355,8 @@ mod_query_data_server <- function(id, tadat) {
           boundingBox = bbox_reactive()
         )
         
+        NWIS_results <- NULL
+        
         tryCatch( 
           {
             NWIS_results <- do.call(dataRetrieval::read_waterdata_samples, args_temp)
@@ -1370,9 +1369,8 @@ mod_query_data_server <- function(id, tadat) {
               paste("An error occurred while querying NWIS (USGS):", e$message),
               easyClose = TRUE
             ))
-            shinyjs::enable("harm_apply")
-            
-            NWIS_results <- NA
+
+            NWIS_results <- NULL
           }
         )
         
