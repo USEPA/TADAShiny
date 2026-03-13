@@ -1311,7 +1311,7 @@ mod_query_data_server <- function(id, tadat) {
           county_fips_arg <- NULL
         }
         else if(input$county == ""){
-          state <- head(counties[counties$STATE_CD == input$state, ], 1)
+          state <- utils::head(counties[counties$STATE_CD == input$state, ], 1)
           state_fips_arg <- paste('US', sprintf("%02d", state$STATE_FIPS), sep = ':')
           county_fips_arg <- NULL
           query_text_string <- input$state
