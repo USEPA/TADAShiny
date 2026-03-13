@@ -1165,7 +1165,7 @@ mod_query_data_server <- function(id, tadat) {
           smallsites_list <- list()
   
           small_title <- base::paste0(
-            "Downloading STORET data from sites with less than or equal to ", pretty_maxrecs,
+            "Downloading EPA Water Quality eXchange (WQX) data from sites with less than or equal to ", pretty_maxrecs,
             " results."
           )
   
@@ -1327,7 +1327,7 @@ mod_query_data_server <- function(id, tadat) {
           color = "#0071bc",
           text = tagList(
             tags$div(
-              tags$p('Querying Data Source', tags$br(), 'NWIS (USGS))'),
+              tags$p('Querying Data Source', tags$br(), 'USGS Samples Data API'),
               style = "text-align:center; padding: 12px;",
                      tags$h3(id = "js_time_display", "00:00:00")
             ),
