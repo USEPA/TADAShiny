@@ -25,7 +25,6 @@ Imports:
     grDevices,
     htmltools,
     leaflet,
-    leaflet.extras,
     lubridate,
     MESS,
     plotly,

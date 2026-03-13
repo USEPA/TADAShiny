@@ -1,4 +1,4 @@
-#' map_bbox UI Function
+#' map_bbox UI Function (two-click drawing; no leaflet.extras)
 #'
 #' @description A shiny Module.
 #'
@@ -9,16 +9,16 @@
 #' @importFrom shiny NS tagList
 mod_map_bboxUI <- function(id, label = "Clear Drawing") {
   ns <- NS(id)
-
+  
   bbox_increment <- 1
-
+  
   tagList(
     shiny::fluidRow(
       column(
         width = 6,
-        leaflet::leafletOutput(ns("map_bbox"))
+        leaflet::leafletOutput(ns("map_bbox")),
+        shiny::helpText("Click two opposite corners on the map to draw a bounding box.")
       ),
-      # Bounding box inputs on the right (takes 4 columns)
       column(
         width = 6,
         htmltools::h4("Bounding Box Latitude and Longitude"),
@@ -91,194 +91,162 @@ mod_map_bboxUI <- function(id, label = "Clear Drawing") {
 mod_map_bboxServer <- function(id) {
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
-
+    
     # Initialize reactive values FIRST
     bbox_reVal <- shiny::reactiveValues(bBox = NULL)
-
+    
     # Flag to prevent infinite loops when syncing
     sync_in_progress <- shiny::reactiveVal(FALSE)
-
-    # Get the default leaflet style
-    shape_opts <- leaflet.extras::drawShapeOptions()
-
+    
+    # Rectangle style (approximate Leaflet defaults)
+    shape_opts <- list(
+      stroke = TRUE,
+      color = "#3388ff",
+      weight = 4,
+      opacity = 1,
+      fill = TRUE,
+      fillColor = "#3388ff",
+      fillOpacity = 0.2,
+      smoothFactor = 1,
+      noClip = FALSE
+    )
+    
+    # Store first corner for two-click drawing
+    draw_state <- shiny::reactiveValues(first_corner = NULL)
+    
     # Render base map
     output$map_bbox <- leaflet::renderLeaflet({
-      # Create the map
-      m <- leaflet::leaflet() |>
-        leaflet.extras::addDrawToolbar(
-          targetGroup = "drawn_items",
-          polylineOptions = FALSE,
-          circleOptions = FALSE,
-          markerOptions = FALSE,
-          circleMarkerOptions = FALSE,
-          polygonOptions = FALSE,
-          rectangleOptions = leaflet.extras::drawRectangleOptions(
-            shapeOptions = leaflet.extras::drawShapeOptions(),
-            showArea = FALSE
-          ),
-          singleFeature = TRUE
-        ) |>
+      leaflet::leaflet() |>
         leafem::addMouseCoordinates() |>
         add_USGS_base() |>
         leaflet::setView(lng = -114, lat = 42, zoom = 3)
-
-      return(m)
     })
-
+    
     # Create leaflet proxy for updates
     map_proxy <- leaflet::leafletProxy("map_bbox", session = session)
-
-    # Clear the map
+    
+    # Clear the map and inputs
     shiny::observeEvent(input$clear_map, {
-      proxy <- leaflet::leafletProxy("map_bbox", session = session)
-      # remove both the toolbar and any drawn features
-      proxy |> leaflet.extras::removeDrawToolbar(clearFeatures = TRUE)
-      # immediately re-add the toolbar so the user can draw again
-      proxy |> leaflet.extras::addDrawToolbar(
-        targetGroup = "drawn_items",
-        polylineOptions = FALSE,
-        polygonOptions = FALSE,
-        circleOptions = FALSE,
-        markerOptions = FALSE,
-        circleMarkerOptions = FALSE,
-        rectangleOptions = leaflet.extras::drawRectangleOptions(),
-        singleFeature = TRUE
-      )
-
-      # Clear manual rectangle
-      map_proxy |> leaflet::clearGroup("manual_bbox")
-
+      map_proxy |>
+        leaflet::clearGroup("manual_bbox") |>
+        leaflet::clearGroup("corner_pt")
+      
       bbox_reVal$bBox <- NULL
-
+      draw_state$first_corner <- NULL
+      
       # Clear numeric inputs
       sync_in_progress(TRUE)
-
       shiny::updateNumericInput(session = session, inputId = "bb_W", value = NA)
       shiny::updateNumericInput(session = session, inputId = "bb_S", value = NA)
       shiny::updateNumericInput(session = session, inputId = "bb_E", value = NA)
       shiny::updateNumericInput(session = session, inputId = "bb_N", value = NA)
-
       sync_in_progress(FALSE)
     })
-
-    # Handle new drawings
-    shiny::observeEvent(input$map_bbox_draw_new_feature, {
-      feat <- input$map_bbox_draw_new_feature
-      coords <- unlist(feat$geometry$coordinates)
-      coords_m <- matrix(coords, ncol = 2, byrow = TRUE)
-
-      # Create proper bbox
-      poly <- sf::st_sf(sf::st_sfc(sf::st_polygon(list(coords_m))), crs = sf::st_crs(4326))
-      bbox_temp <- unname(sf::st_bbox(poly))
-
-      # Store as bbox object
-      bbox_reVal$bBox <- bbox_temp
-
-      # Clear any manual rectangle users draw the map
-      map_proxy |> leaflet::clearGroup("manual_bbox")
+    
+    # Two-click rectangle creation using map clicks
+    shiny::observeEvent(input$map_bbox_click, {
+      click <- input$map_bbox_click
+      if (is.null(click)) return()
+      
+      lng <- click$lng
+      lat <- click$lat
+      
+      # First click: store corner and show a small marker
+      if (is.null(draw_state$first_corner)) {
+        draw_state$first_corner <- c(lng = lng, lat = lat)
+        map_proxy |>
+          leaflet::clearGroup("corner_pt") |>
+          leaflet::addCircleMarkers(
+            lng = lng, lat = lat,
+            radius = 6,
+            color = "#FF5722",
+            fillColor = "#FF5722",
+            fillOpacity = 0.9,
+            stroke = FALSE,
+            group = "corner_pt"
+          )
+        return()
+      }
+      
+      # Second click: compute bbox and draw rectangle
+      lng1 <- draw_state$first_corner["lng"]
+      lat1 <- draw_state$first_corner["lat"]
+      west  <- min(lng1, lng)
+      east  <- max(lng1, lng)
+      south <- min(lat1, lat)
+      north <- max(lat1, lat)
+      
+      # Validate bbox
+      if (west < east && south < north &&
+          west >= -180 && east <= 180 &&
+          south >= -90 && north <= 90) {
+        map_proxy |>
+          leaflet::clearGroup("corner_pt") |>
+          leaflet::clearGroup("manual_bbox") |>
+          leaflet::addRectangles(
+            lng1 = west, lat1 = south, lng2 = east, lat2 = north,
+            stroke = shape_opts$stroke, color = shape_opts$color,
+            weight = shape_opts$weight, opacity = shape_opts$opacity,
+            fill = shape_opts$fill, fillColor = shape_opts$fillColor,
+            fillOpacity = shape_opts$fillOpacity, smoothFactor = shape_opts$smoothFactor,
+            noClip = shape_opts$noClip, group = "manual_bbox"
+          )
+        
+        # Update reactive bbox (numeric inputs will sync from this)
+        bbox_reVal$bBox <- c(west, south, east, north)
+      }
+      
+      # Reset for next draw
+      draw_state$first_corner <- NULL
     })
-
-    # Update numeric inputs when bbox changes: Map to inputs
+    
+    # Update numeric inputs when bbox changes: Map → inputs
     shiny::observe({
       if (!is.null(bbox_reVal$bBox)) {
         sync_in_progress(TRUE)
-
-        shiny::updateNumericInput(
-          session = session,
-          inputId = "bb_W",
-          value = bbox_reVal$bBox[1]
-        ) # xmin = West
-
-        shiny::updateNumericInput(
-          session = session,
-          inputId = "bb_S",
-          value = bbox_reVal$bBox[2]
-        ) # ymin = South
-
-        shiny::updateNumericInput(
-          session = session,
-          inputId = "bb_E",
-          value = bbox_reVal$bBox[3]
-        ) # xmax = East
-
-        shiny::updateNumericInput(
-          session = session,
-          inputId = "bb_N",
-          value = bbox_reVal$bBox[4]
-        ) # ymax = North
+        shiny::updateNumericInput(session = session, inputId = "bb_W", value = bbox_reVal$bBox[1]) # west
+        shiny::updateNumericInput(session = session, inputId = "bb_S", value = bbox_reVal$bBox[2]) # south
+        shiny::updateNumericInput(session = session, inputId = "bb_E", value = bbox_reVal$bBox[3]) # east
+        shiny::updateNumericInput(session = session, inputId = "bb_N", value = bbox_reVal$bBox[4]) # north
         sync_in_progress(FALSE)
       }
     })
-
-    # Create debounced inputs to avoid excessive updates
+    
+    # Debounced inputs: numeric → map
     bb_W_debounce <- shiny::debounce(shiny::reactive(input$bb_W), 1000)
     bb_S_debounce <- shiny::debounce(shiny::reactive(input$bb_S), 1000)
     bb_E_debounce <- shiny::debounce(shiny::reactive(input$bb_E), 1000)
     bb_N_debounce <- shiny::debounce(shiny::reactive(input$bb_N), 1000)
-
-    # Update map when numeric inputs change: Inputs → Map
+    
     shiny::observe({
-      # Don't update if sync is in progress: prevents infinite loops
-      if (sync_in_progress()) {
-        return()
-      }
-
-      # Get debounced values
-      west <- bb_W_debounce()
+      # Prevent feedback loop when we update inputs from the map
+      if (sync_in_progress()) return()
+      
+      west  <- bb_W_debounce()
       south <- bb_S_debounce()
-      east <- bb_E_debounce()
+      east  <- bb_E_debounce()
       north <- bb_N_debounce()
-
-      # Validate all inputs are present
+      
+      # If any is missing, clear any drawn rectangle and corner marker
       if (is.na(west) || is.na(south) || is.na(east) || is.na(north)) {
-        # If any input is missing, clear the manual rectangle
-        map_proxy |> leaflet::clearGroup("manual_bbox")
+        map_proxy |> leaflet::clearGroup("manual_bbox") |> leaflet::clearGroup("corner_pt")
         return()
       }
-
-      # Validate coordinates are valid
-      if (west >= east) {
-        # Invalid: west should be less than east
-        return()
-      }
-
-      if (south >= north) {
-        # Invalid: south should be less than north
-        return()
-      }
-
-      # Validate within bounds
+      
+      # Validate bbox
+      if (west >= east) return()
+      if (south >= north) return()
       if (west < -180 || west > 180 || east < -180 || east > 180 ||
-        south < -90 || south > 90 || north < -90 || north > 90) {
+          south < -90 || south > 90 || north < -90 || north > 90) {
         return()
       }
-
-      # Clear existing manual rectangle
-      map_proxy |> leaflet.extras::removeDrawToolbar(clearFeatures = TRUE)
-      map_proxy |> leaflet::clearGroup("manual_bbox")
-
-      # Re-add the toolbar so user can draw again
-      map_proxy |> leaflet.extras::addDrawToolbar(
-        targetGroup = "drawn_items",
-        polylineOptions = FALSE,
-        polygonOptions = FALSE,
-        circleOptions = FALSE,
-        markerOptions = FALSE,
-        circleMarkerOptions = FALSE,
-        rectangleOptions = leaflet.extras::drawRectangleOptions(
-          shapeOptions = leaflet.extras::drawShapeOptions(),
-          showArea = FALSE
-        ),
-        singleFeature = TRUE
-      )
-
-      # Draw new rectangle with same color as drawn rectangles
+      
+      # Draw new rectangle from numeric inputs
       map_proxy |>
+        leaflet::clearGroup("manual_bbox") |>
+        leaflet::clearGroup("corner_pt") |>
         leaflet::addRectangles(
-          lng1 = west,
-          lat1 = south,
-          lng2 = east,
-          lat2 = north,
+          lng1 = west, lat1 = south, lng2 = east, lat2 = north,
           stroke = shape_opts$stroke,
           color = shape_opts$color,
           weight = shape_opts$weight,
@@ -290,14 +258,13 @@ mod_map_bboxServer <- function(id) {
           noClip = shape_opts$noClip,
           group = "manual_bbox"
         )
-
-      # Update bbox_reVal to keep it in sync
+      
+      # Keep reactive bbox in sync
       bbox_reVal$bBox <- c(west, south, east, north)
     }) |> shiny::bindEvent(
-      bb_W_debounce(), bb_S_debounce(),
-      bb_E_debounce(), bb_N_debounce()
+      bb_W_debounce(), bb_S_debounce(), bb_E_debounce(), bb_N_debounce()
     )
-
+    
     return(bbox_reVal)
   })
 }
