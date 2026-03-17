@@ -1354,6 +1354,7 @@ mod_query_data_server <- function(id, tadat) {
           # providers = tadat$providers,
           dataType = "results",
           dataProfile = "fullphyschem",
+          boundingBox = bbox_reactive(),
         )
         
         NWIS_results <- shiny::reactiveVal(NULL)
