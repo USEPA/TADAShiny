@@ -356,7 +356,7 @@ mod_query_data_ui <- function(id) {
         4,
         shiny::radioButtons(ns("providers"),
           "Data Source",
-          c("NWIS (USGS)" = "NWIS", "WQX (EPA)" = "STORET", "Both (NWIS and WQX)" = "all"),
+          c("USGS (Samples Data API)" = "NWIS", "EPA (WQX)" = "STORET", "Both (USGS and EPA)" = "all"),
           selected = "all"
         )
       )
@@ -596,6 +596,9 @@ mod_query_data_server <- function(id, tadat) {
     ## creates download template button used for importing data to TADAShiny - used in option C
     template_data <- shiny::reactive(EPATADA::TADA_GetTemplate())
     
+    # hold error message for NWIS queries in a reactive value so it can be displayed in a modal if needed
+    nwis_error_message_text <- NULL
+    
     # return an ms excel file with the template columns
     output$download_template <- shiny::downloadHandler(
       filename = function() {
@@ -769,10 +772,6 @@ mod_query_data_server <- function(id, tadat) {
       initializeTable(tadat, raw)
   
       raw <- EPATADA::TADA_AutoClean(raw)
-
-
-
-      # browser()
 
       shinybusy::remove_modal_spinner() # session = session)  # shiny::getDefaultReactiveDomain())
 
@@ -1059,7 +1058,7 @@ mod_query_data_server <- function(id, tadat) {
           color = "#0071bc",
           text = tagList(
             tags$div(
-              tags$p('Querying Data Source', tags$br(), 'WQX (EPA)'),
+              tags$p('Querying Data Source', tags$br(), 'EPA (WQX)'),
               style = "text-align:center; padding: 12px;",
                      tags$h3(id = "js_time_display", "00:00:00")
             ),
@@ -1211,10 +1210,12 @@ mod_query_data_server <- function(id, tadat) {
               ## end of changes for using WQX3
 
               # Assign the data to the list
+              TADAprofile_smallsites_temp$PreparationStartDate <- as.character(TADAprofile_smallsites_temp$PreparationStartDate)
+              TADAprofile_smallsites_temp <- EPATADA::TADA_AutoClean(TADAprofile_smallsites_temp)
+              
               smallsites_list[[i]] <- TADAprofile_smallsites_temp
             }
           })
-  
           # Combine the data
           TADA_smallsites <- dplyr::bind_rows(smallsites_list)
   
@@ -1227,9 +1228,7 @@ mod_query_data_server <- function(id, tadat) {
   
         # Download the data for water quality monitoring locations with more than 'maxrec' records.
         if (nrow(bigsites) > 0) {
-          
-          # browser()
-          
+
           bigsites_list <- list()
   
           bsitesvec <- unique(bigsites$MonitoringLocationIdentifier)
@@ -1277,7 +1276,7 @@ mod_query_data_server <- function(id, tadat) {
           TADA_bigsites_clean <- TADA_download_temp
         }
   
-        disableLoading(session)
+
   
         # Combine the Small and Big sites
         STORET_results <- dplyr::bind_rows(TADA_smallsites_clean, TADA_bigsites_clean)
@@ -1327,7 +1326,7 @@ mod_query_data_server <- function(id, tadat) {
           color = "#0071bc",
           text = tagList(
             tags$div(
-              tags$p('Querying Data Source', tags$br(), 'USGS Samples Data API'),
+              tags$p('Querying Data Source', tags$br(), 'USGS (Samples Data API)'),
               style = "text-align:center; padding: 12px;",
                      tags$h3(id = "js_time_display", "00:00:00")
             ),
@@ -1342,7 +1341,7 @@ mod_query_data_server <- function(id, tadat) {
           stateFips = state_fips_arg,
           countyFips = county_fips_arg,
           # countrycode = tadat$countrycode,
-          # siteid = tadat$siteid,
+          monitoringLocationIdentifier = tadat$siteid,
           # siteType = tadat$siteType,
           # hydrologicUnit = TBD,
           characteristic = tadat$characteristicName,
@@ -1355,35 +1354,33 @@ mod_query_data_server <- function(id, tadat) {
           # providers = tadat$providers,
           dataType = "results",
           dataProfile = "fullphyschem",
-          boundingBox = bbox_reactive()
         )
+        
+        NWIS_results <- shiny::reactiveVal(NULL)
+        got_NWIS_data <- FALSE
+        nwis_error_message_text <- NULL
         
         tryCatch( 
           {
+            # stop("random error is NWIS")
             NWIS_results <- do.call(dataRetrieval::read_waterdata_samples, args_temp)
+            got_NWIS_data <- TRUE;
           },
           error = function(e) {
             # Error handling: show error message and re-enable harmonize button
-            shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
-            shiny::showModal(shiny::modalDialog(
-              title = "Error",
-              paste("An error occurred while querying NWIS (USGS):", e$message),
-              easyClose = TRUE
-            ))
-            shinyjs::enable("harm_apply")
+            nwis_error_message_text <<- paste(tags$strong("An error occurred while querying NWIS (USGS):"), tags$p(e$message))
             
-            NWIS_results <- NA
+            shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
           }
         )
         
-        if (nrow(NWIS_results) > 0) {
+        if (got_NWIS_data == TRUE && nrow(NWIS_results) > 0) {
           NWIS_results_rename <- EPATADA::TADA_RenametoLegacy(NWIS_results)
           
           # TEMP FIX!!!!!!!!!
           # NWIS uses SampleAquifer and STORET and TADA use AquiferName  Change to AquiferName
           colnames(NWIS_results_rename)[colnames(NWIS_results_rename) == "SampleAquifer"] <- "AquiferName"
           
-
           # also getting non-fatal error from NWIS only data
           # [1] "Missing the following fields that are in the csv files:"
           # [1] "TADA.QAPPDocAvailable"
@@ -1402,47 +1399,63 @@ mod_query_data_server <- function(id, tadat) {
           NWIS_results$ActivityStartDate <- as.character(NWIS_results$ActivityStartDate)
           NWIS_results$ActivityStartDateTime <- as.character(NWIS_results$ActivityStartDateTime)
           NWIS_results$ActivityStartTime.TimeZoneCode_offset <- as.character(NWIS_results$ActivityStartTime.TimeZoneCode_offset)
-                              
         }
-      }
+      } # end of NWIS query section
 
-      if (length(providers_arg) == 2){
-        if (nrow(NWIS_results) > 0) {
-          # merge them together
-          All_results <- dplyr::bind_rows(STORET_results, NWIS_results)
-        } else {
-          # if the NWIS query resulted in no rows, then just include these results
-          All_results <- STORET_results
-        }
-        
-        All_results_clean <- EPATADA::TADA_AutoClean(All_results)
-        
-        raw <- EPATADA::TADA_OrderCols(All_results_clean)
-      } else if ("NWIS" %in% providers_arg) {
-        raw <- NWIS_results
-      } else {
-        raw <- STORET_results
-      }
-      
       # show a modal dialog box when tadat$raw is empty and the query didn't return any records.
       # but if tadat$raw isn't empty, perform some initial QC of data that aren't media type water
       # or have NA Resultvalue and no detection limit data
-      if (dim(raw)[1] < 1) {
-        shiny::showModal(
-          shiny::modalDialog(
-            title = "Empty Query",
-            "Your query returned zero results. Please adjust your search inputs and try again. 
-            Remember to update the start and end dates."
-          )
-        )
-      } else {
-        initializeTable(tadat, raw)
+      if (!is.null(nwis_error_message_text) && nzchar(nwis_error_message_text)) {
+         
+          shiny::showModal(shiny::modalDialog(
+            title = "NWIS Error",
+            HTML(nwis_error_message_text),
+            easyClose = FALSE, # Set to FALSE to force user to use a button to close
+            footer = tagList(
+              shiny::modalButton("Dismiss")
+            )
+          ))
       }
-    })
+      else {
+        if (exists("STORET_results") && exists("NWIS_results")) {
+          if (got_NWIS_data == TRUE && nrow(NWIS_results) > 0) {
+            # merge them together
+            All_results <- dplyr::bind_rows(STORET_results, NWIS_results)
+          } else {
+            # if the NWIS query resulted in no rows, then just include these results
+            All_results <- STORET_results
+          }
+          
+          All_results_clean <- EPATADA::TADA_AutoClean(All_results)
+          
+          All_results_clean <- EPATADA::TADA_OrderCols(All_results_clean)
+        } else if (exists("NWIS_results")) { # && !is.null(NWIS_results())) {
+          All_results_clean <- NWIS_results
+        } else if (exists("STORET_results")) {
+          All_results_clean <- STORET_results
+        }
+        
+        if (dim(All_results_clean)[1] < 0) {
+          message_text <- "Your query returned zero results. Please adjust your search inputs and try again. 
+            Remember to update the start and end dates."
 
+          shiny::showModal(
+            shiny::modalDialog(
+              title = "Empty Query",
+             tags$p(message_text), 
+             HTML(nwis_error_message_text)
+            )
+          )
+        }
+        else {
+          disableLoading(session)
+          shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+          raw <- All_results_clean
+          initializeTable(tadat, raw)
+        }
+      }
+    }) # end of observeEvent for querynow button
 
-    
-    
     
     # Update the run parameters if example data is selected
     shiny::observeEvent(input$example_data_go, {
@@ -1472,6 +1485,9 @@ mod_query_data_server <- function(id, tadat) {
     })
   })
 }
+
+
+
 
 initializeTable <- function(tadat, raw) {
   # Test to see if this is a raw table or one previously worked on in TADA
