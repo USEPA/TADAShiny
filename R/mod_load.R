@@ -748,7 +748,7 @@ mod_query_data_server <- function(id, tadat) {
           tags$div(
             tags$p('Loading example data', tags$br(), input$example_data),
             style = "text-align:center; padding: 12px;",
-                   tags$h3(id = "js_time_display", "00:00:00")
+                   tags$p(id = "js_time_display", "00:00:00")
           ),
           # Hidden input to hold elapsed seconds for server (JS updates it)
           tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
@@ -1060,7 +1060,7 @@ mod_query_data_server <- function(id, tadat) {
             tags$div(
               tags$p('Querying Data Source', tags$br(), 'EPA (WQX)'),
               style = "text-align:center; padding: 12px;",
-                     tags$h3(id = "js_time_display", "00:00:00")
+                     tags$p(id = "js_time_display", "00:00:00")
             ),
             # Hidden input to hold elapsed seconds for server (JS updates it)
             tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
@@ -1328,7 +1328,7 @@ mod_query_data_server <- function(id, tadat) {
             tags$div(
               tags$p('Querying Data Source', tags$br(), 'USGS (Samples Data API)'),
               style = "text-align:center; padding: 12px;",
-                     tags$h3(id = "js_time_display", "00:00:00")
+                     tags$p(id = "js_time_display", "00:00:00")
             ),
             # Hidden input to hold elapsed seconds for server (JS updates it)
             tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
