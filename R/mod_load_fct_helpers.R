@@ -49,3 +49,52 @@ args_create <- function(statecode = NULL,
 
   return(args)
 }
+
+### A function to construct the argument list for the NWIS function dataRetrieval::read_waterdata_samples(args_temp)
+nwis_args_create <- function(stateFips = NULL,
+                              countyFips = NULL,
+                              # countrycode = NULL,
+                              hydrologicUnit = NULL,
+                              monitoringLocationIdentifier = NULL,
+                              siteType = NULL,
+                              characteristic = NULL,
+                              characteristicGroup = NULL,
+                              activityMediaName = NULL,
+                              projectIdentifier = NULL,
+                              organizationIdentifier = NULL,
+                              activityStartDateLower = NULL,
+                              activityStartDateUpper = NULL,
+                              dataType = NULL,
+                              dataProfile = NULL,
+                              # providers = NULL,
+                              boundingBox = NULL
+                              ) {
+  # Construct the arguments for downloads
+  args <- list(
+    "stateFips" = stateFips,
+    "countyFips" = countyFips,
+    # "countrycode" = countrycode,
+    "hydrologicUnit" = hydrologicUnit,
+    "monitoringLocationIdentifier" = monitoringLocationIdentifier,
+    # "siteType" = siteType,
+    "characteristic" = characteristic,
+    "characteristicGroup" = characteristicGroup,
+    "activityMediaName" = activityMediaName,
+    "projectIdentifier" = projectIdentifier,
+    "organizationIdentifier" = organizationIdentifier,
+    "activityStartDateLower" = activityStartDateLower,
+    "activityStartDateUpper" = activityStartDateUpper,
+    "dataType" = dataType,
+    "dataProfile" = dataProfile,
+    # "providers" = providers,
+    "boundingBox" = boundingBox
+  )
+
+  # Replace null with NULL
+  args[args %in% "null"] <- list(NULL)
+
+  # Remove NULL attribute
+  args <- args[purrr::map_lgl(args, function(x) !is.null(x))]
+
+  return(args)
+}
