@@ -1342,7 +1342,7 @@ mod_query_data_server <- function(id, tadat) {
           countyFips = county_fips_arg,
           # countrycode = tadat$countrycode,
           monitoringLocationIdentifier = tadat$siteid,
-          # siteType = tadat$siteType,
+          siteTypeName = tadat$siteType,
           # hydrologicUnit = TBD,
           characteristic = tadat$characteristicName,
           characteristicGroup = tadat$characteristicType,
@@ -1436,7 +1436,8 @@ mod_query_data_server <- function(id, tadat) {
           All_results_clean <- STORET_results
         }
         
-        if (dim(All_results_clean)[1] < 0) {
+        # using the NWIS retrieval this returns 0 x 181 - a list of the columns.
+        if (dim(All_results_clean)[1] <= 0) {
           message_text <- "Your query returned zero results. Please adjust your search inputs and try again. 
             Remember to update the start and end dates."
 
