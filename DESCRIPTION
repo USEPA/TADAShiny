@@ -6,7 +6,9 @@ Authors@R: c(
     person("Cristina", "Mullin", , "mywaterway@epa.gov", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-0615-6087")),
     person("Trip", "Hook", role = "aut"),
-    person("Elise", "Hinman", role = "aut")
+    person("Elise", "Hinman", role = "aut"),
+    person("Jimmy", "Bisese", role = "ctr"),
+    person("Yu-Chen", "Wang", role = "ctr")
   )
 Description: Assists data partners in retrieving, wrangling, quality checking, and harmonizing data from the Water Quality Portal for subsequent analyses.
 License: CC0
@@ -67,7 +69,8 @@ Suggests:
     geojsonsf,
     packrat,
     remotes,
-    rprojroot
+    rprojroot,
+    mockery
 Remotes:
     USEPA/EPATADA@develop,
     USEPA/rExpertQuery
