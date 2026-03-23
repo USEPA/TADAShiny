@@ -9,8 +9,14 @@ fixed_port <- 6150
 
 # Requested defaults
 default_start_date <- "2018-07-07"
-default_end_date <- "2018-07-09"
+default_end_date <- "2019-07-09"
 default_siteid <- "REDLAKE_WQX-LRC"
+default_organizations <-  c("REDLAKE_WQX",
+                   "SFNOES_WQX",
+                   "PUEBLO_POJOAQUE",
+                   "FONDULAC_WQX",
+                   "PUEBLOOFTESUQUE", "CNENVSER")
+default_organization <-  c("REDLAKE_WQX", "SFNOES_WQX")
 # default_characteristics <- c(
 #   'TEMPERATURE, WATER_NA_NA_DEG C',
 #   'DEPTH, SECCHI DISK DEPTH_NA_NA_M',
@@ -34,28 +40,67 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
       # Date & site inputs are used by TADA_DataRetrieval when "Load data" pressed
-      dateInput("start_date", "Start date", value = default_start_date),
-      dateInput("end_date",   "End date",   value = default_end_date),
+      shiny::fluidRow(
+        column(
+          5,
+          shiny::dateInput("start_date", "Start date", value = default_start_date)
+        ),
+        column(
+          5,
+          shiny::dateInput("end_date",   "End date",   value = default_end_date)
+        )
+      ),
       textInput("siteid", "Site ID (siteid)", value = default_siteid),
+      selectizeInput("organizations", 
+                     "Up to 6 organizations", 
+                     choices = default_organizations, 
+                     multiple = TRUE, 
+                     selected = default_organization,
+                     options = list(maxItems = 3, plugins = list("remove_button"))
+      ),
 
-      tags$hr(),
-      numericInput("surfacevalue", "Surface depth (m) (used in plot)", value = 2, min = 0),
-      numericInput("bottomvalue",  "Bottom depth (m) (used in plot)", value = 2, min = 0),
-      selectInput("unit", "Unit (for plotting)", choices = c("m","ft","in"), selected = "m"),
 
       actionButton("load_data", "Load data (run TADA_DataRetrieval + processing)", icon = icon("download")),
       tags$hr(),
 
       helpText("After loading, pick an activity date and up to 3 characteristics, then click Update plot."),
 
-      selectInput("activity_date", "Activity date", choices = NULL),
+      shiny::fluidRow(
+        column(
+          5,
+          shiny::selectInput("found_site_id", "Downloaded Site ID", choices = NULL)
+        ),
+        column(
+          5,
+          shiny::selectInput("activity_date", "Activity date", choices = NULL)
+        )
+      ),
       selectizeInput("characteristics", 
                      "Up to 3 characteristics", 
                      choices = NULL, 
                      multiple = TRUE, 
                      options = list(maxItems = 3, plugins = list("remove_button"))
       ),
+      
+      tags$hr(),
       checkboxInput("depthcat", "Show depth category lines in plot", value = TRUE),
+      shiny::fluidRow(
+        column(
+          5,
+          shiny::numericInput("surfacevalue", "Surface (depth below surface)", value = 2, min = 0)
+        ),
+        column(
+          5,
+          shiny::numericInput("bottomvalue",  "Bottom (height above bottom) (m)", value = 2, min = 0)
+        ),
+        # column(
+        #   2,
+        #   shiny::selectInput("unit", "Unit (for plotting)", choices = c("m","ft","in"), selected = "m")
+        # )
+      ),      
+      # numericInput("surfacevalue", "Surface depth (m) (used in plot)", value = 2, min = 0),
+      # numericInput("bottomvalue",  "Bottom depth (m) (used in plot)", value = 2, min = 0),
+      # ,      
       actionButton("update", "Update plot", icon = icon("chart-area"))
     ),
 
@@ -105,7 +150,8 @@ server <- function(input, output, session) {
       incProgress(0.1, detail = "Retrieving data (TADA_DataRetrieval)")
       # TADA_DataRetrieval: use the siteid and dates from UI
       input_raw_df <- tryCatch({
-        EPATADA::TADA_DataRetrieval(siteid = input$siteid,
+        EPATADA::TADA_DataRetrieval(# siteid = input$siteid,
+                                    organization = input$organizations,
                                    startDate = as.character(input$start_date),
                                    endDate = as.character(input$end_date),
                                   ask=FALSE)
@@ -115,7 +161,7 @@ server <- function(input, output, session) {
                               easyClose = TRUE))
         return(NULL)
       })
-      if (is.null(input_raw_df)) return()
+      if ((is.null(input_raw_df)) || nrow(input_raw_df) == 0) return()
       tada_rv$input_raw_df <- input_raw_df
 
       incProgress(0.45, detail = "Flagging depth categories (TADA_FlagDepthCategory)")
@@ -175,12 +221,17 @@ server <- function(input, output, session) {
       # Populate choices:
       # activity_date candidates
       activity_choices <- NULL
+      found_site_id_choices <- NULL
       char_choices <- NULL
 
+      browser()
       if (!is.null(tada_rv$site_date_char_groups_df)) {
         # try common column names
         if ("ActivityStartDate" %in% names(tada_rv$site_date_char_groups_df)) activity_choices <- sort(unique(as.character(tada_rv$site_date_char_groups_df$ActivityStartDate)))
-        if ("activity_date" %in% names(tada_rv$site_date_char_groups_df)) activity_choices <- sort(unique(as.character(tada_rv$site_date_char_groups_df$activity_date)))
+
+        if ("TADA.MonitoringLocationIdentifier" %in% names(tada_rv$site_date_char_groups_df)) { 
+          found_site_id_choices <- sort(unique(as.character(tada_rv$site_date_char_groups_df$TADA.MonitoringLocationIdentifier)))
+        }        
         # characteristics
         if ("TADA.ComparableDataIdentifier" %in% names(tada_rv$site_date_char_groups_df)) 
           char_choices <- sort(unique(as.character(tada_rv$site_date_char_groups_df$TADA.ComparableDataIdentifier)))
@@ -199,6 +250,7 @@ server <- function(input, output, session) {
       }
 
       # Ensure we have a character vector
+      if (is.null(found_site_id_choices)) found_site_id_choices <- character(0)
       if (is.null(activity_choices)) activity_choices <- character(0)
       if (is.null(char_choices)) char_choices <- character(0)
 
@@ -208,6 +260,10 @@ server <- function(input, output, session) {
         selected_characteristics <- head(char_choices, 3)
       }
 
+      updateSelectInput(session, "found_site_id", 
+                        choices = found_site_id_choices, 
+                        selected = ifelse(length(found_site_id_choices)>0, found_site_id_choices[1], NA))
+            
       updateSelectInput(session, "activity_date", 
                         choices = activity_choices, 
                         selected = ifelse(length(activity_choices)>0, activity_choices[1], NA))
@@ -308,7 +364,8 @@ server <- function(input, output, session) {
                                       depthcat = input$depthcat,
                                       surfacevalue = input$surfacevalue,
                                       bottomvalue = input$bottomvalue,
-                                      unit = input$unit)
+                                      # unit = input$unit
+                                      )
       }, error = function(e) {
         return(safe_message_plot(paste0("Plot error: ", e$message)))
       })
@@ -336,7 +393,8 @@ server <- function(input, output, session) {
                                     depthcat = input$depthcat,
                                     surfacevalue = input$surfacevalue,
                                     bottomvalue = input$bottomvalue,
-                                    unit = input$unit)
+                                    # unit = input$unit
+                                    )
     }, error = function(e) {
       return(safe_message_plot(paste0("Plot error: ", e$message)))
     })
