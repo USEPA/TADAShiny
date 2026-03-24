@@ -748,7 +748,7 @@ mod_query_data_server <- function(id, tadat) {
           tags$div(
             tags$p('Loading example data', tags$br(), input$example_data),
             style = "text-align:center; padding: 12px;",
-                   tags$h3(id = "js_time_display", "00:00:00")
+                   tags$p(id = "js_time_display", "00:00:00")
           ),
           # Hidden input to hold elapsed seconds for server (JS updates it)
           tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
@@ -1060,7 +1060,7 @@ mod_query_data_server <- function(id, tadat) {
             tags$div(
               tags$p('Querying Data Source', tags$br(), 'EPA (WQX)'),
               style = "text-align:center; padding: 12px;",
-                     tags$h3(id = "js_time_display", "00:00:00")
+                     tags$p(id = "js_time_display", "00:00:00")
             ),
             # Hidden input to hold elapsed seconds for server (JS updates it)
             tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
@@ -1328,7 +1328,7 @@ mod_query_data_server <- function(id, tadat) {
             tags$div(
               tags$p('Querying Data Source', tags$br(), 'USGS (Samples Data API)'),
               style = "text-align:center; padding: 12px;",
-                     tags$h3(id = "js_time_display", "00:00:00")
+                     tags$p(id = "js_time_display", "00:00:00")
             ),
             # Hidden input to hold elapsed seconds for server (JS updates it)
             tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
@@ -1342,7 +1342,7 @@ mod_query_data_server <- function(id, tadat) {
           countyFips = county_fips_arg,
           # countrycode = tadat$countrycode,
           monitoringLocationIdentifier = tadat$siteid,
-          # siteType = tadat$siteType,
+          siteTypeName = tadat$siteType,
           # hydrologicUnit = TBD,
           characteristic = tadat$characteristicName,
           characteristicGroup = tadat$characteristicType,
@@ -1436,7 +1436,8 @@ mod_query_data_server <- function(id, tadat) {
           All_results_clean <- STORET_results
         }
         
-        if (dim(All_results_clean)[1] < 0) {
+        # using the NWIS retrieval this returns 0 x 181 - a list of the columns.
+        if (dim(All_results_clean)[1] <= 0) {
           message_text <- "Your query returned zero results. Please adjust your search inputs and try again. 
             Remember to update the start and end dates."
 

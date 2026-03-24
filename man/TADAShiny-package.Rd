@@ -25,5 +25,11 @@ Authors:
   \item Elise Hinman
 }
 
+Other contributors:
+\itemize{
+  \item Jimmy Bisese [contractor]
+  \item Yu-Chen Wang [contractor]
+}
+
 }
 \keyword{internal}
