@@ -246,6 +246,7 @@ mod_data_flagging_server <- function(id, tadat) {
         shinyjs::enable(selector = '.nav li a[data-value="Filter"]')
         shinyjs::enable(selector = '.nav li a[data-value="Censored"]')
         shinyjs::enable(selector = '.nav li a[data-value="Harmonize"]')
+        shinyjs::enable(selector = '.nav li a[data-value="Depth"]')        
         shinyjs::enable(selector = '.nav li a[data-value="Figures"]')
         shinyjs::enable(selector = '.nav li a[data-value="Review"]')
       }
@@ -255,7 +256,16 @@ mod_data_flagging_server <- function(id, tadat) {
       shinybusy::show_modal_spinner(
         spin = "double-bounce",
         color = "#0071bc",
-        text = "Running flagging functions...",
+        # text = "Running flagging functions...",
+        text = tagList(
+          tags$div(
+            tags$p('Running flagging functions', tags$br(), input$example_data),
+            style = "text-align:center; padding: 12px;",
+                   tags$p(id = "js_time_display", "00:00:00")
+          ),
+          # Hidden input to hold elapsed seconds for server (JS updates it)
+          tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
+        ),
         session = shiny::getDefaultReactiveDomain()
       )
 

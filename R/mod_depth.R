@@ -1,0 +1,663 @@
+#' depth UI Function
+#'
+#' @description A shiny Module.
+#'
+#' @param id,input,output,session Internal parameters for {shiny}.
+#'
+#' @noRd
+mod_depth_ui <- function(id) {
+  ns <- shiny::NS(id)
+  tagList(
+        # NOTE: Users first decide which columns will define "groups" for analysis and visualization.
+    # TIP: Defaulting to TADA.ComparableDataIdentifier keeps groups aligned with comparable data logic.
+    htmltools::h3("1. Determine If there is sufficient data"),
+    htmltools::HTML("First, hit the Review Depth Data button to check if there is sufficient data
+                    to do a Depth (water column depth) analysis.  TODO: add UI elements for bycategory, bottomvalue, 
+                    surfacevalue, and dailyagg"),
+    htmltools::div(style = "margin-bottom:10px"),
+    shiny::fluidRow(column(
+      3,
+      shiny::actionButton(ns("reviewDepthData"),
+        "Review Depth Data",
+        style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
+      )
+    )),
+    # Table title
+    tags$div(
+      id = "table_class",
+      htmltools::h3(shiny::textOutput(ns("depth_review_table_title"))),
+      DT::DTOutput(ns("depth_review"))
+    ),
+    # NOTE: Users first decide which columns will define "groups" for analysis and visualization.
+    # TIP: Defaulting to TADA.ComparableDataIdentifier keeps groups aligned with comparable data logic.
+    htmltools::h3("1. Determine Characteristic Groups of Interest"),
+    htmltools::HTML("First, pick the columns you'd like to use to group your data. You can stick with 'TADA.ComparableDataIdentifier' (where each group of data represents one unique characteristic-unit-fraction-speciation combination), or you can add other columns that will help you divide and review your data most effectively. For example, you may also want to divide up your data based on monitoring location type, or hydrologic condition. Once you've decided on your grouping columns, click 'Generate Groups' below to group data. It is <B>optional</B> to add more grouping columns."),
+    htmltools::br(),
+    htmltools::br(),
+    shiny::fluidRow(
+      column(
+        10, # column containing drop down and button to select grouping columns
+        # NOTE: Using uiOutput so the choices can be updated dynamically after data load.
+        shiny::uiOutput(ns("groupingcols"))
+      ),
+      column(
+        2, # uiOutput is used when the widget depends upon something the user does/reactivity in the app
+        # NOTE: "Generate Groups" appears only when the names are available in react.
+        shiny::uiOutput(ns("groupinggo"))
+      )
+    ),
+    # this part contains the grouping field and button that show up after the groups have been established
+    shiny::uiOutput(ns("mapplotgroup")),
+    # map
+    shiny::fluidRow(column(12, shinycssloaders::withSpinner(leaflet::leafletOutput(ns("sites_map"), height = "500px")))),
+    htmltools::br(),
+    htmltools::br(),
+    # site selection field and button
+    shiny::uiOutput(ns("selsites")),
+    htmltools::br(),
+    # tabs with plots in them
+    shiny::tabsetPanel(
+      shiny::tabPanel(
+        "Single Characteristic Figures",
+        htmltools::br(),
+        # NOTE: The stats table is built via renderUI to return a DT widget directly.
+        shiny::uiOutput(ns("tada_stats_table")),
+        htmltools::br(),
+        htmltools::HTML("Benchmark values appear as horizontal lines on the single-characteristic scatterplot figure, below. Benchmarks may reflect established or proposed water quality criteria, important physical/chemical/biological thresholds, or any other values relevant to your use case."),
+        htmltools::br(),
+        # NOTE: Simple two-benchmark inputs; expand to more if needed (via dynamic UI).
+        shiny::uiOutput(ns("benchmarks")),
+        htmltools::br(),
+        shiny::fluidRow(DT::DTOutput(ns("explore_sumtable")), width = 600),
+        htmltools::br(),
+        shiny::fluidRow(plotly::plotlyOutput(ns("scatter"))),
+        htmltools::br(),
+        shiny::fluidRow(plotly::plotlyOutput(ns("histogram"))),
+        htmltools::br(),
+        shiny::fluidRow(plotly::plotlyOutput(ns("boxplot")))
+      ),
+      shiny::tabPanel(
+        "Two-Characteristic Scatterplot",
+        shiny::fluidRow(plotly::plotlyOutput(ns("scatter2")))
+      )
+    )
+  )
+}
+
+#' depth Server Functions
+#'
+#' @noRd
+mod_depth_server <- function(id, tadat) {
+  shiny::moduleServer(id, function(input, output, session) {
+    ns <- session$ns
+
+    react <- shiny::reactiveValues() # create a reactive values object to hold vectors, dataframes, etc. that you want to use throughout the app.
+    # NOTE: react is used across multiple UI/observer blocks to share computed datasets and choices.
+
+    # This grabs the column names of tadat$raw when user first clicks on tadat$tab, so grouping col dropdown doesn't have the 'group' column created in this tab.
+    shiny::observeEvent(tadat$tab, {
+      if (tadat$tab == "Figures") {
+        react$names <- names(tadat$raw)
+        # TIP: If you later preprocess tadat$raw (e.g., rename columns), update this hook to reflect new names.
+      }
+    })
+    
+    output$depth_review_table_title <- shiny::renderText({
+      if (is.null(tadat$raw) || dim(tadat$raw)[1] < 1) {
+        return(NULL)
+      } else {
+        "Depth Data Summary"
+      }
+    })
+    
+    shiny::observeEvent(input$reviewDepthData, {
+      shinybusy::show_modal_spinner(
+        spin = "double-bounce",
+        color = "#0071bc",
+        text = "Reviewing Depth Data...",
+        session = shiny::getDefaultReactiveDomain()
+      )
+      tryCatch({
+        # tadat$raw <- applyFlags(tadat$raw, tadat$orgs)
+        depth_review <- EPATADA::TADA_FlagDepthCategory(tadat$raw, 
+                                    bycategory = "no", # require no in shiny?
+                                    bottomvalue = 2, # include option for user input in shiny
+                                    surfacevalue = 2, # include option for user input in shiny
+                                    dailyagg = "none", # include option for user input in shiny, be aware if user chooses to calculate "avg", "min", or "max" this will increase the number of rows in the dataset
+                                    clean = FALSE) # require FALSE in shiny?
+        
+        # SECOND
+# ID location/date/characteristic combinations in the data set that can be used for depth profile plots or analysis
+ # This output will be used to generate options for the plot below
+        depth_summary <- EPATADA::TADA_IDDepthProfiles(depth_review, 
+                                  nresults = TRUE, 
+                                  nvalue = 2, # include option for user input in shiny 
+                                  aggregates = FALSE)
+        
+        browser()
+        characteristic_groups <- as.data.frame(unique(depth_summary$TADA.MonitoringLocationIdentifier))
+        monitoring_location_df <- characteristic_groups %>%
+          dplyr::distinct("unique(depth_summary$TADA.MonitoringLocationIdentifier)", .keep_all = TRUE) %>% 
+          dplyr::rename("Monitoring Location Identifier" = "unique(depth_summary$TADA.MonitoringLocationIdentifier)")
+        output$depth_review <- DT::renderDT(
+      # {
+      #   vals <- filter_values()
+      #   data.frame(Value = vals$Value_label, Count = vals$Count, stringsAsFactors = FALSE)
+      # },
+          monitoring_location_df,
+          escape = FALSE,
+          selection = "multiple",
+          rownames = FALSE,
+          options = list(
+            dom = "tp",
+            ordering = TRUE,
+            paging = TRUE,
+            pageLength = 20,
+            lengthMenu = list(c(10, 25, 50, -1), c('10', '25', '50', 'All'))
+          ),
+          server = TRUE
+        )
+        # depth_review <- review_depth_data(tadat$raw)
+        # shiny::showModal(shiny::modalDialog(
+        #   title = "Depth Data Review",
+        #   shiny::renderTable(depth_review),
+        #   easyClose = FALSE
+        # ))
+      }, error = function(e) {
+        shiny::showModal(shiny::modalDialog(
+          title = "Error Reviewing Depth Data",
+          HTML(paste0("An error occurred while reviewing depth data: <br><br><pre>", e$message, "</pre>")),
+          easyClose = FALSE
+        ))
+      })
+      
+      
+      shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+    })
+    
+    
+    # grouping columns widget that depends upon names reactive object
+    output$groupingcols <- shiny::renderUI({ # this is the companion to the uiOutput call in the UI of the app.
+      shiny::req(react$names) # only shows up when the react$names object is available, with the data's original column names
+      # TIP: You can restrict choices to known "safe" columns for grouping (e.g., avoid free-text fields) via a filter here.
+      shiny::selectInput(ns("groupingcols"), "Select grouping columns", choices = react$names, selected = "TADA.ComparableDataIdentifier", multiple = TRUE, width = "100%")
+    })
+
+    # grouping columns GO button
+    output$groupinggo <- shiny::renderUI({ # this is the companion to the uiOutput call in the UI of the app.
+      shiny::req(react$names)
+      shiny::actionButton(ns("groupinggo"), "Generate Groups", shiny::icon("wand-sparkles"),
+        style = "color: #fff; background-color: #337ab7; border-color: #2e6da4; margin-top:30px"
+      ) # button shows up when react$dat exists
+      # NOTE: Consider disabling the button until at least one column is selected.
+    })
+
+    # event observer that watches grouping columns GO button and carries out unite function to get unique groups from grouping columns
+    shiny::observeEvent(input$groupinggo, { # this event observer carries out its functions whenever the groupinggo button is pushed.
+      # this line adds a new column to the dataset of concatenated values of all of the columns selected by the user in the drop down above.
+      depthcols <- names(tadat$raw)[grepl("DepthHeightMeasure", names(tadat$raw))]
+      depthcols <- depthcols[grepl("TADA.", depthcols)]
+      # This must include all columns needed for plots, include those only needed for the hover features
+      selcols <- c(
+        "TADA.ComparableDataIdentifier",
+        "OrganizationFormalName",
+        "ResultIdentifier",
+        "groupname",
+        "MonitoringLocationIdentifier",
+        "MonitoringLocationName",
+        "MonitoringLocationTypeName",
+        "TADA.LatitudeMeasure",
+        "TADA.LongitudeMeasure",
+        "TADA.ResultMeasureValue",
+        "TADA.ResultMeasure.MeasureUnitCode",
+        "ActivityRelativeDepthName",
+        "ActivityStartDate",
+        "ActivityStartDateTime",
+        "TADA.ActivityMediaName",
+        "ActivityMediaSubdivisionName",
+        "TADA.ResultSampleFractionText",
+        "TADA.MethodSpeciationName",
+        "TADA.CharacteristicName",
+        depthcols
+      )
+
+      # NOTE: Filter out removals and missing result values; adjust if you want to include censored data.
+      react$dat <- tadat$raw %>%
+        dplyr::filter(TADA.Remove == FALSE, !is.na(TADA.ResultMeasureValue)) %>%
+        tidyr::unite("group", input$groupingcols, sep = "_", remove = FALSE) %>%
+        dplyr::mutate(groupname = gsub("_NA", "", group)) %>%
+        dplyr::mutate(groupname = gsub("_", " ", groupname)) %>%
+        dplyr::select(selcols)
+
+      # need all the columns for Stats table
+      react$full_data <- tadat$raw %>%
+        dplyr::filter(TADA.Remove == FALSE, !is.na(TADA.ResultMeasureValue)) %>%
+        tidyr::unite("group", input$groupingcols, sep = "_", remove = FALSE) %>%
+        dplyr::mutate(groupname = gsub("_NA", "", group)) %>%
+        dplyr::mutate(groupname = gsub("_", " ", groupname))
+      # TIP: If stats should consider censored values, refactor here to include flags and apply appropriate methods.
+    })
+
+    # select 1-2 unique groups drop down menu AND button to display on map and plots
+    output$mapplotgroup <- shiny::renderUI({ # this companion to the uiOutput in the UI appears when react$done exists
+      # req(react$done)
+      # this line gets all the unique concatenated group values from react$dat
+      if ("groupname" %in% names(react$dat)) {
+        choices <- unique(react$dat$groupname)
+        shiny::fluidRow(
+          htmltools::h3("2. Pick Groups to Map and Plot"),
+          htmltools::HTML("Use the drop down to pick the characteristic group(s) (max of 2) you'd like to map/plot and then click 'Generate Map'. If you have <B>one</B> group selected, the map will display site markers with radii that reflect the mean result measure value at each site: larger site markers correspond to higher mean result measure values. If you have <B>two</B> results selected, the map will display which sites have data for one or both of the selected groups."),
+          htmltools::br(),
+          htmltools::br(), # the object choices, created above, is used as the vector of choices in this final select input
+          column(
+            6, # column containing drop down menu for all grouping column combinations
+            shiny::selectizeInput(ns("mapplotgroup"), "Select up to TWO groups", choices = NULL, multiple = TRUE, options = list(maxItems = 2), width = "100%")
+          ),
+          column(
+            1,
+            shiny::actionButton(ns("mapplotgroupgo"), "Generate Map", shiny::icon("wand-sparkles"),
+              style = "color: #fff; background-color: #337ab7; border-color: #2e6da4; margin-top:30px"
+            )
+          )
+        ) # the object choices, created above, is used as the vector of choices in this final select input
+        # TIP: You can preselect sensible defaults (e.g., most frequent groups) by updating the selectizeInput on the server.
+      }
+    })
+
+    shiny::observe({
+      shiny::req(react$dat)
+      # NOTE: Update group choices server-side for performance and correctness with large datasets.
+      shiny::updateSelectizeInput(session,
+        "mapplotgroup",
+        choices = unique(react$dat$groupname),
+        selected = unique(react$dat$groupname)[1],
+        server = TRUE
+      )
+    })
+
+    # event observer that creates all reactive objects needed for map and plots following button push
+    shiny::observeEvent(input$mapplotgroupgo, {
+      react$groups <- input$mapplotgroup
+      # Guard against empty or missing groups before indexing react$groups[1]
+      if (length(react$groups) == 0) {
+        shiny::showNotification("Please select at least one group.", type = "warning")
+        return(NULL)
+      }
+      # NOTE: Subset using selected groups; consider validating that selected groups exist in react$dat.
+      groupdata <- subset(react$dat, react$dat$groupname %in% c(react$groups))
+      react$plotdataset <- groupdata
+      # Use na.rm = TRUE in mean to avoid NA means if there are missing values, and use dplyr::n() for counts
+      react$mapdata <- groupdata %>%
+        dplyr::group_by(
+          OrganizationFormalName, MonitoringLocationIdentifier, MonitoringLocationName,
+          MonitoringLocationTypeName, TADA.LatitudeMeasure, TADA.LongitudeMeasure
+        ) %>%
+        dplyr::summarise(
+          Ncount = dplyr::n(),
+          MeanV = mean(TADA.ResultMeasureValue, na.rm = TRUE),
+          GroupID = paste0(unique(sort(groupname)), collapse = ";"),
+          DateRange = paste0(
+            min(lubridate::year(as.Date(ActivityStartDate, "%Y-%m-%d")), na.rm = TRUE),
+            " - ",
+            max(lubridate::year(as.Date(ActivityStartDate, "%Y-%m-%d")), na.rm = TRUE)
+          ),
+          .groups = "drop"
+        )
+      # TIP: If you need weighted means (e.g., by sample count or QA flags), adjust the summarise accordingly.
+    })
+
+    # taken from this stackoverflow: https://stackoverflow.com/questions/58505589/circles-in-legend-for-leaflet-map-with-addcirclemarkers-in-r-without-shiny
+    addLegendCustom <- function(map, colors, labels, sizes, opacity = 0.5, title = NULL) {
+      colorAdditions <- base::paste0(colors, "; border-radius: 50%; width:", sizes, "px; height:", sizes, "px")
+      labelAdditions <- base::paste0("<div style='display: inline-block;height: ", sizes, "px;margin-top: 4px;line-height: ", sizes, "px;'>", labels, "</div>")
+
+      return(leaflet::addLegend(map, colors = colorAdditions, labels = labelAdditions, opacity = opacity, title = title))
+      # NOTE: This creates a legend with circular markers whose diameter matches the plotted radii.
+    }
+
+    # leaflet map, which is dependent upon above event observer's output reactive object (react$mapdata)
+    output$sites_map <- leaflet::renderLeaflet({
+      shiny::req(react$mapdata)
+
+      # prep for the radius of the points to correspond to the number of measurements and the legend to match
+      # Quantile/median computations should be guarded against zero-length vectors
+      if (nrow(react$mapdata) > 0) {
+        react$mapdata$radius <- scales::rescale(react$mapdata$Ncount, c(5, 35))
+        leg_labs <- c(
+          signif(stats::quantile(react$mapdata$Ncount, 0.10, na.rm = TRUE), 3),
+          signif(stats::median(react$mapdata$Ncount), 3),
+          signif(stats::quantile(react$mapdata$Ncount, 0.90, na.rm = TRUE), 3)
+        )
+        leg_sizes <- c(
+          stats::quantile(react$mapdata$radius, 0.10, na.rm = TRUE),
+          stats::median(react$mapdata$radius, na.rm = TRUE),
+          stats::quantile(react$mapdata$radius, 0.90, na.rm = TRUE)
+        ) * 2
+      } else {
+        react$mapdata$radius <- numeric(0)
+        leg_labs <- character(0)
+        leg_sizes <- numeric(0)
+      }
+
+      # Fit map bounds only if you have valid coordinates; otherwise, leaflet::fitBounds can error if min/max are NA.
+      coords_ok <- all(is.finite(range(react$mapdata$TADA.LongitudeMeasure))) &&
+        all(is.finite(range(react$mapdata$TADA.LatitudeMeasure)))
+      map <- leaflet::leaflet() %>%
+        leaflet::addProviderTiles("Esri.WorldTopoMap",
+          group = "World topo",
+          options = leaflet::providerTileOptions(updateWhenZooming = FALSE, updateWhenIdle = TRUE)
+        ) %>%
+        leaflet::clearMarkers()
+
+      if (coords_ok) {
+        map <- map %>%
+          leaflet::fitBounds(
+            lng1 = min(react$mapdata$TADA.LongitudeMeasure),
+            lat1 = min(react$mapdata$TADA.LatitudeMeasure),
+            lng2 = max(react$mapdata$TADA.LongitudeMeasure),
+            lat2 = max(react$mapdata$TADA.LatitudeMeasure)
+          )
+      }
+      # TIP: If you expect out-of-range coordinates (e.g., 999), filter or coerce before fitBounds.
+
+      # if there's one group, show a map with markers whose color saturation corresponds to mean values at each site: darker = higher
+      if (length(react$groups) < 2) {
+        pal <- leaflet::colorNumeric(
+          palette = "Blues",
+          domain = react$mapdata$MeanV
+        )
+        map %>%
+          leaflet::addCircleMarkers(
+            data = react$mapdata, lng = ~TADA.LongitudeMeasure, lat = ~TADA.LatitudeMeasure, color = "black", fillColor = ~ pal(react$mapdata$MeanV), fillOpacity = 0.7, stroke = TRUE, weight = 1.5,
+            radius = ~radius,
+            popup = base::paste0(
+              "Organization: ", react$mapdata$OrganizationFormalName,
+              "<br> Site Name: ", react$mapdata$MonitoringLocationName,
+              "<br> Site ID: ", react$mapdata$MonitoringLocationIdentifier,
+              "<br> Site Type: ", react$mapdata$MonitoringLocationTypeName,
+              "<br> Group: ", react$mapdata$GroupID,
+              "<br> Date Range: ", react$mapdata$DateRange,
+              "<br> Mean Measurement Value: ", react$mapdata$MeanV,
+              "<br> Measurement Count: ", react$mapdata$Ncount
+            )
+          ) %>%
+          leaflet::addLegend("bottomright",
+            pal = pal, values = react$mapdata$MeanV,
+            title = "Mean Result Value",
+            opacity = 1
+          ) %>%
+          addLegendCustom(colors = "black", labels = leg_labs, sizes = leg_sizes, title = "Measurement Count")
+      } else { # if there's two groups, show which sites have which groups, plus the ones that have BOTH groups, shown by different colors
+        pal <- leaflet::colorFactor("Set2", unique(react$mapdata$GroupID))
+        map %>%
+          leaflet::addCircleMarkers(
+            data = react$mapdata, lng = ~TADA.LongitudeMeasure, lat = ~TADA.LatitudeMeasure, color = "black", fillColor = ~ pal(GroupID), fillOpacity = 0.7, stroke = TRUE, weight = 1.5,
+            radius = ~radius,
+            popup = base::paste0(
+              "Organization: ", react$mapdata$OrganizationFormalName,
+              "<br> Site Name: ", react$mapdata$MonitoringLocationName,
+              "<br> Site ID: ", react$mapdata$MonitoringLocationIdentifier,
+              "<br> Site Type: ", react$mapdata$MonitoringLocationTypeName,
+              "<br> Group(s): ", react$mapdata$GroupID,
+              "<br> Date Range: ", react$mapdata$DateRange,
+              "<br> Measurement Count: ", react$mapdata$Ncount
+            )
+          ) %>%
+          leaflet::addLegend("bottomright",
+            pal = pal, values = react$mapdata$GroupID,
+            title = "Data Groups",
+            opacity = 1
+          ) %>%
+          addLegendCustom(colors = "black", labels = leg_labs, sizes = leg_sizes, title = "Measurement Count")
+      }
+      # TIP: For many points, consider cluster options or heatmaps to improve performance.
+    })
+
+    # select sites whose data to display in plots
+    output$selsites <- shiny::renderUI({ # this companion to the uiOutput in the UI appears when react$done exists
+      shiny::req(react$mapdata)
+
+      # the list of 'sites' is managed in the server function (below)
+      shiny::fluidRow(
+        htmltools::h3("3. Select Specific Sites (Optional)"),
+        htmltools::HTML(base::paste0("Use the drop down to pick the sites you'd like to include
+                               in the plots below and then click 'Generate Plots'.
+                               Defaults to all sites in the dataset.
+                               <B>NOTE:</B> Currently, the single-characteristic scatterplot,
+                               histogram, and boxplot show the first characteristic from the
+                               drop down above the map: <B>", react$groups[1], "</B>.")),
+        htmltools::br(),
+        column(
+          6, # column containing drop down menu for all grouping column combinations
+          shiny::selectizeInput(ns("selsites1"),
+            "Select sites",
+            choices = NULL,
+            multiple = TRUE,
+            width = "100%"
+          )
+        ),
+        column(
+          1,
+          shiny::actionButton(ns("selsitesgo"), "Generate Plots", shiny::icon("wand-sparkles"),
+            style = "color: #fff; background-color: #337ab7; border-color: #2e6da4; margin-top:30px"
+          )
+        )
+      )
+      # TIP: Consider adding helper text for "All sites" behavior and multi-select keyboard usage.
+    })
+
+    # this is 'server-side' processing of the options for the 'Select Specific Sites' widget
+    shiny::observe({
+      shiny::req(react$mapdata)
+      shiny::updateSelectizeInput(session,
+        "selsites1",
+        choices = c("All sites", unique(react$mapdata$MonitoringLocationIdentifier)),
+        selected = c("All sites", unique(react$mapdata$MonitoringLocationIdentifier))[1],
+        server = TRUE
+      )
+      # NOTE: Keeping choices server-side avoids rendering overhead for large site lists.
+    })
+
+    # when the Go button is pushed to generate plots, this ensures the plot data is filtered to the selected sites (or all sites)
+    shiny::observeEvent(input$selsitesgo, {
+      if (all(input$selsites1 == "All sites")) {
+        react$plotdata <- react$plotdataset
+      } else {
+        plotdata <- react$plotdataset %>% dplyr::filter(MonitoringLocationIdentifier %in% input$selsites1)
+        if (!react$groups[1] %in% plotdata$groupname) {
+          shiny::showModal(shiny::modalDialog(
+            title = "Whoops!",
+            base::paste0("You selected a site/sites where ", react$groups[1], " was not sampled. Please use the legend in the map above to select site(s) where ", react$groups[1], "was sampled.")
+          ))
+          # TIP: Consider programmatically selecting valid sites that contain the chosen group to guide the user.
+        } else {
+          react$plotdata <- plotdata
+        }
+      }
+    })
+
+    # benchmark widgets
+    output$benchmarks <- shiny::renderUI({
+      shiny::req(react$plotdata)
+      shiny::fluidRow(
+        column(3, shiny::numericInput(ns("benchmark1"), "Benchmark 1", value = 0)),
+        column(3, shiny::numericInput(ns("benchmark2"), "Benchmark 2", value = 0))
+      )
+      # TIP: Add units or labels for benchmarks to match the characteristic units.
+    })
+
+    # 2025-11-20 initial place to start inserting table of STATS
+    output$tada_stats_table <- shiny::renderUI({
+      shiny::req(react$plotdata)
+
+      success <- FALSE # Flag to track if the process completes successfully
+
+      tryCatch(
+        {
+          # Temporarily treat warnings as errors; withr will auto-restore
+          withr::local_options(list(warn = 2))
+
+          # Get the data summary
+          selected_groups <- input$mapplotgroup
+          # NOTE: selected_groups is available if you need to focus stats on the UI selection; here, stats use react$groups.
+
+          groupdata <- subset(
+            react$full_data,
+            react$full_data$groupname %in% c(react$groups)
+          )
+
+          # NOTE: If groupdata can be large, consider pre-aggregating or paging the results.
+          tada_stats_data <- EPATADA::TADA_Stats(groupdata)
+
+          # NOTE: Select expected columns in order; gracefully handle missing columns.
+          react$tada_stats_data <-
+            tada_stats_data[, names(tada_stats_data) %in% c(
+              "TADA.ComparableDataIdentifier",
+              "Non_Detect_Pct",
+              "Min",
+              "Mean",
+              "Max",
+              "Percentile_5th",
+              "Percentile_10th",
+              "Percentile_15th",
+              "Percentile_25th",
+              "Percentile_50th_Median",
+              "Percentile_75th",
+              "Percentile_85th",
+              "Percentile_95th",
+              "Percentile_98th"
+            )]
+
+          success <- TRUE
+        },
+        error = function(e) {
+          # Log error details for debugging
+          cat("Error: ", e$message, "\n")
+
+          # Show error notification to the user
+          shiny::showNotification(
+            ui = tagList(
+              htmltools::h4(htmltools::strong("WQP Error")),
+              htmltools::hr(style = "margin-top: 5px; margin-bottom: 5px;"),
+              paste(e$message),
+              paste("An error occurred while generating stats. Check your filter values and try again.")
+            ),
+            type = "error",
+            duration = NULL,
+            id = "uploadError"
+          )
+        }
+      )
+
+      if (!isTRUE(success)) {
+        return(NULL)
+      }
+
+      # Return the datatable widget (renderUI should return UI/htmlwidgets, not renderDT)
+      dt_tada_stats_table <- react$tada_stats_data
+      # NOTE: Pretty column labels for readability; adjust to match final nomenclature.
+      colnames(dt_tada_stats_table) <- c(
+        "TADA.ComparableDataIdentifier",
+        "Non-Detect %",
+        "Min",
+        "Mean",
+        "Max",
+        "P5",
+        "P10",
+        "P15",
+        "P25",
+        "P50",
+        "P75",
+        "P85",
+        "P95",
+        "P98"
+      )
+
+      DT::datatable(
+        dt_tada_stats_table,
+        extensions = "Buttons",
+        caption = "Summary Statistics",
+        options = list(
+          dom = "lftiB",
+          scrollX = TRUE,
+          pageLength = 10,
+          searching = FALSE,
+          paging = FALSE,
+          buttons = c("csv")
+        ),
+        selection = "none",
+        rownames = FALSE
+      )
+      # TIP: If you want client-side filters, set searching = TRUE and enable column filters in extensions.
+    })
+
+    # for plotting benchmarks
+    hline <- function(y = 0, color = "black") {
+      list(
+        type = "line",
+        x0 = 0,
+        x1 = 1,
+        xref = "paper",
+        y0 = y,
+        y1 = y,
+        line = list(color = color)
+      )
+      # NOTE: Horizontal reference lines used for benchmark visualization.
+    }
+
+    # plotly scatter plot
+    output$scatter <- plotly::renderPlotly({
+      shiny::req(react$plotdata)
+      suppressWarnings(EPATADA::TADA_Scatterplot(subset(react$plotdata, react$plotdata$groupname == react$groups[1]), id_cols = "groupname")) %>%
+        plotly::layout(shapes = list(
+          hline(y = input$benchmark1, color = "red"),
+          hline(y = input$benchmark2, color = "orange")
+        ))
+      # TIP: Consider log scales for characteristics with wide ranges via plotly::layout(yaxis = list(type = "log")).
+    })
+
+    # plotly boxplot
+    output$boxplot <- plotly::renderPlotly({
+      shiny::req(react$plotdata)
+      suppressWarnings(EPATADA::TADA_Boxplot(subset(react$plotdata, react$plotdata$groupname == react$groups[1]), id_cols = "groupname"))
+      # NOTE: Boxplots summarize distribution efficiently; ensure consistent units across groups.
+    })
+
+    # plotly histogram
+    output$histogram <- plotly::renderPlotly({
+      shiny::req(react$plotdata)
+      suppressWarnings(EPATADA::TADA_Histogram(subset(react$plotdata, react$plotdata$groupname == react$groups[1]), id_cols = "groupname"))
+      # TIP: Consider binning strategy (fixed vs. Freedman–Diaconis) for consistent comparisons.
+    })
+
+    # dynamically show/hide two-char scatter
+    shiny::observe({
+      shiny::req(react$plotdata)
+      if (length(react$groups) > 1) {
+        shinyjs::enable(selector = '.nav li a[data-value="Two-Characteristic Scatterplot"]')
+      } else {
+        shinyjs::disable(selector = '.nav li a[data-value="Two-Characteristic Scatterplot"]')
+      }
+      # NOTE: This prevents users from accessing the two-characteristic tab when only a single group is present.
+    })
+
+    # plotly two-characteristic scatter plot
+    output$scatter2 <- plotly::renderPlotly({
+      shiny::req(react$plotdata)
+      if (length(unique(react$plotdata$groupname)) > 1) {
+        suppressWarnings(EPATADA::TADA_TwoCharacteristicScatterplot
+        (react$plotdata,
+          id_cols = "groupname",
+          groups = unique(react$plotdata$groupname)
+        ))
+      }
+      # TIP: Add marginal distributions or color-coded density for deeper visual comparison.
+    })
+  })
+}
+
+## To be copied in the UI
+# mod_depth_ui("depth_1")
+
+## To be copied in the server
+# mod_depth_server("depth_1")
