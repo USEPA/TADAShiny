@@ -25,3 +25,4 @@ _snaps
 .Ruserdata
 .vscode/
 packrat/lib*/
+/dev/depth/archive

@@ -17,72 +17,110 @@ mod_depth_ui <- function(id) {
     htmltools::div(style = "margin-bottom:10px"),
     shiny::fluidRow(column(
       3,
-      shiny::actionButton(ns("reviewDepthData"),
+      shiny::actionButton(ns("review_depth_profile_data"),
         "Review Depth Data",
         style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
       )
     )),
-    # Table title
-    tags$div(
-      id = "table_class",
-      htmltools::h3(shiny::textOutput(ns("depth_review_table_title"))),
-      DT::DTOutput(ns("depth_review"))
-    ),
-    # NOTE: Users first decide which columns will define "groups" for analysis and visualization.
-    # TIP: Defaulting to TADA.ComparableDataIdentifier keeps groups aligned with comparable data logic.
-    htmltools::h3("1. Determine Characteristic Groups of Interest"),
-    htmltools::HTML("First, pick the columns you'd like to use to group your data. You can stick with 'TADA.ComparableDataIdentifier' (where each group of data represents one unique characteristic-unit-fraction-speciation combination), or you can add other columns that will help you divide and review your data most effectively. For example, you may also want to divide up your data based on monitoring location type, or hydrologic condition. Once you've decided on your grouping columns, click 'Generate Groups' below to group data. It is <B>optional</B> to add more grouping columns."),
-    htmltools::br(),
-    htmltools::br(),
-    shiny::fluidRow(
-      column(
-        10, # column containing drop down and button to select grouping columns
-        # NOTE: Using uiOutput so the choices can be updated dynamically after data load.
-        shiny::uiOutput(ns("groupingcols"))
-      ),
-      column(
-        2, # uiOutput is used when the widget depends upon something the user does/reactivity in the app
-        # NOTE: "Generate Groups" appears only when the names are available in react.
-        shiny::uiOutput(ns("groupinggo"))
+    tags$hr(),
+
+    shiny::conditionalPanel(
+      condition = paste0("output['", ns("no_depth_profile_data"), "'] == true"),
+      # Show only the loading message when data is not loaded
+      shiny::div(style = "margin-top:20px; color: #666;font-size: large;font-weight: bolder;",
+          "After retrieval and data cleaning, there are no usable water quality records with data collected in a Depth Profile."
       )
     ),
-    # this part contains the grouping field and button that show up after the groups have been established
-    shiny::uiOutput(ns("mapplotgroup")),
-    # map
-    shiny::fluidRow(column(12, shinycssloaders::withSpinner(leaflet::leafletOutput(ns("sites_map"), height = "500px")))),
-    htmltools::br(),
-    htmltools::br(),
-    # site selection field and button
-    shiny::uiOutput(ns("selsites")),
-    htmltools::br(),
-    # tabs with plots in them
-    shiny::tabsetPanel(
-      shiny::tabPanel(
-        "Single Characteristic Figures",
-        htmltools::br(),
-        # NOTE: The stats table is built via renderUI to return a DT widget directly.
-        shiny::uiOutput(ns("tada_stats_table")),
-        htmltools::br(),
-        htmltools::HTML("Benchmark values appear as horizontal lines on the single-characteristic scatterplot figure, below. Benchmarks may reflect established or proposed water quality criteria, important physical/chemical/biological thresholds, or any other values relevant to your use case."),
-        htmltools::br(),
-        # NOTE: Simple two-benchmark inputs; expand to more if needed (via dynamic UI).
-        shiny::uiOutput(ns("benchmarks")),
-        htmltools::br(),
-        shiny::fluidRow(DT::DTOutput(ns("explore_sumtable")), width = 600),
-        htmltools::br(),
-        shiny::fluidRow(plotly::plotlyOutput(ns("scatter"))),
-        htmltools::br(),
-        shiny::fluidRow(plotly::plotlyOutput(ns("histogram"))),
-        htmltools::br(),
-        shiny::fluidRow(plotly::plotlyOutput(ns("boxplot")))
-      ),
-      shiny::tabPanel(
-        "Two-Characteristic Scatterplot",
-        shiny::fluidRow(plotly::plotlyOutput(ns("scatter2")))
-      )
+     # Show the rest of the UI only after data is loaded
+    shiny::conditionalPanel(
+        condition = paste0("output['", ns("depth_profile_loaded"), "'] == true"), # output.depth_profile_loaded == true",
+        # Instruction text
+        shiny::div(style = "margin-bottom:8px; color: #666;font-size: large;font-weight: bolder;",
+            "The map shows all the sites that have data collected in a Depth profile.
+            After loading: choose a Site ID, then choose a Visit Date.
+            Then pick up to 3 characteristics and click 'Update plot'."
+        ),
+        # map
+        shiny::fluidRow(
+          column(12,
+                 shinycssloaders::withSpinner(leaflet::leafletOutput(
+                                                ns("depth_profile_sites_map"),
+                                                height = "500px")
+                                              )
+                 )
+        ),
+        # Site and date selects (same row)
+        shiny::fluidRow(class = "control-row", style="width: 50%; padding-top: 10px;",
+          column(8,
+                 shiny::div(style = "display:flex; flex-direction:column; ",
+                     tags$label("Site ID", `for` = "depth_profile_site_id"),
+                     shiny::selectInput(ns("depth_profile_site_id"), NULL, choices = NULL, width = "100%")
+                 )
+          ),
+          column(4,
+                 shiny::div(style = "display:flex; flex-direction:column;",
+                     tags$label("Visit date", `for` = "activity_date"),
+                     shiny::selectInput(ns("activity_date"), NULL, choices = NULL, width = "100%")
+                 )
+          )
+        ),
+
+        shiny::br(),
+
+        # Available characteristics table
+        shiny::fluidRow(class = "control-row",
+          column(12, DT::DTOutput(ns("available_characteristics")))
+        ),
+
+        tags$hr(),
+
+        # Options row: depthcat, surfacevalue, bottomvalue
+        shiny::fluidRow(class = "control-row", style="width: 30%;",
+          column(4,
+                 shiny::div(style = "display:flex; flex-direction:column;",
+                     tags$label("Depth category"),
+                     shiny::checkboxInput(ns("depthcat"), NULL, value = TRUE)
+                 )
+          ),
+          column(4,
+                 shiny::div(style = "display:flex; flex-direction:column;",
+                     tags$label("Surface (depth below surface)"),
+                     shiny::numericInput(ns("surfacevalue"), NULL, value = 2, min = 0, width = "100%")
+                 )
+          ),
+          column(4,
+                 shiny::div(style = "display:flex; flex-direction:column;",
+                     tags$label("Bottom (height above bottom) (m)"),
+                     shiny::numericInput(ns("bottomvalue"), NULL, value = 2, min = 0, width = "100%")
+                 )
+          )
+        ),
+
+        # Update button full-width
+        shiny::fluidRow(class = "control-row",
+          column(12, shiny::actionButton(ns("update"),
+                                  "Update plot",
+                                  icon = shiny::icon("chart-area"), class = "btn btn-primary", style = "width:10%; padding-top: 10px;"))
+        ),
+          # Middle: the plot (map) — use viewport height so it fills much of the window
+        shiny::fluidRow(
+          column(width = 12,
+                 # 70vh => 70% of viewport height; adjust to taste
+                 plotly::plotlyOutput(ns("depthPlotly"), height = "70vh")
+          )
+        ),
+      
+        # Bottom: debug information occupying full width
+        shiny::fluidRow(
+          column(width = 12,
+                 tags$hr(),
+                 shiny::verbatimTextOutput(ns("debug_text"))
+          )
+        )
     )
   )
-}
+}    
+
 
 #' depth Server Functions
 #'
@@ -91,6 +129,83 @@ mod_depth_server <- function(id, tadat) {
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
+    depth_profile <- shiny::reactiveValues(
+        depth_categorized_df = NULL,
+        site_date_char_groups_df = NULL,
+        site_date_pairs = NULL,
+        available_characteristics_df = NULL,
+        loaded = FALSE,
+        no_data = FALSE
+    )    
+    # Preferred defaults (priority order)
+    preferred_characteristics <- c(
+      "TEMPERATURE, WATER_NA_NA_DEG C",
+      "DISSOLVED OXYGEN (DO)_NA_NA_MG/L",
+      "CONDUCTIVITY_NA_NA_US/CM",
+      "PH_NA_NA_NONE"
+    )    
+    
+    # Helper to split semicolon-separated characteristic lists (robust)
+    split_characteristics <- function(vec) {
+      vec <- na.omit(as.character(vec))
+      if (length(vec) == 0) return(character(0))
+      parts <- unlist(strsplit(vec, ";", fixed = TRUE))
+      parts <- trimws(parts)
+      parts <- parts[parts != ""]
+      sort(unique(parts))
+    }
+    
+    # Normalize tokens: trim and remove trailing " (digits)" only
+    normalize_token <- function(x) {
+      x <- as.character(x)
+      x <- trimws(x)
+      sub(" \\(\\d+\\)$", "", x)
+    }
+    
+    # Normalize tokens: remove _NA_NA_ sequence if needed
+    normalize_NA_token <- function(x) {
+      x <- as.character(x)
+      x <- trimws(x)
+      sub("(_NA_NA_)", " ", x)
+    }
+    
+    # Extract trailing numeric count from token strings like "TOKEN (5)". Returns NA if none.
+    extract_trailing_count <- function(token) {
+      token <- as.character(token)
+      m <- regexec(".*?\\((\\d+)\\)\\s*$", token)
+      r <- regmatches(token, m)
+      if (length(r) == 0 || length(r[[1]]) < 2) return(NA_integer_)
+      val <- as.integer(r[[1]][2])
+      if (is.na(val)) NA_integer_ else val
+    }
+    
+    # Safe message for plot area (plotly)
+    safe_message_plot <- function(msg) {
+      plotly::plot_ly() %>%
+        plotly::layout(
+          title = msg,
+          xaxis = list(visible = FALSE),
+          yaxis = list(visible = FALSE),
+          annotations = list(list(text = msg,
+                                  x = 0.5, xref = "paper", xanchor = "center",
+                                  y = 0.5, yref = "paper", yanchor = "middle",
+                                  showarrow = FALSE, font = list(size = 14)))
+        )
+    }    
+    
+    # this a reactive list created to hold all the reactive objects specific to this module.
+    mapdat <- shiny::reactiveValues()
+  
+    # expose the loaded flag to conditionalPanel in UI to show a UI elements that says there is no depth profile data
+    output$no_depth_profile_data <- shiny::reactive({ isTRUE(depth_profile$no_data) })
+    # ensure the output is not suspended when hidden, so UI sees the change
+    shiny::outputOptions(output, "no_depth_profile_data", suspendWhenHidden = FALSE)
+  
+    # ibid
+    output$depth_profile_loaded <- shiny::reactive({ isTRUE(depth_profile$loaded) })
+    # ibid
+    shiny::outputOptions(output, "depth_profile_loaded", suspendWhenHidden = FALSE)
+  
     react <- shiny::reactiveValues() # create a reactive values object to hold vectors, dataframes, etc. that you want to use throughout the app.
     # NOTE: react is used across multiple UI/observer blocks to share computed datasets and choices.
 
@@ -110,549 +225,559 @@ mod_depth_server <- function(id, tadat) {
       }
     })
     
-    shiny::observeEvent(input$reviewDepthData, {
-      shinybusy::show_modal_spinner(
-        spin = "double-bounce",
-        color = "#0071bc",
-        text = "Reviewing Depth Data...",
-        session = shiny::getDefaultReactiveDomain()
-      )
-      tryCatch({
-        # tadat$raw <- applyFlags(tadat$raw, tadat$orgs)
-        depth_review <- EPATADA::TADA_FlagDepthCategory(tadat$raw, 
-                                    bycategory = "no", # require no in shiny?
-                                    bottomvalue = 2, # include option for user input in shiny
-                                    surfacevalue = 2, # include option for user input in shiny
-                                    dailyagg = "none", # include option for user input in shiny, be aware if user chooses to calculate "avg", "min", or "max" this will increase the number of rows in the dataset
-                                    clean = FALSE) # require FALSE in shiny?
-        
-        # SECOND
-# ID location/date/characteristic combinations in the data set that can be used for depth profile plots or analysis
- # This output will be used to generate options for the plot below
-        depth_summary <- EPATADA::TADA_IDDepthProfiles(depth_review, 
-                                  nresults = TRUE, 
-                                  nvalue = 2, # include option for user input in shiny 
-                                  aggregates = FALSE)
-        
-        browser()
-        characteristic_groups <- as.data.frame(unique(depth_summary$TADA.MonitoringLocationIdentifier))
-        monitoring_location_df <- characteristic_groups %>%
-          dplyr::distinct("unique(depth_summary$TADA.MonitoringLocationIdentifier)", .keep_all = TRUE) %>% 
-          dplyr::rename("Monitoring Location Identifier" = "unique(depth_summary$TADA.MonitoringLocationIdentifier)")
-        output$depth_review <- DT::renderDT(
-      # {
-      #   vals <- filter_values()
-      #   data.frame(Value = vals$Value_label, Count = vals$Count, stringsAsFactors = FALSE)
-      # },
-          monitoring_location_df,
-          escape = FALSE,
-          selection = "multiple",
-          rownames = FALSE,
-          options = list(
-            dom = "tp",
-            ordering = TRUE,
-            paging = TRUE,
-            pageLength = 20,
-            lengthMenu = list(c(10, 25, 50, -1), c('10', '25', '50', 'All'))
-          ),
-          server = TRUE
-        )
-        # depth_review <- review_depth_data(tadat$raw)
-        # shiny::showModal(shiny::modalDialog(
-        #   title = "Depth Data Review",
-        #   shiny::renderTable(depth_review),
-        #   easyClose = FALSE
-        # ))
-      }, error = function(e) {
-        shiny::showModal(shiny::modalDialog(
-          title = "Error Reviewing Depth Data",
-          HTML(paste0("An error occurred while reviewing depth data: <br><br><pre>", e$message, "</pre>")),
-          easyClose = FALSE
-        ))
-      })
-      
-      
-      shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
-    })
+  shiny::observeEvent(input$review_depth_profile_data, {
+    # if TADA.Remove column exists, filter out records where TADA.Remove == TRUE;
+    # if it doesn't exist, keep all records (don't filter)
+    # Ensure required data is present
+    shiny::req(tadat$raw)
+
+    # a modal that pops up showing it's working on loading the data
+    shinybusy::show_modal_spinner(
+      spin = "double-bounce",
+      color = "#0071bc",
+      text = tagList(
+        tags$div(
+          tags$p('Checking for Depth Profile data', tags$br(), input$example_data),
+          style = "text-align:center; padding: 12px;",
+                 tags$p(id = "js_time_display", "00:00:00")
+        ),
+        # Hidden input to hold elapsed seconds for server (JS updates it)
+        tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
+      ),
+      session = shiny::getDefaultReactiveDomain()
+    )    
     
     
-    # grouping columns widget that depends upon names reactive object
-    output$groupingcols <- shiny::renderUI({ # this is the companion to the uiOutput call in the UI of the app.
-      shiny::req(react$names) # only shows up when the react$names object is available, with the data's original column names
-      # TIP: You can restrict choices to known "safe" columns for grouping (e.g., avoid free-text fields) via a filter here.
-      shiny::selectInput(ns("groupingcols"), "Select grouping columns", choices = react$names, selected = "TADA.ComparableDataIdentifier", multiple = TRUE, width = "100%")
-    })
-
-    # grouping columns GO button
-    output$groupinggo <- shiny::renderUI({ # this is the companion to the uiOutput call in the UI of the app.
-      shiny::req(react$names)
-      shiny::actionButton(ns("groupinggo"), "Generate Groups", shiny::icon("wand-sparkles"),
-        style = "color: #fff; background-color: #337ab7; border-color: #2e6da4; margin-top:30px"
-      ) # button shows up when react$dat exists
-      # NOTE: Consider disabling the button until at least one column is selected.
-    })
-
-    # event observer that watches grouping columns GO button and carries out unite function to get unique groups from grouping columns
-    shiny::observeEvent(input$groupinggo, { # this event observer carries out its functions whenever the groupinggo button is pushed.
-      # this line adds a new column to the dataset of concatenated values of all of the columns selected by the user in the drop down above.
-      depthcols <- names(tadat$raw)[grepl("DepthHeightMeasure", names(tadat$raw))]
-      depthcols <- depthcols[grepl("TADA.", depthcols)]
-      # This must include all columns needed for plots, include those only needed for the hover features
-      selcols <- c(
-        "TADA.ComparableDataIdentifier",
-        "OrganizationFormalName",
-        "ResultIdentifier",
-        "groupname",
-        "MonitoringLocationIdentifier",
-        "MonitoringLocationName",
-        "MonitoringLocationTypeName",
-        "TADA.LatitudeMeasure",
-        "TADA.LongitudeMeasure",
-        "TADA.ResultMeasureValue",
-        "TADA.ResultMeasure.MeasureUnitCode",
-        "ActivityRelativeDepthName",
-        "ActivityStartDate",
-        "ActivityStartDateTime",
-        "TADA.ActivityMediaName",
-        "ActivityMediaSubdivisionName",
-        "TADA.ResultSampleFractionText",
-        "TADA.MethodSpeciationName",
-        "TADA.CharacteristicName",
-        depthcols
-      )
-
-      # NOTE: Filter out removals and missing result values; adjust if you want to include censored data.
-      react$dat <- tadat$raw %>%
-        dplyr::filter(TADA.Remove == FALSE, !is.na(TADA.ResultMeasureValue)) %>%
-        tidyr::unite("group", input$groupingcols, sep = "_", remove = FALSE) %>%
-        dplyr::mutate(groupname = gsub("_NA", "", group)) %>%
-        dplyr::mutate(groupname = gsub("_", " ", groupname)) %>%
-        dplyr::select(selcols)
-
-      # need all the columns for Stats table
-      react$full_data <- tadat$raw %>%
-        dplyr::filter(TADA.Remove == FALSE, !is.na(TADA.ResultMeasureValue)) %>%
-        tidyr::unite("group", input$groupingcols, sep = "_", remove = FALSE) %>%
-        dplyr::mutate(groupname = gsub("_NA", "", group)) %>%
-        dplyr::mutate(groupname = gsub("_", " ", groupname))
-      # TIP: If stats should consider censored values, refactor here to include flags and apply appropriate methods.
-    })
-
-    # select 1-2 unique groups drop down menu AND button to display on map and plots
-    output$mapplotgroup <- shiny::renderUI({ # this companion to the uiOutput in the UI appears when react$done exists
-      # req(react$done)
-      # this line gets all the unique concatenated group values from react$dat
-      if ("groupname" %in% names(react$dat)) {
-        choices <- unique(react$dat$groupname)
-        shiny::fluidRow(
-          htmltools::h3("2. Pick Groups to Map and Plot"),
-          htmltools::HTML("Use the drop down to pick the characteristic group(s) (max of 2) you'd like to map/plot and then click 'Generate Map'. If you have <B>one</B> group selected, the map will display site markers with radii that reflect the mean result measure value at each site: larger site markers correspond to higher mean result measure values. If you have <B>two</B> results selected, the map will display which sites have data for one or both of the selected groups."),
-          htmltools::br(),
-          htmltools::br(), # the object choices, created above, is used as the vector of choices in this final select input
-          column(
-            6, # column containing drop down menu for all grouping column combinations
-            shiny::selectizeInput(ns("mapplotgroup"), "Select up to TWO groups", choices = NULL, multiple = TRUE, options = list(maxItems = 2), width = "100%")
-          ),
-          column(
-            1,
-            shiny::actionButton(ns("mapplotgroupgo"), "Generate Map", shiny::icon("wand-sparkles"),
-              style = "color: #fff; background-color: #337ab7; border-color: #2e6da4; margin-top:30px"
-            )
-          )
-        ) # the object choices, created above, is used as the vector of choices in this final select input
-        # TIP: You can preselect sensible defaults (e.g., most frequent groups) by updating the selectizeInput on the server.
+    input_raw_df <- tadat$raw %>%
+      {
+        if("TADA.Remove" %in% names(.)) {
+          dplyr::filter(., TADA.Remove == FALSE)
+        } else {
+          . # Return the original data frame unchanged
+        }
       }
+
+    # shiny::incProgress(0.40, detail = "Flagging depth categories (TADA_FlagDepthCategory)")
+    depth_categorized_df <- tryCatch({
+      EPATADA::TADA_FlagDepthCategory(input_raw_df,
+                                      bycategory = "no",
+                                      bottomvalue = 2, # input$bottomvalue,
+                                      surfacevalue = 2, # input$surfacevalue,
+                                      dailyagg = "none",
+                                      clean = FALSE)
+    }, error = function(e) {
+      shiny::showModal(shiny::modalDialog(title = "Depth categorization error",
+                            paste0("TADA_FlagDepthCategory failed: ", e$message), easyClose = TRUE))
+      depth_profile$no_data <- TRUE
+      return(NULL)
     })
 
-    shiny::observe({
-      shiny::req(react$dat)
-      # NOTE: Update group choices server-side for performance and correctness with large datasets.
-      shiny::updateSelectizeInput(session,
-        "mapplotgroup",
-        choices = unique(react$dat$groupname),
-        selected = unique(react$dat$groupname)[1],
-        server = TRUE
-      )
-    })
+    # filter out records with NA depth category and groups with < 3 records (per TADA_IDDepthProfiles requirements)
+    depth_categorized_df <- depth_categorized_df[!is.na(depth_categorized_df$TADA.ConsolidatedDepth), , drop = FALSE]
+    depth_categorized_df <- depth_categorized_df %>%
+      dplyr::group_by(TADA.ComparableDataIdentifier) %>%
+      dplyr::filter(dplyr::n() >= 3) %>%
+      dplyr::ungroup()
 
-    # event observer that creates all reactive objects needed for map and plots following button push
-    shiny::observeEvent(input$mapplotgroupgo, {
-      react$groups <- input$mapplotgroup
-      # Guard against empty or missing groups before indexing react$groups[1]
-      if (length(react$groups) == 0) {
-        shiny::showNotification("Please select at least one group.", type = "warning")
-        return(NULL)
-      }
-      # NOTE: Subset using selected groups; consider validating that selected groups exist in react$dat.
-      groupdata <- subset(react$dat, react$dat$groupname %in% c(react$groups))
-      react$plotdataset <- groupdata
-      # Use na.rm = TRUE in mean to avoid NA means if there are missing values, and use dplyr::n() for counts
-      react$mapdata <- groupdata %>%
-        dplyr::group_by(
-          OrganizationFormalName, MonitoringLocationIdentifier, MonitoringLocationName,
-          MonitoringLocationTypeName, TADA.LatitudeMeasure, TADA.LongitudeMeasure
-        ) %>%
-        dplyr::summarise(
-          Ncount = dplyr::n(),
-          MeanV = mean(TADA.ResultMeasureValue, na.rm = TRUE),
-          GroupID = paste0(unique(sort(groupname)), collapse = ";"),
-          DateRange = paste0(
-            min(lubridate::year(as.Date(ActivityStartDate, "%Y-%m-%d")), na.rm = TRUE),
-            " - ",
-            max(lubridate::year(as.Date(ActivityStartDate, "%Y-%m-%d")), na.rm = TRUE)
-          ),
-          .groups = "drop"
-        )
-      # TIP: If you need weighted means (e.g., by sample count or QA flags), adjust the summarise accordingly.
-    })
-
-    # taken from this stackoverflow: https://stackoverflow.com/questions/58505589/circles-in-legend-for-leaflet-map-with-addcirclemarkers-in-r-without-shiny
-    addLegendCustom <- function(map, colors, labels, sizes, opacity = 0.5, title = NULL) {
-      colorAdditions <- base::paste0(colors, "; border-radius: 50%; width:", sizes, "px; height:", sizes, "px")
-      labelAdditions <- base::paste0("<div style='display: inline-block;height: ", sizes, "px;margin-top: 4px;line-height: ", sizes, "px;'>", labels, "</div>")
-
-      return(leaflet::addLegend(map, colors = colorAdditions, labels = labelAdditions, opacity = opacity, title = title))
-      # NOTE: This creates a legend with circular markers whose diameter matches the plotted radii.
+    if (is.null(depth_categorized_df) || nrow(depth_categorized_df) == 0) {
+      shiny::showModal(shiny::modalDialog(title = "No usable records", 
+                                          "No usable depth records after cleaning.", 
+                                          easyClose = TRUE)); 
+      depth_profile$no_data <- TRUE
+      return()
     }
 
-    # leaflet map, which is dependent upon above event observer's output reactive object (react$mapdata)
-    output$sites_map <- leaflet::renderLeaflet({
-      shiny::req(react$mapdata)
+    # shiny::incProgress(0.75, detail = "Computing ID combos (TADA_IDDepthProfiles)")
+    site_date_char_groups_df <- tryCatch({
+      EPATADA::TADA_IDDepthProfiles(depth_categorized_df,
+                                    nresults = TRUE,
+                                    nvalue = 2,
+                                    aggregates = FALSE)
+    }, error = function(e) {
+      shiny::showModal(shiny::modalDialog(title = "IDDepthProfiles error", 
+                                          paste0("TADA_IDDepthProfiles failed: ", e$message), easyClose = TRUE)); 
+      depth_profile$no_data <- TRUE      
+      return(NULL)
+    })
+    if (is.null(site_date_char_groups_df) || nrow(site_date_char_groups_df) == 0) {
+      shiny::showModal(shiny::modalDialog(title = "No ID combos", 
+                                          "TADA_IDDepthProfiles returned no rows.", easyClose = TRUE)); 
+      depth_profile$no_data <- TRUE      
+      return()
+    }
+    depth_profile$site_date_char_groups_df <- site_date_char_groups_df
 
-      # prep for the radius of the points to correspond to the number of measurements and the legend to match
-      # Quantile/median computations should be guarded against zero-length vectors
-      if (nrow(react$mapdata) > 0) {
-        react$mapdata$radius <- scales::rescale(react$mapdata$Ncount, c(5, 35))
-        leg_labs <- c(
-          signif(stats::quantile(react$mapdata$Ncount, 0.10, na.rm = TRUE), 3),
-          signif(stats::median(react$mapdata$Ncount), 3),
-          signif(stats::quantile(react$mapdata$Ncount, 0.90, na.rm = TRUE), 3)
+    # update the depth_categorized_df by removing records that don't
+    # have matching TADA.MonitoringLocationIdentifier and ActivityStartDate in site_date_char_groups_df,
+    # because those records won't be used in the plot and this way we avoid confusion
+    # of showing sites/dates in the map that can't be plotted.
+
+    # NOTE: this is driving me crazy.  Something isn't right and I can't understand it.
+    depth_categorized_filtered_df <- depth_categorized_df %>%
+      dplyr::inner_join(
+        site_date_char_groups_df %>%
+          dplyr::select(OrganizationIdentifier, TADA.MonitoringLocationIdentifier, ActivityStartDate) %>%
+          dplyr::distinct(),
+        by = c("OrganizationIdentifier", "TADA.MonitoringLocationIdentifier", "ActivityStartDate")
+      )
+
+
+    # this is when the map get populated
+    # depth_profile$depth_categorized_df <- depth_categorized_df
+
+    # trying this first
+    depth_profile$depth_categorized_df <- depth_categorized_filtered_df
+
+    # shiny::incProgress(0.95, detail = "Extracting unique (site, date) pairs")
+
+    # find columns robustly
+    loc_col  <- "TADA.MonitoringLocationIdentifier"
+    date_col <- "ActivityStartDate"
+
+    pairs_df <- data.frame(
+      MonitoringLocationIdentifier =
+        if (!is.na(loc_col)) as.character(site_date_char_groups_df[[loc_col]]) else NA_character_,
+      ActivityStartDate =
+        if (!is.na(date_col)) as.character(site_date_char_groups_df[[date_col]]) else NA_character_,
+      stringsAsFactors = FALSE
+    )
+    pairs_df <- unique(pairs_df)
+    suppressWarnings({ dt_parsed <- as.Date(pairs_df$ActivityStartDate) })
+    if (!all(is.na(dt_parsed))) {
+      pairs_df <- pairs_df[order(dt_parsed, decreasing = TRUE, na.last = TRUE), , drop = FALSE]
+    }
+
+    depth_profile$site_date_pairs <- pairs_df
+    depth_profile$available_characteristics_df <- data.frame(Characteristic = character(0), stringsAsFactors = FALSE)
+    
+    depth_profile$loaded <- TRUE
+    depth_profile$no_data <- FALSE
+    
+    # Populate the site and date selectInputs
+    found_site_id_choices <- if (!is.null(pairs_df) && nrow(pairs_df) > 0) sort(unique(as.character(pairs_df$MonitoringLocationIdentifier))) else character(0)
+    all_dates <- if (!is.null(pairs_df) && nrow(pairs_df) > 0) sort(unique(as.character(pairs_df$ActivityStartDate))) else character(0)
+
+    shiny::updateSelectInput(session, "depth_profile_site_id",
+                      choices = found_site_id_choices,
+                      selected = if (length(found_site_id_choices) > 0) found_site_id_choices[1] else NA)
+    shiny::updateSelectInput(session, "activity_date",
+                      choices = all_dates,
+                      selected = if (length(all_dates) > 0) all_dates[1] else NA)
+
+    # shiny::incProgress(1, detail = "Done")
+    shinybusy::remove_modal_spinner()
+
+  }) # end shiny::observeEvent(input$review_depth_profile_data, { ... })
+
+
+      # the leaflet map - shows all sites in the loaded data, with popups of site ID and number of records (if CompID available)
+    output$depth_profile_sites_map <- leaflet::renderLeaflet({
+      shiny::req(mapdat$text)
+      EPATADA::TADA_OverviewMap(depth_profile$depth_categorized_df)
+    })
+
+    # create dataset for map and histogram using raw data
+    shiny::observe( {
+      shiny::req(depth_profile$depth_categorized_df)
+      # create gray text tile info
+      mapdat$text <- depth_profile$depth_categorized_df %>%
+        dplyr::select(
+          ResultIdentifier,
+          MonitoringLocationIdentifier,
+          OrganizationFormalName,
+          ActivityStartDate
         )
-        leg_sizes <- c(
-          stats::quantile(react$mapdata$radius, 0.10, na.rm = TRUE),
-          stats::median(react$mapdata$radius, na.rm = TRUE),
-          stats::quantile(react$mapdata$radius, 0.90, na.rm = TRUE)
-        ) * 2
-      } else {
-        react$mapdata$radius <- numeric(0)
-        leg_labs <- character(0)
-        leg_sizes <- numeric(0)
-      }
 
-      # Fit map bounds only if you have valid coordinates; otherwise, leaflet::fitBounds can error if min/max are NA.
-      coords_ok <- all(is.finite(range(react$mapdata$TADA.LongitudeMeasure))) &&
-        all(is.finite(range(react$mapdata$TADA.LatitudeMeasure)))
-      map <- leaflet::leaflet() %>%
-        leaflet::addProviderTiles("Esri.WorldTopoMap",
-          group = "World topo",
-          options = leaflet::providerTileOptions(updateWhenZooming = FALSE, updateWhenIdle = TRUE)
-        ) %>%
-        leaflet::clearMarkers()
+      # create summary info and binning for map
 
-      if (coords_ok) {
-        map <- map %>%
-          leaflet::fitBounds(
-            lng1 = min(react$mapdata$TADA.LongitudeMeasure),
-            lat1 = min(react$mapdata$TADA.LatitudeMeasure),
-            lng2 = max(react$mapdata$TADA.LongitudeMeasure),
-            lat2 = max(react$mapdata$TADA.LatitudeMeasure)
-          )
-      }
-      # TIP: If you expect out-of-range coordinates (e.g., 999), filter or coerce before fitBounds.
-
-      # if there's one group, show a map with markers whose color saturation corresponds to mean values at each site: darker = higher
-      if (length(react$groups) < 2) {
-        pal <- leaflet::colorNumeric(
-          palette = "Blues",
-          domain = react$mapdata$MeanV
+      # get top 10 characteristics by result number in the dataset and place the rest in a group called "all others"
+      chars <- tadat$raw %>%
+        # dplyr::filter(TADA.Remove == FALSE) %>%
+        dplyr::group_by(TADA.CharacteristicName) %>%
+        dplyr::summarise("Result_Count" = length(unique(ResultIdentifier)))
+      
+      topslice <-
+        chars %>% dplyr::slice_max(order_by = Result_Count, n = 10)
+      
+      bottomslice <- chars %>%
+        dplyr::ungroup() %>%
+        dplyr::filter(!TADA.CharacteristicName %in% topslice$TADA.CharacteristicName) %>%
+        dplyr::select("Result_Count") %>%
+        dplyr::summarise("Result_Count" = sum(Result_Count)) %>%
+        dplyr::mutate("TADA.CharacteristicName" = "ALL OTHERS")
+      
+      chars <-
+        plyr::rbind.fill(topslice, bottomslice) %>% dplyr::filter(Result_Count > 0)
+      
+      chars <-
+        chars %>% dplyr::mutate(TADA.Chars = substr(TADA.CharacteristicName, 1, 22))
+      
+      chars$TADA.Chars <-
+        ifelse(
+          nchar(chars$TADA.CharacteristicName) > 22,
+          base::paste0(chars$TADA.Chars, "..."),
+          chars$TADA.Chars
         )
-        map %>%
-          leaflet::addCircleMarkers(
-            data = react$mapdata, lng = ~TADA.LongitudeMeasure, lat = ~TADA.LatitudeMeasure, color = "black", fillColor = ~ pal(react$mapdata$MeanV), fillOpacity = 0.7, stroke = TRUE, weight = 1.5,
-            radius = ~radius,
-            popup = base::paste0(
-              "Organization: ", react$mapdata$OrganizationFormalName,
-              "<br> Site Name: ", react$mapdata$MonitoringLocationName,
-              "<br> Site ID: ", react$mapdata$MonitoringLocationIdentifier,
-              "<br> Site Type: ", react$mapdata$MonitoringLocationTypeName,
-              "<br> Group: ", react$mapdata$GroupID,
-              "<br> Date Range: ", react$mapdata$DateRange,
-              "<br> Mean Measurement Value: ", react$mapdata$MeanV,
-              "<br> Measurement Count: ", react$mapdata$Ncount
-            )
-          ) %>%
-          leaflet::addLegend("bottomright",
-            pal = pal, values = react$mapdata$MeanV,
-            title = "Mean Result Value",
-            opacity = 1
-          ) %>%
-          addLegendCustom(colors = "black", labels = leg_labs, sizes = leg_sizes, title = "Measurement Count")
-      } else { # if there's two groups, show which sites have which groups, plus the ones that have BOTH groups, shown by different colors
-        pal <- leaflet::colorFactor("Set2", unique(react$mapdata$GroupID))
-        map %>%
-          leaflet::addCircleMarkers(
-            data = react$mapdata, lng = ~TADA.LongitudeMeasure, lat = ~TADA.LatitudeMeasure, color = "black", fillColor = ~ pal(GroupID), fillOpacity = 0.7, stroke = TRUE, weight = 1.5,
-            radius = ~radius,
-            popup = base::paste0(
-              "Organization: ", react$mapdata$OrganizationFormalName,
-              "<br> Site Name: ", react$mapdata$MonitoringLocationName,
-              "<br> Site ID: ", react$mapdata$MonitoringLocationIdentifier,
-              "<br> Site Type: ", react$mapdata$MonitoringLocationTypeName,
-              "<br> Group(s): ", react$mapdata$GroupID,
-              "<br> Date Range: ", react$mapdata$DateRange,
-              "<br> Measurement Count: ", react$mapdata$Ncount
-            )
-          ) %>%
-          leaflet::addLegend("bottomright",
-            pal = pal, values = react$mapdata$GroupID,
-            title = "Data Groups",
-            opacity = 1
-          ) %>%
-          addLegendCustom(colors = "black", labels = leg_labs, sizes = leg_sizes, title = "Measurement Count")
-      }
-      # TIP: For many points, consider cluster options or heatmaps to improve performance.
+      
+      chars <-
+        chars %>% dplyr::mutate(TADA.Chars = forcats::fct_reorder(TADA.Chars, Result_Count, .desc = TRUE))
+      
+      mapdat$chars <- chars
     })
 
-    # select sites whose data to display in plots
-    output$selsites <- shiny::renderUI({ # this companion to the uiOutput in the UI appears when react$done exists
-      shiny::req(react$mapdata)
+  # Proxy to select rows programmatically
+  available_chars_proxy <- DT::dataTableProxy("available_characteristics")
 
-      # the list of 'sites' is managed in the server function (below)
-      shiny::fluidRow(
-        htmltools::h3("3. Select Specific Sites (Optional)"),
-        htmltools::HTML(base::paste0("Use the drop down to pick the sites you'd like to include
-                               in the plots below and then click 'Generate Plots'.
-                               Defaults to all sites in the dataset.
-                               <B>NOTE:</B> Currently, the single-characteristic scatterplot,
-                               histogram, and boxplot show the first characteristic from the
-                               drop down above the map: <B>", react$groups[1], "</B>.")),
-        htmltools::br(),
-        column(
-          6, # column containing drop down menu for all grouping column combinations
-          shiny::selectizeInput(ns("selsites1"),
-            "Select sites",
-            choices = NULL,
-            multiple = TRUE,
-            width = "100%"
-          )
-        ),
-        column(
-          1,
-          shiny::actionButton(ns("selsitesgo"), "Generate Plots", shiny::icon("wand-sparkles"),
-            style = "color: #fff; background-color: #337ab7; border-color: #2e6da4; margin-top:30px"
-          )
-        )
-      )
-      # TIP: Consider adding helper text for "All sites" behavior and multi-select keyboard usage.
-    })
+  # Client-side callback to enforce max 3 selections (no Select extension)
+  available_chars_callback <- DT::JS(
+    "table.on('click', 'tr', function() {",
+    "  var clicked = this;",
+    "  setTimeout(function(){",
+    "    var sel_count = table.$('tr.selected').length;",
+    "    if(sel_count > 3){",
+    "      $(clicked).removeClass('selected');",
+    "      var sel_nodes = table.$('tr.selected');",
+    "      var sel_idx = [];",
+    "      sel_nodes.each(function(){ sel_idx.push(table.row(this).index() + 1); });",
+    "      if(window.Shiny){",
+    "        Shiny.setInputValue('available_characteristics_rows_selected', sel_idx, {priority: 'event'});",
+    "        Shiny.setInputValue('available_chars_overlimit', Math.random(), {priority: 'event'});",
+    "      }",
+    "    }",
+    "  }, 1);",
+    "});"
+  )
 
-    # this is 'server-side' processing of the options for the 'Select Specific Sites' widget
-    shiny::observe({
-      shiny::req(react$mapdata)
-      shiny::updateSelectizeInput(session,
-        "selsites1",
-        choices = c("All sites", unique(react$mapdata$MonitoringLocationIdentifier)),
-        selected = c("All sites", unique(react$mapdata$MonitoringLocationIdentifier))[1],
-        server = TRUE
-      )
-      # NOTE: Keeping choices server-side avoids rendering overhead for large site lists.
-    })
-
-    # when the Go button is pushed to generate plots, this ensures the plot data is filtered to the selected sites (or all sites)
-    shiny::observeEvent(input$selsitesgo, {
-      if (all(input$selsites1 == "All sites")) {
-        react$plotdata <- react$plotdataset
-      } else {
-        plotdata <- react$plotdataset %>% dplyr::filter(MonitoringLocationIdentifier %in% input$selsites1)
-        if (!react$groups[1] %in% plotdata$groupname) {
-          shiny::showModal(shiny::modalDialog(
-            title = "Whoops!",
-            base::paste0("You selected a site/sites where ", react$groups[1], " was not sampled. Please use the legend in the map above to select site(s) where ", react$groups[1], "was sampled.")
-          ))
-          # TIP: Consider programmatically selecting valid sites that contain the chosen group to guide the user.
-        } else {
-          react$plotdata <- plotdata
-        }
-      }
-    })
-
-    # benchmark widgets
-    output$benchmarks <- shiny::renderUI({
-      shiny::req(react$plotdata)
-      shiny::fluidRow(
-        column(3, shiny::numericInput(ns("benchmark1"), "Benchmark 1", value = 0)),
-        column(3, shiny::numericInput(ns("benchmark2"), "Benchmark 2", value = 0))
-      )
-      # TIP: Add units or labels for benchmarks to match the characteristic units.
-    })
-
-    # 2025-11-20 initial place to start inserting table of STATS
-    output$tada_stats_table <- shiny::renderUI({
-      shiny::req(react$plotdata)
-
-      success <- FALSE # Flag to track if the process completes successfully
-
-      tryCatch(
-        {
-          # Temporarily treat warnings as errors; withr will auto-restore
-          withr::local_options(list(warn = 2))
-
-          # Get the data summary
-          selected_groups <- input$mapplotgroup
-          # NOTE: selected_groups is available if you need to focus stats on the UI selection; here, stats use react$groups.
-
-          groupdata <- subset(
-            react$full_data,
-            react$full_data$groupname %in% c(react$groups)
-          )
-
-          # NOTE: If groupdata can be large, consider pre-aggregating or paging the results.
-          tada_stats_data <- EPATADA::TADA_Stats(groupdata)
-
-          # NOTE: Select expected columns in order; gracefully handle missing columns.
-          react$tada_stats_data <-
-            tada_stats_data[, names(tada_stats_data) %in% c(
-              "TADA.ComparableDataIdentifier",
-              "Non_Detect_Pct",
-              "Min",
-              "Mean",
-              "Max",
-              "Percentile_5th",
-              "Percentile_10th",
-              "Percentile_15th",
-              "Percentile_25th",
-              "Percentile_50th_Median",
-              "Percentile_75th",
-              "Percentile_85th",
-              "Percentile_95th",
-              "Percentile_98th"
-            )]
-
-          success <- TRUE
-        },
-        error = function(e) {
-          # Log error details for debugging
-          cat("Error: ", e$message, "\n")
-
-          # Show error notification to the user
-          shiny::showNotification(
-            ui = tagList(
-              htmltools::h4(htmltools::strong("WQP Error")),
-              htmltools::hr(style = "margin-top: 5px; margin-bottom: 5px;"),
-              paste(e$message),
-              paste("An error occurred while generating stats. Check your filter values and try again.")
-            ),
-            type = "error",
-            duration = NULL,
-            id = "uploadError"
-          )
-        }
-      )
-
-      if (!isTRUE(success)) {
-        return(NULL)
-      }
-
-      # Return the datatable widget (renderUI should return UI/htmlwidgets, not renderDT)
-      dt_tada_stats_table <- react$tada_stats_data
-      # NOTE: Pretty column labels for readability; adjust to match final nomenclature.
-      colnames(dt_tada_stats_table) <- c(
-        "TADA.ComparableDataIdentifier",
-        "Non-Detect %",
-        "Min",
-        "Mean",
-        "Max",
-        "P5",
-        "P10",
-        "P15",
-        "P25",
-        "P50",
-        "P75",
-        "P85",
-        "P95",
-        "P98"
-      )
+  # Available characteristics table (renderDT + datatable) - display excludes CompID
+  output$available_characteristics <- DT::renderDT({
+    shiny::req(depth_profile$loaded)
+    df_full <- depth_profile$available_characteristics_df
+    if (is.null(df_full) || nrow(df_full) == 0) {
+      DT::datatable(data.frame(Message = "No available characteristics. Select a Site and Date above."),
+                options = list(dom = 't'))
+    } else {
+      # Prepare display df: include Characteristic, N, Unit only (if Unit exists)
+      disp_cols <- c("Characteristic", "N")
+      if ("Unit" %in% names(df_full)) disp_cols <- c(disp_cols, "Unit")
+      display_df <- df_full[, intersect(disp_cols, names(df_full)), drop = FALSE]
 
       DT::datatable(
-        dt_tada_stats_table,
-        extensions = "Buttons",
-        caption = "Summary Statistics",
-        options = list(
-          dom = "lftiB",
-          scrollX = TRUE,
-          pageLength = 10,
-          searching = FALSE,
-          paging = FALSE,
-          buttons = c("csv")
-        ),
-        selection = "none",
-        rownames = FALSE
+        display_df,
+        rownames = FALSE,
+        selection = list(mode = "multiple"),
+        options = list(pageLength = 6, scrollY = "100%", dom = 't'),
+        callback = available_chars_callback
       )
-      # TIP: If you want client-side filters, set searching = TRUE and enable column filters in extensions.
-    })
+    }
+  }, server = FALSE)
 
-    # for plotting benchmarks
-    hline <- function(y = 0, color = "black") {
-      list(
-        type = "line",
-        x0 = 0,
-        x1 = 1,
-        xref = "paper",
-        y0 = y,
-        y1 = y,
-        line = list(color = color)
-      )
-      # NOTE: Horizontal reference lines used for benchmark visualization.
+  # When user changes selected site, update the activity_date choices
+  shiny::observeEvent(input$depth_profile_site_id, {
+    shiny::req(depth_profile$loaded)
+    site_in <- input$depth_profile_site_id
+    if (is.null(site_in) || !nzchar(site_in)) {
+      shiny::updateSelectInput(session, "activity_date", choices = character(0), selected = NA)
+      return()
+    }
+    pairs_df <- depth_profile$site_date_pairs
+    if (is.null(pairs_df) || nrow(pairs_df) == 0) {
+      updateSelectInput(session, "activity_date", choices = character(0), selected = NA)
+      return()
+    }
+    site_dates <- sort(unique(as.character(pairs_df$ActivityStartDate[pairs_df$MonitoringLocationIdentifier == site_in])))
+    shiny::updateSelectInput(session, "activity_date", choices = site_dates, selected = if (length(site_dates) > 0) site_dates[1] else NA)
+  })
+
+  # When user selects an activity_date (after site chosen), compute available characteristics
+  shiny::observeEvent(input$activity_date, {
+    shiny::req(depth_profile$loaded)
+    sel_site <- input$depth_profile_site_id
+    sel_date <- input$activity_date
+    if (is.null(sel_site) || !nzchar(sel_site) || is.null(sel_date) || !nzchar(sel_date)) {
+      depth_profile$available_characteristics_df <- data.frame(Characteristic = character(0), stringsAsFactors = FALSE)
+      return()
     }
 
-    # plotly scatter plot
-    output$scatter <- plotly::renderPlotly({
-      shiny::req(react$plotdata)
-      suppressWarnings(EPATADA::TADA_Scatterplot(subset(react$plotdata, react$plotdata$groupname == react$groups[1]), id_cols = "groupname")) %>%
-        plotly::layout(shapes = list(
-          hline(y = input$benchmark1, color = "red"),
-          hline(y = input$benchmark2, color = "orange")
-        ))
-      # TIP: Consider log scales for characteristics with wide ranges via plotly::layout(yaxis = list(type = "log")).
-    })
+    df <- depth_profile$site_date_char_groups_df
+    if (is.null(df)) df <- depth_profile$depth_categorized_df
+    if (is.null(df)) {
+      depth_profile$available_characteristics_df <- data.frame(Characteristic = character(0), stringsAsFactors = FALSE)
+      return()
+    }
 
-    # plotly boxplot
-    output$boxplot <- plotly::renderPlotly({
-      shiny::req(react$plotdata)
-      suppressWarnings(EPATADA::TADA_Boxplot(subset(react$plotdata, react$plotdata$groupname == react$groups[1]), id_cols = "groupname"))
-      # NOTE: Boxplots summarize distribution efficiently; ensure consistent units across groups.
-    })
+    loc_col  <- "TADA.MonitoringLocationIdentifier"
+    date_col <- "ActivityStartDate"
+    char_col <- "TADA.CharacteristicsForDepthProfile"
 
-    # plotly histogram
-    output$histogram <- plotly::renderPlotly({
-      shiny::req(react$plotdata)
-      suppressWarnings(EPATADA::TADA_Histogram(subset(react$plotdata, react$plotdata$groupname == react$groups[1]), id_cols = "groupname"))
-      # TIP: Consider binning strategy (fixed vs. Freedman–Diaconis) for consistent comparisons.
-    })
+    if (is.na(loc_col) || is.na(date_col) || is.na(char_col)) {
+      depth_profile$available_characteristics_df <- data.frame(Characteristic = character(0), stringsAsFactors = FALSE)
+      return()
+    }
 
-    # dynamically show/hide two-char scatter
-    shiny::observe({
-      shiny::req(react$plotdata)
-      if (length(react$groups) > 1) {
-        shinyjs::enable(selector = '.nav li a[data-value="Two-Characteristic Scatterplot"]')
+    df_sel <- df[as.character(df[[loc_col]]) == sel_site & as.character(df[[date_col]]) == sel_date, , drop = FALSE]
+    if (nrow(df_sel) == 0) {
+      depth_profile$available_characteristics_df <- data.frame(Characteristic = character(0), stringsAsFactors = FALSE)
+      return()
+    }
+
+    # Extract tokens from char_col and compute N per-token
+    raw_vals <- as.character(df_sel[[char_col]])
+    char_choices <- split_characteristics(raw_vals)
+    if (length(char_choices) == 0) char_choices <- sort(unique(na.omit(raw_vals)))
+    if (length(char_choices) == 0) {
+      depth_profile$available_characteristics_df <- data.frame(Characteristic = character(0), stringsAsFactors = FALSE)
+      return()
+    }
+
+    tokens_display <- vapply(char_choices, normalize_token, FUN.VALUE = character(1), USE.NAMES = FALSE)
+    tokens_display <- vapply(tokens_display, normalize_NA_token, FUN.VALUE = character(1), USE.NAMES = FALSE)
+
+    counts <- integer(length(char_choices))
+    unit_col_candidates <- names(df_sel)[grepl("unit", names(df_sel), ignore.case = TRUE)]
+    unit_col <- if (length(unit_col_candidates) > 0) unit_col_candidates[1] else NA_character_
+    units <- rep(NA_character_, length(char_choices))
+
+    for (i in seq_along(char_choices)) {
+      ch <- char_choices[i]
+      explicit_total <- 0L
+      explicit_found <- FALSE
+      row_match_flags <- rep(FALSE, nrow(df_sel))
+
+      for (j in seq_len(nrow(df_sel))) {
+        pv <- as.character(df_sel[[char_col]][j])
+        if (!is.na(pv) && nzchar(pv)) {
+          toks <- split_characteristics(pv)
+          if (length(toks) > 0) {
+            for (tok in toks) {
+              if (normalize_token(tok) == normalize_token(ch)) {
+                cnt <- extract_trailing_count(tok)
+                if (!is.na(cnt)) {
+                  explicit_total <- explicit_total + cnt
+                  explicit_found <- TRUE
+                } else {
+                  row_match_flags[j] <- TRUE
+                }
+                break
+              }
+            }
+          }
+        }
+      }
+
+      if (explicit_found && explicit_total > 0L) {
+        counts[i] <- explicit_total
       } else {
-        shinyjs::disable(selector = '.nav li a[data-value="Two-Characteristic Scatterplot"]')
+        counts[i] <- sum(row_match_flags, na.rm = TRUE)
       }
-      # NOTE: This prevents users from accessing the two-characteristic tab when only a single group is present.
+
+      if (!is.na(unit_col) && any((!is.na(row_match_flags) & row_match_flags) & !is.na(df_sel[[unit_col]]))) {
+        uu <- as.character(df_sel[[unit_col]][row_match_flags])
+        uu <- uu[!is.na(uu)]
+        if (length(uu) > 0) units[i] <- names(sort(table(uu), decreasing = TRUE))[1]
+      }
+    }
+
+    df_chars <- data.frame(
+      Characteristic = tokens_display,
+      N = counts,
+      stringsAsFactors = FALSE
+    )
+    df_chars$CompID <- vapply(char_choices, normalize_token, FUN.VALUE = character(1), USE.NAMES = FALSE)
+    if (!all(is.na(units))) df_chars$Unit <- units
+
+    depth_profile$available_characteristics_df <- df_chars
+
+    # Pre-select defaults by priority (match normalized preferred_characteristics)
+    df_chars_local <- depth_profile$available_characteristics_df
+    sel_rows <- integer(0)
+    for (pc in preferred_characteristics) {
+      pc_clean <- normalize_token(pc)
+      idx <- which(df_chars_local$CompID == pc_clean | df_chars_local$Characteristic == pc_clean)
+      if (length(idx) > 0) sel_rows <- c(sel_rows, idx[1])
+      if (length(sel_rows) >= 3) break()
+    }
+    if (length(sel_rows) < 3) {
+      more_idx <- setdiff(seq_len(nrow(df_chars_local)), sel_rows)
+      if (length(more_idx) > 0) sel_rows <- c(sel_rows, head(more_idx, 3 - length(sel_rows)))
+    }
+    sel_rows <- unique(sel_rows)
+    if (length(sel_rows) > 0) {
+      try({ selectRows(available_chars_proxy, sel_rows) }, silent = TRUE)
+    }
+
+  }, ignoreNULL = TRUE)
+
+  # Notify when client-side over-limit attempted
+  shiny::observeEvent(input$available_chars_overlimit, {
+    shiny::showNotification("You may select up to 3 characteristics.", type = "warning", duration = 3)
+  })
+
+  # Safety trim if >3 selected
+  shiny::observeEvent(input$available_characteristics_rows_selected, {
+    sel <- input$available_characteristics_rows_selected
+    if (is.null(sel) || length(sel) <= 3) return()
+    new_sel <- sel[seq_len(3)]
+    shiny::selectRows(available_chars_proxy, new_sel)
+    shiny::showNotification("Selection limited to 3 characteristics (trimmed).", type = "warning", duration = 3)
+  }, ignoreNULL = FALSE)
+
+  # Build plot on Update
+  depth_plot_obj <- shiny::eventReactive(input$update, {
+    if (!depth_profile$loaded || is.null(depth_profile$depth_categorized_df)) {
+      shiny::showModal(shiny::modalDialog(title = "Data not loaded", "Please click Load data first.", easyClose = TRUE))
+      return(NULL)
+    }
+
+    sel_site <- if (!is.null(input$depth_profile_site_id) && nzchar(as.character(input$depth_profile_site_id))) input$depth_profile_site_id else input$siteid
+    sel_date <- input$activity_date
+
+    if (is.null(sel_site) || !nzchar(as.character(sel_site)) || is.null(sel_date) || !nzchar(as.character(sel_date))) {
+      return(safe_message_plot("Please select Site and Date first."))
+    }
+
+    # gather selected characteristics comp IDs
+    chars_idx <- input$available_characteristics_rows_selected
+    characteristics <- character(0)
+    if (!is.null(chars_idx) && length(chars_idx) > 0 &&
+        !is.null(depth_profile$available_characteristics_df) && nrow(depth_profile$available_characteristics_df) > 0) {
+      if ("CompID" %in% names(depth_profile$available_characteristics_df)) {
+        characteristics <- as.character(depth_profile$available_characteristics_df$CompID[chars_idx])
+      } else {
+        characteristics <- as.character(depth_profile$available_characteristics_df$Characteristic[chars_idx])
+      }
+    }
+
+    # fallback defaults
+    if (length(characteristics) == 0) {
+      if (!is.null(depth_profile$available_characteristics_df) && nrow(depth_profile$available_characteristics_df) > 0) {
+        if ("CompID" %in% names(depth_profile$available_characteristics_df)) {
+          characteristics <- head(as.character(depth_profile$available_characteristics_df$CompID), 3)
+        } else {
+          characteristics <- head(as.character(depth_profile$available_characteristics_df$Characteristic), 3)
+        }
+      } else {
+        characteristics <- head(unique(depth_profile$depth_categorized_df$TADA.ComparableDataIdentifier %||% character(0)), 3)
+        if (length(characteristics) == 0) return(safe_message_plot("No characteristic selected"))
+      }
+    }
+
+    # determine matching columns
+    df_all <- depth_profile$depth_categorized_df
+    loc_col  <- "TADA.MonitoringLocationIdentifier"
+    date_col <- "ActivityStartDate"
+    char_col <- "TADA.ComparableDataIdentifier"
+
+    # filter by site/date
+    df_sel <- df_all
+    if (!is.na(loc_col) && !is.null(sel_site) && nzchar(as.character(sel_site))) {
+      df_sel <- df_sel[as.character(df_sel[[loc_col]]) == as.character(sel_site), , drop = FALSE]
+    }
+    if (!is.na(date_col) && !is.null(sel_date) && nzchar(as.character(sel_date))) {
+      df_sel <- df_sel[as.character(df_sel[[date_col]]) == as.character(sel_date), , drop = FALSE]
+    }
+
+    if (nrow(df_sel) == 0) {
+      return(safe_message_plot(sprintf("No records for site %s on %s", sel_site %||% "<none>", sel_date %||% "<none>")))
+    }
+
+    # normalize selected tokens
+    characteristics_norm <- vapply(characteristics, normalize_token, FUN.VALUE = character(1), USE.NAMES = FALSE)
+
+    # prepare df_sel normalized copy for char_col
+    df_sel_norm <- df_sel
+    if (!is.na(char_col) && char_col %in% names(df_sel_norm)) {
+      df_sel_norm[[char_col]] <- vapply(as.character(df_sel_norm[[char_col]]), normalize_token, FUN.VALUE = character(1), USE.NAMES = FALSE)
+    }
+
+    keep_idx <- rep(FALSE, nrow(df_sel_norm))
+
+    # match normalized char_col
+    if (!is.na(char_col) && char_col %in% names(df_sel_norm)) {
+      keep_idx <- keep_idx | (as.character(df_sel_norm[[char_col]]) %in% characteristics_norm)
+    }
+
+    # match normalized tokens from char_col (split per-row)
+    if (!is.na(char_col) && char_col %in% names(df_sel_norm)) {
+      prof_vals <- as.character(df_sel_norm[[char_col]])
+      for (i in seq_along(prof_vals)) {
+        rvchars <- split_characteristics(prof_vals[i])
+        if (length(rvchars) > 0) rvchars <- vapply(rvchars, normalize_token, FUN.VALUE = character(1), USE.NAMES = FALSE)
+        if (length(intersect(rvchars, characteristics_norm)) > 0) keep_idx[i] <- TRUE
+      }
+    }
+
+    # fallback regex match if nothing matched (escape specials)
+    if (!any(keep_idx)) {
+      esc <- gsub("([.|()\\^{}+$*?\\[\\]\\\\])", "\\\\\\1", characteristics_norm)
+      pattern <- paste0("^(", paste0(esc, collapse = "|"), ")$")
+      if (!is.na(char_col) && char_col %in% names(df_sel_norm)) {
+        keep_idx <- keep_idx | grepl(pattern, as.character(df_sel_norm[[char_col]]), ignore.case = TRUE)
+      }
+      if (!is.na(char_col) && char_col %in% names(df_sel_norm)) {
+        keep_idx <- keep_idx | grepl(pattern, as.character(df_sel_norm[[char_col]]), ignore.case = TRUE)
+      }
+    }
+
+    df_plot_prep <- df_sel[keep_idx, , drop = FALSE]
+    if (nrow(df_plot_prep) == 0) {
+      return(safe_message_plot("No records match the selected characteristics for that site/date."))
+    }
+
+    val_col <- intersect(c("TADA.ResultMeasureValue", "ResultMeasureValue", "ResultMeasure"), names(df_plot_prep))[1]
+    depth_col <- intersect(c("TADA.ConsolidatedDepth", "ConsolidatedDepth", "Depth"), names(df_plot_prep))[1]
+
+    good_vals <- FALSE
+    if (!is.na(val_col) && !is.na(depth_col)) {
+      num_val <- suppressWarnings(as.numeric(as.character(df_plot_prep[[val_col]])))
+      num_depth <- suppressWarnings(as.numeric(as.character(df_plot_prep[[depth_col]])))
+      if (any(!is.na(num_val)) && any(!is.na(num_depth))) good_vals <- TRUE
+    }
+
+    if (!good_vals) {
+      return(safe_message_plot("Selected combination has no numeric measure or depth values to plot."))
+    }
+
+    # All checks passed: call EPATADA plotting function
+    p <- tryCatch({
+      EPATADA::TADA_DepthProfilePlot(df_sel,
+                                    groups = characteristics,
+                                    location = sel_site,
+                                    activity_date = sel_date,
+                                    depthcat = input$depthcat,
+                                    surfacevalue = input$surfacevalue,
+                                    bottomvalue = input$bottomvalue)
+    }, error = function(e) {
+      safe_message_plot(paste0("Plot error: ", e$message))
     })
 
-    # plotly two-characteristic scatter plot
-    output$scatter2 <- plotly::renderPlotly({
-      shiny::req(react$plotdata)
-      if (length(unique(react$plotdata$groupname)) > 1) {
-        suppressWarnings(EPATADA::TADA_TwoCharacteristicScatterplot
-        (react$plotdata,
-          id_cols = "groupname",
-          groups = unique(react$plotdata$groupname)
-        ))
-      }
-      # TIP: Add marginal distributions or color-coded density for deeper visual comparison.
-    })
+    p
+  })
+
+  # Render plotly (or convert ggplot to plotly)
+  output$depthPlotly <- plotly::renderPlotly({
+    p <- depth_plot_obj()
+    shiny::req(p)
+    if (inherits(p, "plotly") || inherits(p, "htmlwidget")) return(p)
+    if (inherits(p, "ggplot")) return(plotly::ggplotly(p))
+    safe_message_plot("Unable to render plot object.")
+  })
+
+  output$debug_text <- shiny::renderText({
+    paste0(
+      "loaded: ", depth_profile$loaded, "\n",
+      "selected site: ", ifelse(is.null(input$depth_profile_site_id), 
+                                "<none>", 
+                                input$depth_profile_site_id), "\n",
+      "selected date: ", ifelse(is.null(input$activity_date), 
+                                "<none>", 
+                                input$activity_date), "\n",
+      "available_characteristics rows: ", ifelse(is.null(depth_profile$available_characteristics_df), 
+                                                 "NULL", 
+                                                 nrow(depth_profile$available_characteristics_df))
+    )
+  })
+    
+    
   })
 }
 
