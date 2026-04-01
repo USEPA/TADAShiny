@@ -1162,9 +1162,9 @@ mod_query_data_server <- function(id, tadat) {
             ))
   
           smallsites_list <- list()
-  
+
           small_title <- base::paste0(
-            "Downloading EPA Water Quality eXchange (WQX) data from sites with less than or equal to ", pretty_maxrecs,
+            "Downloading EPA Water Quality eXchange (WQX) data from ", scales::comma(nrow(smallsites)), " sites with less than or equal to ", pretty_maxrecs,
             " results."
           )
   

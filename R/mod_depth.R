@@ -5,15 +5,27 @@
 #' @param id,input,output,session Internal parameters for {shiny}.
 #'
 #' @noRd
+#' 
+#' 
+#' 
+depth_profile <- shiny::reactiveValues(
+    depth_categorized_df = NULL,
+    site_date_char_groups_df = NULL,
+    site_date_pairs = NULL,
+    available_characteristics_df = NULL,
+    loaded = FALSE,
+    no_data = FALSE
+)    
+    
 mod_depth_ui <- function(id) {
   ns <- shiny::NS(id)
   tagList(
-        # NOTE: Users first decide which columns will define "groups" for analysis and visualization.
-    # TIP: Defaulting to TADA.ComparableDataIdentifier keeps groups aligned with comparable data logic.
-    htmltools::h3("1. Determine If there is sufficient data"),
-    htmltools::HTML("First, hit the Review Depth Data button to check if there is sufficient data
-                    to do a Depth (water column depth) analysis.  TODO: add UI elements for bycategory, bottomvalue, 
-                    surfacevalue, and dailyagg"),
+    htmltools::h3("1. Determine if there is sufficient Depth Profile data"),
+    htmltools::HTML("First, hit the 'Review Depth Data' button to check if there is sufficient depth profile data
+                    to do a Depth (water column depth) analysis. If there is sufficient data available,
+                    the map will populate with sites that have depth profile data. 
+                    Click on a site to see the available visit dates for that site, 
+                    then select a date to see the characteristics available for plotting."),
     htmltools::div(style = "margin-bottom:10px"),
     shiny::fluidRow(column(
       3,
@@ -22,11 +34,12 @@ mod_depth_ui <- function(id) {
         style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
       )
     )),
-    tags$hr(),
+    # tags$hr(),
 
     shiny::conditionalPanel(
       condition = paste0("output['", ns("no_depth_profile_data"), "'] == true"),
       # Show only the loading message when data is not loaded
+
       shiny::div(style = "margin-top:20px; color: #666;font-size: large;font-weight: bolder;",
           "After retrieval and data cleaning, there are no usable water quality records with data collected in a Depth Profile."
       )
@@ -35,10 +48,25 @@ mod_depth_ui <- function(id) {
     shiny::conditionalPanel(
         condition = paste0("output['", ns("depth_profile_loaded"), "'] == true"), # output.depth_profile_loaded == true",
         # Instruction text
+        tags$hr(style="margin-top: 10px;"),
+        htmltools::h3("2. Select sites, dates, and characteristics to plot."),
+        shiny::HTML(paste0("A total of <strong>", shiny::textOutput(ns("number_of_records"), container = tags$span), 
+                           "</strong> results at <strong>",
+                           shiny::textOutput(ns("number_of_sites"), container = tags$span), 
+                           "</strong> sites are available for plotting Depth Profiles.
+        The following data processing steps were performed performed to prepare the data for plotting:
+        <ol>
+        <li> Selected only sites with Depth profiles (i.e., samples with depth values collected at multiple depths on the same date at the same site),
+        <li> Prepared counts of available characteristics for each site/date combination, and
+        <li> harmonized result and depth units to TADA defaults, and
+        <li> replaced retired characteristic names with current names.
+        </ol>")),
         shiny::div(style = "margin-bottom:8px; color: #666;font-size: large;font-weight: bolder;",
-            "The map shows all the sites that have data collected in a Depth profile.
+            shiny::HTML(paste0("The map shows the ",
+                           shiny::textOutput(ns("number_of_sites2"), container = tags$span), 
+                           " sites that have data available for plotting Depth profiles.
             After loading: choose a Site ID, then choose a Visit Date.
-            Then pick up to 3 characteristics and click 'Update plot'."
+            Then pick up to 3 characteristics and click 'Update plot'."))
         ),
         # map
         shiny::fluidRow(
@@ -129,14 +157,6 @@ mod_depth_server <- function(id, tadat) {
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
-    depth_profile <- shiny::reactiveValues(
-        depth_categorized_df = NULL,
-        site_date_char_groups_df = NULL,
-        site_date_pairs = NULL,
-        available_characteristics_df = NULL,
-        loaded = FALSE,
-        no_data = FALSE
-    )    
     # Preferred defaults (priority order)
     preferred_characteristics <- c(
       "TEMPERATURE, WATER_NA_NA_DEG C",
@@ -378,6 +398,7 @@ mod_depth_server <- function(id, tadat) {
 
     # create dataset for map and histogram using raw data
     shiny::observe( {
+      shiny::req(tadat$raw)
       shiny::req(depth_profile$depth_categorized_df)
       # create gray text tile info
       mapdat$text <- depth_profile$depth_categorized_df %>%
@@ -430,7 +451,7 @@ mod_depth_server <- function(id, tadat) {
 
   # Client-side callback to enforce max 3 selections (no Select extension)
   available_chars_callback <- DT::JS(
-    "table.on('click', 'tr', function() {",
+    paste0("table.on('click', 'tr', function() {",
     "  var clicked = this;",
     "  setTimeout(function(){",
     "    var sel_count = table.$('tr.selected').length;",
@@ -440,12 +461,12 @@ mod_depth_server <- function(id, tadat) {
     "      var sel_idx = [];",
     "      sel_nodes.each(function(){ sel_idx.push(table.row(this).index() + 1); });",
     "      if(window.Shiny){",
-    "        Shiny.setInputValue('available_characteristics_rows_selected', sel_idx, {priority: 'event'});",
-    "        Shiny.setInputValue('available_chars_overlimit', Math.random(), {priority: 'event'});",
+    "        Shiny.setInputValue('", ns("available_characteristics_rows_selected"), "', sel_idx, {priority: 'event'});",
+    "        Shiny.setInputValue('", ns("available_chars_overlimit"), "', Math.random(), {priority: 'event'});",
     "      }",
     "    }",
     "  }, 1);",
-    "});"
+    "});")
   )
 
   # Available characteristics table (renderDT + datatable) - display excludes CompID
@@ -602,7 +623,8 @@ mod_depth_server <- function(id, tadat) {
     }
     sel_rows <- unique(sel_rows)
     if (length(sel_rows) > 0) {
-      try({ selectRows(available_chars_proxy, sel_rows) }, silent = TRUE)
+      # TODO DT::dataTableProxy("filterStep2", session = session)
+      try({ DT::selectRows(available_chars_proxy, sel_rows) }, silent = TRUE)
     }
 
   }, ignoreNULL = TRUE)
@@ -617,7 +639,7 @@ mod_depth_server <- function(id, tadat) {
     sel <- input$available_characteristics_rows_selected
     if (is.null(sel) || length(sel) <= 3) return()
     new_sel <- sel[seq_len(3)]
-    shiny::selectRows(available_chars_proxy, new_sel)
+    DT::selectRows(available_chars_proxy, new_sel)
     shiny::showNotification("Selection limited to 3 characteristics (trimmed).", type = "warning", duration = 3)
   }, ignoreNULL = FALSE)
 
@@ -762,6 +784,27 @@ mod_depth_server <- function(id, tadat) {
     safe_message_plot("Unable to render plot object.")
   })
 
+  output$number_of_records <- shiny::renderText({
+    if (!depth_profile$loaded) return("Data not loaded.")
+    if (is.null(depth_profile$depth_categorized_df)) return("No data available.")
+    scales::comma(nrow(depth_profile$depth_categorized_df))
+  })
+  
+  output$number_of_sites <- shiny::renderText({
+    if (!depth_profile$loaded) return("Data not loaded.")
+    if (is.null(depth_profile$depth_categorized_df)) return("No data available.")
+    num_sites <- length(unique(as.character(depth_profile$depth_categorized_df$TADA.MonitoringLocationIdentifier)))
+    scales::comma(num_sites)
+  })
+  
+  output$number_of_sites2 <- shiny::renderText({
+    if (!depth_profile$loaded) return("Data not loaded.")
+    if (is.null(depth_profile$depth_categorized_df)) return("No data available.")
+    num_sites <- length(unique(as.character(depth_profile$depth_categorized_df$TADA.MonitoringLocationIdentifier)))
+    scales::comma(num_sites)
+  })
+  
+  
   output$debug_text <- shiny::renderText({
     paste0(
       "loaded: ", depth_profile$loaded, "\n",
