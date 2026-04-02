@@ -21,7 +21,7 @@ jobs:
         run: air format .
 
       - name: commit updates
-        uses: EndBug/add-and-commit@v9
+        uses: EndBug/add-and-commit@v10
         with:
           author_name: 'github-actions[bot]'
           author_email: 'github-actions[bot]@users.noreply.github.com'
