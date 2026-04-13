@@ -298,6 +298,15 @@ ui <- fluidPage(
            plotly::plotlyOutput("depthPlotly", height = "70vh")
     )
   ),
+  
+  # Middle: the data table of the data shown in the plot
+  shiny::fluidRow(
+    column(width = 12,
+           div(style = "width:70%; margin-left: auto; margin-right: auto; overflow-x: auto;",
+            column(12, DT::DTOutput("depth_plot_data_table"))
+           )
+    )
+  ),
 
   # Bottom: debug information occupying full width
   shiny::fluidRow(
@@ -868,6 +877,214 @@ server <- function(input, output, session) {
     if (inherits(p, "ggplot")) return(ggplotly(p))
     safe_message_plot("Unable to render plot object.")
   })
+  
+  # Create a reactive data.frame that contains the same underlying data the plot
+  # uses, but in "wide" form: one column per selected characteristic and rows = depths.
+  depth_plot_data <- reactive({
+    # Require that plot has been prepared (the eventReactive builds the plot on Update)
+    # but we don't rely on its object - instead rebuild the filtered df similarly
+    req(depth_profile$loaded)
+    req(input$activity_date)
+    # site must be selected
+    sel_site <- if (!is.null(input$depth_profile_site_id) && nzchar(as.character(input$depth_profile_site_id))) input$depth_profile_site_id else input$siteid
+    sel_date <- input$activity_date
+    if (is.null(sel_site) || !nzchar(as.character(sel_site)) || is.null(sel_date) || !nzchar(as.character(sel_date))) {
+      return(NULL)
+    }
+
+    # gather selected characteristics comp IDs (same source as depth_plot_obj)
+    chars_idx <- input$available_characteristics_rows_selected
+    characteristics <- character(0)
+    if (!is.null(chars_idx) && length(chars_idx) > 0 &&
+        !is.null(depth_profile$available_characteristics_df) && nrow(depth_profile$available_characteristics_df) > 0) {
+      if ("CompID" %in% names(depth_profile$available_characteristics_df)) {
+        characteristics <- as.character(depth_profile$available_characteristics_df$CompID[chars_idx])
+      } else {
+        characteristics <- as.character(depth_profile$available_characteristics_df$Characteristic[chars_idx])
+      }
+    }
+
+    # fallback defaults (same as plot)
+    if (length(characteristics) == 0) {
+      if (!is.null(depth_profile$available_characteristics_df) && nrow(depth_profile$available_characteristics_df) > 0) {
+        if ("CompID" %in% names(depth_profile$available_characteristics_df)) {
+          characteristics <- head(as.character(depth_profile$available_characteristics_df$CompID), 3)
+        } else {
+          characteristics <- head(as.character(depth_profile$available_characteristics_df$Characteristic), 3)
+        }
+      } else {
+        characteristics <- head(unique(depth_profile$depth_categorized_df$TADA.ComparableDataIdentifier %||% character(0)), 3)
+        if (length(characteristics) == 0) return(NULL)
+      }
+    }
+
+    # Filter the depth_categorized_df similarly to depth_plot_obj
+    df_all <- depth_profile$depth_categorized_df
+    if (is.null(df_all) || nrow(df_all) == 0) return(NULL)
+
+    loc_col  <- "TADA.MonitoringLocationIdentifier"
+    date_col <- "ActivityStartDate"
+    char_col <- "TADA.ComparableDataIdentifier"
+
+    df_sel <- df_all
+    if (!is.na(loc_col) && !is.null(sel_site) && nzchar(as.character(sel_site))) {
+      df_sel <- df_sel[as.character(df_sel[[loc_col]]) == as.character(sel_site), , drop = FALSE]
+    }
+    if (!is.na(date_col) && !is.null(sel_date) && nzchar(as.character(sel_date))) {
+      df_sel <- df_sel[as.character(df_sel[[date_col]]) == as.character(sel_date), , drop = FALSE]
+    }
+
+    if (nrow(df_sel) == 0) return(NULL)
+
+    # normalize selected tokens
+    characteristics_norm <- vapply(characteristics, normalize_token, FUN.VALUE = character(1), USE.NAMES = FALSE)
+
+    # prepare df_sel normalized copy for char_col
+    df_sel_norm <- df_sel
+    if (!is.na(char_col) && char_col %in% names(df_sel_norm)) {
+      df_sel_norm[[char_col]] <- vapply(as.character(df_sel_norm[[char_col]]), normalize_token, FUN.VALUE = character(1), USE.NAMES = FALSE)
+    }
+
+    # build keep index again (same matching strategy)
+    keep_idx <- rep(FALSE, nrow(df_sel_norm))
+
+    if (!is.na(char_col) && char_col %in% names(df_sel_norm)) {
+      keep_idx <- keep_idx | (as.character(df_sel_norm[[char_col]]) %in% characteristics_norm)
+    }
+
+    if (!is.na(char_col) && char_col %in% names(df_sel_norm)) {
+      prof_vals <- as.character(df_sel_norm[[char_col]])
+      for (i in seq_along(prof_vals)) {
+        rvchars <- split_characteristics(prof_vals[i])
+        if (length(rvchars) > 0) rvchars <- vapply(rvchars, normalize_token, FUN.VALUE = character(1), USE.NAMES = FALSE)
+        if (length(intersect(rvchars, characteristics_norm)) > 0) keep_idx[i] <- TRUE
+      }
+    }
+
+    # fallback regex if needed (same as plot)
+    if (!any(keep_idx)) {
+      esc <- gsub("([.|()\\^{}+$*?\\[\\]\\\\])", "\\\\\\1", characteristics_norm)
+      pattern <- paste0("^(", paste0(esc, collapse = "|"), ")$")
+      if (!is.na(char_col) && char_col %in% names(df_sel_norm)) {
+        keep_idx <- keep_idx | grepl(pattern, as.character(df_sel_norm[[char_col]]), ignore.case = TRUE)
+      }
+    }
+
+    df_plot_prep <- df_sel[keep_idx, , drop = FALSE]
+    if (nrow(df_plot_prep) == 0) return(NULL)
+
+    # identify value and depth columns as used in the plotting code
+    val_col <- intersect(c("TADA.ResultMeasureValue", "ResultMeasureValue", "ResultMeasure"), names(df_plot_prep))[1]
+    depth_col <- intersect(c("TADA.ConsolidatedDepth", "ConsolidatedDepth", "Depth"), names(df_plot_prep))[1]
+
+    if (is.null(val_col) || is.null(depth_col)) return(NULL)
+
+    # Prepare a tidy long table containing characteristic, depth, value
+    # We will try to get a characteristic label for each row: prefer normalized char_col, otherwise try TADA.CharacteristicName
+    char_label_col <- NULL
+    if (!is.na(char_col) && char_col %in% names(df_plot_prep)) char_label_col <- char_col
+    alt_char_name_col <- intersect(c("TADA.CharacteristicName", "CharacteristicName", "Characteristic"), names(df_plot_prep))[1]
+
+    # Ensure depth and value numeric
+    df_plot_prep <- df_plot_prep %>%
+      dplyr::mutate(
+        .depth_num = suppressWarnings(as.numeric(as.character(.data[[depth_col]]))),
+        .value_num = suppressWarnings(as.numeric(as.character(.data[[val_col]])))
+      )
+
+    # Create a character label to pivot on
+    if (!is.null(char_label_col)) {
+      df_plot_prep <- df_plot_prep %>%
+        dplyr::mutate(.char_label = vapply(as.character(.data[[char_label_col]]), normalize_token, FUN.VALUE = character(1), USE.NAMES = FALSE))
+    } else if (!is.null(alt_char_name_col)) {
+      df_plot_prep <- df_plot_prep %>%
+        dplyr::mutate(.char_label = vapply(as.character(.data[[alt_char_name_col]]), normalize_token, FUN.VALUE = character(1), USE.NAMES = FALSE))
+    } else {
+      # fallback: use ComparableDataIdentifier if present or ResultIdentifier
+      fallback_char <- intersect(c("TADA.ComparableDataIdentifier", "TADA.ResultIdentifier", "ResultIdentifier"), names(df_plot_prep))[1]
+      df_plot_prep <- df_plot_prep %>%
+        dplyr::mutate(.char_label = if (!is.null(fallback_char)) as.character(.data[[fallback_char]]) else "value")
+    }
+
+    # Filter out rows missing depth and value
+    df_plot_prep <- df_plot_prep %>% dplyr::filter(!is.na(.depth_num))
+
+    if (nrow(df_plot_prep) == 0) return(NULL)
+
+    # If multiple observations for same depth & characteristic exist, choose summary (mean)
+    tidy_long <- df_plot_prep %>%
+      dplyr::group_by(.char_label, .depth_num) %>%
+      dplyr::summarise(value = mean(.value_num, na.rm = TRUE), .groups = "drop")
+
+    # Pivot to wide: depth as first column, then one column per .char_label
+    tidy_wide <- tidy_long %>%
+      tidyr::pivot_wider(names_from = .char_label, values_from = value)
+
+    # Ensure depth column is first and sorted (ascending or descending to match plot orientation)
+    if (!" .depth_num" %in% names(tidy_wide)) {
+      # pivot_wider will keep .depth_num as a column; rename if needed
+    }
+    # after pivot_wider and before returning tidy_wide, do:
+    
+    # 1) Rename depth column to "Depth (m)" and sort by depth (ascending)
+    tidy_wide <- tidy_wide %>%
+      dplyr::rename(`Depth (m)` = .data$.depth_num) %>%
+      dplyr::arrange(`Depth (m)`)
+    
+    # 2) Sanitize the other column names (characteristic columns) using your helper
+    #    normalize_NA_token (optionally also normalize_token if desired).
+    all_cols <- names(tidy_wide)
+    
+    # Keep the depth column name unchanged
+    depth_col_name <- "Depth (m)"
+    
+    # Identify non-depth columns to sanitize
+    other_cols <- setdiff(all_cols, depth_col_name)
+    
+    if (length(other_cols) > 0) {
+      # Apply normalization: first normalize_token (trim/strip trailing counts), then normalize_NA_token
+      sanitized <- vapply(other_cols,
+                          FUN.VALUE = character(1),
+                          FUN = function(x) {
+                            nm <- normalize_token(x)
+                            nm <- normalize_NA_token(nm)
+                            nm
+                          })
+    
+      # Ensure uniqueness (append suffixes if necessary)
+      if (any(duplicated(sanitized))) {
+        # make unique while preserving order (like make.names(unique=TRUE) but keep nicer labels)
+        sanitized <- make.unique(sanitized, sep = "_")
+      }
+    
+      # Build final names vector and assign
+      new_names <- all_cols
+      new_names[match(other_cols, all_cols)] <- sanitized
+      names(tidy_wide) <- new_names
+    }
+
+    # Return the wide df (depth first)
+    tidy_wide
+  })
+  
+  # Render the depth plot data table (one column per selected characteristic, rows = depths)
+  output$depth_plot_data_table <- DT::renderDT({
+    df <- depth_plot_data()
+    if (is.null(df) || nrow(df) == 0) {
+      datatable(data.frame(Message = "No data to show. Click Update plot or select a Site/Date and characteristics."),
+                options = list(dom = 't'))
+    } else {
+      # Format numeric columns reasonably
+      # Use server = TRUE if you expect many rows; small tables fine server = FALSE
+      datatable(
+        df,
+        rownames = FALSE,
+        options = list(pageLength = 15, scrollX = TRUE, dom = 't')
+      )
+    }
+  }, server = FALSE)
+  
+  
 
   output$debug_text <- shiny::renderText({
     paste0(
