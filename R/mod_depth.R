@@ -168,10 +168,10 @@ mod_depth_server <- function(id, tadat) {
 
     # Preferred defaults (priority order)
     preferred_characteristics <- c(
-      "TEMPERATURE, WATER_NA_NA_DEG C",
-      "DISSOLVED OXYGEN (DO)_NA_NA_MG/L",
-      "CONDUCTIVITY_NA_NA_US/CM",
-      "PH_NA_NA_NONE"
+      "TEMPERATURE, WATER_NONE_NONE_DEG C",
+      "DISSOLVED OXYGEN (DO)_NONE_NONE_MG/L",
+      "CONDUCTIVITY_NONE_NONE_US/CM",
+      "PH_NONE_NONE_NONE"
     )    
     
     # Helper to split semicolon-separated characteristic lists (robust)
@@ -195,7 +195,7 @@ mod_depth_server <- function(id, tadat) {
     normalize_NA_token <- function(x) {
       x <- as.character(x)
       x <- trimws(x)
-      sub("(_NA_NA_)", " ", x)
+      sub("(_NONE_NONE_)", " ", x)
     }
     
     # Extract trailing numeric count from token strings like "TOKEN (5)". Returns NA if none.
@@ -254,6 +254,7 @@ mod_depth_server <- function(id, tadat) {
       }
     })
     
+  # 'Review Depth Data' button click
   shiny::observeEvent(input$review_depth_profile_data, {
     # if TADA.Remove column exists, filter out records where TADA.Remove == TRUE;
     # if it doesn't exist, keep all records (don't filter)
@@ -276,7 +277,7 @@ mod_depth_server <- function(id, tadat) {
       session = shiny::getDefaultReactiveDomain()
     )    
     
-    
+    # remove any rows as necessary
     input_raw_df <- tadat$raw %>%
       {
         if("TADA.Remove" %in% names(.)) {
@@ -316,6 +317,17 @@ mod_depth_server <- function(id, tadat) {
       return()
     }
 
+    # browser()
+    # target_value1 <- 'DEPTH, SECCHI DISK DEPTH'
+    #       
+    # # Split the data frame
+    # row_to_move <- depth_categorized_df[depth_categorized_df$TADA.CharacteristicName == target_value1, ]  # Row to move
+    # remaining_rows <- depth_categorized_df[depth_categorized_df$TADA.CharacteristicName != target_value1, ]  # Other rows
+    # 
+    # # Recombine with the target row at the bottom
+    # depth_categorized_df <- rbind(remaining_rows, row_to_move)
+    
+    
     # shiny::incProgress(0.75, detail = "Computing ID combos (TADA_IDDepthProfiles)")
     site_date_char_groups_df <- tryCatch({
       EPATADA::TADA_IDDepthProfiles(depth_categorized_df,
@@ -491,6 +503,16 @@ mod_depth_server <- function(id, tadat) {
       if ("Unit" %in% names(df_full)) disp_cols <- c(disp_cols, "Unit")
       display_df <- df_full[, intersect(disp_cols, names(df_full)), drop = FALSE]
 
+      # # Move this row to the bottom to prevent a EPATADA error
+      # target_value <- 'DEPTH, SECCHI DISK DEPTH M'
+      # 
+      # # Split the data frame
+      # row_to_move <- display_df[display_df$Characteristic == target_value, ]  # Row to move
+      # remaining_rows <- display_df[display_df$Characteristic != target_value, ]  # Other rows
+      # 
+      # # Recombine with the target row at the bottom
+      # display_df <- rbind(remaining_rows, row_to_move)
+      
       DT::datatable(
         display_df,
         rownames = FALSE,
@@ -614,12 +636,23 @@ mod_depth_server <- function(id, tadat) {
     )
     df_chars$CompID <- vapply(char_choices, normalize_token, FUN.VALUE = character(1), USE.NAMES = FALSE)
     if (!all(is.na(units))) df_chars$Unit <- units
+    
+    browser()
+    target_value <- 'DEPTH, SECCHI DISK DEPTH M'
+          
+    # Split the data frame
+    row_to_move <- df_chars[df_chars$Characteristic == target_value, ]  # Row to move
+    remaining_rows <- df_chars[df_chars$Characteristic != target_value, ]  # Other rows
+    
+    # Recombine with the target row at the bottom
+    df_chars <- rbind(remaining_rows, row_to_move)    
 
     depth_profile$available_characteristics_df <- df_chars
 
     # Pre-select defaults by priority (match normalized preferred_characteristics)
     df_chars_local <- depth_profile$available_characteristics_df
     sel_rows <- integer(0)
+
     for (pc in preferred_characteristics) {
       pc_clean <- normalize_token(pc)
       idx <- which(df_chars_local$CompID == pc_clean | df_chars_local$Characteristic == pc_clean)
@@ -986,12 +1019,12 @@ mod_depth_server <- function(id, tadat) {
   output$depth_plot_data_table <- DT::renderDT({
     df <- depth_plot_data()
     if (is.null(df) || nrow(df) == 0) {
-      datatable(data.frame(Message = "No data to show. Click Update plot or select a Site/Date and characteristics."),
+      DT::datatable(data.frame(Message = "No data to show. Click Update plot or select a Site/Date and characteristics."),
                 options = list(dom = 't'))
     } else {
       # Format numeric columns reasonably
       # Use server = TRUE if you expect many rows; small tables fine server = FALSE
-      datatable(
+      DT::datatable(
         df,
         rownames = FALSE,
         options = list(pageLength = 15, scrollX = TRUE, dom = 't')
