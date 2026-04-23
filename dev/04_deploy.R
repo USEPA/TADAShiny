@@ -16,10 +16,10 @@
 # This is how to add the shiny sever file needed for any deployment
 # golem::add_shinyserver_file() # already exists
 
-# This is how to setup deployment to EPA's Posit Connect
+# This is how to setup deployment to Posit Connect
 # golem::add_positconnect_file() # already exists see rsconnect folder
 
-# This is how to setup deployment to TetraTech's shinyappsio
+# This is how to setup deployment to shinyappsio
 # golem::add_shinyappsio_file() # already exists see rsconnect folder
 
 # This is how to deploy, works for both TT shinyappsio and EPA posit connect

@@ -70,7 +70,8 @@ Suggests:
     packrat,
     remotes,
     rprojroot,
-    mockery
+    mockery,
+    igraph
 Remotes:
     USEPA/EPATADA@develop,
     USEPA/rExpertQuery
