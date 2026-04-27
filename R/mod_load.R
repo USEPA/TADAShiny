@@ -49,8 +49,6 @@
 # County: census file has no header; on failure return empty data.frame with expected columns
 .safe_fetch_county <- function(u) {
   txt <- .safe_req_string(u)
-  cols <- c("STUSAB", "STATE", "COUNTY", "COUNTY_NAME", "COUNTY_ID")
-  # should be 
   cols <- c("STATE_CD", "STATE_FIPS", "COUNTY_FIPS", "COUNTY_NAME", "COUNTY_FOOBAR")
   # dataRetrieval::read_waterdata_samples needs "US:{STATE_FIPS}"
   # and "US:{STATE_FIPS}:{COUNTY_FIPS}"
@@ -67,8 +65,8 @@
   )
   if (is.null(dt)) {
     return(data.frame(
-      STUSAB = character(), STATE = character(), COUNTY = character(),
-      COUNTY_NAME = character(), COUNTY_ID = character(), stringsAsFactors = FALSE
+      STATE_CD = character(), STATE_FIPS = character(), COUNTY_FIPS = character(),
+      COUNTY_NAME = character(), COUNTY_FOOBAR = character(), stringsAsFactors = FALSE
     ))
   }
   as.data.frame(dt)
@@ -286,9 +284,9 @@ mod_query_data_ui <- function(id) {
         3,
         shiny::selectizeInput(
           ns("media"),
-          tags$span(
+          shiny::tags$span(
             "Sample Media",
-            tags$i(
+            shiny::tags$i(
               class = "glyphicon glyphicon-info-sign",
               style = "color:#0072B2;",
               title = "TADA is designed to work with water data"
@@ -378,7 +376,7 @@ mod_query_data_ui <- function(id) {
       # widget to upload WQP profile or WQX formatted spreadsheet
       column(
         9,
-        tags$div(
+        shiny::tags$div(
           id = "file-upload-wrapper", # Add a wrapper div with an id
           shiny::fileInput(
             ns("file"),
@@ -420,7 +418,7 @@ mod_query_data_ui <- function(id) {
       # widget to upload WQP profile or WQX formatted spreadsheet
       column(
         9,
-        tags$div(
+        shiny::tags$div(
           id = "progress-file-wrapper", # Add a wrapper div with an id
           shiny::fileInput(
             ns("progress_file"),
@@ -433,7 +431,7 @@ mod_query_data_ui <- function(id) {
       )
     ),
     # JavaScript implementing the stopwatch (client-side)
-    tags$script(HTML("
+    shiny::tags$script(HTML("
 (function () {
     // Keep state inside closure so it's fresh per modal instance
     var running = false;
@@ -580,6 +578,284 @@ mod_query_data_ui <- function(id) {
   )
 }
 
+
+all.cols <- c(
+  "ResultIdentifier",
+  "ActivityTypeCode",
+  "TADA.ActivityType.Flag",
+  "TADA.ReplicateSampleID",
+  "ActivityMediaName",
+  "TADA.ActivityMediaName",
+  "ActivityMediaSubdivisionName",
+  "TADA.Media.Flag",
+  "CountryCode",
+  "StateCode",
+  "CountyCode",
+  "MonitoringLocationName",
+  "TADA.MonitoringLocationName",
+  "MonitoringLocationTypeName",
+  "TADA.MonitoringLocationTypeName",
+  "MonitoringLocationDescriptionText",
+  "LatitudeMeasure",
+  "TADA.LatitudeMeasure",
+  "LongitudeMeasure",
+  "TADA.LongitudeMeasure",
+  "HorizontalCoordinateReferenceSystemDatumName",
+  "TADA.SuspectCoordinates.Flag",
+  "HUCEightDigitCode",
+  "MonitoringLocationIdentifier",
+  "TADA.MonitoringLocationIdentifier",
+  "TADA.NearbySites.Flag",
+  "TADA.NearbySiteGroup",
+  "TADA.DistanceAway.Meters",
+  "TADA.AURefSource",
+  "ResultSampleFractionText",
+  "TADA.ResultSampleFractionText",
+  "TADA.SampleFraction.Flag",
+  "Target.TADA.ResultSampleFractionText",
+  "TADA.FractionAssumptions",
+  "CharacteristicName",
+  "TADA.CharacteristicName",
+  "Target.TADA.CharacteristicName",
+  "TADA.CharacteristicNameAssumptions",
+  "SubjectTaxonomicName",
+  "SampleTissueAnatomyName",
+  "MethodSpeciationName",
+  "TADA.MethodSpeciationName",
+  "TADA.Target.MethodSpeciationName",
+  "TADA.MethodSpeciation.Flag",
+  "Target.TADA.MethodSpeciationName",
+  "Target.TADA.SpeciationConversionFactor",
+  "TADA.SpeciationAssumptions",
+  "TADA.SpeciationUnitConversion",
+  "TADA.SpeciationConversionFactor",
+  "TADA.ComparableDataIdentifier",
+  "TADA.Harmonized.Flag",
+  "ActivityStartDate",
+  "ActivityStartTime.Time",
+  "ActivityStartTime.TimeZoneCode",
+  "ActivityStartDateTime",
+  "ResultMeasureValue",
+  "ResultMeasure.MeasureUnitCode",
+  "TADA.ResultMeasureValue",
+  "TADA.ResultMeasure.MeasureUnitCode",
+  "TADA.Target.ResultMeasure.MeasureUnitCode",
+  "TADA.WQXUnitConversionFactor",
+  "TADA.WQXUnitConversionCoefficient",
+  "TADA.WQXResultUnitConversion",
+  "TADA.ResultUnit.Flag",
+  "ResultValueTypeName",
+  "TADA.ResultMeasureValueDataTypes.Flag",
+  "TADA.ResultValueAboveUpperThreshold.Flag",
+  "TADA.ResultValueBelowLowerThreshold.Flag",
+  "ResultDetectionConditionText",
+  "DetectionQuantitationLimitTypeName",
+  "DetectionQuantitationLimitMeasure.MeasureValue",
+  "DetectionQuantitationLimitMeasure.MeasureUnitCode",
+  "TADA.DetectionQuantitationLimitMeasure.MeasureValue",
+  "TADA.DetectionQuantitationLimitMeasure.MeasureUnitCode",
+  "TADA.DetectionQuantitationLimitMeasure.MeasureValueDataTypes.Flag",
+  "TADA.CensoredData.Flag",
+  "TADA.CensoredMethod",
+  "TADA.ConsolidatedDepth",
+  "TADA.ConsolidatedDepth.Bottom",
+  "TADA.ConsolidatedDepth.Unit",
+  "TADA.DepthCategory.Flag",
+  "TADA.DepthProfileAggregation.Flag",
+  "ResultDepthHeightMeasure.MeasureValue",
+  "TADA.ResultDepthHeightMeasure.MeasureValue",
+  "TADA.ResultDepthHeightMeasure.MeasureValueDataTypes.Flag",
+  "ResultDepthHeightMeasure.MeasureUnitCode",
+  "TADA.ResultDepthHeightMeasure.MeasureUnitCode",
+  "TADA.WQXConversionFactor.ResultDepthHeightMeasure",
+  "ResultDepthAltitudeReferencePointText",
+  "ActivityRelativeDepthName",
+  "ActivityDepthHeightMeasure.MeasureValue",
+  "TADA.WQXConversionFactor.ActivityDepthHeightMeasure",
+  "TADA.ActivityDepthHeightMeasure.MeasureValue",
+  "TADA.ActivityDepthHeightMeasure.MeasureValueDataTypes.Flag",
+  "ActivityDepthHeightMeasure.MeasureUnitCode",
+  "TADA.ActivityDepthHeightMeasure.MeasureUnitCode",
+  "ActivityTopDepthHeightMeasure.MeasureValue",
+  "TADA.ActivityTopDepthHeightMeasure.MeasureValue",
+  "TADA.WQXConversionFactor.ActivityTopDepthHeightMeasure",
+  "TADA.ActivityTopDepthHeightMeasure.MeasureValueDataTypes.Flag",
+  "ActivityTopDepthHeightMeasure.MeasureUnitCode",
+  "TADA.ActivityTopDepthHeightMeasure.MeasureUnitCode",
+  "ActivityBottomDepthHeightMeasure.MeasureValue",
+  "TADA.ActivityBottomDepthHeightMeasure.MeasureValue",
+  "TADA.WQXConversionFactor.ActivityBottomDepthHeightMeasure",
+  "TADA.ActivityBottomDepthHeightMeasure.MeasureValueDataTypes.Flag",
+  "ActivityBottomDepthHeightMeasure.MeasureUnitCode",
+  "TADA.ActivityBottomDepthHeightMeasure.MeasureUnitCode",
+  "ResultTimeBasisText",
+  "StatisticalBaseCode",
+  "ResultFileUrl",
+  "TADA.ContinuousData.Flag",
+  "TADA.ResultValueAggregation.Flag",
+  "TADA.NutrientSummation.Flag",
+  "TADA.NutrientSummationGroup",
+  "TADA.NutrientSummationEquation",
+  "ResultAnalyticalMethod.MethodName",
+  "ResultAnalyticalMethod.MethodDescriptionText",
+  "ResultAnalyticalMethod.MethodIdentifier",
+  "ResultAnalyticalMethod.MethodIdentifierContext",
+  "ResultAnalyticalMethod.MethodUrl",
+  "TADA.AnalyticalMethod.Flag",
+  "SampleCollectionMethod.MethodIdentifier",
+  "SampleCollectionMethod.MethodIdentifierContext",
+  "SampleCollectionMethod.MethodName",
+  "SampleCollectionMethod.MethodDescriptionText",
+  "SampleCollectionEquipmentName",
+  "MeasureQualifierCode",
+  "ResultStatusIdentifier",
+  "TADA.MeasureQualifierCode.Flag",
+  "TADA.MeasureQualifierCode.Def",
+  "ResultCommentText",
+  "ActivityCommentText",
+  "HydrologicCondition",
+  "HydrologicEvent",
+  "DataQuality.PrecisionValue",
+  "DataQuality.BiasValue",
+  "DataQuality.ConfidenceIntervalValue",
+  "DataQuality.UpperConfidenceLimitValue",
+  "DataQuality.LowerConfidenceLimitValue",
+  "SamplingDesignTypeCode",
+  "LaboratoryName",
+  "ResultLaboratoryCommentText",
+  "ActivityIdentifier",
+  "OrganizationIdentifier",
+  "OrganizationFormalName",
+  "TADA.MultipleOrgDuplicate",
+  "TADA.MultipleOrgDupGroupID",
+  "TADA.ResultSelectedMultipleOrgs",
+  "TADA.SingleOrgDupGroupID",
+  "TADA.SingleOrgDup.Flag",
+  "ProjectName",
+  "ProjectDescriptionText",
+  "ProjectIdentifier",
+  "ProjectFileUrl",
+  "QAPPApprovedIndicator",
+  "QAPPApprovalAgencyName",
+  "TADA.QAPPDocAvailable",
+  "AquiferName",
+  "AquiferTypeName",
+  "LocalAqfrName",
+  "ConstructionDateText",
+  "WellDepthMeasure.MeasureValue",
+  "WellDepthMeasure.MeasureUnitCode",
+  "WellHoleDepthMeasure.MeasureValue",
+  "WellHoleDepthMeasure.MeasureUnitCode",
+  "ActivityDepthAltitudeReferencePointText",
+  "ActivityEndDate",
+  "ActivityEndTime.Time",
+  "ActivityEndTime.TimeZoneCode",
+  "ActivityEndDateTime",
+  "ActivityConductingOrganizationText",
+  "SampleAquifer",
+  "ActivityLocation.LatitudeMeasure",
+  "ActivityLocation.LongitudeMeasure",
+  "ResultWeightBasisText",
+  "ResultTemperatureBasisText",
+  "ResultParticleSizeBasisText",
+  "USGSPCode",
+  "BinaryObjectFileName",
+  "BinaryObjectFileTypeCode",
+  "AnalysisStartDate",
+  "ResultDetectionQuantitationLimitUrl",
+  "LabSamplePreparationUrl",
+  "timeZoneStart",
+  "timeZoneEnd",
+  "ActivityStartTime.TimeZoneCode_offset",
+  "ActivityEndTime.TimeZoneCode_offset",
+  "SourceMapScaleNumeric",
+  "HorizontalAccuracyMeasure.MeasureValue",
+  "HorizontalAccuracyMeasure.MeasureUnitCode",
+  "HorizontalCollectionMethodName",
+  "VerticalMeasure.MeasureValue",
+  "VerticalMeasure.MeasureUnitCode",
+  "VerticalAccuracyMeasure.MeasureValue",
+  "VerticalAccuracyMeasure.MeasureUnitCode",
+  "VerticalCollectionMethodName",
+  "VerticalCoordinateReferenceSystemDatumName",
+  "FormationTypeText",
+  "ProjectMonitoringLocationWeightingUrl",
+  "DrainageAreaMeasure.MeasureValue",
+  "DrainageAreaMeasure.MeasureUnitCode",
+  "ContributingDrainageAreaMeasure.MeasureValue",
+  "ContributingDrainageAreaMeasure.MeasureUnitCode",
+  "ProviderName",
+  "LastUpdated",
+  "ATTAINS.OrganizationIdentifier",
+  "ATTAINS.SubmissionId",
+  "ATTAINS.HasProtectionPlan",
+  "ATTAINS.AssessmentUnitName",
+  "ATTAINS.NhdPlusId",
+  "ATTAINS.Tas303d",
+  "ATTAINS.IsThreatened",
+  "ATTAINS.State",
+  "ATTAINS.On303dList",
+  "ATTAINS.OrganizationName",
+  "ATTAINS.Region",
+  "ATTAINS.ShapeLength",
+  "ATTAINS.ReportingCycle",
+  "ATTAINS.AssmntJoinKey",
+  "ATTAINS.HasTmdl",
+  "ATTAINS.OrgType",
+  "ATTAINS.PermIdJoinKey",
+  "ATTAINS.CatchmentIsTribal",
+  "ATTAINS.IrCategory",
+  "ATTAINS.WaterbodyReportLink",
+  "ATTAINS.AssessmentUnitIdentifier",
+  "ATTAINS.OverallStatus",
+  "ATTAINS.IsAssessed",
+  "ATTAINS.IsImpaired",
+  "ATTAINS.Has4bPlan",
+  "ATTAINS.Huc12",
+  "ATTAINS.HasAlternativePlan",
+  "ATTAINS.VisionPriority303d",
+  "ATTAINS.AreaSqkm",
+  "ATTAINS.CatchmentAreaSqkm",
+  "ATTAINS.CatchmentStateCode",
+  "ATTAINS.CatchmentResolution",
+  "ATTAINS.WaterType",
+  "ATTAINS.ShapeArea",
+  "TADA.Remove",
+  "TADA.RemovalReason",
+  "TADAShiny.tab",
+  "geometry"
+)
+
+# Keep only the columns in 'keep_cols' (in order); print removed and missing
+restrict_to_keep_cols <- function(df, keep_cols = all.cols, verbose = TRUE) {
+  orig_names <- names(df)
+  
+  # Preserve the order you provided in keep_cols (skip those not in df)
+  keep_ordered <- keep_cols[keep_cols %in% orig_names]
+  
+  # Columns to remove (present in df but not in keep list)
+  removed <- setdiff(orig_names, keep_cols)
+  
+  # Columns requested but not present in df (informational only)
+  missing <- setdiff(keep_cols, orig_names)
+  
+  # Subset and return
+  df_out <- df[, keep_ordered, drop = FALSE]
+  
+  if (isTRUE(verbose)) {
+    if (length(removed)) {
+      message("Removing ", length(removed), " column(s): ", paste(removed, collapse = ", "))
+    } else {
+      message("No columns removed.")
+    }
+    if (length(missing)) {
+      message("Requested but not present in input (not added): ",
+              paste(missing, collapse = ", "))
+    }
+  }
+  df_out
+}
+
 #' query_data Server Functions
 #'
 #' @noRd
@@ -715,9 +991,15 @@ mod_query_data_server <- function(id, tadat) {
       # Ensure spinner is removed regardless of success or error
       shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
 
-      # If successful, initialize table and add blank TADA.Remove column
+      # If successful, reduce columns then initialize
       if (success == TRUE) {
-        # add empty TADA.Remove column
+        # Standardize to TADA template order before restricting
+        raw <- EPATADA::TADA_OrderCols(raw)
+        
+        # Trim to keep list (prints removed columns to console)
+        raw <- restrict_to_keep_cols(raw, keep_cols = all.cols, verbose = TRUE)
+        
+        # Let initializeTable add TADA.Remove for new datasets
         raw$TADA.Remove <- NULL
 
         initializeTable(tadat, raw)
@@ -736,6 +1018,7 @@ mod_query_data_server <- function(id, tadat) {
       shiny::req(input$progress_file)
       # user uploaded data
       readFile(tadat, input$progress_file$datapath)
+      # resumed session will not trim the users input dataset, extra columns they have would be carried through
     })
 
     # if user presses example data button, make tadat$raw the one of the example_data contained within the TADA package.
@@ -745,13 +1028,13 @@ mod_query_data_server <- function(id, tadat) {
         spin = "double-bounce",
         color = "#0071bc",
         text = tagList(
-          tags$div(
-            tags$p('Loading example data', tags$br(), input$example_data),
+          shiny::tags$div(
+            shiny::tags$p('Loading example data', shiny::tags$br(), input$example_data),
             style = "text-align:center; padding: 12px;",
-                   tags$p(id = "js_time_display", "00:00:00")
+                   shiny::tags$p(id = "js_time_display", "00:00:00")
           ),
           # Hidden input to hold elapsed seconds for server (JS updates it)
-          tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
+          shiny::tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
         ),
         session = shiny::getDefaultReactiveDomain()
       )
@@ -769,9 +1052,12 @@ mod_query_data_server <- function(id, tadat) {
         raw <- EPATADA::Data_Nutrients_UT
       }
 
-      initializeTable(tadat, raw)
-  
+      # Clean → order → restrict → initialize
       raw <- EPATADA::TADA_AutoClean(raw)
+      raw <- EPATADA::TADA_OrderCols(raw)
+      raw <- restrict_to_keep_cols(raw, keep_cols = all.cols, verbose = TRUE)
+      
+      initializeTable(tadat, raw)
 
       shinybusy::remove_modal_spinner() # session = session)  # shiny::getDefaultReactiveDomain())
 
@@ -1057,13 +1343,13 @@ mod_query_data_server <- function(id, tadat) {
           spin = "double-bounce",
           color = "#0071bc",
           text = tagList(
-            tags$div(
-              tags$p('Querying Data Source', tags$br(), 'EPA (WQX)'),
+            shiny::tags$div(
+              shiny::tags$p('Querying Data Source', shiny::tags$br(), 'EPA (WQX)'),
               style = "text-align:center; padding: 12px;",
-                     tags$p(id = "js_time_display", "00:00:00")
+                     shiny::tags$p(id = "js_time_display", "00:00:00")
             ),
             # Hidden input to hold elapsed seconds for server (JS updates it)
-            tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
+            shiny::tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
           ),
           session = shiny::getDefaultReactiveDomain()
         )
@@ -1325,13 +1611,13 @@ mod_query_data_server <- function(id, tadat) {
           spin = "double-bounce",
           color = "#0071bc",
           text = tagList(
-            tags$div(
-              tags$p('Querying Data Source', tags$br(), 'USGS (Samples Data API)'),
+            shiny::tags$div(
+              shiny::tags$p('Querying Data Source', shiny::tags$br(), 'USGS (Samples Data API)'),
               style = "text-align:center; padding: 12px;",
-                     tags$p(id = "js_time_display", "00:00:00")
+                     shiny::tags$p(id = "js_time_display", "00:00:00")
             ),
             # Hidden input to hold elapsed seconds for server (JS updates it)
-            tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
+            shiny::tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
           ),
           session = shiny::getDefaultReactiveDomain()
         )
@@ -1357,7 +1643,7 @@ mod_query_data_server <- function(id, tadat) {
           boundingBox = bbox_reactive(),
         )
         
-        NWIS_results <- shiny::reactiveVal(NULL)
+        NWIS_results <- NULL
         got_NWIS_data <- FALSE
         nwis_error_message_text <- NULL
         
@@ -1369,13 +1655,13 @@ mod_query_data_server <- function(id, tadat) {
           },
           error = function(e) {
             # Error handling: show error message and re-enable harmonize button
-            nwis_error_message_text <<- paste(tags$strong("An error occurred while querying NWIS (USGS):"), tags$p(e$message))
+            nwis_error_message_text <<- paste(shiny::tags$strong("An error occurred while querying NWIS (USGS):"), shiny::tags$p(e$message))
             
             shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
           }
         )
         
-        if (got_NWIS_data == TRUE && nrow(NWIS_results) > 0) {
+        if (got_NWIS_data && nrow(NWIS_results) > 0) {
           NWIS_results_rename <- EPATADA::TADA_RenametoLegacy(NWIS_results)
           
           # TEMP FIX!!!!!!!!!
@@ -1444,7 +1730,7 @@ mod_query_data_server <- function(id, tadat) {
           shiny::showModal(
             shiny::modalDialog(
               title = "Empty Query",
-             tags$p(message_text), 
+             shiny::tags$p(message_text), 
              HTML(nwis_error_message_text)
             )
           )
@@ -1452,7 +1738,9 @@ mod_query_data_server <- function(id, tadat) {
         else {
           disableLoading(session)
           shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
-          raw <- All_results_clean
+          
+          # Reduce to your keep list and print removed columns
+          raw <- restrict_to_keep_cols(All_results_clean, keep_cols = all.cols, verbose = TRUE)
           initializeTable(tadat, raw)
         }
       }
@@ -1487,9 +1775,6 @@ mod_query_data_server <- function(id, tadat) {
     })
   })
 }
-
-
-
 
 initializeTable <- function(tadat, raw) {
   # Test to see if this is a raw table or one previously worked on in TADA
@@ -1531,28 +1816,28 @@ disableLoading <- function(session) {
   shiny::insertUI(
     selector = "#query_data_1-example_data_go", # Insert relative to the button
     where = "afterEnd", # Place it immediately after the button
-    ui = tags$span("Reload the TADAShiny app to load new data",
+    ui = shiny::tags$span("Reload the TADAShiny app to load new data",
       style = "margin-left: 10px; color: red;"
     )
   )
   shiny::insertUI(
     selector = "#query_data_1-querynow", # Insert relative to the button
     where = "afterEnd", # Place it immediately after the button
-    ui = tags$span("Reload the TADAShiny app to query the Water Quality Portal",
+    ui = shiny::tags$span("Reload the TADAShiny app to query the Water Quality Portal",
       style = "margin-left: 10px; color: red;"
     )
   )
   shiny::insertUI(
     selector = "#file-upload-wrapper", # Use the wrapper div's id
     where = "afterEnd", # Place it immediately after the wrapper div
-    ui = tags$span("Reload the TADAShiny app to upload a new dataset",
+    ui = shiny::tags$span("Reload the TADAShiny app to upload a new dataset",
       style = "margin-left: 10px; color: red;"
     )
   )
   shiny::insertUI(
     selector = "#progress-file-wrapper", # Insert relative to the button
     where = "afterEnd", # Place it immediately after the button
-    ui = tags$span("Reload the TADAShiny app to upload a new progress file",
+    ui = shiny::tags$span("Reload the TADAShiny app to upload a new progress file",
       style = "margin-left: 10px; color: red;"
     )
   )

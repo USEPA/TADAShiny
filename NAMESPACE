@@ -2,6 +2,7 @@
 
 export("%>%")
 export(run_app)
+import(TADACommunityHub)
 import(rExpertQuery)
 importFrom(data.table,as.data.table)
 importFrom(data.table,data.table)
