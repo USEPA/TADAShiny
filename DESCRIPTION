@@ -73,7 +73,7 @@ Suggests:
     mockery,
     igraph
 Remotes:
-    USEPA/EPATADA@develop,
+    USEPA/EPATADA,
     USEPA/rExpertQuery
 Depends: 
     R (>= 4.1.0)
