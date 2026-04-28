@@ -317,18 +317,6 @@ mod_depth_server <- function(id, tadat) {
       return()
     }
 
-    # browser()
-    # target_value1 <- 'DEPTH, SECCHI DISK DEPTH'
-    #       
-    # # Split the data frame
-    # row_to_move <- depth_categorized_df[depth_categorized_df$TADA.CharacteristicName == target_value1, ]  # Row to move
-    # remaining_rows <- depth_categorized_df[depth_categorized_df$TADA.CharacteristicName != target_value1, ]  # Other rows
-    # 
-    # # Recombine with the target row at the bottom
-    # depth_categorized_df <- rbind(remaining_rows, row_to_move)
-    
-    
-    # shiny::incProgress(0.75, detail = "Computing ID combos (TADA_IDDepthProfiles)")
     site_date_char_groups_df <- tryCatch({
       EPATADA::TADA_IDDepthProfiles(depth_categorized_df,
                                     nresults = TRUE,
@@ -411,7 +399,7 @@ mod_depth_server <- function(id, tadat) {
   }) # end shiny::observeEvent(input$review_depth_profile_data, { ... })
 
 
-      # the leaflet map - shows all sites in the loaded data, with popups of site ID and number of records (if CompID available)
+    # the leaflet map - shows all sites in the loaded data, with popups of site ID and number of records (if CompID available)
     output$depth_profile_sites_map <- leaflet::renderLeaflet({
       shiny::req(mapdat$text)
       EPATADA::TADA_OverviewMap(depth_profile$depth_categorized_df)
@@ -637,7 +625,6 @@ mod_depth_server <- function(id, tadat) {
     df_chars$CompID <- vapply(char_choices, normalize_token, FUN.VALUE = character(1), USE.NAMES = FALSE)
     if (!all(is.na(units))) df_chars$Unit <- units
     
-    browser()
     target_value <- 'DEPTH, SECCHI DISK DEPTH M'
           
     # Split the data frame
@@ -1027,7 +1014,7 @@ mod_depth_server <- function(id, tadat) {
       DT::datatable(
         df,
         rownames = FALSE,
-        options = list(pageLength = 15, scrollX = TRUE, dom = 't')
+        options = list(pageLength = 30, scrollX = TRUE, dom = 't')
       )
     }
   }, server = FALSE)  
