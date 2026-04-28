@@ -16,6 +16,7 @@ Copyright: This software is in the public domain because it contains materials t
 Imports: 
     EPATADA,
     rExpertQuery,
+    TADACommunityHub,
     golem,
     magrittr,
     shiny,
@@ -70,10 +71,12 @@ Suggests:
     packrat,
     remotes,
     rprojroot,
-    mockery
+    mockery,
+    igraph
 Remotes:
     USEPA/EPATADA@develop,
-    USEPA/rExpertQuery
+    USEPA/rExpertQuery@develop,
+    USEPA/TADACommunityHub@main
 Depends: 
     R (>= 4.1.0)
 Encoding: UTF-8

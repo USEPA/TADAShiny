@@ -14,7 +14,7 @@ testthat::test_that(".safe_fetch_county handles malformed input by returning fal
   df <- .safe_fetch_county("ignored")
   testthat::expect_true(is.data.frame(df))
   # In the code, the fallback when fread fails returns a data.frame with STUSAB etc.
-  testthat::expect_true(all(c("STUSAB", "STATE", "COUNTY", "COUNTY_NAME", "COUNTY_ID") %in% names(df)))
+  testthat::expect_true(all(c("STATE_CD", "STATE_FIPS", "COUNTY_FIPS", "COUNTY_NAME", "COUNTY_FOOBAR") %in% names(df)))
 })
 
 testthat::test_that(".safe_fetch_csv_column returns values when given CSV text (via temp file + file://)", {

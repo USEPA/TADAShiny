@@ -15,6 +15,7 @@
 #' @importFrom jsonlite fromJSON
 #' @importFrom pkgload load_all
 #' @import rExpertQuery
+#' @import TADACommunityHub
 NULL
 
 #' Pipe operator
