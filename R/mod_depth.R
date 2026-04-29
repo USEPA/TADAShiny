@@ -159,6 +159,43 @@ mod_depth_ui <- function(id) {
 }    
 
 
+# --- Depth module helper functions (module-level so they are testable) ---
+
+# Helper to split semicolon-separated characteristic lists (robust)
+split_characteristics <- function(vec) {
+  vec <- na.omit(as.character(vec))
+  if (length(vec) == 0) return(character(0))
+  parts <- unlist(strsplit(vec, ";", fixed = TRUE))
+  parts <- trimws(parts)
+  parts <- parts[parts != ""]
+  sort(unique(parts))
+}
+
+# Normalize tokens: trim and remove trailing " (digits)" only
+normalize_token <- function(x) {
+  x <- as.character(x)
+  x <- trimws(x)
+  sub(" \\(\\d+\\)$", "", x)
+}
+
+# Normalize tokens: remove _NONE_NONE_ sequence if needed
+normalize_NA_token <- function(x) {
+  x <- as.character(x)
+  x <- trimws(x)
+  sub("_NONE_NONE_", " ", x)
+}
+
+# Extract trailing numeric count from token strings like "TOKEN (5)". Returns NA if none.
+extract_trailing_count <- function(token) {
+  token <- as.character(token)
+  m <- regexec(".*?\\((\\d+)\\)\\s*$", token)
+  r <- regmatches(token, m)
+  if (length(r) == 0 || length(r[[1]]) < 2) return(NA_integer_)
+  val <- as.integer(r[[1]][2])
+  if (is.na(val)) NA_integer_ else val
+}
+
+
 #' depth Server Functions
 #'
 #' @noRd
@@ -174,40 +211,7 @@ mod_depth_server <- function(id, tadat) {
       "PH_NONE_NONE_NONE"
     )    
     
-    # Helper to split semicolon-separated characteristic lists (robust)
-    split_characteristics <- function(vec) {
-      vec <- na.omit(as.character(vec))
-      if (length(vec) == 0) return(character(0))
-      parts <- unlist(strsplit(vec, ";", fixed = TRUE))
-      parts <- trimws(parts)
-      parts <- parts[parts != ""]
-      sort(unique(parts))
-    }
-    
-    # Normalize tokens: trim and remove trailing " (digits)" only
-    normalize_token <- function(x) {
-      x <- as.character(x)
-      x <- trimws(x)
-      sub(" \\(\\d+\\)$", "", x)
-    }
-    
-    # Normalize tokens: remove _NA_NA_ sequence if needed
-    normalize_NA_token <- function(x) {
-      x <- as.character(x)
-      x <- trimws(x)
-      sub("(_NONE_NONE_)", " ", x)
-    }
-    
-    # Extract trailing numeric count from token strings like "TOKEN (5)". Returns NA if none.
-    extract_trailing_count <- function(token) {
-      token <- as.character(token)
-      m <- regexec(".*?\\((\\d+)\\)\\s*$", token)
-      r <- regmatches(token, m)
-      if (length(r) == 0 || length(r[[1]]) < 2) return(NA_integer_)
-      val <- as.integer(r[[1]][2])
-      if (is.na(val)) NA_integer_ else val
-    }
-    
+
     # Safe message for plot area (plotly)
     safe_message_plot <- function(msg) {
       plotly::plot_ly() %>%
