@@ -21,3 +21,4 @@ _disable_autoload.R
 ^\.rscignore$
 ^dev$
 ^air\.toml$
+.pre-commit-config.yaml
