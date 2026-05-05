@@ -61,7 +61,7 @@ app_server <- function(input, output, session) {
   shinyjs::disable(selector = '.nav li a[data-value="Filter"]')
   shinyjs::disable(selector = '.nav li a[data-value="Censored"]')
   shinyjs::disable(selector = '.nav li a[data-value="Harmonize"]')
-  shinyjs::disable(selector = '.nav li a[data-value="Depth"]')  
+  shinyjs::disable(selector = '.nav li a[data-value="Depth"]')
   shinyjs::disable(selector = '.nav li a[data-value="Figures"]')
   shinyjs::disable(selector = '.nav li a[data-value="Review"]')
 
@@ -78,10 +78,10 @@ app_server <- function(input, output, session) {
     # browser()
     shiny::showModal(shiny::modalDialog(
       title = "Data Loaded",
-      shiny::HTML(paste0("A total of <strong>", scales::comma(length(tadat$raw$ResultIdentifier)), 
-                         "</strong> results at <strong>",
-                         scales::comma(length(unique(tadat$raw$MonitoringLocationIdentifier))), 
-                         "</strong> sites were successfully loaded into the app and are displayed on the Overview tab.
+      shiny::HTML(paste0("A total of <strong>", scales::comma(length(tadat$raw$ResultIdentifier)),
+        "</strong> results at <strong>",
+        scales::comma(length(unique(tadat$raw$MonitoringLocationIdentifier))),
+        "</strong> sites were successfully loaded into the app and are displayed on the Overview tab.
       The following data wrangling steps were performed automatically when data was loaded:
       <ol>
       <li> created TADA versions of a subset of columns for editing (originals are retained),

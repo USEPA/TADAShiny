@@ -193,9 +193,9 @@ mod_filtering_server <- function(id, tadat) {
     shiny::observeEvent(list(active_data(), input$field_sel), {
       d <- active_data()
       shiny::req(d)  # d is a data frame; can be 0 rows
-      
+
       display_mode <- if (!is.null(input$field_sel)) input$field_sel else "key"
-      
+
       # Safe call to TADA_FieldCounts; return an empty data frame with a Fields column if it fails
       fc <- tryCatch({
         if (nrow(d) == 0) {
@@ -212,21 +212,21 @@ mod_filtering_server <- function(id, tadat) {
       }, error = function(e) {
         data.frame(Fields = character(), stringsAsFactors = FALSE)
       })
-      
+
       # Join with filter descriptions; guarantee a Description column exists
       ff <- dplyr::left_join(fc, filter_dat, by = "Fields")
       if (!"Description" %in% names(ff)) {
         ff$Description <- character(nrow(ff))
       }
       ff$Description[is.na(ff$Description) | ff$Description == ""] <- "No description available"
-      
+
       tables$filter_fields <- ff
-      
+
       tables$filter_fields[
         tables$filter_fields$Fields == "TADA.Media.Flag",
         "Description"
       ] <- "TADA-standardized media fields"
-      
+
       # Clear selection if previously selected field no longer exists
       if (!is.null(values$selected_field) && !(values$selected_field %in% names(d))) {
         values$selected_field <- NULL
@@ -234,7 +234,7 @@ mod_filtering_server <- function(id, tadat) {
         shinyjs::hide("excludeSelectedValues")
         output$promptStep2 <- shiny::renderUI(htmltools::HTML("<p>No valid field selected.</p>"))
       }
-      
+
       # Clear any selection in the Fields table
       DT::selectRows(DT::dataTableProxy("filterStep1", session = session), NULL)
     })
@@ -344,7 +344,7 @@ mod_filtering_server <- function(id, tadat) {
         ordering = TRUE,
         paging = TRUE,
         pageLength = 20,
-        lengthMenu = list(c(10, 25, 50, -1), c('10', '25', '50', 'All'))
+        lengthMenu = list(c(10, 25, 50, -1), c("10", "25", "50", "All"))
       ),
       server = TRUE
     )
@@ -730,9 +730,9 @@ mod_filtering_server <- function(id, tadat) {
               nrow(removals_df) == nrow(tadat$raw) &&
               ncol(removals_df) > 0) {
               # Coerce to logical to avoid surprises
-              rem_log <- as.data.frame(lapply(removals_df, 
-                                              function(col) if (is.logical(col)) col else as.logical(col)), 
-                                       optional = TRUE) # added this to preserve column names for use in TADA.RemovalReason
+              rem_log <- as.data.frame(lapply(removals_df,
+                function(col) if (is.logical(col)) col else as.logical(col)),
+              optional = TRUE) # added this to preserve column names for use in TADA.RemovalReason
               cn <- colnames(rem_log)
               mat <- as.matrix(rem_log)
 

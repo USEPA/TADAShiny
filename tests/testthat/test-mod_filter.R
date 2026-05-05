@@ -209,7 +209,7 @@ test_that("mod_filtering_server: field list observer is robust to empty/missing 
       NULL
     }
   }
-  
+
   # Case 1: Empty dataset (nrow = 0) -> should not call FieldCounts and should not error
   tadat1 <- shiny::reactiveValues(
     raw = data.frame(),            # 0-row df
@@ -217,15 +217,15 @@ test_that("mod_filtering_server: field list observer is robust to empty/missing 
     selected_filters = NULL,
     field_sel = NULL
   )
-  
+
   expect_silent(
     shiny::testServer(mod_filtering_server, args = list(tadat = tadat1), {
       session$setInputs(field_sel = "key")
       session$flushReact()
-      
+
       # The DT should render without error
       expect_false(is.null(output$filterStep1))
-      
+
       # If the widget exposes data, it should have Fields + Description columns
       dt_data <- extract_dt_data(output$filterStep1)
       if (!is.null(dt_data)) {
@@ -235,7 +235,7 @@ test_that("mod_filtering_server: field list observer is robust to empty/missing 
       }
     })
   )
-  
+
   # Case 2: Non-empty dataset but EPATADA::TADA_FieldCounts likely unavailable
   # The tryCatch should yield an empty 'Fields' data frame with a Description column.
   tadat2 <- shiny::reactiveValues(
@@ -244,12 +244,12 @@ test_that("mod_filtering_server: field list observer is robust to empty/missing 
     selected_filters = NULL,
     field_sel = NULL
   )
-  
+
   expect_silent(
     shiny::testServer(mod_filtering_server, args = list(tadat = tadat2), {
       session$setInputs(field_sel = "most")
       session$flushReact()
-      
+
       expect_false(is.null(output$filterStep1))
       dt_data <- extract_dt_data(output$filterStep1)
       if (!is.null(dt_data)) {
