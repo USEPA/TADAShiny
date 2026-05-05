@@ -281,15 +281,24 @@ mod_depth_server <- function(id, tadat) {
       session = shiny::getDefaultReactiveDomain()
     )    
     
-    # remove any rows as necessary
-    input_raw_df <- tadat$raw %>%
-      {
-        if("TADA.Remove" %in% names(.)) {
-          dplyr::filter(., TADA.Remove == FALSE)
-        } else {
-          . # Return the original data frame unchanged
-        }
+    # Keep rows only when TADA.Remove is explicitly FALSE (no NA expected)
+    input_raw_df <- if ("TADA.Remove" %in% names(tadat$raw)) {
+      df <- tadat$raw
+      
+      # Enforce the assumption
+      if (anyNA(df[["TADA.Remove"]])) {
+        stop("TADA.Remove contains NA; none expected.")
       }
+      
+      # Optional: ensure logical type
+      if (!is.logical(df[["TADA.Remove"]])) {
+        stop("TADA.Remove must be logical (TRUE/FALSE).")
+      }
+      
+      df[df[["TADA.Remove"]] == FALSE, , drop = FALSE]
+    } else {
+      tadat$raw
+    }
 
     # shiny::incProgress(0.40, detail = "Flagging depth categories (TADA_FlagDepthCategory)")
     depth_categorized_df <- tryCatch({
@@ -400,7 +409,8 @@ mod_depth_server <- function(id, tadat) {
     # shiny::incProgress(1, detail = "Done")
     shinybusy::remove_modal_spinner()
 
-  }) # end shiny::observeEvent(input$review_depth_profile_data, { ... })
+  }
+  ) # end shiny::observeEvent(input$review_depth_profile_data, { ... })
 
 
     # the leaflet map - shows all sites in the loaded data, with popups of site ID and number of records (if CompID available)
