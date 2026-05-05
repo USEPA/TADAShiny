@@ -163,7 +163,7 @@ mod_depth_ui <- function(id) {
 
 # Helper to split semicolon-separated characteristic lists (robust)
 split_characteristics <- function(vec) {
-  vec <- na.omit(as.character(vec))
+  vec <- stats::na.omit(as.character(vec))
   if (length(vec) == 0) return(character(0))
   parts <- unlist(strsplit(vec, ";", fixed = TRUE))
   parts <- trimws(parts)
@@ -525,7 +525,7 @@ mod_depth_server <- function(id, tadat) {
     }
     pairs_df <- depth_profile$site_date_pairs
     if (is.null(pairs_df) || nrow(pairs_df) == 0) {
-      updateSelectInput(session, "activity_date", choices = character(0), selected = NA)
+      shiny::updateSelectInput(session, "activity_date", choices = character(0), selected = NA)
       return()
     }
     site_dates <- sort(unique(as.character(pairs_df$ActivityStartDate[pairs_df$MonitoringLocationIdentifier == site_in])))
@@ -567,7 +567,7 @@ mod_depth_server <- function(id, tadat) {
     # Extract tokens from char_col and compute N per-token
     raw_vals <- as.character(df_sel[[char_col]])
     char_choices <- split_characteristics(raw_vals)
-    if (length(char_choices) == 0) char_choices <- sort(unique(na.omit(raw_vals)))
+    if (length(char_choices) == 0) char_choices <- sort(unique(stats::na.omit(raw_vals)))
     if (length(char_choices) == 0) {
       depth_profile$available_characteristics_df <- data.frame(Characteristic = character(0), stringsAsFactors = FALSE)
       return()
@@ -652,7 +652,7 @@ mod_depth_server <- function(id, tadat) {
     }
     if (length(sel_rows) < 3) {
       more_idx <- setdiff(seq_len(nrow(df_chars_local)), sel_rows)
-      if (length(more_idx) > 0) sel_rows <- c(sel_rows, head(more_idx, 3 - length(sel_rows)))
+      if (length(more_idx) > 0) sel_rows <- c(sel_rows, utils::head(more_idx, 3 - length(sel_rows)))
     }
     sel_rows <- unique(sel_rows)
     if (length(sel_rows) > 0) {
@@ -706,12 +706,12 @@ mod_depth_server <- function(id, tadat) {
     if (length(characteristics) == 0) {
       if (!is.null(depth_profile$available_characteristics_df) && nrow(depth_profile$available_characteristics_df) > 0) {
         if ("CompID" %in% names(depth_profile$available_characteristics_df)) {
-          characteristics <- head(as.character(depth_profile$available_characteristics_df$CompID), 3)
+          characteristics <- utils::head(as.character(depth_profile$available_characteristics_df$CompID), 3)
         } else {
-          characteristics <- head(as.character(depth_profile$available_characteristics_df$Characteristic), 3)
+          characteristics <- utils::head(as.character(depth_profile$available_characteristics_df$Characteristic), 3)
         }
       } else {
-        characteristics <- head(unique(depth_profile$depth_categorized_df$TADA.ComparableDataIdentifier %||% character(0)), 3)
+        characteristics <- utils::head(unique(depth_profile$depth_categorized_df$TADA.ComparableDataIdentifier %||% character(0)), 3)
         if (length(characteristics) == 0) return(safe_message_plot("No characteristic selected"))
       }
     }
@@ -819,7 +819,7 @@ mod_depth_server <- function(id, tadat) {
 
   # Create a reactive data.frame that contains the same underlying data the plot
   # uses, but in "wide" form: one column per selected characteristic and rows = depths.
-  depth_plot_data <- reactive({
+  depth_plot_data <- shiny::reactive({
     # Require that plot has been prepared (the eventReactive builds the plot on Update)
     # but we don't rely on its object - instead rebuild the filtered df similarly
     shiny::req(depth_profile$loaded)
@@ -847,12 +847,12 @@ mod_depth_server <- function(id, tadat) {
     if (length(characteristics) == 0) {
       if (!is.null(depth_profile$available_characteristics_df) && nrow(depth_profile$available_characteristics_df) > 0) {
         if ("CompID" %in% names(depth_profile$available_characteristics_df)) {
-          characteristics <- head(as.character(depth_profile$available_characteristics_df$CompID), 3)
+          characteristics <- utils::head(as.character(depth_profile$available_characteristics_df$CompID), 3)
         } else {
-          characteristics <- head(as.character(depth_profile$available_characteristics_df$Characteristic), 3)
+          characteristics <- utils::head(as.character(depth_profile$available_characteristics_df$Characteristic), 3)
         }
       } else {
-        characteristics <- head(unique(depth_profile$depth_categorized_df$TADA.ComparableDataIdentifier %||% character(0)), 3)
+        characteristics <- utils::head(unique(depth_profile$depth_categorized_df$TADA.ComparableDataIdentifier %||% character(0)), 3)
         if (length(characteristics) == 0) return(NULL)
       }
     }

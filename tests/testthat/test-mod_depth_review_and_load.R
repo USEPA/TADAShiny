@@ -1,8 +1,4 @@
 # tests/testthat/test-mod_depth_review_and_load.R
-library(testthat)
-library(shiny)
-library(EPATADA)
-library(shinybusy)
 
 reset_depth_profile_state <- function() {
   depth_profile$depth_categorized_df <- NULL

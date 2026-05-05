@@ -51,7 +51,7 @@ depth_profile <- shiny::reactiveValues(
 
 # Helper to split semicolon-separated characteristic lists (robust)
 split_characteristics <- function(vec) {
-  vec <- na.omit(as.character(vec))
+  vec <- stats::na.omit(as.character(vec))
   if (length(vec) == 0) return(character(0))
   parts <- unlist(strsplit(vec, ";", fixed = TRUE))
   parts <- trimws(parts)
@@ -592,16 +592,16 @@ server <- function(input, output, session) {
     req(depth_profile$loaded)
     site_in <- input$depth_profile_site_id
     if (is.null(site_in) || !nzchar(site_in)) {
-      updateSelectInput(session, "activity_date", choices = character(0), selected = NA)
+      shiny::updateSelectInput(session, "activity_date", choices = character(0), selected = NA)
       return()
     }
     pairs_df <- depth_profile$site_date_pairs
     if (is.null(pairs_df) || nrow(pairs_df) == 0) {
-      updateSelectInput(session, "activity_date", choices = character(0), selected = NA)
+      shiny::updateSelectInput(session, "activity_date", choices = character(0), selected = NA)
       return()
     }
     site_dates <- sort(unique(as.character(pairs_df$ActivityStartDate[pairs_df$MonitoringLocationIdentifier == site_in])))
-    updateSelectInput(session, "activity_date", choices = site_dates, selected = if (length(site_dates) > 0) site_dates[1] else NA)
+    shiny::updateSelectInput(session, "activity_date", choices = site_dates, selected = if (length(site_dates) > 0) site_dates[1] else NA)
   })
 
   # When user selects an activity_date (after site chosen), compute available characteristics
@@ -639,7 +639,7 @@ server <- function(input, output, session) {
     # Extract tokens from char_col and compute N per-token
     raw_vals <- as.character(df_sel[[char_col]])
     char_choices <- split_characteristics(raw_vals)
-    if (length(char_choices) == 0) char_choices <- sort(unique(na.omit(raw_vals)))
+    if (length(char_choices) == 0) char_choices <- sort(unique(stats::na.omit(raw_vals)))
     if (length(char_choices) == 0) {
       depth_profile$available_characteristics_df <- data.frame(Characteristic = character(0), stringsAsFactors = FALSE)
       return()
@@ -880,7 +880,7 @@ server <- function(input, output, session) {
   
   # Create a reactive data.frame that contains the same underlying data the plot
   # uses, but in "wide" form: one column per selected characteristic and rows = depths.
-  depth_plot_data <- reactive({
+  depth_plot_data <- shiny::reactive({
     # Require that plot has been prepared (the eventReactive builds the plot on Update)
     # but we don't rely on its object - instead rebuild the filtered df similarly
     req(depth_profile$loaded)

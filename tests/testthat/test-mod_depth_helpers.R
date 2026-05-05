@@ -1,8 +1,6 @@
 # tests/testthat/test-mod_depth_helpers.R
 # Unit tests for helper functions: split_characteristics, normalize_token, etc.
 
-library(testthat)
-
 # Ensure module helpers are loaded (testServer loads via TADAShiny package)
 
 describe("split_characteristics", {

@@ -21,6 +21,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Cristina Mullin \email{mywaterway@epa.gov} (\href{https://orcid.org/0000-0002-0615-6087}{ORCID})
   \item Trip Hook
   \item Elise Hinman
 }

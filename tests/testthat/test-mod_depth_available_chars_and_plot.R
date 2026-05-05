@@ -1,8 +1,4 @@
 # tests/testthat/test-mod_depth_available_chars_and_plot.R
-library(testthat)
-library(shiny)
-library(EPATADA)
-library(plotly)
 
 reset_depth_profile_state <- function() {
   depth_profile$depth_categorized_df <- NULL

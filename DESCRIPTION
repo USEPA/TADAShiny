@@ -86,5 +86,5 @@ Config/testthat/load-all: list(export_all = FALSE, helpers = FALSE)
 LazyData: true
 URL: https://github.com/USEPA/TADAShiny
 BugReports: https://github.com/USEPA/TADAShiny/issues
-RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)
+Config/roxygen2/version: 8.0.0
