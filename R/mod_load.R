@@ -1045,7 +1045,7 @@ mod_query_data_server <- function(id, tadat) {
         raw <- EPATADA::Data_R5_TADAPackageDemo
       }
       if (input$example_data == "Six Tribal Nations (143k results)") {
-        raw <- EPATADA::Data_6Tribes_5y
+        raw <- EPATADA::Data_TribalNations
       }
       if (input$example_data == "Utah Nutrients (15k results)") {
         raw <- EPATADA::Data_Nutrients_UT
