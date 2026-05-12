@@ -51,7 +51,7 @@ testthat::test_that("disableLoading calls shiny update functions and attempts to
   mockery::stub(disableLoading, "shiny::updateSelectInput", mock_updateSelectInput)
   mockery::stub(disableLoading, "shinyjs::disable", mock_shinyjs_disable)
   mockery::stub(disableLoading, "shiny::insertUI", mock_insertUI)
-  
+
   # Call disableLoading with a fake session object (not used by our mocks, but keep something sensible)
   fake_session <- list(user = "fake")
   testthat::expect_silent(disableLoading(fake_session))

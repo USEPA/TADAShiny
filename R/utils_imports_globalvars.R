@@ -15,7 +15,6 @@
 #' @importFrom jsonlite fromJSON
 #' @importFrom pkgload load_all
 #' @import rExpertQuery
-#' @import TADACommunityHub
 NULL
 
 #' Pipe operator
@@ -52,5 +51,7 @@ utils::globalVariables(c(
   "nd_method", "nd_mult", "num", "num_chr", "od_method", "od_mult", "org_table",
   "organization", "original_source", "project", "resultCount", "sampleMedia",
   "selected_filters", "selected_flags", "siteType", "siteid", "startDate", "statecode",
-  "tot_n", "TADA.RemovalReason", "Fields", "Value", "old_warn"
+  "tot_n", "TADA.RemovalReason", "Fields", "Value", "old_warn", "TADA.ComparableDataIdentifier",
+  "value", ".char_label", "Depth (m)", ".value_num", ".char_label", ".depth_num", ".data",
+  "TADA.MonitoringLocationIdentifier"
 ))

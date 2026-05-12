@@ -101,7 +101,7 @@ app_ui <- function(request) {
           value = "Depth",
           htmltools::br(),
           mod_depth_ui("depth_1")
-        ),        
+        ),
         shiny::tabPanel("8. Explore",
           value = "Figures",
           htmltools::br(),

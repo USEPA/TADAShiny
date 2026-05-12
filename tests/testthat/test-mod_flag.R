@@ -1,6 +1,3 @@
-library(testthat)
-library(shiny)
-
 reset_flag_state <- function(tadat) {
   tadat$raw <- NULL
   tadat$removals <- NULL
@@ -169,4 +166,3 @@ test_that("checkFlagColumns/flagCensus helper behavior is consistent", {
   expect_identical(names(complete_census), flag_types)
   expect_true(checkFlagColumns(raw_complete))
 })
-

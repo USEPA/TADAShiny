@@ -23,3 +23,5 @@ _disable_autoload.R
 ^air\.toml$
 ^\.positai$
 ^\.claude$
+.pre-commit-config.yaml
+

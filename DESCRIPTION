@@ -16,7 +16,6 @@ Copyright: This software is in the public domain because it contains materials t
 Imports: 
     EPATADA,
     rExpertQuery,
-    TADACommunityHub,
     golem,
     magrittr,
     shiny,
@@ -75,8 +74,7 @@ Suggests:
     igraph
 Remotes:
     USEPA/EPATADA@develop,
-    USEPA/rExpertQuery@develop,
-    USEPA/TADACommunityHub@main
+    USEPA/rExpertQuery@develop
 Depends: 
     R (>= 4.1.0)
 Encoding: UTF-8
@@ -86,5 +84,5 @@ Config/testthat/load-all: list(export_all = FALSE, helpers = FALSE)
 LazyData: true
 URL: https://github.com/USEPA/TADAShiny
 BugReports: https://github.com/USEPA/TADAShiny/issues
-RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)
+Config/roxygen2/version: 8.0.0
