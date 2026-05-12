@@ -21,3 +21,5 @@ _disable_autoload.R
 ^\.rscignore$
 ^dev$
 ^air\.toml$
+^\.positai$
+^\.claude$
