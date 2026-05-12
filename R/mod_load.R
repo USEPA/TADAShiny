@@ -1041,14 +1041,13 @@ mod_query_data_server <- function(id, tadat) {
 
       tadat$example_data <- input$example_data
 
-      if (input$example_data == "EPA Region 5 May 1-7 2019 (172k results)") {
-        # raw <- EPATADA::TADA_AutoClean(EPATADA::Data_R5_TADAPackageDemo)
+      if (input$example_data == "EPA Region 5 May 1-7 2019 (173k results)") {
         raw <- EPATADA::Data_R5_TADAPackageDemo
       }
-      if (input$example_data == "Tribal (136k results)") {
+      if (input$example_data == "Six Tribal Nations (143k results)") {
         raw <- EPATADA::Data_6Tribes_5y
       }
-      if (input$example_data == "Nutrients Utah (15k results)") {
+      if (input$example_data == "Utah Nutrients (15k results)") {
         raw <- EPATADA::Data_Nutrients_UT
       }
 
