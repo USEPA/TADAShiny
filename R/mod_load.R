@@ -252,7 +252,14 @@ mod_query_data_ui <- function(id) {
         3,
         shiny::selectizeInput(
           ns("org"),
-          "Organization(s)",
+          shiny::tags$span(
+            "Organization(s)",
+            shiny::tags$i(
+              class = "glyphicon glyphicon-info-sign",
+              style = "color:#0072B2;",
+              title = "Organization filter is only available with the Data Source EPA (WQX)"
+            )
+          ),          
           choices = NULL,
           options = list(placeholder = "Start typing or use drop down menu"),
           multiple = TRUE
@@ -568,7 +575,7 @@ mod_query_data_ui <- function(id) {
         // ignore if bootstrap/jQuery not available
         }
     }
-    
+
     // Fallback: if the page already contains the timer element at load (unlikely in your case),
     // ensure it starts at 00:00:00 until a modal open triggers startTimerNow.
     var existing = document.getElementById('js_time_display');
@@ -829,19 +836,19 @@ all.cols <- c(
 # Keep only the columns in 'keep_cols' (in order); print removed and missing
 restrict_to_keep_cols <- function(df, keep_cols = all.cols, verbose = TRUE) {
   orig_names <- names(df)
-  
+
   # Preserve the order you provided in keep_cols (skip those not in df)
   keep_ordered <- keep_cols[keep_cols %in% orig_names]
-  
+
   # Columns to remove (present in df but not in keep list)
   removed <- setdiff(orig_names, keep_cols)
-  
+
   # Columns requested but not present in df (informational only)
   missing <- setdiff(keep_cols, orig_names)
-  
+
   # Subset and return
   df_out <- df[, keep_ordered, drop = FALSE]
-  
+
   if (isTRUE(verbose)) {
     if (length(removed)) {
       message("Removing ", length(removed), " column(s): ", paste(removed, collapse = ", "))
@@ -850,7 +857,7 @@ restrict_to_keep_cols <- function(df, keep_cols = all.cols, verbose = TRUE) {
     }
     if (length(missing)) {
       message("Requested but not present in input (not added): ",
-              paste(missing, collapse = ", "))
+        paste(missing, collapse = ", "))
     }
   }
   df_out
@@ -862,7 +869,7 @@ restrict_to_keep_cols <- function(df, keep_cols = all.cols, verbose = TRUE) {
 mod_query_data_server <- function(id, tadat) {
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
-    
+
     # Increase timeout to 5 minutes
     withr::local_options(list(timeout = max(getOption("timeout"), 300)))
 
@@ -871,10 +878,10 @@ mod_query_data_server <- function(id, tadat) {
 
     ## creates download template button used for importing data to TADAShiny - used in option C
     template_data <- shiny::reactive(EPATADA::TADA_GetTemplate())
-    
+
     # hold error message for NWIS queries in a reactive value so it can be displayed in a modal if needed
     nwis_error_message_text <- NULL
-    
+
     # return an ms excel file with the template columns
     output$download_template <- shiny::downloadHandler(
       filename = function() {
@@ -887,7 +894,7 @@ mod_query_data_server <- function(id, tadat) {
       },
       contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
-    
+
     ## greys out Load button for example data until file has been selected
     # https://stackoverflow.com/questions/24175997/force-no-default-selection-in-selectinput
     shiny::observeEvent(input$example_data, {
@@ -995,10 +1002,10 @@ mod_query_data_server <- function(id, tadat) {
       if (success == TRUE) {
         # Standardize to TADA template order before restricting
         raw <- EPATADA::TADA_OrderCols(raw)
-        
+
         # Trim to keep list (prints removed columns to console)
         raw <- restrict_to_keep_cols(raw, keep_cols = all.cols, verbose = TRUE)
-        
+
         # Let initializeTable add TADA.Remove for new datasets
         raw$TADA.Remove <- NULL
 
@@ -1029,9 +1036,9 @@ mod_query_data_server <- function(id, tadat) {
         color = "#0071bc",
         text = tagList(
           shiny::tags$div(
-            shiny::tags$p('Loading example data', shiny::tags$br(), input$example_data),
+            shiny::tags$p("Loading example data", shiny::tags$br(), input$example_data),
             style = "text-align:center; padding: 12px;",
-                   shiny::tags$p(id = "js_time_display", "00:00:00")
+            shiny::tags$p(id = "js_time_display", "00:00:00")
           ),
           # Hidden input to hold elapsed seconds for server (JS updates it)
           shiny::tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
@@ -1040,15 +1047,14 @@ mod_query_data_server <- function(id, tadat) {
       )
 
       tadat$example_data <- input$example_data
-      
-      if (input$example_data == "EPA Region 5 May 1-7 2019 (172k results)") {
-        # raw <- EPATADA::TADA_AutoClean(EPATADA::Data_R5_TADAPackageDemo)
+
+      if (input$example_data == "EPA Region 5 May 1-7 2019 (173k results)") {
         raw <- EPATADA::Data_R5_TADAPackageDemo
       }
-      if (input$example_data == "Tribal (136k results)") {
-        raw <- EPATADA::Data_6Tribes_5y
+      if (input$example_data == "Six Tribal Nations (143k results)") {
+        raw <- EPATADA::Data_TribalNations
       }
-      if (input$example_data == "Nutrients Utah (15k results)") {
+      if (input$example_data == "Utah Nutrients (15k results)") {
         raw <- EPATADA::Data_Nutrients_UT
       }
 
@@ -1056,7 +1062,7 @@ mod_query_data_server <- function(id, tadat) {
       raw <- EPATADA::TADA_AutoClean(raw)
       raw <- EPATADA::TADA_OrderCols(raw)
       raw <- restrict_to_keep_cols(raw, keep_cols = all.cols, verbose = TRUE)
-      
+
       initializeTable(tadat, raw)
 
       shinybusy::remove_modal_spinner() # session = session)  # shiny::getDefaultReactiveDomain())
@@ -1065,8 +1071,8 @@ mod_query_data_server <- function(id, tadat) {
     })
 
 
-    
-    
+
+
     statecodes_df <- readRDS(system.file("extdata", "statecodes_df.rds", package = "TADAShiny"))
 
     # this section has widget update commands for the selectizeinputs that have a lot of possible selections - shiny suggested hosting the choices server-side rather than ui-side
@@ -1215,7 +1221,7 @@ mod_query_data_server <- function(id, tadat) {
     # shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
 
 
-    
+
     # this event observer is triggered when the user hits the "Query Now" button, and then runs the TADAdataRetrieval function
     shiny::observeEvent(input$querynow, {
       tadat$original_source <- "Query"
@@ -1237,6 +1243,16 @@ mod_query_data_server <- function(id, tadat) {
       } else {
         tadat$countrycode <- input$countryocean
       }
+      if((input$providers == "all" || input$providers == "NWIS") && !is.null(input$org)) {
+        # display a modal and return because these are not compatible
+        # browser()
+        shiny::showModal(shiny::modalDialog(title = "Input warning",
+          paste0("The USGS (Samples Data API) data source does not recognize the Organization(s) argument.",
+                 " Use the Organization(s) option only with the EPA (WQX) data source."), easyClose = TRUE))
+        return(NULL)
+      }
+      
+      
       
       # this is used for toggling retrievals for 1 or both or the services
       providers_arg <- c("NWIS", "STORET")
@@ -1344,16 +1360,16 @@ mod_query_data_server <- function(id, tadat) {
           color = "#0071bc",
           text = tagList(
             shiny::tags$div(
-              shiny::tags$p('Querying Data Source', shiny::tags$br(), 'EPA (WQX)'),
+              shiny::tags$p("Querying Data Source", shiny::tags$br(), "EPA (WQX)"),
               style = "text-align:center; padding: 12px;",
-                     shiny::tags$p(id = "js_time_display", "00:00:00")
+              shiny::tags$p(id = "js_time_display", "00:00:00")
             ),
             # Hidden input to hold elapsed seconds for server (JS updates it)
             shiny::tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
           ),
           session = shiny::getDefaultReactiveDomain()
         )
-        
+
         # Create the list of input arguments for dataRetrieval::readWQPsummary
         args_temp <- args_create(
           statecode = tadat$statecode,
@@ -1371,73 +1387,73 @@ mod_query_data_server <- function(id, tadat) {
           providers = tadat$providers,
           bBox = bbox_reactive()
         )
-  
+
         # Get the data summary
         # does this have recent USGS data????
         result_summary <- dataRetrieval::whatWQPdata(args_temp)
-  
+
         # Check if anything is outside the tribal's shapefile boundary
         if (inherits(tadat$tribal_boundary, "sf")) {
           # Convert result_summary to sf object
           result_summary_sf <- result_summary |>
             sf::st_as_sf(coords = c("lon", "lat"), crs = 4326) |>
             sf::st_transform(crs = sf::st_crs(tadat$tribal_boundary))
-  
+
           # Filter the sites within the tribal boundary
           result_summary_sf_filter <- result_summary_sf |>
             sf::st_filter(tadat$tribal_boundary)
-  
+
           result_summary <- result_summary_sf_filter |>
             sf::st_set_geometry(NULL)
         }
-  
+
         # A warning section to show if the sample size is zero
         if (nrow(result_summary) == 0) {
           shiny::showModal(
             shiny::modalDialog(
               title = "Empty Query",
-              "Your query returned zero results. Please adjust your search inputs and try again. 
+              "Your query returned zero results. Please adjust your search inputs and try again.
               Remember to update the start and end dates."
             )
           )
           return()
         }
-  
+
         tot_sites <- result_summary |>
           dplyr::group_by(MonitoringLocationIdentifier) |>
           dplyr::summarise(tot_n = sum(resultCount)) |>
           dplyr::filter(tot_n > 0) |>
           dplyr::arrange(tot_n)
-  
+
         # A warning section to show if the sample size is zero
         if (nrow(tot_sites) == 0) {
           shiny::showModal(
             shiny::modalDialog(
               title = "Empty Query",
-              "Your query returned zero results. Please adjust your search inputs and try again. 
+              "Your query returned zero results. Please adjust your search inputs and try again.
               Remember to update the start and end dates."
             )
           )
           return()
         }
-  
+
         # Separate the sites into small and big sites
-  
+
         # Set the cut point to decide the small or big sites
         maxrecs <- 100000
         pretty_maxrecs <- prettyNum(maxrecs, big.mark = ",", scientific = FALSE)
-  
+
         smallsites <- tot_sites |> dplyr::filter(tot_n <= maxrecs)
         bigsites <- tot_sites |> dplyr::filter(tot_n > maxrecs)
-  
+
         # Set other location inputs to be NULL as site ID is available
         args_temp2 <- args_temp
-  
+
         args_temp2[["statecode"]] <- NULL
         args_temp2[["countycode"]] <- NULL
         args_temp2[["countrycode"]] <- NULL
         args_temp2[["bBox"]] <- NULL
-  
+
         # Download the data for water quality monitoring locations with less than 'maxrec' records.
         if (nrow(smallsites) > 0) {
           smallsitesgrp <- smallsites |>
@@ -1446,42 +1462,42 @@ mod_query_data_server <- function(id, tadat) {
               threshold = maxrecs,
               maxgroupsize = 100 # 100 # changed from 300 after Warning: Error in httr2::req_perform: HTTP 414 URI Too Long.
             ))
-  
+
           smallsites_list <- list()
-  
+
           small_title <- base::paste0(
-            "Downloading EPA Water Quality eXchange (WQX) data from sites with less than or equal to ", pretty_maxrecs,
+            "Downloading EPA Water Quality eXchange (WQX) data from ", scales::comma(nrow(smallsites)), " sites with less than or equal to ", pretty_maxrecs,
             " results."
           )
-  
+
           shiny::withProgress(message = small_title, detail = "0%", value = 0, {
             for (i in 1:max(smallsitesgrp$group)) {
               shiny::incProgress(1 / max(smallsitesgrp$group),
                 detail = base::paste0(round(i / max(smallsitesgrp$group) * 100), "%")
               )
-  
+
               small_site_chunk <- subset(
                 smallsitesgrp$MonitoringLocationIdentifier,
                 smallsitesgrp$group == i
               )
-  
+
               args_temp_small <- args_temp2
-  
+
               args_temp_small[["siteid"]] <- small_site_chunk
-  
+
               TADAprofile_smallsites_temp <- NULL
-              
+
               ## start of changes for using WQX3
-              tryCatch( 
+              tryCatch(
                 {
-                    # Download the WQP data using the WQX3 and the full Physical Chemistry profile
-                    TADAprofile_smallsites_temp <- dataRetrieval::readWQPdata(args_temp_small,
-                      service = 'ResultWQX3',
-                      dataProfile = "fullPhysChem",
-                      ignore_attributes = TRUE
-                    )
-                    # revert names to the legacy
-                    TADAprofile_smallsites_temp <- EPATADA::TADA_RenametoLegacy(TADAprofile_smallsites_temp)
+                  # Download the WQP data using the WQX3 and the full Physical Chemistry profile
+                  TADAprofile_smallsites_temp <- dataRetrieval::readWQPdata(args_temp_small,
+                    service = "ResultWQX3",
+                    dataProfile = "fullPhysChem",
+                    ignore_attributes = TRUE
+                  )
+                  # revert names to the legacy
+                  TADAprofile_smallsites_temp <- EPATADA::TADA_RenametoLegacy(TADAprofile_smallsites_temp)
                 },
                 error = function(e) {
                   # Error handling: show error message and re-enable harmonize button
@@ -1498,75 +1514,75 @@ mod_query_data_server <- function(id, tadat) {
               # Assign the data to the list
               TADAprofile_smallsites_temp$PreparationStartDate <- as.character(TADAprofile_smallsites_temp$PreparationStartDate)
               TADAprofile_smallsites_temp <- EPATADA::TADA_AutoClean(TADAprofile_smallsites_temp)
-              
+
               smallsites_list[[i]] <- TADAprofile_smallsites_temp
             }
           })
           # Combine the data
           TADA_smallsites <- dplyr::bind_rows(smallsites_list)
-  
+
           # Apply TADA_autoclean
           TADA_smallsites_clean <- EPATADA::TADA_AutoClean(TADA_smallsites) |>
             dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
         } else {
           TADA_smallsites_clean <- TADA_download_temp
         }
-  
+
         # Download the data for water quality monitoring locations with more than 'maxrec' records.
         if (nrow(bigsites) > 0) {
 
           bigsites_list <- list()
-  
+
           bsitesvec <- unique(bigsites$MonitoringLocationIdentifier)
-  
+
           big_title <- base::paste0(
             "Downloading STORET data from sites with greater than ", pretty_maxrecs,
             " results."
           )
-  
+
           shiny::withProgress(message = big_title, detail = "0%", value = 0, {
             for (i in 1:length(bsitesvec)) {
               shiny::incProgress(1 / length(bsitesvec),
                 detail = base::paste0(round(i / length(bsitesvec) * 100), "%")
               )
-  
+
               args_temp_big <- args_temp2
-  
+
               args_temp_big[["siteid"]] <- bsitesvec[i]
-              
+
               ## start of changes for using WQX3
-              
+
               # Download the WQP data using the WQX3 and the full Physical Chemistry profile
               bigsites_result_temp <- dataRetrieval::readWQPdata(args_temp_big,
-                service = 'ResultWQX3',
+                service = "ResultWQX3",
                 dataProfile = "fullPhysChem",
                 ignore_attributes = TRUE
               )
               # revert names to the legacy
               TADAprofile_bigsites_temp <- EPATADA::TADA_RenametoLegacy(bigsites_result_temp)
-              
+
               # Assign the data to the list
               bigsites_list[[i]] <- TADAprofile_bigsites_temp
-              
+
               ## end of changes for using WQX3
             }
           })
-  
+
           # Combine the data
           TADA_bigsites <- dplyr::bind_rows(bigsites_list)
-  
+
           # Apply TADA_autoclean
           TADA_bigsites_clean <- EPATADA::TADA_AutoClean(TADA_bigsites) |>
             dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
         } else {
           TADA_bigsites_clean <- TADA_download_temp
         }
-  
 
-  
+
+
         # Combine the Small and Big sites
         STORET_results <- dplyr::bind_rows(TADA_smallsites_clean, TADA_bigsites_clean)
-  
+
         # Convert the column types
         STORET_results <- STORET_results |>
           dplyr::mutate(dplyr::across(tidyselect::everything(), ~ {
@@ -1582,28 +1598,28 @@ mod_query_data_server <- function(id, tadat) {
               as.character(.x) # default case
             )
           }))
-  
+
         # remove the modal once the dataset has been pulled
         shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
       }
-      
+
       if ("NWIS" %in% providers_arg) {
         # use this to show the user something while they are waiting
         query_text_string <- NULL
-        
+
         if(input$state == ""){
           state_fips_arg <- NULL
           county_fips_arg <- NULL
         }
         else if(input$county == ""){
           state <- utils::head(counties[counties$STATE_CD == input$state, ], 1)
-          state_fips_arg <- paste('US', sprintf("%02d", state$STATE_FIPS), sep = ':')
+          state_fips_arg <- paste("US", sprintf("%02d", state$STATE_FIPS), sep = ":")
           county_fips_arg <- NULL
           query_text_string <- input$state
         } else {
           county <- counties[counties$STATE_CD == input$state & counties$COUNTY_NAME == input$county,]
-          state_fips_arg <- paste('US', sprintf("%02d", county$STATE_FIPS), sep = ':')
-          county_fips_arg <- paste('US', sprintf("%02d", county$STATE_FIPS), sprintf("%03d", county$COUNTY_FIPS), sep = ':')
+          state_fips_arg <- paste("US", sprintf("%02d", county$STATE_FIPS), sep = ":")
+          county_fips_arg <- paste("US", sprintf("%02d", county$STATE_FIPS), sprintf("%03d", county$COUNTY_FIPS), sep = ":")
           query_text_string <- paste(input$state, "and", county$COUNTY_NAME, sep=" ")
         }
         # a modal that pops up showing it's working on querying the portal
@@ -1612,16 +1628,16 @@ mod_query_data_server <- function(id, tadat) {
           color = "#0071bc",
           text = tagList(
             shiny::tags$div(
-              shiny::tags$p('Querying Data Source', shiny::tags$br(), 'USGS (Samples Data API)'),
+              shiny::tags$p("Querying Data Source", shiny::tags$br(), "USGS (Samples Data API)"),
               style = "text-align:center; padding: 12px;",
-                     shiny::tags$p(id = "js_time_display", "00:00:00")
+              shiny::tags$p(id = "js_time_display", "00:00:00")
             ),
             # Hidden input to hold elapsed seconds for server (JS updates it)
             shiny::tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
           ),
           session = shiny::getDefaultReactiveDomain()
         )
-       
+
         # Create the list of input arguments for dataRetrieval::read_waterdata_samples
         args_temp <- nwis_args_create(
           stateFips = state_fips_arg,
@@ -1642,46 +1658,46 @@ mod_query_data_server <- function(id, tadat) {
           dataProfile = "fullphyschem",
           boundingBox = bbox_reactive(),
         )
-        
+
         NWIS_results <- NULL
         got_NWIS_data <- FALSE
         nwis_error_message_text <- NULL
-        
-        tryCatch( 
+
+        tryCatch(
           {
             # stop("random error is NWIS")
             NWIS_results <- do.call(dataRetrieval::read_waterdata_samples, args_temp)
-            got_NWIS_data <- TRUE;
+            got_NWIS_data <- TRUE
           },
           error = function(e) {
             # Error handling: show error message and re-enable harmonize button
             nwis_error_message_text <<- paste(shiny::tags$strong("An error occurred while querying NWIS (USGS):"), shiny::tags$p(e$message))
-            
+
             shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
           }
         )
-        
+
         if (got_NWIS_data && nrow(NWIS_results) > 0) {
           NWIS_results_rename <- EPATADA::TADA_RenametoLegacy(NWIS_results)
-          
+
           # TEMP FIX!!!!!!!!!
           # NWIS uses SampleAquifer and STORET and TADA use AquiferName  Change to AquiferName
           colnames(NWIS_results_rename)[colnames(NWIS_results_rename) == "SampleAquifer"] <- "AquiferName"
-          
+
           # also getting non-fatal error from NWIS only data
           # [1] "Missing the following fields that are in the csv files:"
           # [1] "TADA.QAPPDocAvailable"
-          
+
           # this will not run if the df is empty
           NWIS_results_clean <- EPATADA::TADA_AutoClean(NWIS_results_rename)
-          
+
           NWIS_results <- EPATADA::TADA_OrderCols(NWIS_results_clean)
-          
+
           # this field is all NA but still needs to be recast as date
           # NWIS_results_ordered$Activity_EndDate <- as.Date(NWIS_results_ordered$Activity_EndDate)
-          
+
           # his this one later
-          # Warning: Error in dplyr::bind_rows: 
+          # Warning: Error in dplyr::bind_rows:
           # Can't combine ..1$ActivityStartDate <character> and ..2$ActivityStartDate <date>.
           NWIS_results$ActivityStartDate <- as.character(NWIS_results$ActivityStartDate)
           NWIS_results$ActivityStartDateTime <- as.character(NWIS_results$ActivityStartDateTime)
@@ -1693,15 +1709,15 @@ mod_query_data_server <- function(id, tadat) {
       # but if tadat$raw isn't empty, perform some initial QC of data that aren't media type water
       # or have NA Resultvalue and no detection limit data
       if (!is.null(nwis_error_message_text) && nzchar(nwis_error_message_text)) {
-         
-          shiny::showModal(shiny::modalDialog(
-            title = "NWIS Error",
-            HTML(nwis_error_message_text),
-            easyClose = FALSE, # Set to FALSE to force user to use a button to close
-            footer = tagList(
-              shiny::modalButton("Dismiss")
-            )
-          ))
+
+        shiny::showModal(shiny::modalDialog(
+          title = "NWIS Error",
+          HTML(nwis_error_message_text),
+          easyClose = FALSE, # Set to FALSE to force user to use a button to close
+          footer = tagList(
+            shiny::modalButton("Dismiss")
+          )
+        ))
       }
       else {
         if (exists("STORET_results") && exists("NWIS_results")) {
@@ -1712,33 +1728,33 @@ mod_query_data_server <- function(id, tadat) {
             # if the NWIS query resulted in no rows, then just include these results
             All_results <- STORET_results
           }
-          
+
           All_results_clean <- EPATADA::TADA_AutoClean(All_results)
-          
+
           All_results_clean <- EPATADA::TADA_OrderCols(All_results_clean)
         } else if (exists("NWIS_results")) { # && !is.null(NWIS_results())) {
           All_results_clean <- NWIS_results
         } else if (exists("STORET_results")) {
           All_results_clean <- STORET_results
         }
-        
+
         # using the NWIS retrieval this returns 0 x 181 - a list of the columns.
         if (dim(All_results_clean)[1] <= 0) {
-          message_text <- "Your query returned zero results. Please adjust your search inputs and try again. 
+          message_text <- "Your query returned zero results. Please adjust your search inputs and try again.
             Remember to update the start and end dates."
 
           shiny::showModal(
             shiny::modalDialog(
               title = "Empty Query",
-             shiny::tags$p(message_text), 
-             HTML(nwis_error_message_text)
+              shiny::tags$p(message_text),
+              HTML(nwis_error_message_text)
             )
           )
         }
         else {
           disableLoading(session)
           shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
-          
+
           # Reduce to your keep list and print removed columns
           raw <- restrict_to_keep_cols(All_results_clean, keep_cols = all.cols, verbose = TRUE)
           initializeTable(tadat, raw)
@@ -1746,7 +1762,7 @@ mod_query_data_server <- function(id, tadat) {
       }
     }) # end of observeEvent for querynow button
 
-    
+
     # Update the run parameters if example data is selected
     shiny::observeEvent(input$example_data_go, {
       tadat$original_source <- "Example"
@@ -1786,6 +1802,7 @@ initializeTable <- function(tadat, raw) {
     shinyjs::enable(selector = '.nav li a[data-value="Filter"]')
     shinyjs::enable(selector = '.nav li a[data-value="Censored"]')
     shinyjs::enable(selector = '.nav li a[data-value="Harmonize"]')
+    shinyjs::enable(selector = '.nav li a[data-value="Depth"]')
     shinyjs::enable(selector = '.nav li a[data-value="Figures"]')
     shinyjs::enable(selector = '.nav li a[data-value="Review"]')
   } else {

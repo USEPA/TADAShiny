@@ -21,7 +21,10 @@
 manifest.json
 
 # Other
+tests/_snaps/
 _snaps
 .Ruserdata
 .vscode/
 packrat/lib*/
+/dev/depth/archive
+.positai

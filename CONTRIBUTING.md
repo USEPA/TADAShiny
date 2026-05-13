@@ -1,30 +1,3 @@
----
-title: "Contributing"
-date: "`r Sys.Date()`"
-output: 
-  rmarkdown::html_vignette:
-    toc: true
-    number_sections: false
-vignette: >
-  %\VignetteIndexEntry{Contributing}
-  \usepackage[utf8]{inputenc}
-  %\VignetteEngine{knitr::rmarkdown}
-editor_options: 
-  chunk_output_type: console
-  markdown: 
-    wrap: 72
----
-
-```{r setup, include = FALSE}
-library(knitr)
-
-knitr::opts_chunk$set(
-  echo = TRUE,
-  warning = FALSE,
-  message = FALSE
-)
-```
-
 ## Contribute to TADA!
 
 We encourage you to read this project's

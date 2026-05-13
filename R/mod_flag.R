@@ -163,16 +163,16 @@ mod_data_flagging_server <- function(id, tadat) {
       # Build TADA.RemovalReason
       if (is.null(tadat$raw) == FALSE) {
         # Update TADA.RemovalReason (fast guard paths)
-        # this is the code cut-and-pasted from mod_filter.R - it should be the same process        
+        # this is the code cut-and-pasted from mod_filter.R - it should be the same process
         removals_df <- tadat$removals
 
         if (is.data.frame(removals_df) &&
           nrow(removals_df) == nrow(tadat$raw) &&
           ncol(removals_df) > 0) {
           # Coerce to logical to avoid surprises
-          rem_log <- as.data.frame(lapply(removals_df, 
-                                          function(col) if (is.logical(col)) col else as.logical(col)), 
-                                   optional = TRUE) # added this to preserve column names for use in TADA.RemovalReason
+          rem_log <- as.data.frame(lapply(removals_df,
+            function(col) if (is.logical(col)) col else as.logical(col)),
+          optional = TRUE) # added this to preserve column names for use in TADA.RemovalReason
           cn <- colnames(rem_log)
           mat <- as.matrix(rem_log)
 
@@ -246,6 +246,7 @@ mod_data_flagging_server <- function(id, tadat) {
         shinyjs::enable(selector = '.nav li a[data-value="Filter"]')
         shinyjs::enable(selector = '.nav li a[data-value="Censored"]')
         shinyjs::enable(selector = '.nav li a[data-value="Harmonize"]')
+        shinyjs::enable(selector = '.nav li a[data-value="Depth"]')
         shinyjs::enable(selector = '.nav li a[data-value="Figures"]')
         shinyjs::enable(selector = '.nav li a[data-value="Review"]')
       }
@@ -255,7 +256,16 @@ mod_data_flagging_server <- function(id, tadat) {
       shinybusy::show_modal_spinner(
         spin = "double-bounce",
         color = "#0071bc",
-        text = "Running flagging functions...",
+        # text = "Running flagging functions...",
+        text = tagList(
+          tags$div(
+            tags$p("Running flagging functions", tags$br(), input$example_data),
+            style = "text-align:center; padding: 12px;",
+            tags$p(id = "js_time_display", "00:00:00")
+          ),
+          # Hidden input to hold elapsed seconds for server (JS updates it)
+          tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
+        ),
         session = shiny::getDefaultReactiveDomain()
       )
 

@@ -97,12 +97,17 @@ app_ui <- function(request) {
           htmltools::br(),
           mod_harmonize_np_ui("harmonize_np_1")
         ),
-        shiny::tabPanel("7. Explore",
+        shiny::tabPanel("7. Depth",
+          value = "Depth",
+          htmltools::br(),
+          mod_depth_ui("depth_1")
+        ),
+        shiny::tabPanel("8. Explore",
           value = "Figures",
           htmltools::br(),
           mod_figures_ui("figures_1")
         ),
-        shiny::tabPanel("8. Review",
+        shiny::tabPanel("9. Review",
           value = "Review",
           htmltools::br(),
           mod_review_data_ui("review_data_1")

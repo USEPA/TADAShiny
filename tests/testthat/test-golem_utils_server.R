@@ -59,7 +59,7 @@ test_that("options() usage is safe and consistent", {
     rprojroot::find_package_root_file(),
     error = function(e) normalizePath(file.path(testthat::test_path(), "..", ".."), mustWork = FALSE)
   )
-  
+
   # Directories to scan
   dirs <- c(
     file.path(root, "R"),
@@ -69,32 +69,32 @@ test_that("options() usage is safe and consistent", {
     file.path(root, "dev")
   )
   dirs <- dirs[dir.exists(dirs)]
-  
+
   # Collect R files (flatten to character, clean up, then filter existing)
   r_files <- unlist(lapply(dirs, function(d) {
     list.files(d, pattern = "\\.[Rr]$", full.names = TRUE, recursive = TRUE)
   }), use.names = FALSE)
-  
+
   # Ensure character and clean
   r_files <- as.character(r_files)
   r_files <- r_files[!is.na(r_files) & nzchar(r_files)]
   r_files <- unique(r_files)
   r_files <- r_files[file.exists(r_files)]
-  
+
   # If nothing to scan, skip rather than fail
   skip_if(length(r_files) == 0, "No R files found to scan for options() usage.")
-  
+
   # Helper: read file lines
   read_file_lines <- function(f) {
     tryCatch(readLines(f, warn = FALSE), error = function(e) character(0))
   }
-  
+
   # Helper: find options() calls via parse, capturing srcref and code
   find_options_calls <- function(file) {
     calls <- list()
     exprs <- tryCatch(parse(file, keep.source = TRUE), error = function(e) NULL)
     if (is.null(exprs)) return(calls)
-    
+
     walk <- function(e) {
       if (is.call(e)) {
         fn <- as.character(e[[1]])
@@ -111,21 +111,21 @@ test_that("options() usage is safe and consistent", {
     walk(exprs)
     calls
   }
-  
+
   issues <- list()
-  
+
   for (f in r_files) {
     lines <- read_file_lines(f)
     calls <- find_options_calls(f)
     has_withr_local_options <- any(grepl("withr::local_options", lines, fixed = TRUE))
-    
+
     # Rule A: unnamed arguments to options()
     for (c in calls) {
       call <- c$call
       line <- c$line
       args <- as.list(call)[-1]
       arg_names <- names(as.list(call))[-1]
-      
+
       unnamed_idx <- which(is.na(arg_names) | arg_names == "")
       if (length(unnamed_idx) > 0) {
         bad <- TRUE
@@ -144,7 +144,7 @@ test_that("options() usage is safe and consistent", {
         }
       }
     }
-    
+
     # Rule B: discourage options("warn") for getting warn
     warn_get_lines <- grep("options\\(\\s*\"warn\"\\s*\\)", lines)
     for (ln in warn_get_lines) {
@@ -153,17 +153,17 @@ test_that("options() usage is safe and consistent", {
         f, ln, trimws(lines[ln])
       )
     }
-    
+
     # Rule C: options(warn = ...) without restoration or withr::local_options
     warn_set_lines <- grep("options\\s*\\(\\s*warn\\s*=", lines)
     for (ln in warn_set_lines) {
       window_lo <- max(1, ln - 10)
       window_hi <- min(length(lines), ln + 10)
       window <- lines[window_lo:window_hi]
-      
+
       nearby_withr <- any(grepl("withr::local_options", window, fixed = TRUE))
       nearby_onexit_restore <- any(grepl("on\\.exit\\s*\\(\\s*options\\s*\\(\\s*warn\\s*=", window))
-      
+
       if (!nearby_withr && !nearby_onexit_restore && !has_withr_local_options) {
         issues[[length(issues) + 1]] <- sprintf(
           "%s:%s: options(warn = ...) without restoration or withr::local_options. Add withr::local_options(list(warn = ...)) or on.exit(options(warn = old_warn), add = TRUE). Line: %s",
@@ -171,7 +171,7 @@ test_that("options() usage is safe and consistent", {
         )
       }
     }
-    
+
     # Rule D: interactive() guard + options(warn=...) warning
     interactive_guard_lines <- grep("if\\s*\\(\\s*interactive\\s*\\(\\s*\\)\\s*\\)", lines)
     if (length(interactive_guard_lines) > 0 && length(warn_set_lines) > 0) {
@@ -181,7 +181,7 @@ test_that("options() usage is safe and consistent", {
       )
     }
   }
-  
+
   if (length(issues) > 0) {
     msg <- paste0(
       "Unsafe or inconsistent options() usage detected:\n",
