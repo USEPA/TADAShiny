@@ -252,7 +252,14 @@ mod_query_data_ui <- function(id) {
         3,
         shiny::selectizeInput(
           ns("org"),
-          "Organization(s)",
+          shiny::tags$span(
+            "Organization(s)",
+            shiny::tags$i(
+              class = "glyphicon glyphicon-info-sign",
+              style = "color:#0072B2;",
+              title = "Organization filter is only available with the Data Source EPA (WQX)"
+            )
+          ),          
           choices = NULL,
           options = list(placeholder = "Start typing or use drop down menu"),
           multiple = TRUE
@@ -1237,7 +1244,17 @@ mod_query_data_server <- function(id, tadat) {
       } else {
         tadat$countrycode <- input$countryocean
       }
-
+      if((input$providers == "all" || input$providers == "NWIS") && !is.null(input$org)) {
+        # display a modal and return because these are not compatible
+        # browser()
+        shiny::showModal(shiny::modalDialog(title = "Input warning",
+          paste0("The USGS (Samples Data API) data source does not recognize the Organization(s) argument.",
+                 " Use the Organization(s) option only with the EPA (WQX) data source."), easyClose = TRUE))
+        return(NULL)
+      }
+      
+      
+      
       # this is used for toggling retrievals for 1 or both or the services
       providers_arg <- c("NWIS", "STORET")
       if (is.null(input$providers) | input$providers == "all") {
