@@ -58,7 +58,8 @@ Imports:
 Suggests:
     spelling,
     testthat (>= 3.0.0),
-    mockery
+    mockery,
+    rprojroot
 Remotes:
     USEPA/EPATADA@develop,
     USEPA/rExpertQuery@develop
