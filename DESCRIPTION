@@ -56,22 +56,10 @@ Imports:
     pkgload,
     httr2
 Suggests:
-    httr,
-    covr,
-    devtools,
-    knitr,
     spelling,
-    styler,
     testthat (>= 3.0.0),
-    roxygen2,
-    rsconnect,
-    rstudioapi,
-    geojsonsf,
-    packrat,
-    remotes,
-    rprojroot,
     mockery,
-    igraph
+    rprojroot
 Remotes:
     USEPA/EPATADA@develop,
     USEPA/rExpertQuery@develop
