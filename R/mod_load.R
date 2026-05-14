@@ -1048,14 +1048,25 @@ mod_query_data_server <- function(id, tadat) {
 
       tadat$example_data <- input$example_data
 
-      if (input$example_data == "EPA Region 5 May 1-7 2019 (173k results)") {
-        raw <- EPATADA::Data_R5_TADAPackageDemo
-      }
-      if (input$example_data == "Six Tribal Nations (143k results)") {
-        raw <- EPATADA::Data_TribalNations
-      }
-      if (input$example_data == "Utah Nutrients (15k results)") {
-        raw <- EPATADA::Data_Nutrients_UT
+      # Named list mapping each dropdown label to its corresponding EPATADA dataset.
+      # Keys must exactly match the choices defined in mod_query_data_ui().
+      example_data_map <- list(
+        "Nutrients Utah (15k results)" = EPATADA::Data_Nutrients_UT,
+        "EPA Region 5 May 1-7 2019 (172k results)" = EPATADA::Data_R5_TADAPackageDemo,
+        "Tribal (136k results)" = EPATADA::Data_TribalNations
+      )
+
+      # Retrieve the dataset that corresponds to the user's selection.
+      raw <- example_data_map[[input$example_data]]
+
+      # Guard: if the selection did not match any entry in the map, stop early.
+      if (is.null(raw)) {
+        shinybusy::remove_modal_spinner()
+        shiny::showNotification(
+          paste("Unrecognized example dataset:", input$example_data),
+          type = "error"
+        )
+        return()
       }
 
       # Clean → order → restrict → initialize
