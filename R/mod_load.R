@@ -3,6 +3,26 @@
   nzchar(Sys.getenv("TADAS_OFFLINE", "")) # set TADAS_OFFLINE=true in CI to force offline
 }
 
+# source of Example UI options and then loaded data frames
+# for the example datasets.  These are used to populate the
+# example dataset dropdown and load the data when selected.
+get_example_data_map <- function() {
+  m <- list(
+    "Utah Nutrients (15k results)" = function() EPATADA::Data_Nutrients_UT,
+    "EPA Region 5 May 1-7 2019 (173k results)" = function() EPATADA::Data_R5_TADAPackageDemo
+  )
+
+  # Optional dataset: add only if exported by EPATADA
+  if ("Data_TribalNations" %in% getNamespaceExports("EPATADA")) {
+    m[["Six Tribal Nations (143k results)"]] <- function() EPATADA::Data_TribalNations
+  }
+
+  m
+}
+
+# Build map lazily so objects are only touched when selected
+example_data_map <- get_example_data_map()
+
 .safe_req_string <- function(u, timeout = 30, max_tries = 3) {
   if (.tadas_offline()) {
     return(NULL)
@@ -150,12 +170,7 @@ mod_query_data_ui <- function(id) {
       column(3, shiny::selectInput(
         ns("example_data"),
         "Use example data",
-        choices = c(
-          "",
-          "Nutrients Utah (15k results)",
-          "EPA Region 5 May 1-7 2019 (172k results)",
-          "Tribal (136k results)"
-        )
+        choices = c("", names(example_data_map))
       ))
     ),
     shiny::fluidRow(column(
@@ -201,29 +216,19 @@ mod_query_data_ui <- function(id) {
     "Choose at least one spatial location from the following options. If multiple options are used, the locations must be overlapping.",
     htmltools::br(),
     shiny::fluidRow(
-      column(4, shiny::selectizeInput(ns("countryocean"),
-        "Country/Ocean(s)",
-        choices = NULL,
-        multiple = TRUE
-      ))
-    ),
-    shiny::fluidRow(
       column(4, shiny::selectizeInput(ns("state"), "State", choices = NULL)),
       column(
         4,
         shiny::selectizeInput(ns("county"), "County (pick state first)", choices = NULL)
-      )
-    ),
-    shiny::fluidRow(
-      column(4, shiny::selectizeInput(ns("tribe_layer"), "Tribe Data Layers",
-        choices = NULL
-      )),
+      ),
       column(
         4,
-        shiny::selectizeInput(ns("tribe_name"), "Tribe Name (pick data layers first)",
-          choices = NULL
+        shiny::selectizeInput(ns("siteid"),
+          "Monitoring Location ID(s)",
+          choices = NULL,
+          multiple = TRUE
         )
-      )
+      )      
     ),
     shiny::fluidRow(
       column(
@@ -235,46 +240,9 @@ mod_query_data_ui <- function(id) {
       )
     ),
     htmltools::br(),
-    htmltools::br(),
-    shiny::fluidRow(
-      column(
-        4,
-        shiny::selectizeInput(ns("siteid"),
-          "Monitoring Location ID(s)",
-          choices = NULL,
-          multiple = TRUE
-        )
-      )
-    ),
     htmltools::h4("Metadata Filters"),
     shiny::fluidRow(
-      column(
-        3,
-        shiny::selectizeInput(
-          ns("org"),
-          shiny::tags$span(
-            "Organization(s)",
-            shiny::tags$i(
-              class = "glyphicon glyphicon-info-sign",
-              style = "color:#0072B2;",
-              title = "Organization filter is only available with the Data Source EPA (WQX)"
-            )
-          ),          
-          choices = NULL,
-          options = list(placeholder = "Start typing or use drop down menu"),
-          multiple = TRUE
-        )
-      ),
-      column(
-        5,
-        shiny::selectizeInput(
-          ns("project"),
-          "Project(s)",
-          choices = NULL,
-          options = list(placeholder = "Start typing or use drop down menu"),
-          multiple = TRUE
-        )
-      ),
+
       column(
         4,
         shiny::selectizeInput(
@@ -284,9 +252,7 @@ mod_query_data_ui <- function(id) {
           options = list(placeholder = "Start typing or use drop down menu"),
           multiple = TRUE
         )
-      )
-    ),
-    shiny::fluidRow(
+      ),
       column(
         3,
         shiny::selectizeInput(
@@ -303,7 +269,9 @@ mod_query_data_ui <- function(id) {
           selected = c("Water"), # "water" gets added automatically if Water is included.  This is for older USGS data
           multiple = TRUE
         )
-      ),
+      ),      
+    ),
+    shiny::fluidRow(
       column(
         5,
         shiny::fluidRow( # this is what allows both widgets to be side-by-side
@@ -354,6 +322,71 @@ mod_query_data_ui <- function(id) {
           options = list(placeholder = "Start typing or use drop down menu"),
           multiple = TRUE
         )
+      )
+    ),
+    shiny::fluidRow(
+      column(9,
+           htmltools::h4("EPA (WQX) Metadata Filters", style = "margin-top: 30px;"),
+           htmltools::HTML(
+           "<i>Note: These filters are only compatible with the EPA (WQX) data source option.
+           If you select any of these filters, the Data Source option USGS (Samples Data API) will not be available.</i>"
+           ),
+           htmltools::hr(style = "margin-bottom: 15px; margin-top: 0px;")
+      )
+    ),
+    shiny::fluidRow(
+
+      column(3, shiny::selectizeInput(ns("countryocean"),
+        "Country/Ocean(s)",
+        choices = NULL,
+        multiple = TRUE
+      )),
+
+      column(
+        3,
+        shiny::selectizeInput(
+          ns("org"),
+          shiny::tags$span(
+            "Organization(s)",
+            shiny::tags$i(
+              class = "glyphicon glyphicon-info-sign",
+              style = "color:#0072B2;",
+              title = "Organization filter is only available with the Data Source EPA (WQX)"
+            )
+          ),
+          choices = NULL,
+          options = list(placeholder = "Start typing or use drop down menu"),
+          multiple = TRUE
+        )
+      ),
+      column(
+        3,
+        shiny::selectizeInput(
+          ns("project"),
+          "Project(s)",
+          choices = NULL,
+          options = list(placeholder = "Start typing or use drop down menu"),
+          multiple = TRUE
+        )
+      ),
+
+    ),
+    shiny::fluidRow(
+      column(10,
+           shiny::fluidRow( # this is what allows both widgets to be side-by-side
+          htmltools::h3("Tribal Data", style = "margin-bottom: 10px; font-size: 16px;"),
+          htmltools::hr(style = "margin-bottom: 0px; margin-top: 0px;"),
+          column(4, style = "margin-left: -15px;", shiny::selectizeInput(ns("tribe_layer"), "Data Layers",
+            choices = NULL
+          )),
+          column(
+            6,
+            shiny::selectizeInput(ns("tribe_name"), "Tribe Name (pick data layers first)",
+              choices = NULL
+            )
+          )
+        )
+
       )
     ),
     shiny::fluidRow(
@@ -1046,17 +1079,10 @@ mod_query_data_server <- function(id, tadat) {
         session = shiny::getDefaultReactiveDomain()
       )
 
-      tadat$example_data <- input$example_data
-
-      if (input$example_data == "EPA Region 5 May 1-7 2019 (173k results)") {
-        raw <- EPATADA::Data_R5_TADAPackageDemo
-      }
-      # if (input$example_data == "Six Tribal Nations (143k results)") {
-      #   raw <- EPATADA::Data_TribalNations
-      # }
-      if (input$example_data == "Utah Nutrients (15k results)") {
-        raw <- EPATADA::Data_Nutrients_UT
-      }
+      # get the data from the example_data_map based on the user's selection.
+      # This is a named list of functions that each return a dataset, so we
+      # call the function corresponding to the user's selection to get the dataset.
+      raw <- example_data_map[[input$example_data]]()
 
       # Clean → order → restrict → initialize
       raw <- EPATADA::TADA_AutoClean(raw)
@@ -1178,7 +1204,7 @@ mod_query_data_server <- function(id, tadat) {
     shiny::updateSelectizeInput(
       session,
       "tribe_layer",
-      choices = names(tribal_list),
+      choices = c("", names(tribal_list)),
       selected = character(0),
       options = list(placeholder = "Select tribal data layer", maxItems = 1),
       server = TRUE
@@ -1243,12 +1269,17 @@ mod_query_data_server <- function(id, tadat) {
       } else {
         tadat$countrycode <- input$countryocean
       }
-      if((input$providers == "all" || input$providers == "NWIS") && !is.null(input$org)) {
+
+      if((input$providers == "all" || input$providers == "NWIS") &&
+         (shiny::isTruthy(input$org) || shiny::isTruthy(input$project)
+          || shiny::isTruthy(input$countryocean) || shiny::isTruthy(input$tribe_layer)
+          || shiny::isTruthy(input$tribe_name))) {
         # display a modal and return because these are not compatible
         # browser()
         shiny::showModal(shiny::modalDialog(title = "Input warning",
-          paste0("The USGS (Samples Data API) data source does not recognize the Organization(s) argument.",
-                 " Use the Organization(s) option only with the EPA (WQX) data source."), easyClose = TRUE))
+          paste0("The Data Source USGS (Samples Data API) does not recognize the Country/Ocean(s), Organization(s), Project(s), ",
+          "or Tribal Data arguments.",
+         " Use those 5 filters only with the EPA (WQX) data source."), easyClose = TRUE))
         return(NULL)
       }
       
@@ -1413,7 +1444,7 @@ mod_query_data_server <- function(id, tadat) {
             shiny::modalDialog(
               title = "Empty Query",
               "Your query returned zero results. Please adjust your search inputs and try again.
-              Remember to update the start and end dates."
+              Remember to update the Start Date and End Date."
             )
           )
           return()
