@@ -262,7 +262,7 @@ mod_query_data_ui <- function(id) {
             shiny::tags$i(
               class = "glyphicon glyphicon-info-sign",
               style = "color:#0072B2;",
-              title = "TADA is designed to work with water data"
+              title = "TADA is designed to work primarily with 'Water' data"
             )
           ),
           choices = c("", media),
@@ -347,12 +347,12 @@ mod_query_data_ui <- function(id) {
         shiny::selectizeInput(
           ns("org"),
           shiny::tags$span(
-            "Organization(s)",
-            shiny::tags$i(
-              class = "glyphicon glyphicon-info-sign",
-              style = "color:#0072B2;",
-              title = "Organization filter is only available with the Data Source EPA (WQX)"
-            )
+            "Organization(s)" # ,
+            # shiny::tags$i(
+            #   class = "glyphicon glyphicon-info-sign",
+            #   style = "color:#0072B2;",
+            #   title = "Organization filter is only available with the Data Source EPA (WQX)"
+            # )
           ),
           choices = NULL,
           options = list(placeholder = "Start typing or use drop down menu"),
@@ -372,7 +372,7 @@ mod_query_data_ui <- function(id) {
 
     ),
     shiny::fluidRow(
-      column(10,
+      column(5,
            shiny::fluidRow( # this is what allows both widgets to be side-by-side
           htmltools::h3("Tribal Data", style = "margin-bottom: 10px; font-size: 16px;"),
           htmltools::hr(style = "margin-bottom: 0px; margin-top: 0px;"),
@@ -390,6 +390,7 @@ mod_query_data_ui <- function(id) {
       )
     ),
     shiny::fluidRow(
+      htmltools::br(),
       column(
         4,
         shiny::radioButtons(ns("providers"),
@@ -1277,9 +1278,11 @@ mod_query_data_server <- function(id, tadat) {
         # display a modal and return because these are not compatible
         # browser()
         shiny::showModal(shiny::modalDialog(title = "Input warning",
-          paste0("The Data Source USGS (Samples Data API) does not recognize the Country/Ocean(s), Organization(s), Project(s), ",
-          "or Tribal Data arguments.",
-         " Use those 5 filters only with the EPA (WQX) data source."), easyClose = TRUE))
+          shiny::HTML(paste0("The Data Source '<strong>USGS (Samples Data API)</strong>' is not compatible ",
+                             "with any of the EPA (WQX) Metadata Filters. Please either change your Data Source ",
+                             "selection to '<strong>EPA (WQX)</strong>' or remove any of the following filters: ",
+                             "Country/Ocean(s), Organization(s), Project(s), and Tribal Data.")), 
+         easyClose = TRUE))
         return(NULL)
       }
       
@@ -1743,7 +1746,7 @@ mod_query_data_server <- function(id, tadat) {
 
         shiny::showModal(shiny::modalDialog(
           title = "NWIS Error",
-          HTML(nwis_error_message_text),
+          shiny::HTML(nwis_error_message_text),
           easyClose = FALSE, # Set to FALSE to force user to use a button to close
           footer = tagList(
             shiny::modalButton("Dismiss")
