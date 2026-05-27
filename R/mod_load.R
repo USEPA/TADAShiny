@@ -1789,7 +1789,9 @@ mod_query_data_server <- function(id, tadat) {
               ## end of changes for using WQX3
 
               # Assign the data to the list
-              TADAprofile_smallsites_temp$PreparationStartDate <- as.character(TADAprofile_smallsites_temp$PreparationStartDate)
+              if ("PreparationStartDate" %in% names(TADAprofile_smallsites_temp)) {
+                TADAprofile_smallsites_temp$PreparationStartDate <- as.character(TADAprofile_smallsites_temp$PreparationStartDate)
+              }
               TADAprofile_smallsites_temp <- EPATADA::TADA_AutoClean(TADAprofile_smallsites_temp)
 
               smallsites_list[[i]] <- TADAprofile_smallsites_temp
@@ -1861,18 +1863,18 @@ mod_query_data_server <- function(id, tadat) {
         STORET_results <- dplyr::bind_rows(TADA_smallsites_clean, TADA_bigsites_clean)
 
         # Convert the column types
+        type_template <- readRDS(system.file("extdata", "TADA_download_temp_type.rds", package = "TADAShiny"))
         STORET_results <- STORET_results |>
           dplyr::mutate(dplyr::across(tidyselect::everything(), ~ {
             col_name <- dplyr::cur_column()
-            TADA_download_temp_type <- readRDS(system.file("extdata", "TADA_download_temp_type.rds", package = "TADAShiny"))
-            target_class <- class(TADA_download_temp_type[[col_name]])[1]
+            target_class <- class(type_template[[col_name]])[1]
             switch(target_class,
-              "integer" = as.integer(.x),
-              "numeric" = as.numeric(.x),
-              "logical" = as.logical(.x),
-              "Date" = as.Date(.x),
-              "factor" = as.factor(.x),
-              as.character(.x) # default case
+                   integer = as.integer(.x),
+                   numeric = as.numeric(.x),
+                   logical = as.logical(.x),
+                   Date    = as.Date(.x),
+                   factor  = as.factor(.x),
+                   as.character(.x)
             )
           }))
 
