@@ -1,86 +1,109 @@
 #' map_bbox UI Function (two-click drawing; no leaflet.extras)
 #'
-#' @description A shiny Module.
+#' @description A shiny Module with address search and three-decimal rounding.
 #'
 #' @param id,input,output,session Internal parameters for {shiny}.
+#' @param label Label for the "Clear" button.
+#' @param step Numeric increment for inputs (default 0.001 degrees).
 #'
 #' @noRd
-#'
 #' @importFrom shiny NS tagList
-mod_map_bboxUI <- function(id, label = "Clear Drawing") {
+mod_map_bboxUI <- function(id, label = "Clear Drawing", step = 0.001) {
   ns <- NS(id)
-
-  bbox_increment <- 1
-
-  tagList(
+  
+  htmltools::div(
+    class = "tada-bbox",
     shiny::fluidRow(
+      # Map + address search
       column(
-        width = 6,
+        width = 6, class = "tada-bbox-map",
+        htmltools::div(
+          class = "form-group",
+          htmltools::tags$label(class = "control-label", "Search address or place"),
+          shiny::textInput(
+            inputId = ns("addr"),
+            label = NULL,
+            placeholder = "e.g., 1200 Pennsylvania Ave NW, Washington, DC or 20002",
+            width = "100%"
+          )
+        ),
+        shiny::actionButton(ns("addr_find"), "Find", icon = shiny::icon("search")),
+        htmltools::tags$span(
+          class = "tada-note",
+          style = "margin-left: 8px;",
+          "Pans/zooms map; does not set the bounding box."
+        ),
+        # Press Enter to trigger Find
+        htmltools::tags$script(htmltools::HTML(sprintf("
+  (function(){
+    var input = document.getElementById('%s');
+    if (input) {
+      input.addEventListener('keydown', function(e){
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          // Force value to sync to Shiny, then click Find on next tick
+          var btn = document.getElementById('%s');
+          this.blur();
+          setTimeout(function(){ if (btn) btn.click(); }, 0);
+        }
+      });
+    }
+  })();
+", ns("addr"), ns("addr_find")))),
+        htmltools::br(), htmltools::br(),
+        
         leaflet::leafletOutput(ns("map_bbox")),
-        shiny::helpText("Click two opposite corners on the map to draw a bounding box.")
+        htmltools::p(
+          class = "tada-note",
+          "Click two opposite corners on the map to draw a bounding box."
+        )
       ),
+      
+      # Coordinate inputs
       column(
-        width = 6,
-        htmltools::h4("Bounding Box Latitude and Longitude"),
+        width = 6, class = "tada-bbox-controls",
+        # North (top, centered)
         shiny::fluidRow(
           column(
-            width = 3,
-            htmltools::br(),
-            htmltools::br(),
-            # West coordinate
+            width = 6, offset = 3,
             shiny::numericInput(
-              inputId = ns("bb_W"),
-              label = "West:",
-              value = NULL,
-              min = -180,
-              max = 180,
-              step = bbox_increment
+              ns("bb_N"), "North", value = NULL,
+              min = -90, max = 90, step = step, width = "100%"
+            )
+          )
+        ),
+        # West / East (middle)
+        shiny::fluidRow(
+          column(
+            width = 6,
+            shiny::numericInput(
+              ns("bb_W"), "West", value = NULL,
+              min = -180, max = 180, step = step, width = "100%"
             )
           ),
           column(
-            width = 3,
-            # North coordinate
+            width = 6,
             shiny::numericInput(
-              inputId = ns("bb_N"),
-              label = "North:",
-              value = NULL,
-              min = -90,
-              max = 90,
-              step = bbox_increment
-            ),
-            htmltools::br(),
-            htmltools::br(),
-            # South coordinate
-            shiny::numericInput(
-              inputId = ns("bb_S"),
-              label = "South:",
-              value = NULL,
-              min = -90,
-              max = 90,
-              step = bbox_increment
+              ns("bb_E"), "East", value = NULL,
+              min = -180, max = 180, step = step, width = "100%"
             )
-          ),
+          )
+        ),
+        # South (bottom, centered)
+        shiny::fluidRow(
           column(
-            width = 3,
-            htmltools::br(),
-            htmltools::br(),
-            # East coordinate
+            width = 6, offset = 3,
             shiny::numericInput(
-              inputId = ns("bb_E"),
-              label = "East:",
-              value = NULL,
-              min = -180,
-              max = 180,
-              step = bbox_increment
+              ns("bb_S"), "South", value = NULL,
+              min = -90, max = 90, step = step, width = "100%"
             )
           )
         ),
         # Clear button
-        htmltools::br(),
         shiny::fluidRow(
           column(
-            width = 3,
-            shiny::actionButton(inputId = ns("clear_map"), label = label, width = "100%")
+            width = 6, offset = 3,
+            shiny::actionButton(ns("clear_map"), label = label, width = "100%")
           )
         )
       )
@@ -88,32 +111,103 @@ mod_map_bboxUI <- function(id, label = "Clear Drawing") {
   )
 }
 
-mod_map_bboxServer <- function(id) {
+#' map_bbox Server Function
+#'
+#' @noRd
+mod_map_bboxServer <- function(id, increment = 0.001, debounce_ms = 500) {
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
-
-    # Initialize reactive values FIRST
+    
+    # Reactive state
     bbox_reVal <- shiny::reactiveValues(bBox = NULL)
-
-    # Flag to prevent infinite loops when syncing
     sync_in_progress <- shiny::reactiveVal(FALSE)
-
-    # Rectangle style (approximate Leaflet defaults)
-    shape_opts <- list(
-      stroke = TRUE,
-      color = "#3388ff",
-      weight = 4,
-      opacity = 1,
-      fill = TRUE,
-      fillColor = "#3388ff",
-      fillOpacity = 0.2,
-      smoothFactor = 1,
-      noClip = FALSE
-    )
-
-    # Store first corner for two-click drawing
-    draw_state <- shiny::reactiveValues(first_corner = NULL)
-
+    last_search <- shiny::reactiveVal(as.numeric(Sys.time()) - 5) # for rate limiting
+    
+    last_addr <- shiny::reactiveVal("")
+    shiny::observeEvent(input$addr, {
+      q <- trimws(input$addr %||% "")
+      if (nzchar(q)) last_addr(q)
+    }, ignoreInit = TRUE)
+    
+    # Snap to increment, clamp to range, round to 3 decimals
+    round_to_inc <- function(x, inc, minv, maxv, digits = 3) {
+      if (is.null(x) || is.na(x)) return(x)
+      out <- round(x / inc) * inc
+      out <- max(min(out, maxv), minv)
+      round(out, digits)
+    }
+    
+    # Address geocoding helper (Nominatim)
+    geocode_nominatim <- function(q) {
+      url <- "https://nominatim.openstreetmap.org/search"
+      resp <- tryCatch({
+        httr2::request(url) |>
+          httr2::req_url_query(q = q, format = "json", limit = 1, countrycodes = "us") |>
+          httr2::req_user_agent("TADAShiny/1.0 (https://epa.gov; contact: mywaterway@epa.gov)") |>
+          httr2::req_timeout(10) |>
+          httr2::req_perform()
+      }, error = function(e) NULL)
+      if (is.null(resp)) return(NULL)
+      
+      txt <- httr2::resp_body_string(resp)
+      dat <- tryCatch(jsonlite::fromJSON(txt, flatten = TRUE), error = function(e) NULL)
+      if (is.null(dat)) return(NULL)
+      
+      # Helper to parse lon/lat and boundingbox from a row-like object
+      parse_hit <- function(hit) {
+        lon <- suppressWarnings(as.numeric(if (!is.null(hit$lon)) hit$lon else NA_real_))
+        lat <- suppressWarnings(as.numeric(if (!is.null(hit$lat)) hit$lat else NA_real_))
+        if (!is.finite(lon) || !is.finite(lat)) return(NULL)
+        
+        bb <- NULL
+        if (!is.null(hit$boundingbox)) {
+          bb_raw <- hit$boundingbox
+          # boundingbox can arrive as character vector, list, or data.frame row
+          if (is.character(bb_raw)) {
+            bb <- suppressWarnings(as.numeric(bb_raw))
+          } else if (is.list(bb_raw)) {
+            bb <- suppressWarnings(as.numeric(unlist(bb_raw, use.names = FALSE)))
+          } else if (is.data.frame(bb_raw)) {
+            bb <- suppressWarnings(as.numeric(unlist(bb_raw[1, , drop = TRUE], use.names = FALSE)))
+          }
+        }
+        bbox <- if (!is.null(bb) && length(bb) == 4 && all(is.finite(bb))) c(bb[3], bb[1], bb[4], bb[2]) else NULL
+        list(center = c(lon, lat), bbox = bbox)
+      }
+      
+      # dat is usually a data.frame with columns lon/lat/boundingbox (possibly nested)
+      if (is.data.frame(dat) && nrow(dat) >= 1) {
+        hit <- lapply(names(dat), function(nm) dat[[nm]][1])
+        names(hit) <- names(dat)
+        return(parse_hit(hit))
+      }
+      
+      # Fallback: if dat is a list (array of hits), take the first element
+      if (is.list(dat) && length(dat) >= 1) {
+        return(parse_hit(dat[[1]]))
+      }
+      
+      NULL
+    }
+    
+    geocode_census <- function(q) {
+      url <- "https://geocoding.geo.census.gov/geocoder/locations/onelineaddress"
+      resp <- tryCatch({
+        httr2::request(url) |>
+          httr2::req_url_query(address = q, benchmark = "Public_AR_Current", format = "json") |>
+          httr2::req_timeout(10) |>
+          httr2::req_perform()
+      }, error = function(e) NULL)
+      if (is.null(resp)) return(NULL)
+      dat <- tryCatch(jsonlite::fromJSON(httr2::resp_body_string(resp)), error = function(e) NULL)
+      if (is.null(dat)) return(NULL)
+      res <- dat$result$addressMatches
+      if (length(res) < 1) return(NULL)
+      coords <- res$coordinates[[1]]
+      if (is.null(coords$x) || is.null(coords$y)) return(NULL)
+      list(center = c(as.numeric(coords$x), as.numeric(coords$y)), bbox = NULL)
+    }
+    
     # Render base map
     output$map_bbox <- leaflet::renderLeaflet({
       leaflet::leaflet() |>
@@ -121,53 +215,125 @@ mod_map_bboxServer <- function(id) {
         add_USGS_base() |>
         leaflet::setView(lng = -114, lat = 42, zoom = 3)
     })
-
-    # Create leaflet proxy for updates
+    
+    # Leaflet proxy for most updates
     map_proxy <- leaflet::leafletProxy("map_bbox", session = session)
-
+    
+    # Address search handler
+    shiny::observeEvent(input$addr_find, {
+      q <- trimws(input$addr %||% "")
+      if (!nzchar(q)) q <- last_addr() %||% ""
+      
+      # ZIP-aware minimum validation
+      is_zip5 <- grepl("^[0-9]{5}$", q)
+      if (!is_zip5 && nchar(q) < 3) {
+        shiny::showNotification(
+          "Enter a 5-digit ZIP code or at least 3 characters to search.",
+          type = "message", duration = 3
+        )
+        return()
+      }
+      
+      # Rate limit: ≤ 1 req/sec
+      now <- as.numeric(Sys.time())
+      if ((now - last_search()) < 1) {
+        shiny::showNotification("Please wait a moment before searching again.", type = "message", duration = 3)
+        return()
+      }
+      last_search(now)
+      
+      # Optional: disable button during request if shinyjs is available
+      if (requireNamespace("shinyjs", quietly = TRUE)) shinyjs::disable("addr_find")
+      on.exit({
+        if (requireNamespace("shinyjs", quietly = TRUE)) shinyjs::enable("addr_find")
+      }, add = TRUE)
+      
+      # Clear previous search marker
+      leaflet::leafletProxy("map_bbox", session = session) |>
+        leaflet::clearGroup("search_center")
+      
+      # Offline/CI safety
+      if (isTRUE(.tadas_offline())) {
+        shiny::showNotification("Address lookup is unavailable in offline mode.", type = "warning", duration = 5)
+        return()
+      }
+      
+      # Geocode via Nominatim, then Census as fallback
+      res <- geocode_nominatim(q)
+      if (is.null(res)) res <- geocode_census(q)
+      if (is.null(res)) {
+        shiny::showNotification("No results found for that address.", type = "warning", duration = 5)
+        return()
+      }
+      
+      lon <- res$center[1]; lat <- res$center[2]
+      
+      # Zoom: fit bounds if available, otherwise fly to center
+      if (!is.null(res$bbox) && length(res$bbox) == 4 && all(is.finite(res$bbox))) {
+        leaflet::leafletProxy("map_bbox", session = session) |>
+          leaflet::fitBounds(lng1 = res$bbox[1], lat1 = res$bbox[2], lng2 = res$bbox[3], lat2 = res$bbox[4])
+      } else {
+        leaflet::leafletProxy("map_bbox", session = session) |>
+          leaflet::flyTo(lng = lon, lat = lat, zoom = 12)
+      }
+      
+      # Drop a marker to show search center
+      leaflet::leafletProxy("map_bbox", session = session) |>
+        leaflet::addCircleMarkers(
+          lng = lon, lat = lat,
+          radius = 5, color = "#111827", fillColor = "#111827",
+          fillOpacity = 0.9, stroke = FALSE,
+          group = "search_center", label = "Search result"
+        )
+    })
+    
+    # Rectangle style
+    shape_opts <- list(
+      stroke = TRUE, color = "#3388ff", weight = 4, opacity = 1,
+      fill = TRUE, fillColor = "#3388ff", fillOpacity = 0.2,
+      smoothFactor = 1, noClip = FALSE
+    )
+    
+    # Two-click drawing state
+    draw_state <- shiny::reactiveValues(first_corner = NULL)
+    
     # Clear the map and inputs
     shiny::observeEvent(input$clear_map, {
       map_proxy |>
         leaflet::clearGroup("manual_bbox") |>
         leaflet::clearGroup("corner_pt")
-
       bbox_reVal$bBox <- NULL
       draw_state$first_corner <- NULL
-
-      # Clear numeric inputs
+      
       sync_in_progress(TRUE)
-      shiny::updateNumericInput(session = session, inputId = "bb_W", value = NA)
-      shiny::updateNumericInput(session = session, inputId = "bb_S", value = NA)
-      shiny::updateNumericInput(session = session, inputId = "bb_E", value = NA)
-      shiny::updateNumericInput(session = session, inputId = "bb_N", value = NA)
+      shiny::updateNumericInput(session, "bb_W", value = NA)
+      shiny::updateNumericInput(session, "bb_S", value = NA)
+      shiny::updateNumericInput(session, "bb_E", value = NA)
+      shiny::updateNumericInput(session, "bb_N", value = NA)
       sync_in_progress(FALSE)
     })
-
+    
     # Two-click rectangle creation using map clicks
     shiny::observeEvent(input$map_bbox_click, {
       click <- input$map_bbox_click
       if (is.null(click)) return()
-
+      
       lng <- click$lng
       lat <- click$lat
-
-      # First click: store corner and show a small marker
+      
+      # First click: store corner
       if (is.null(draw_state$first_corner)) {
         draw_state$first_corner <- c(lng = lng, lat = lat)
         map_proxy |>
           leaflet::clearGroup("corner_pt") |>
           leaflet::addCircleMarkers(
             lng = lng, lat = lat,
-            radius = 6,
-            color = "#FF5722",
-            fillColor = "#FF5722",
-            fillOpacity = 0.9,
-            stroke = FALSE,
-            group = "corner_pt"
+            radius = 6, color = "#FF5722", fillColor = "#FF5722",
+            fillOpacity = 0.9, stroke = FALSE, group = "corner_pt"
           )
         return()
       }
-
+      
       # Second click: compute bbox and draw rectangle
       lng1 <- draw_state$first_corner["lng"]
       lat1 <- draw_state$first_corner["lat"]
@@ -175,11 +341,18 @@ mod_map_bboxServer <- function(id) {
       east  <- max(lng1, lng)
       south <- min(lat1, lat)
       north <- max(lat1, lat)
-
+      
+      # Snap to increment and clamp
+      west  <- round_to_inc(west,  increment, -180, 180)
+      east  <- round_to_inc(east,  increment, -180, 180)
+      south <- round_to_inc(south, increment,  -90,  90)
+      north <- round_to_inc(north, increment,  -90,  90)
+      
       # Validate bbox
       if (west < east && south < north &&
-        west >= -180 && east <= 180 &&
-        south >= -90 && north <= 90) {
+          west >= -180 && east <= 180 &&
+          south >= -90 && north <= 90) {
+        
         map_proxy |>
           leaflet::clearGroup("corner_pt") |>
           leaflet::clearGroup("manual_bbox") |>
@@ -191,80 +364,95 @@ mod_map_bboxServer <- function(id) {
             fillOpacity = shape_opts$fillOpacity, smoothFactor = shape_opts$smoothFactor,
             noClip = shape_opts$noClip, group = "manual_bbox"
           )
-
-        # Update reactive bbox (numeric inputs will sync from this)
+        
+        # Update reactive bbox
         bbox_reVal$bBox <- c(west, south, east, north)
       }
-
+      
       # Reset for next draw
       draw_state$first_corner <- NULL
     })
-
-    # Update numeric inputs when bbox changes: Map → inputs
+    
+    # Map → inputs: update numeric inputs when bbox changes
     shiny::observe({
       if (!is.null(bbox_reVal$bBox)) {
         sync_in_progress(TRUE)
-        shiny::updateNumericInput(session = session, inputId = "bb_W", value = bbox_reVal$bBox[1]) # west
-        shiny::updateNumericInput(session = session, inputId = "bb_S", value = bbox_reVal$bBox[2]) # south
-        shiny::updateNumericInput(session = session, inputId = "bb_E", value = bbox_reVal$bBox[3]) # east
-        shiny::updateNumericInput(session = session, inputId = "bb_N", value = bbox_reVal$bBox[4]) # north
+        shiny::updateNumericInput(session, "bb_W", value = bbox_reVal$bBox[1]) # west
+        shiny::updateNumericInput(session, "bb_S", value = bbox_reVal$bBox[2]) # south
+        shiny::updateNumericInput(session, "bb_E", value = bbox_reVal$bBox[3]) # east
+        shiny::updateNumericInput(session, "bb_N", value = bbox_reVal$bBox[4]) # north
         sync_in_progress(FALSE)
       }
     })
-
-    # Debounced inputs: numeric → map
-    bb_W_debounce <- shiny::debounce(shiny::reactive(input$bb_W), 1000)
-    bb_S_debounce <- shiny::debounce(shiny::reactive(input$bb_S), 1000)
-    bb_E_debounce <- shiny::debounce(shiny::reactive(input$bb_E), 1000)
-    bb_N_debounce <- shiny::debounce(shiny::reactive(input$bb_N), 1000)
-
+    
+    # Inputs → map: debounced observers
+    bb_W_debounce <- shiny::debounce(shiny::reactive(input$bb_W), debounce_ms)
+    bb_S_debounce <- shiny::debounce(shiny::reactive(input$bb_S), debounce_ms)
+    bb_E_debounce <- shiny::debounce(shiny::reactive(input$bb_E), debounce_ms)
+    bb_N_debounce <- shiny::debounce(shiny::reactive(input$bb_N), debounce_ms)
+    
     shiny::observe({
-      # Prevent feedback loop when we update inputs from the map
       if (sync_in_progress()) return()
-
+      
       west  <- bb_W_debounce()
       south <- bb_S_debounce()
       east  <- bb_E_debounce()
       north <- bb_N_debounce()
-
-      # If any is missing, clear any drawn rectangle and corner marker
-      if (is.na(west) || is.na(south) || is.na(east) || is.na(north)) {
-        map_proxy |> leaflet::clearGroup("manual_bbox") |> leaflet::clearGroup("corner_pt")
+      
+      # Treat NULL/NA as missing
+      is_missing <- function(x) is.null(x) || is.na(x)
+      if (is_missing(west) || is_missing(south) || is_missing(east) || is_missing(north)) {
+        map_proxy |>
+          leaflet::clearGroup("manual_bbox") |>
+          leaflet::clearGroup("corner_pt")
         return()
       }
-
+      
+      # Snap to increment and clamp
+      r_west  <- round_to_inc(west,  increment, -180, 180)
+      r_east  <- round_to_inc(east,  increment, -180, 180)
+      r_south <- round_to_inc(south, increment,  -90,  90)
+      r_north <- round_to_inc(north, increment,  -90,  90)
+      
+      # Reflect any rounding back into inputs
+      if (!identical(c(west, south, east, north), c(r_west, r_south, r_east, r_north))) {
+        sync_in_progress(TRUE)
+        shiny::updateNumericInput(session, "bb_W", value = r_west)
+        shiny::updateNumericInput(session, "bb_S", value = r_south)
+        shiny::updateNumericInput(session, "bb_E", value = r_east)
+        shiny::updateNumericInput(session, "bb_N", value = r_north)
+        sync_in_progress(FALSE)
+        west <- r_west; south <- r_south; east <- r_east; north <- r_north
+      }
+      
       # Validate bbox
       if (west >= east) return()
       if (south >= north) return()
       if (west < -180 || west > 180 || east < -180 || east > 180 ||
-        south < -90 || south > 90 || north < -90 || north > 90) {
+          south < -90 || south > 90 || north < -90 || north > 90) {
         return()
       }
-
+      
       # Draw new rectangle from numeric inputs
       map_proxy |>
         leaflet::clearGroup("manual_bbox") |>
         leaflet::clearGroup("corner_pt") |>
         leaflet::addRectangles(
           lng1 = west, lat1 = south, lng2 = east, lat2 = north,
-          stroke = shape_opts$stroke,
-          color = shape_opts$color,
-          weight = shape_opts$weight,
-          opacity = shape_opts$opacity,
-          fill = shape_opts$fill,
-          fillColor = shape_opts$fillColor,
-          fillOpacity = shape_opts$fillOpacity,
-          smoothFactor = shape_opts$smoothFactor,
-          noClip = shape_opts$noClip,
-          group = "manual_bbox"
+          stroke = shape_opts$stroke, color = shape_opts$color,
+          weight = shape_opts$weight, opacity = shape_opts$opacity,
+          fill = shape_opts$fill, fillColor = shape_opts$fillColor,
+          fillOpacity = shape_opts$fillOpacity, smoothFactor = shape_opts$smoothFactor,
+          noClip = shape_opts$noClip, group = "manual_bbox"
         )
-
+      
       # Keep reactive bbox in sync
       bbox_reVal$bBox <- c(west, south, east, north)
     }) |> shiny::bindEvent(
-      bb_W_debounce(), bb_S_debounce(), bb_E_debounce(), bb_N_debounce()
+      bb_W_debounce(), bb_S_debounce(), bb_E_debounce(), bb_N_debounce(),
+      ignoreInit = TRUE
     )
-
+    
     return(bbox_reVal)
   })
 }
