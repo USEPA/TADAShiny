@@ -157,315 +157,381 @@ match_types <- c(
   "Equals" = "matches"
 )
 
+# start of UI
 mod_query_data_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    shiny::fluidRow(
-      htmltools::h3("Option A: Use example data"),
-      column(3, shiny::selectInput(
-        ns("example_data"),
-        "Use example data",
-        choices = c("", names(example_data_map))
-      ))
+    # Card styling for Options A, B, and C
+    tags$head(
+      htmltools::tags$style(htmltools::HTML("
+        .tada-card {
+          background: #ffffff;
+          border: 1px solid #e5e7eb;
+          border-radius: 8px;
+          padding: 16px;
+          margin-bottom: 16px;
+        }
+      "))
     ),
-    shiny::fluidRow(column(
-      3,
-      shiny::actionButton(
-        ns("example_data_go"),
-        "Load",
-        shiny::icon("truck-ramp-box"),
-        disabled = TRUE,
-        style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
-      )
-    )),
-    htmltools::hr(),
-    shiny::fluidRow(
-      htmltools::h3("Option B: Query the Water Quality Portal (WQP)"),
-      "Use the fields below to download a dataset directly from WQP. Fields with '(s)' in the label allow multiple selections.
-      Hydrologic Units may be at any scale, from subwatershed to region. However, be mindful that large queries may time out."
+    
+    # Card 1 — Option A: Use example data
+    htmltools::div(class = "tada-card",
+                   shiny::fluidRow(
+                     htmltools::h3("Option A: Use example data"),
+                     column(3, shiny::selectInput(
+                       ns("example_data"),
+                       "Use example data",
+                       choices = c("", names(example_data_map))
+                     ))
+                   ),
+                   shiny::fluidRow(
+                     column(
+                       3,
+                       shiny::actionButton(
+                         ns("example_data_go"),
+                         "Load",
+                         shiny::icon("truck-ramp-box"),
+                         disabled = TRUE,
+                         style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
+                       )
+                     )
+                   )
     ),
-    htmltools::br(),
-    # styling several fluid rows with columns to hold the input drop down widgets
-    htmltools::h4("Date Range"),
-    shiny::fluidRow(
-      column(
-        4,
-        shiny::dateInput(
-          ns("startDate"),
-          "Start Date",
-          format = "yyyy-mm-dd",
-          startview = "year"
-        )
-      ),
-      column(
-        4,
-        shiny::dateInput(
-          ns("endDate"),
-          "End Date",
-          format = "yyyy-mm-dd",
-          startview = "year"
-        )
-      )
+    
+    # Card 2 — Option B: Query WQP (dates, location, map, metadata, providers, EPA/WQX + Tribal auto-open, Run Query)
+    htmltools::div(class = "tada-card",
+                   shiny::fluidRow(
+                     htmltools::h3("Option B: Query the Water Quality Portal (WQP)"),
+                     "Use the fields below to download a dataset directly from WQP. Fields with '(s)' in the label allow multiple selections.
+     Hydrologic Units may be at any scale, from subwatershed to region. However, be mindful that large queries may time out."
+                   ),
+                   htmltools::br(),
+                   
+                   # Date Range
+                   htmltools::h4("Date Range"),
+                   shiny::fluidRow(
+                     column(
+                       4,
+                       shiny::dateInput(
+                         ns("startDate"),
+                         "Start Date",
+                         format = "yyyy-mm-dd",
+                         startview = "year"
+                       )
+                     ),
+                     column(
+                       4,
+                       shiny::dateInput(
+                         ns("endDate"),
+                         "End Date",
+                         format = "yyyy-mm-dd",
+                         startview = "year"
+                       )
+                     )
+                   ),
+                   
+                   # Location Information
+                   htmltools::h4("Location Information"),
+                   "Choose at least one spatial location from the following options. If multiple options are used, the locations must be overlapping.",
+                   htmltools::br(),
+                   shiny::fluidRow(
+                     column(4, shiny::selectizeInput(ns("state"), "State", choices = NULL)),
+                     column(
+                       4,
+                       shiny::selectizeInput(ns("county"), "County (pick state first)", choices = NULL)
+                     ),
+                     column(
+                       4,
+                       shiny::selectizeInput(ns("siteid"),
+                                             "Monitoring Location ID(s)",
+                                             choices = NULL,
+                                             multiple = TRUE
+                       )
+                     )
+                   ),
+                   shiny::fluidRow(
+                     column(
+                       12,
+                       shiny::strong("Provide the latitude and longitude by drawing a rectangle on the map or typing in the coordinates in the input fields"),
+                       htmltools::br(),
+                       htmltools::br(),
+                       mod_map_bboxUI(ns("BBox_map"))
+                     )
+                   ),
+                   htmltools::br(),
+                   
+                   # Metadata Filters (general)
+                   htmltools::h4("Metadata Filters"),
+                   shiny::fluidRow(
+                     column(
+                       4,
+                       shiny::selectizeInput(
+                         ns("type"),
+                         "Site Type(s)",
+                         choices = c(sitetype),
+                         options = list(placeholder = "Start typing or use drop down menu"),
+                         multiple = TRUE
+                       )
+                     ),
+                     column(
+                       3,
+                       shiny::selectizeInput(
+                         ns("media"),
+                         shiny::tags$span(
+                           "Sample Media",
+                           shiny::tags$i(
+                             class = "glyphicon glyphicon-info-sign",
+                             style = "color:#0072B2;",
+                             title = "TADA is designed to work primarily with 'Water' data"
+                           )
+                         ),
+                         choices = c("", media),
+                         selected = c("Water"), # "water" gets added automatically if Water is included. This is for older USGS data
+                         multiple = TRUE
+                       )
+                     )
+                   ),
+                   shiny::fluidRow(
+                     column(
+                       5,
+                       shiny::fluidRow(
+                         htmltools::h3("Characteristic(s)", style = "margin-bottom: 3px; font-size: 16px;"),
+                         htmltools::hr(style = "margin-bottom: 0px; margin-top: 0px;"),
+                         column(
+                           width = 3,
+                           style = "margin-left: -15px;",
+                           shiny::selectizeInput(
+                             inputId = ns("match_type_selector"),
+                             label = "Match type:",
+                             choices = match_types, # Choices are populated on client
+                             selected = "contains",
+                             multiple = FALSE
+                           )
+                         ),
+                         column(
+                           width = 3,
+                           # Input for the user to type their search string
+                           shiny::textInput(
+                             inputId = ns("text_string"),
+                             label = "Search string:",
+                             value = ""
+                           )
+                         ),
+                         column(
+                           width = 6,
+                           shiny::selectizeInput(
+                             inputId = ns("characteristic_select"),
+                             label = "Select matching characteristics",
+                             choices = NULL,
+                             multiple = TRUE,
+                             options = list(
+                               placeholder = "Start typing or use drop down menu",
+                               openOnFocus = TRUE,
+                               plugins = list("remove_button")
+                             )
+                           )
+                         )
+                       )
+                     ),
+                     column(
+                       4,
+                       shiny::selectizeInput(
+                         ns("chargroup"),
+                         "Characteristic Group",
+                         choices = NULL,
+                         options = list(placeholder = "Start typing or use drop down menu"),
+                         multiple = TRUE
+                       )
+                     )
+                   ),
+                   
+                   # Data Source (moved above advanced filters panel)
+                   shiny::fluidRow(
+                     htmltools::br(),
+                     column(
+                       4,
+                       shiny::radioButtons(
+                         ns("providers"),
+                         "Data Source",
+                         c(
+                           "USGS (Samples Data API)" = "NWIS",
+                           "EPA (WQX)" = "STORET",
+                           "Both (USGS and EPA)" = "all"
+                         ),
+                         selected = "all"
+                       )
+                     )
+                   ),
+                   
+                   # Short hint when not STORET
+                   shiny::conditionalPanel(
+                     condition = sprintf("input['%s'] !== 'STORET'", ns("providers")),
+                     htmltools::div(style = "margin: 6px 0 12px 0; color: #555;",
+                                    htmltools::HTML("<em>Select <strong>EPA (WQX)</strong> as the Data Source to enable additional filters below.</em>")
+                     )
+                   ),
+                   
+                   # Single collapsible panel for EPA (WQX) Metadata Filters
+                   # Automatically opened whenever provider == STORET
+                   shiny::conditionalPanel(
+                     condition = sprintf("input['%s'] === 'STORET'", ns("providers")),
+                     htmltools::tags$details(
+                       open = "open",
+                       htmltools::tags$summary("Additional Filters Only Compatible With the EPA (WQX) Data Source"),
+                       htmltools::div(
+                         style = "margin-top: 8px;",
+                         
+                         # EPA (WQX) metadata filters (row sums to 12)
+                         shiny::fluidRow(
+                           column(
+                             4,
+                             shiny::selectizeInput(
+                               ns("countryocean"),
+                               "Country/Ocean(s)",
+                               choices = NULL,
+                               multiple = TRUE
+                             )
+                           ),
+                           column(
+                             4,
+                             shiny::selectizeInput(
+                               ns("org"),
+                               shiny::tags$span("Organization(s)"),
+                               choices = NULL,
+                               options = list(placeholder = "Start typing or use drop down menu"),
+                               multiple = TRUE
+                             )
+                           ),
+                           column(
+                             4,
+                             shiny::selectizeInput(
+                               ns("project"),
+                               "Project(s)",
+                               choices = NULL,
+                               options = list(placeholder = "Start typing or use drop down menu"),
+                               multiple = TRUE
+                             )
+                           )
+                         ),
+                         
+                         # Tribal Data subsection (clearly indicates both fields are needed)
+                         shiny::fluidRow(
+                           column(
+                             12,
+                             htmltools::h4("Tribal Data (requires both fields)", style = "margin-top: 20px;"),
+                             htmltools::p("Step 1: Select a Tribal Data Layer. Step 2: Select a Tribe Name."),
+                             htmltools::hr(style = "margin: 6px 0 10px 0;")
+                           )
+                         ),
+                         htmltools::div(
+                           style = "border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px; background: #fafafa; margin-bottom: 8px;",
+                           shiny::fluidRow(
+                             column(
+                               5,
+                               shiny::selectizeInput(
+                                 ns("tribe_layer"),
+                                 "Step 1 — Tribal Data Layer",
+                                 choices = NULL
+                               )
+                             ),
+                             column(
+                               7,
+                               shiny::selectizeInput(
+                                 ns("tribe_name"),
+                                 "Step 2 — Tribe Name (pick a data layer first)",
+                                 choices = NULL
+                               )
+                             )
+                           )
+                         )
+                       )
+                     )
+                   ),
+                   
+                   # Run Query
+                   shiny::fluidRow(
+                     column(
+                       4,
+                       shiny::actionButton(
+                         ns("querynow"),
+                         "Run Query",
+                         shiny::icon("cloud"),
+                         style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
+                       )
+                     )
+                   )
     ),
-    htmltools::h4("Location Information"),
-    "Choose at least one spatial location from the following options. If multiple options are used, the locations must be overlapping.",
-    htmltools::br(),
-    shiny::fluidRow(
-      column(4, shiny::selectizeInput(ns("state"), "State", choices = NULL)),
-      column(
-        4,
-        shiny::selectizeInput(ns("county"), "County (pick state first)", choices = NULL)
-      ),
-      column(
-        4,
-        shiny::selectizeInput(ns("siteid"),
-          "Monitoring Location ID(s)",
-          choices = NULL,
-          multiple = TRUE
-        )
-      )      
+    
+    # Card 3 — Option C (Upload) + Optional Progress File
+    htmltools::div(class = "tada-card",
+                   # Option C: Upload dataset
+                   shiny::fluidRow(
+                     htmltools::h3("Option C: Upload dataset"),
+                     htmltools::HTML((
+                       "Upload a compatible dataset from your computer. This upload feature only accepts data in .xls and .xlsx formats. Data must be formatted in the EPA Water Quality eXchange (WQX) schema (and include all columns required for this TADA R Shiny application) to run
+           this tool. The file can be a <B>fresh</B> dataset you created using the TADA template below or a <B>working</B> dataset that you downloaded from this application using the Download Working Dataset feature, and are now returning to the
+           app to iterate on."
+                     )),
+                     column(
+                       9,
+                       shiny::tags$div(
+                         id = "file-upload-wrapper", # Use the wrapper div's id
+                         shiny::fileInput(
+                           ns("file"),
+                           "",
+                           multiple = TRUE,
+                           accept = c(".xlsx", ".xls"),
+                           width = "100%"
+                         )
+                       )
+                     )
+                   ),
+                   shiny::fluidRow(
+                     htmltools::HTML(
+                       "Download a blank TADA data template in .xlsx format. This template is available to assist users that do not have data available in the WQP (and therefore cannot use Option B) prepare their data for upload to this R Shiny application using import Option C.
+           You may reach out to the TADA team through the helpdesk at mywaterway@epa.gov for assistance preparing your data. If your data is not in the WQP yet and you are interested in submitting it, you may reach out to the WQX helpdesk at WQX@epa.gov for assistance preparing and submitting your data
+           to the WQP through EPA's WQX.<br><br>"
+                     ),
+                     column(
+                       9,
+                       shiny::downloadButton(
+                         ns("download_template"),
+                         "Download Template",
+                         style = "color: #fff; background-color: #337ab7; border-color: #2e6da4;"
+                       )
+                     )
+                   ),
+                   
+                   # Optional: Upload Progress File
+                   htmltools::hr(),
+                   shiny::fluidRow(
+                     htmltools::h3("Optional: Upload Progress File"),
+                     htmltools::HTML((
+                       "Upload a progress file from your computer. This upload feature only accepts data in the .RData format.
+           The TADA Shiny application keeps track of all user selections, and makes a .RData file
+           available for download at any time. If you saved a progress file you generated during a
+           previous use of the TADA Shiny application, then it can be uploaded here and used
+           to automatically parameterize the TADA Shiny app with the same selections. This file can
+           be used to regenerate a dataset with the same decisions as before, or can be used
+           to apply the same user selections to a new dataset"
+                     )),
+                     # widget to upload WQP profile or WQX formatted spreadsheet
+                     column(
+                       9,
+                       shiny::tags$div(
+                         id = "progress-file-wrapper",
+                         shiny::fileInput(
+                           ns("progress_file"),
+                           "",
+                           multiple = TRUE,
+                           accept = c(".RData"),
+                           width = "100%"
+                         )
+                       )
+                     )
+                   )
     ),
-    shiny::fluidRow(
-      column(
-        12,
-        shiny::strong("Provide the latitude and longitude by drawing a rectangle on the map or typing in the coordinates in the input fields"),
-        htmltools::br(),
-        htmltools::br(),
-        mod_map_bboxUI(ns("BBox_map"))
-      )
-    ),
-    htmltools::br(),
-    htmltools::h4("Metadata Filters"),
-    shiny::fluidRow(
-
-      column(
-        4,
-        shiny::selectizeInput(
-          ns("type"),
-          "Site Type(s)",
-          choices = c(sitetype),
-          options = list(placeholder = "Start typing or use drop down menu"),
-          multiple = TRUE
-        )
-      ),
-      column(
-        3,
-        shiny::selectizeInput(
-          ns("media"),
-          shiny::tags$span(
-            "Sample Media",
-            shiny::tags$i(
-              class = "glyphicon glyphicon-info-sign",
-              style = "color:#0072B2;",
-              title = "TADA is designed to work primarily with 'Water' data"
-            )
-          ),
-          choices = c("", media),
-          selected = c("Water"), # "water" gets added automatically if Water is included.  This is for older USGS data
-          multiple = TRUE
-        )
-      ),      
-    ),
-    shiny::fluidRow(
-      column(
-        5,
-        shiny::fluidRow( # this is what allows both widgets to be side-by-side
-          htmltools::h3("Characteristic(s)", style = "margin-bottom: 3px; font-size: 16px;"),
-          htmltools::hr(style = "margin-bottom: 0px; margin-top: 0px;"),
-          column(
-            width = 3,
-            style = "margin-left: -15px;",
-            shiny::selectizeInput(
-              inputId = ns("match_type_selector"),
-              label = "Match type:",
-              choices = match_types, # Choices are populated on client
-              selected = "contains",
-              multiple = FALSE
-            )
-          ),
-          column(
-            width = 3,
-            # Input for the user to type their search string
-            shiny::textInput(
-              inputId = ns("text_string"),
-              label = "Search string:",
-              value = ""
-            )
-          ),
-          column(
-            width = 6,
-            shiny::selectizeInput(
-              inputId = ns("characteristic_select"),
-              label = "Select matching characteristics",
-              choices = NULL,
-              multiple = TRUE,
-              options = list(
-                placeholder = "Start typing or use drop down menu",
-                openOnFocus = TRUE,
-                plugins = list("remove_button")
-              )
-            )
-          )
-        )
-      ),
-      column(
-        4,
-        shiny::selectizeInput(
-          ns("chargroup"),
-          "Characteristic Group",
-          choices = NULL,
-          options = list(placeholder = "Start typing or use drop down menu"),
-          multiple = TRUE
-        )
-      )
-    ),
-    shiny::fluidRow(
-      column(9,
-           htmltools::h4("EPA (WQX) Metadata Filters", style = "margin-top: 30px;"),
-           htmltools::HTML(
-           "<i>Note: These filters are only compatible with the EPA (WQX) data source option.
-           If you select any of these filters, the Data Source option USGS (Samples Data API) will not be available.</i>"
-           ),
-           htmltools::hr(style = "margin-bottom: 15px; margin-top: 0px;")
-      )
-    ),
-    shiny::fluidRow(
-
-      column(3, shiny::selectizeInput(ns("countryocean"),
-        "Country/Ocean(s)",
-        choices = NULL,
-        multiple = TRUE
-      )),
-
-      column(
-        3,
-        shiny::selectizeInput(
-          ns("org"),
-          shiny::tags$span(
-            "Organization(s)" # ,
-            # shiny::tags$i(
-            #   class = "glyphicon glyphicon-info-sign",
-            #   style = "color:#0072B2;",
-            #   title = "Organization filter is only available with the Data Source EPA (WQX)"
-            # )
-          ),
-          choices = NULL,
-          options = list(placeholder = "Start typing or use drop down menu"),
-          multiple = TRUE
-        )
-      ),
-      column(
-        3,
-        shiny::selectizeInput(
-          ns("project"),
-          "Project(s)",
-          choices = NULL,
-          options = list(placeholder = "Start typing or use drop down menu"),
-          multiple = TRUE
-        )
-      ),
-
-    ),
-    shiny::fluidRow(
-      column(5,
-           shiny::fluidRow( # this is what allows both widgets to be side-by-side
-          htmltools::h3("Tribal Data", style = "margin-bottom: 10px; font-size: 16px;"),
-          htmltools::hr(style = "margin-bottom: 0px; margin-top: 0px;"),
-          column(4, style = "margin-left: -15px;", shiny::selectizeInput(ns("tribe_layer"), "Data Layers",
-            choices = NULL
-          )),
-          column(
-            6,
-            shiny::selectizeInput(ns("tribe_name"), "Tribe Name (pick data layers first)",
-              choices = NULL
-            )
-          )
-        )
-
-      )
-    ),
-    shiny::fluidRow(
-      htmltools::br(),
-      column(
-        4,
-        shiny::radioButtons(ns("providers"),
-          "Data Source",
-          c("USGS (Samples Data API)" = "NWIS", "EPA (WQX)" = "STORET", "Both (USGS and EPA)" = "all"),
-          selected = "all"
-        )
-      )
-    ),
-    shiny::fluidRow(column(
-      4,
-      shiny::actionButton(ns("querynow"), "Run Query", shiny::icon("cloud"),
-        style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
-      )
-    )),
-    htmltools::hr(),
-    shiny::fluidRow(
-      htmltools::h3("Option C: Upload dataset"),
-      htmltools::HTML((
-        "Upload a compatible dataset from your computer. This upload feature only accepts data in .xls and .xlsx formats. Data must be formatted in the EPA Water Quality eXchange (WQX) schema (and include all columns required for this TADA R Shiny application) to run
-                                    this tool. The file can be a <B>fresh</B> dataset you created using the TADA template below or a <B>working</B> dataset that you downloaded from this application using the Download Working Dataset feature, and are now returning to the
-                                    app to iterate on."
-      )),
-      # widget to upload WQP profile or WQX formatted spreadsheet
-      column(
-        9,
-        shiny::tags$div(
-          id = "file-upload-wrapper", # Add a wrapper div with an id
-          shiny::fileInput(
-            ns("file"),
-            "",
-            multiple = TRUE,
-            accept = c(".xlsx", ".xls"),
-            width = "100%"
-          )
-        )
-      )
-    ),
-    shiny::fluidRow(
-      htmltools::HTML(
-        "Download a blank TADA data template in .xlsx format. This template is available to assist users that do not have data available in the WQP (and therefore cannot use Option B) prepare their data for upload to this R Shiny application using import Option C.
-          You may reach out to the TADA team through the helpdesk at mywaterway@epa.gov for assistance preparing your data. If your data is not in the WQP yet and you are interested in submitting it, you may reach out to the WQX helpdesk at WQX@epa.gov for assistance preparing and submitting your data
-                                    to the WQP through EPA's WQX.<br><br>"
-      ),
-      column(
-        9,
-        shiny::downloadButton(
-          ns("download_template"),
-          "Download Template",
-          style = "color: #fff; background-color: #337ab7; border-color: #2e6da4;"
-        )
-      )
-    ),
-    htmltools::hr(),
-    shiny::fluidRow(
-      htmltools::h3("Optional: Upload Progress File"),
-      htmltools::HTML((
-        "Upload a progress file from your computer. This upload feature only accepts data in the .RData format.
-        The TADA Shiny application keeps track of all user selections, and makes a .RData file
-        available for download at any time. If you saved a progress file you generated during a
-        previous use of the TADA Shiny application, then it can be uploaded here and used
-        to automatically parameterize the TADA Shiny app with the same selections. This file can
-        be used to regenerate a dataset with the same decisions as before, or can be used
-        to apply the same user selections to a new dataset"
-      )),
-      # widget to upload WQP profile or WQX formatted spreadsheet
-      column(
-        9,
-        shiny::tags$div(
-          id = "progress-file-wrapper", # Add a wrapper div with an id
-          shiny::fileInput(
-            ns("progress_file"),
-            "",
-            multiple = TRUE,
-            accept = c(".RData"),
-            width = "100%"
-          )
-        )
-      )
-    ),
+    
     # JavaScript implementing the stopwatch (client-side)
     shiny::tags$script(HTML("
 (function () {
@@ -613,7 +679,7 @@ mod_query_data_ui <- function(id) {
 "))
   )
 }
-
+# end of UI
 
 all.cols <- c(
   "ResultIdentifier",
