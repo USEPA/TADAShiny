@@ -9,15 +9,9 @@
 get_example_data_map <- function() {
   m <- list(
     "Utah Nutrients (15k results)" = function() EPATADA::Data_Nutrients_UT,
-    "EPA Region 5 May 1-7 2019 (173k results)" = function() EPATADA::Data_R5_TADAPackageDemo
+    "EPA Region 5 May 1-7 2019 (173k results)" = function() EPATADA::Data_R5_TADAPackageDemo,
+    "Six Tribal Nations (143k results)" = function() EPATADA::Data_TribalNations
   )
-
-  # Optional dataset: add only if exported by EPATADA
-  if ("Data_TribalNations" %in% getNamespaceExports("EPATADA")) {
-    m[["Six Tribal Nations (143k results)"]] <- function() EPATADA::Data_TribalNations
-  }
-
-  m
 }
 
 # Build map lazily so objects are only touched when selected
