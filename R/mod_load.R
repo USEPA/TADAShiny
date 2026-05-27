@@ -12,6 +12,7 @@ get_example_data_map <- function() {
     "EPA Region 5 May 1-7 2019 (173k results)" = function() EPATADA::Data_R5_TADAPackageDemo,
     "Six Tribal Nations (143k results)" = function() EPATADA::Data_TribalNations
   )
+  m
 }
 
 # Build map lazily so objects are only touched when selected
@@ -926,7 +927,7 @@ mod_query_data_server <- function(id, tadat) {
     ## greys out Load button for example data until file has been selected
     # https://stackoverflow.com/questions/24175997/force-no-default-selection-in-selectinput
     shiny::observeEvent(input$example_data, {
-      if (!is.na(input$example_data) && nchar(input$example_data) > 1) {
+      if (!is.na(input$example_data) && !is.na(input$example_data) > 1) {
         shinyjs::enable("example_data_go")
       }
     })
@@ -1129,7 +1130,7 @@ mod_query_data_server <- function(id, tadat) {
         return(chars)
       } else {
         match_type <- "contains"
-        if (input$match_type_selector != "") {
+        if (isTRUE(nzchar(input$match_type_selector))) {
           match_type <- input$match_type_selector
         }
         # set the grep pattern for each match type
