@@ -165,7 +165,7 @@ mod_query_data_ui <- function(id) {
     tags$head(
       htmltools::tags$style(htmltools::HTML("
     /* ============================
-       TADA – Typography baseline
+       TADA - Typography baseline
        ============================ */
     :root{
       /* Font family: system stack for performance and offline safety */
@@ -369,7 +369,7 @@ mod_query_data_ui <- function(id) {
   "))
     ),
     
-    # Card 1 — Option A: Use example data
+    # Card 1 - Option A: Use example data
     htmltools::div(
       class = "tada-card",
       shiny::fluidRow(
@@ -399,7 +399,7 @@ mod_query_data_ui <- function(id) {
       )
     ),
     
-    # Card 2 — Option B
+    # Card 2 - Option B
     htmltools::div(
       class = "tada-card",
       shiny::fluidRow(
@@ -641,7 +641,7 @@ mod_query_data_ui <- function(id) {
                   5,
                   shiny::selectizeInput(
                     ns("tribe_layer"),
-                    "Step 1 — Tribal Data Layer",
+                    "Step 1 - Tribal Data Layer",
                     choices = NULL
                   )
                 ),
@@ -649,7 +649,7 @@ mod_query_data_ui <- function(id) {
                   7,
                   shiny::selectizeInput(
                     ns("tribe_name"),
-                    "Step 2 — Tribe Name (pick a data layer first)",
+                    "Step 2 - Tribe Name (pick a data layer first)",
                     choices = NULL
                   )
                 )
@@ -673,7 +673,7 @@ mod_query_data_ui <- function(id) {
       )
     ),
     
-    # Card 3 — Option C (Upload) + Optional Progress File
+    # Card 3 - Option C (Upload) + Optional Progress File
     htmltools::div(
       class = "tada-card",
       # Option C: Upload dataset
@@ -1198,7 +1198,7 @@ mod_query_data_server <- function(id, tadat) {
 
       tryCatch(
         {
-          # only in interactive dev — withr will auto-restore at the end of this block
+          # only in interactive dev - withr will auto-restore at the end of this block
           # Consider whether you want warn = 2 to apply in Shiny deployments. If yes, remove the interactive() guard
           if (interactive()) withr::local_options(list(warn = 2))
 
