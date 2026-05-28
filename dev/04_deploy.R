@@ -44,7 +44,7 @@ rsconnect::deployApp(
   appTitle = "TADAShiny Module 1 WQP Data Discovery and Cleaning",
   launch.browser = TRUE,
   forceUpdate = TRUE
-  # appId = 1473
+  # appId = 11684
 )
 
 # To deploy to EPA posit connect production (public)
