@@ -161,6 +161,22 @@ mod_depth_ui <- function(id) {
 
 # --- Depth module helper functions (module-level so they are testable) ---
 
+# Ensure plotly traces have explicit type/mode when x/y are present
+ensure_plotly_scatter_defaults <- function(p) {
+  if (!inherits(p, "plotly") || is.null(p$x$data)) return(p)
+  for (i in seq_along(p$x$data)) {
+    tr <- p$x$data[[i]]
+    has_xy <- !is.null(tr$x) || !is.null(tr$y)
+    if (is.null(tr$type) && has_xy) tr$type <- "scatter"
+    if (identical(tr$type, "scatter") && is.null(tr$mode)) {
+      # Choose a reasonable default; lines+markers works well for profiles
+      tr$mode <- "lines+markers"
+    }
+    p$x$data[[i]] <- tr
+  }
+  p
+}
+
 # Helper to split semicolon-separated characteristic lists (robust)
 split_characteristics <- function(vec) {
   vec <- stats::na.omit(as.character(vec))
@@ -212,18 +228,22 @@ mod_depth_server <- function(id, tadat) {
     )
 
 
-    # Safe message for plot area (plotly)
+    # Safe message for plot area (plotly) — zero traces, no warnings
     safe_message_plot <- function(msg) {
-      plotly::plot_ly() %>%
+      p <- plotly::plot_ly() %>% 
         plotly::layout(
-          title = msg,
-          xaxis = list(visible = FALSE),
-          yaxis = list(visible = FALSE),
-          annotations = list(list(text = msg,
+          title = list(text = msg),
+          xaxis = list(visible = FALSE, title = NULL, zeroline = FALSE),
+          yaxis = list(visible = FALSE, title = NULL, zeroline = FALSE),
+          annotations = list(list(
+            text = msg,
             x = 0.5, xref = "paper", xanchor = "center",
             y = 0.5, yref = "paper", yanchor = "middle",
-            showarrow = FALSE, font = list(size = 14)))
+            showarrow = FALSE, font = list(size = 14)
+          ))
         )
+      # Optional: cleaner look for message cards
+      plotly::config(p, displayModeBar = FALSE)
     }
 
     # this a reactive list created to hold all the reactive objects specific to this module.
@@ -778,9 +798,6 @@ mod_depth_server <- function(id, tadat) {
         if (!is.na(char_col) && char_col %in% names(df_sel_norm)) {
           keep_idx <- keep_idx | grepl(pattern, as.character(df_sel_norm[[char_col]]), ignore.case = TRUE)
         }
-        if (!is.na(char_col) && char_col %in% names(df_sel_norm)) {
-          keep_idx <- keep_idx | grepl(pattern, as.character(df_sel_norm[[char_col]]), ignore.case = TRUE)
-        }
       }
 
       df_plot_prep <- df_sel[keep_idx, , drop = FALSE]
@@ -804,26 +821,48 @@ mod_depth_server <- function(id, tadat) {
 
       # All checks passed: call EPATADA plotting function
       p <- tryCatch({
-        EPATADA::TADA_DepthProfilePlot(df_sel,
+        EPATADA::TADA_DepthProfilePlot(
+          df_sel,
           groups = characteristics,
           location = sel_site,
           activity_date = sel_date,
           depthcat = input$depthcat,
           surfacevalue = input$surfacevalue,
-          bottomvalue = input$bottomvalue)
+          bottomvalue = input$bottomvalue
+        )
       }, error = function(e) {
         safe_message_plot(paste0("Plot error: ", e$message))
       })
+      
+      # If it's already a plotly object, set defaults to avoid hints
+      if (inherits(p, "plotly")) {
+        p <- ensure_plotly_scatter_defaults(p)
+      }
 
       p
     })
 
-    # Render plotly (or convert ggplot to plotly)
+    # Render plotly
     output$depthPlotly <- plotly::renderPlotly({
       p <- depth_plot_obj()
       shiny::req(p)
-      if (inherits(p, "plotly") || inherits(p, "htmlwidget")) return(p)
-      if (inherits(p, "ggplot")) return(plotly::ggplotly(p))
+      
+      # Convert ggplot to plotly if needed
+      if (inherits(p, "ggplot")) {
+        p <- plotly::ggplotly(p)
+      }
+      
+      # If it’s plotly/htmlwidget at this point, apply defaults as needed
+      if (inherits(p, "plotly")) {
+        p <- ensure_plotly_scatter_defaults(p)
+        return(p)
+      }
+      
+      if (inherits(p, "htmlwidget")) {
+        # leave other htmlwidgets untouched
+        return(p)
+      }
+      
       safe_message_plot("Unable to render plot object.")
     })
 
