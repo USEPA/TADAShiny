@@ -139,7 +139,7 @@ ui <- fluidPage(
 
   # Top area: controls and the Available Characteristics table
   shiny::fluidRow(
-    column(
+    shiny::column(
       width = 12,
       shiny::wellPanel(class = "top-controls",
 
@@ -182,7 +182,7 @@ ui <- fluidPage(
 
         # THIRD ROW: Load button (always below the Site/Org row)
         shiny::fluidRow(class = "control-row",
-          column(12,
+                        shiny::column(12,
                  shiny::div(style = "display:flex; align-items:flex-start;",
                      shiny::actionButton("load_data", "Load data",
                                   icon = icon("download"),
@@ -207,7 +207,7 @@ ui <- fluidPage(
                       to do a Depth (water column depth) analysis.  TODO: add UI elements for bycategory, bottomvalue, 
                       surfacevalue, and dailyagg"),
       htmltools::div(style = "margin-bottom:10px"),
-      shiny::fluidRow(column(
+      shiny::fluidRow(shiny::column(
         3,
         shiny::actionButton("review_depth_profile_data",
           "Review Depth Data",
@@ -227,7 +227,7 @@ ui <- fluidPage(
         ),
         # map
         shiny::fluidRow(
-          column(12,
+          shiny::column(12,
                  shinycssloaders::withSpinner(leaflet::leafletOutput(
                                                 "sites_map",
                                                 height = "500px")
@@ -236,13 +236,13 @@ ui <- fluidPage(
         ),
         # Site and date selects (same row)
         shiny::fluidRow(class = "control-row",
-          column(6,
+                        shiny::column(6,
                  shiny::div(style = "display:flex; flex-direction:column; ",
                      tags$label("Site ID", `for` = "depth_profile_site_id"),
                      shiny::selectInput("depth_profile_site_id", NULL, choices = NULL, width = "100%")
                  )
           ),
-          column(6,
+          shiny::column(6,
                  shiny::div(style = "display:flex; flex-direction:column;",
                      tags$label("Visit date", `for` = "activity_date"),
                      shiny::selectInput("activity_date", NULL, choices = NULL, width = "100%")
@@ -254,26 +254,26 @@ ui <- fluidPage(
 
         # Available characteristics table
         shiny::fluidRow(class = "control-row",
-          column(12, DT::DTOutput("available_characteristics"))
+                        shiny::column(12, DT::DTOutput("available_characteristics"))
         ),
 
         tags$hr(),
 
         # Options row: depthcat, surfacevalue, bottomvalue
         shiny::fluidRow(class = "control-row",
-          column(4,
+                        shiny::column(4,
                  shiny::div(style = "display:flex; flex-direction:column;",
                      tags$label("Depth category"),
                      shiny::checkboxInput("depthcat", NULL, value = TRUE)
                  )
           ),
-          column(4,
+          shiny::column(4,
                  shiny::div(style = "display:flex; flex-direction:column;",
                      tags$label("Surface (depth below surface)"),
                      shiny::numericInput("surfacevalue", NULL, value = 2, min = 0, width = "100%")
                  )
           ),
-          column(4,
+          shiny::column(4,
                  shiny::div(style = "display:flex; flex-direction:column;",
                      tags$label("Bottom (height above bottom) (m)"),
                      shiny::numericInput("bottomvalue", NULL, value = 2, min = 0, width = "100%")
@@ -283,7 +283,7 @@ ui <- fluidPage(
 
         # Update button full-width
         shiny::fluidRow(class = "control-row",
-          column(12, shiny::actionButton("update",
+                        shiny::column(12, shiny::actionButton("update",
                                   "Update plot",
                                   icon = icon("chart-area"), class = "btn btn-primary", style = "width:25%;"))
         )
@@ -293,7 +293,7 @@ ui <- fluidPage(
 
   # Middle: the plot (map) — use viewport height so it fills much of the window
   shiny::fluidRow(
-    column(width = 12,
+    shiny::column(width = 12,
            # 70vh => 70% of viewport height; adjust to taste
            plotly::plotlyOutput("depthPlotly", height = "70vh")
     )
@@ -301,16 +301,16 @@ ui <- fluidPage(
   
   # Middle: the data table of the data shown in the plot
   shiny::fluidRow(
-    column(width = 12,
+    shiny::column(width = 12,
            div(style = "width:70%; margin-left: auto; margin-right: auto; overflow-x: auto;",
-            column(12, DT::DTOutput("depth_plot_data_table"))
+               shiny::column(12, DT::DTOutput("depth_plot_data_table"))
            )
     )
   ),
 
   # Bottom: debug information occupying full width
   shiny::fluidRow(
-    column(width = 12,
+    shiny::column(width = 12,
            tags$hr(),
            shiny::verbatimTextOutput("debug_text")
     )

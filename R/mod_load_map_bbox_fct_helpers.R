@@ -17,7 +17,7 @@ att <- base::paste0(
 
 # Get the base map
 GetURL <- function(service, host = "basemap.nationalmap.gov") {
-  sprintf("https://%s/arcgis/services/%s/MapServer/WmsServer", host, service)
+  sprintf("https://%s/arcgis/services/%s/MapServer/WMSServer", host, service)
 }
 
 add_USGS_base <- function(x) {
@@ -33,6 +33,11 @@ add_USGS_base <- function(x) {
   x <- leaflet::addWMSTiles(x, GetURL("USGSShadedReliefOnly"),
     group = grp[4], attribution = att, layers = "0"
   )
+  
+  # Show only one base by default (e.g., USGS Topo)
+  x <- leaflet::hideGroup(x, grp[2])
+  x <- leaflet::hideGroup(x, grp[3])
+  x <- leaflet::hideGroup(x, grp[4])
 
   # Add the tiled overlay for the National Hydrography Dataset to the map widget:
   opt <- leaflet::WMSTileOptions(format = "image/png", transparent = TRUE)

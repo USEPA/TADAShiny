@@ -15,7 +15,7 @@ mod_map_bboxUI <- function(id, label = "Clear Drawing", step = 0.001) {
     class = "tada-bbox",
     shiny::fluidRow(
       # Map + address search
-      column(
+      shiny::column(
         width = 6, class = "tada-bbox-map",
         htmltools::div(
           class = "form-group",
@@ -60,48 +60,45 @@ mod_map_bboxUI <- function(id, label = "Clear Drawing", step = 0.001) {
       ),
       
       # Coordinate inputs
-      column(
+      shiny::column(
         width = 6, class = "tada-bbox-controls",
         # North (top, centered)
         shiny::fluidRow(
-          column(
+          shiny::column(
             width = 6, offset = 3,
-            shiny::numericInput(
-              ns("bb_N"), "North", value = NULL,
-              min = -90, max = 90, step = step, width = "100%"
-            )
+            shiny::numericInput(ns("bb_N"), "North", value = NA_real_, min = -90, max = 90, step = step, width = "100%")
           )
         ),
         # West / East (middle)
         shiny::fluidRow(
-          column(
+          shiny::column(
             width = 6,
             shiny::numericInput(
-              ns("bb_W"), "West", value = NULL,
+              ns("bb_W"), "West", value = NA_real_,
               min = -180, max = 180, step = step, width = "100%"
             )
           ),
-          column(
+          shiny::column(
             width = 6,
             shiny::numericInput(
-              ns("bb_E"), "East", value = NULL,
+              ns("bb_E"), "East", value = NA_real_,
               min = -180, max = 180, step = step, width = "100%"
             )
           )
         ),
         # South (bottom, centered)
         shiny::fluidRow(
-          column(
+          shiny::column(
             width = 6, offset = 3,
             shiny::numericInput(
-              ns("bb_S"), "South", value = NULL,
+              ns("bb_S"), "South", value = NA_real_,
               min = -90, max = 90, step = step, width = "100%"
             )
           )
         ),
         # Clear button
         shiny::fluidRow(
-          column(
+          shiny::column(
             width = 6, offset = 3,
             shiny::actionButton(ns("clear_map"), label = label, width = "100%")
           )
@@ -125,7 +122,7 @@ mod_map_bboxServer <- function(id, increment = 0.001, debounce_ms = 500) {
     
     last_addr <- shiny::reactiveVal("")
     shiny::observeEvent(input$addr, {
-      q <- trimws(input$addr %||% "")
+      q <- trimws(if (is.null(input$addr)) "" else input$addr)
       if (nzchar(q)) last_addr(q)
     }, ignoreInit = TRUE)
     
@@ -221,8 +218,10 @@ mod_map_bboxServer <- function(id, increment = 0.001, debounce_ms = 500) {
     
     # Address search handler
     shiny::observeEvent(input$addr_find, {
-      q <- trimws(input$addr %||% "")
-      if (!nzchar(q)) q <- last_addr() %||% ""
+      q <- trimws(if (is.null(input$addr)) "" else input$addr)
+      if (!nzchar(q)) {
+        q <- if (is.null(last_addr())) "" else last_addr()
+      }
       
       # ZIP-aware minimum validation
       is_zip5 <- grepl("^[0-9]{5}$", q)
@@ -243,9 +242,9 @@ mod_map_bboxServer <- function(id, increment = 0.001, debounce_ms = 500) {
       last_search(now)
       
       # Optional: disable button during request if shinyjs is available
-      if (requireNamespace("shinyjs", quietly = TRUE)) shinyjs::disable("addr_find")
+      if (requireNamespace("shinyjs", quietly = TRUE)) shinyjs::disable(ns("addr_find"))
       on.exit({
-        if (requireNamespace("shinyjs", quietly = TRUE)) shinyjs::enable("addr_find")
+        if (requireNamespace("shinyjs", quietly = TRUE)) shinyjs::enable(ns("addr_find"))
       }, add = TRUE)
       
       # Clear previous search marker
@@ -253,7 +252,8 @@ mod_map_bboxServer <- function(id, increment = 0.001, debounce_ms = 500) {
         leaflet::clearGroup("search_center")
       
       # Offline/CI safety
-      if (isTRUE(.tadas_offline())) {
+      offline <- tryCatch(isTRUE(.tadas_offline()), error = function(...) FALSE)
+      if (offline) {
         shiny::showNotification("Address lookup is unavailable in offline mode.", type = "warning", duration = 5)
         return()
       }
@@ -301,7 +301,8 @@ mod_map_bboxServer <- function(id, increment = 0.001, debounce_ms = 500) {
     shiny::observeEvent(input$clear_map, {
       map_proxy |>
         leaflet::clearGroup("manual_bbox") |>
-        leaflet::clearGroup("corner_pt")
+        leaflet::clearGroup("corner_pt") |>
+        leaflet::clearGroup("search_center")
       bbox_reVal$bBox <- NULL
       draw_state$first_corner <- NULL
       
@@ -373,7 +374,7 @@ mod_map_bboxServer <- function(id, increment = 0.001, debounce_ms = 500) {
       draw_state$first_corner <- NULL
     })
     
-    # Map → inputs: update numeric inputs when bbox changes
+    # Map inputs: update numeric inputs when bbox changes
     shiny::observe({
       if (!is.null(bbox_reVal$bBox)) {
         sync_in_progress(TRUE)
@@ -385,7 +386,7 @@ mod_map_bboxServer <- function(id, increment = 0.001, debounce_ms = 500) {
       }
     })
     
-    # Inputs → map: debounced observers
+    # Inputs map: debounced observers
     bb_W_debounce <- shiny::debounce(shiny::reactive(input$bb_W), debounce_ms)
     bb_S_debounce <- shiny::debounce(shiny::reactive(input$bb_S), debounce_ms)
     bb_E_debounce <- shiny::debounce(shiny::reactive(input$bb_E), debounce_ms)
@@ -426,10 +427,13 @@ mod_map_bboxServer <- function(id, increment = 0.001, debounce_ms = 500) {
       }
       
       # Validate bbox
-      if (west >= east) return()
-      if (south >= north) return()
+      if (west >= east || south >= north) {
+        map_proxy |> leaflet::clearGroup("manual_bbox") |> leaflet::clearGroup("corner_pt")
+        return()
+      }
       if (west < -180 || west > 180 || east < -180 || east > 180 ||
           south < -90 || south > 90 || north < -90 || north > 90) {
+        map_proxy |> leaflet::clearGroup("manual_bbox") |> leaflet::clearGroup("corner_pt")
         return()
       }
       

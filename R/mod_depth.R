@@ -70,7 +70,7 @@ mod_depth_ui <- function(id) {
       ),
       # map
       shiny::fluidRow(
-        column(12,
+        shiny::column(12,
           shinycssloaders::withSpinner(leaflet::leafletOutput(
             ns("depth_profile_sites_map"),
             height = "500px")
@@ -79,13 +79,13 @@ mod_depth_ui <- function(id) {
       ),
       # Site and date selects (same row)
       shiny::fluidRow(class = "control-row", style="width: 50%; padding-top: 10px;",
-        column(8,
+        shiny::column(8,
           shiny::div(style = "display:flex; flex-direction:column; ",
             tags$label("Site ID", `for` = "depth_profile_site_id"),
             shiny::selectInput(ns("depth_profile_site_id"), NULL, choices = NULL, width = "100%")
           )
         ),
-        column(4,
+        shiny::column(4,
           shiny::div(style = "display:flex; flex-direction:column;",
             tags$label("Visit date", `for` = "activity_date"),
             shiny::selectInput(ns("activity_date"), NULL, choices = NULL, width = "100%")
@@ -97,26 +97,26 @@ mod_depth_ui <- function(id) {
 
       # Available characteristics table
       shiny::fluidRow(class = "control-row",
-        column(12, DT::DTOutput(ns("available_characteristics")))
+        shiny::column(12, DT::DTOutput(ns("available_characteristics")))
       ),
 
       tags$hr(),
 
       # Options row: depthcat, surfacevalue, bottomvalue
       shiny::fluidRow(class = "control-row", style="width: 30%;",
-        column(4,
+        shiny::column(4,
           shiny::div(style = "display:flex; flex-direction:column;",
             tags$label("Depth category"),
             shiny::checkboxInput(ns("depthcat"), NULL, value = TRUE)
           )
         ),
-        column(4,
+        shiny::column(4,
           shiny::div(style = "display:flex; flex-direction:column;",
             tags$label("Surface (depth below surface)"),
             shiny::numericInput(ns("surfacevalue"), NULL, value = 2, min = 0, width = "100%")
           )
         ),
-        column(4,
+        shiny::column(4,
           shiny::div(style = "display:flex; flex-direction:column;",
             tags$label("Bottom (height above bottom) (m)"),
             shiny::numericInput(ns("bottomvalue"), NULL, value = 2, min = 0, width = "100%")
@@ -126,22 +126,22 @@ mod_depth_ui <- function(id) {
 
       # Update button full-width
       shiny::fluidRow(class = "control-row",
-        column(12, shiny::actionButton(ns("update"),
+        shiny::column(12, shiny::actionButton(ns("update"),
           "Update plot",
           icon = shiny::icon("chart-area"), class = "btn btn-primary", style = "width:10%; padding-top: 10px;"))
       ),
       # Middle: the plot (map) — use viewport height so it fills much of the window
       shiny::fluidRow(
-        column(width = 12,
+        shiny::column(width = 12,
           # 70vh => 70% of viewport height; adjust to taste
           plotly::plotlyOutput(ns("depthPlotly"), height = "70vh")
         )
       ),
       # Middle: the data table of the data shown in the plot
       shiny::fluidRow(
-        column(width = 12,
+        shiny::column(width = 12,
           shiny::div(style = "width:70%; margin-left: auto; margin-right: auto; overflow-x: auto;",
-            column(12, DT::DTOutput(ns("depth_plot_data_table"))
+            shiny::column(12, DT::DTOutput(ns("depth_plot_data_table"))
             )
         ))
       ),
@@ -149,7 +149,7 @@ mod_depth_ui <- function(id) {
 
       # Bottom: debug information occupying full width
       shiny::fluidRow(
-        column(width = 12,
+        shiny::column(width = 12,
           tags$hr(),
           shiny::verbatimTextOutput(ns("debug_text"))
         )

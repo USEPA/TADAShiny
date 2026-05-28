@@ -14,7 +14,7 @@ mod_overview_ui <- function(id) {
       "<B>Note:</B> This page shows maps and figures using the <B>original</B> dataset uploaded to this TADAShiny session. If you'd like to see updated figures after working in other tabs, please press the 'Refresh' button."
     ),
     htmltools::div(style = "margin-bottom:10px"),
-    shiny::fluidRow(column(
+    shiny::fluidRow(shiny::column(
       3,
       shiny::actionButton(
         ns("refresh_overview"),
@@ -24,7 +24,7 @@ mod_overview_ui <- function(id) {
       )
     )),
     htmltools::hr(),
-    shiny::fluidRow(column(
+    shiny::fluidRow(shiny::column(
       12, shiny::wellPanel(shiny::htmlOutput(ns(
         "overview_totals"
       )))
@@ -33,15 +33,15 @@ mod_overview_ui <- function(id) {
       "<B>Your dataset, mapped:</B> Zoom in and click on sites of interest. A pop up will appear that shows the number of measurements, characteristics, and visits at each site."
     ),
     htmltools::br(),
-    shiny::fluidRow(column(
+    shiny::fluidRow(shiny::column(
       12, shinycssloaders::withSpinner(leaflet::leafletOutput(ns("overview_map"), height = "500px"))
     )),
     # "Larger point sizes represent more samples collected at a site; darker points represent more characteristics collected at a site. Click on a point to see the site ID, name, and sample/visit/parameter counts."
     htmltools::br(),
     shiny::fluidRow(
-      column(6, shiny::plotOutput(ns("overview_hist"), height = "500px")),
+      shiny::column(6, shiny::plotOutput(ns("overview_hist"), height = "500px")),
       # "This histogram shows sample collection frequency for all sites over the time period queried.",
-      column(6, shiny::plotOutput(ns(
+      shiny::column(6, shiny::plotOutput(ns(
         "overview_barchar"
       ), height = "600px"))
     ),
@@ -50,7 +50,7 @@ mod_overview_ui <- function(id) {
       "The table below shows the organizations that collected data in your dataset and the number of measurements collected by each. Notice the third column, 'Rank'. This editable column is present because sometimes organizations unintentionally upload the same dataset multiple times to the WQP. For example, USGS will collect data at the request of state agencies. The USGS 'copy' of the results is uploaded to NWIS and made available in the portal, and the state agency's 'copy' of the results is uploaded to WQX. This rank provides the necessary info needed to flag and select one representative result from groups of duplicative uploads based on date, characteristic and result value/unit, and proximity to other sites. Double click in a cell in the 'Rank' column to edit the hierarchy of organizations and Ctrl-Enter to save those changes in the table: the default ranks organizations by the number of measurements in the dataset. Using the state vs USGS data example, if the state agency's organization name has a higher rank (ex. ranked #1) than USGS (ex. ranked #2), its result will be selected over the USGS upload of the sample, and the USGS version will be flagged for removal."
     ),
     htmltools::div(style = "margin-bottom:10px"),
-    shiny::fluidRow(column(12, DT::DTOutput(
+    shiny::fluidRow(shiny::column(12, DT::DTOutput(
       ns("overview_orgtable"),
       height = "500px"
     )))

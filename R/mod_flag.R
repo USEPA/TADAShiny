@@ -25,7 +25,7 @@ mod_data_flagging_ui <- function(id) {
       "Click the button below to run a series of tests that check for quality control issues or data formats not compatible with TADA. When the tests are finished running, a table will appear below. Each row describes an evaluation test, reports the number of results affected, and contains a switch users may toggle on/off to decide whether to flag results for removal. However, evaluation tests marked as <B>Required</B> have permanently 'ON' light blue switches that cannot be changed. <B>Recommended</B> tests are automatically switched 'ON' (darker blue), and <B>Optional</B> tests are automatically switched 'OFF' (gray)."
     ),
     htmltools::div(style = "margin-bottom:10px"),
-    shiny::fluidRow(column(
+    shiny::fluidRow(shiny::column(
       3,
       shiny::actionButton(ns("runFlags"),
         "Run Tests",
@@ -39,7 +39,7 @@ mod_data_flagging_ui <- function(id) {
     htmltools::HTML(
       "Depth units in the dataset are automatically converted to <B>meters</B> upon data retrieval. Click the radio buttons below to convert depth units to feet, inches, or back to meters."
     ),
-    shiny::fluidRow(column(
+    shiny::fluidRow(shiny::column(
       6,
       shiny::radioButtons(
         ns("m2f"),

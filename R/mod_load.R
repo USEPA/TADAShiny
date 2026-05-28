@@ -376,7 +376,7 @@ mod_query_data_ui <- function(id) {
         htmltools::h3("Option A: Use example data")
       ),
       shiny::fluidRow(class = "tada-field-row",
-                      column(
+                      shiny::column(
                         3,
                         shiny::selectInput(
                           ns("example_data"),
@@ -386,7 +386,7 @@ mod_query_data_ui <- function(id) {
                       )
       ),
       shiny::fluidRow(class = "tada-actions",
-                      column(
+                      shiny::column(
                         3,
                         shiny::actionButton(
                           ns("example_data_go"),
@@ -413,7 +413,7 @@ mod_query_data_ui <- function(id) {
       # Date Range
       htmltools::h4("Date Range"),
       shiny::fluidRow(class = "tada-field-row",
-                      column(
+                      shiny::column(
                         4,
                         shiny::dateInput(
                           ns("startDate"),
@@ -422,7 +422,7 @@ mod_query_data_ui <- function(id) {
                           startview = "year"
                         )
                       ),
-                      column(
+                      shiny::column(
                         4,
                         shiny::dateInput(
                           ns("endDate"),
@@ -440,12 +440,12 @@ mod_query_data_ui <- function(id) {
         "Choose at least one spatial location from the following options. If multiple options are used, the locations must be overlapping."
       ),
       shiny::fluidRow(class = "tada-field-row",
-                      column(4, shiny::selectizeInput(ns("state"), "State", choices = NULL)),
-                      column(
+                      shiny::column(4, shiny::selectizeInput(ns("state"), "State", choices = NULL)),
+                      shiny::column(
                         4,
                         shiny::selectizeInput(ns("county"), "County (pick state first)", choices = NULL)
                       ),
-                      column(
+                      shiny::column(
                         4,
                         shiny::selectizeInput(
                           ns("siteid"),
@@ -457,7 +457,7 @@ mod_query_data_ui <- function(id) {
       ),
       shiny::fluidRow(
         class = "tada-field-row",
-        column(
+        shiny::column(
           12,
           # Label styled like other input labels
           htmltools::div(
@@ -478,7 +478,7 @@ mod_query_data_ui <- function(id) {
       # Metadata Filters
       htmltools::h4("Metadata Filters"),
       shiny::fluidRow(class = "tada-field-row",
-                      column(
+                      shiny::column(
                         4,
                         shiny::selectizeInput(
                           ns("type"),
@@ -488,7 +488,7 @@ mod_query_data_ui <- function(id) {
                           multiple = TRUE
                         )
                       ),
-                      column(
+                      shiny::column(
                         3,
                         shiny::selectizeInput(
                           ns("media"),
@@ -507,13 +507,13 @@ mod_query_data_ui <- function(id) {
                       )
       ),
       shiny::fluidRow(class = "tada-field-row",
-                      column(
+                      shiny::column(
                         5,
                         # Characteristic(s)
                         htmltools::h4("Characteristic(s)"),
                         shiny::fluidRow(
                           class = "tada-field-row",
-                          column(
+                          shiny::column(
                             width = 3,
                             shiny::selectizeInput(
                               inputId = ns("match_type_selector"),
@@ -523,7 +523,7 @@ mod_query_data_ui <- function(id) {
                               multiple = FALSE
                             )
                           ),
-                          column(
+                          shiny::column(
                             width = 3,
                             shiny::textInput(
                               inputId = ns("text_string"),
@@ -531,7 +531,7 @@ mod_query_data_ui <- function(id) {
                               value = ""
                             )
                           ),
-                          column(
+                          shiny::column(
                             width = 6,
                             shiny::selectizeInput(
                               inputId = ns("characteristic_select"),
@@ -547,7 +547,7 @@ mod_query_data_ui <- function(id) {
                           )
                         )
                       ),
-                      column(
+                      shiny::column(
                         4,
                         shiny::selectizeInput(
                           ns("chargroup"),
@@ -561,7 +561,7 @@ mod_query_data_ui <- function(id) {
       
       # Data Source
       shiny::fluidRow(class = "tada-field-row",
-                      column(
+                      shiny::column(
                         4,
                         shiny::radioButtons(
                           ns("providers"),
@@ -595,7 +595,7 @@ mod_query_data_ui <- function(id) {
           htmltools::div(
             # Filters row
             shiny::fluidRow(class = "tada-field-row",
-                            column(
+                            shiny::column(
                               4,
                               shiny::selectizeInput(
                                 ns("countryocean"),
@@ -604,7 +604,7 @@ mod_query_data_ui <- function(id) {
                                 multiple = TRUE
                               )
                             ),
-                            column(
+                            shiny::column(
                               4,
                               shiny::selectizeInput(
                                 ns("org"),
@@ -614,7 +614,7 @@ mod_query_data_ui <- function(id) {
                                 multiple = TRUE
                               )
                             ),
-                            column(
+                            shiny::column(
                               4,
                               shiny::selectizeInput(
                                 ns("project"),
@@ -628,7 +628,7 @@ mod_query_data_ui <- function(id) {
             
             # Tribal Data subsection
             shiny::fluidRow(class = "tada-field-row",
-                            column(
+                            shiny::column(
                               12,
                               htmltools::h4("Tribal Data (requires both fields)"),
                               htmltools::p("Step 1: Select a Tribal Data Layer. Step 2: Select a Tribe Name.")
@@ -637,7 +637,7 @@ mod_query_data_ui <- function(id) {
             htmltools::div(
               class = "tada-box",
               shiny::fluidRow(
-                column(
+                shiny::column(
                   5,
                   shiny::selectizeInput(
                     ns("tribe_layer"),
@@ -645,7 +645,7 @@ mod_query_data_ui <- function(id) {
                     choices = NULL
                   )
                 ),
-                column(
+                shiny::column(
                   7,
                   shiny::selectizeInput(
                     ns("tribe_name"),
@@ -661,7 +661,7 @@ mod_query_data_ui <- function(id) {
       
       # Run Query
       shiny::fluidRow(class = "tada-actions",
-                      column(
+                      shiny::column(
                         4,
                         shiny::actionButton(
                           ns("querynow"),
@@ -686,7 +686,7 @@ mod_query_data_ui <- function(id) {
                       )
       ),
       shiny::fluidRow(class = "tada-field-row",
-                      column(
+                      shiny::column(
                         9,
                         shiny::tags$div(
                           id = "file-upload-wrapper",
@@ -706,7 +706,7 @@ mod_query_data_ui <- function(id) {
                       )
       ),
       shiny::fluidRow(class = "tada-actions",
-                      column(
+                      shiny::column(
                         9,
                         shiny::downloadButton(
                           ns("download_template"),
@@ -727,7 +727,7 @@ mod_query_data_ui <- function(id) {
                       )
       ),
       shiny::fluidRow(class = "tada-field-row",
-                      column(
+                      shiny::column(
                         9,
                         shiny::tags$div(
                           id = "progress-file-wrapper",
