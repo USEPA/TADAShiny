@@ -59,4 +59,4 @@ jobs:
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
-          check-args: '--no-staged-install'
+          args: 'c("--no-staged-install")'
