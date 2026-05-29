@@ -158,10 +158,13 @@ match_types <- c(
 )
 
 # start of UI
-# Updated UI with aligned sections and lighter subgroup styling (fieldset/legend)
+# Updated UI with lighter subgroup styling, subtle background clusters,
+# reworded location guidance, reordered Site ID(s), and consistent Tribal Data styling
 mod_query_data_ui <- function(id) {
   ns <- NS(id)
   tagList(
+    # Enable Bootstrap tooltips globally
+    tags$script(HTML("$(function () { $('[data-toggle=\"tooltip\"]').tooltip({container: 'body'}); });")),
     # Card styling and spacing system
     tags$head(
       htmltools::tags$style(htmltools::HTML("
@@ -169,21 +172,14 @@ mod_query_data_ui <- function(id) {
        TADA - Typography baseline
        ============================ */
     :root{
-      /* Font family: system stack for performance and offline safety */
       --tada-font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'Noto Sans', 'Liberation Sans', sans-serif;
-
-      /* Base sizing */
       --tada-font-size-base: 16px;     /* 1rem */
       --tada-line-height: 1.5;
       --tada-text-color: #111827;      /* gray-900 */
       --tada-muted-color: #4b5563;     /* gray-600 */
-
-      /* Scale (relative to base) */
       --tada-font-size-sm: 0.875rem;   /* ~14px */
       --tada-font-size-md: 1rem;       /* 16px */
       --tada-font-size-lg: 1.125rem;   /* 18px */
-
-      /* Headings inside cards */
       --tada-h3-size: 1.125rem;        /* 18px */
       --tada-h4-size: 1rem;            /* 16px */
       --tada-headings-weight: 600;
@@ -238,7 +234,6 @@ mod_query_data_ui <- function(id) {
       line-height: 1.4;
       color: var(--tada-text-color);
     }
-    .tada-card .help-block,
     .tada-note {
       font-size: var(--tada-font-size-sm);
       color: var(--tada-muted-color);
@@ -274,7 +269,7 @@ mod_query_data_ui <- function(id) {
     }
     .tada-details[open] { margin-bottom: 6px; }
 
-    /* Simple boxed section for nested UI (e.g., Tribal Data) */
+    /* Simple boxed section for nested UI (legacy use) */
     .tada-box {
       border: 1px solid #e5e7eb;
       border-radius: 6px;
@@ -289,8 +284,8 @@ mod_query_data_ui <- function(id) {
     .tada-fieldset {
       border: 0;
       margin: 8px 0 12px;
-      padding: 8px 0 0 12px;         /* slight indent */
-      border-left: 3px solid #c7d2fe; /* indigo-200 accent */
+      padding: 8px 0 0 12px;              /* slight indent */
+      border-left: 2px dotted #e5e7eb;    /* lighter, dotted accent */
     }
     .tada-fieldset .tada-legend {
       margin: 0 0 6px;
@@ -299,6 +294,15 @@ mod_query_data_ui <- function(id) {
       font-weight: 600;
       line-height: 1.3;
       color: var(--tada-text-color);
+    }
+
+    /* Subtle background wrapper for a cluster */
+    .tada-subsection-bg {
+      background: #fafafa;
+      border-radius: 6px;
+      padding: 10px 12px;
+      margin-top: 8px;
+      margin-bottom: 12px;
     }
 
     /* Buttons (actionButton, downloadButton) */
@@ -337,58 +341,54 @@ mod_query_data_ui <- function(id) {
     }
     
     /* Bounding box UI: responsive polish */
-.tada-bbox .leaflet-container {
-  height: 420px !important; /* desktop/tablet default */
-}
-@media (max-width: 767px) {
-  .tada-bbox .leaflet-container {
-    height: 320px !important; /* smaller height on phones */
-  }
-  /* Ensure nice vertical rhythm when stacked */
-  .tada-bbox .tada-bbox-map { margin-bottom: 12px; }
-  .tada-bbox .tada-bbox-controls .form-group { margin-bottom: 10px; }
-}
+    .tada-bbox .leaflet-container {
+      height: 420px !important; /* desktop/tablet default */
+    }
+    @media (max-width: 767px) {
+      .tada-bbox .leaflet-container {
+        height: 320px !important; /* smaller height on phones */
+      }
+      /* Ensure nice vertical rhythm when stacked */
+      .tada-bbox .tada-bbox-map { margin-bottom: 12px; }
+      .tada-bbox .tada-bbox-controls .form-group { margin-bottom: 10px; }
+    }
 
-/* Ensure radio/checkbox labels match other labels (Data Source, etc.) */
-.tada-card .radio label,
-.tada-card .checkbox label {
-  font-size: var(--tada-font-size-md);
-  line-height: 1.4;
-  font-weight: 400; /* keep normal weight for inline option labels */
-  color: var(--tada-text-color);
-  margin-bottom: 6px;
-}
+    /* Ensure radio/checkbox labels match other labels (Data Source, etc.) */
+    .tada-card .radio label,
+    .tada-card .checkbox label {
+      font-size: var(--tada-font-size-md);
+      line-height: 1.4;
+      font-weight: 400; /* keep normal weight for inline option labels */
+      color: var(--tada-text-color);
+      margin-bottom: 6px;
+    }
 
-/* Make selectize dropdown menus match input font size */
-.selectize-dropdown {
-  font-size: var(--tada-font-size-md);
-  font-family: var(--tada-font-family);
-  line-height: 1.4;
-}
+    /* Make selectize dropdown menus match input font size */
+    .selectize-dropdown {
+      font-size: var(--tada-font-size-md);
+      font-family: var(--tada-font-family);
+      line-height: 1.4;
+    }
 
-/* Slightly tighten label spacing in the bbox inputs */
-.tada-bbox .form-group .control-label {
-  margin-bottom: 4px;
-}
+    /* Slightly tighten label spacing in the bbox inputs */
+    .tada-bbox .form-group .control-label { margin-bottom: 4px; }
 
-/* Optional: a bit taller map on very large displays */
-@media (min-width: 1200px) and (min-height: 900px) {
-  .tada-bbox .leaflet-container {
-    height: 480px !important;
-  }
-}
+    /* Optional: a bit taller map on very large displays */
+    @media (min-width: 1200px) and (min-height: 900px) {
+      .tada-bbox .leaflet-container { height: 480px !important; }
+    }
 
-/* Leaflet attribution: keep subtle but readable */
-.leaflet-control-attribution {
-  font-size: 0.75rem; /* ~12px */
-  line-height: 1.2;
-}
+    /* Leaflet attribution: keep subtle but readable */
+    .leaflet-control-attribution {
+      font-size: 0.75rem; /* ~12px */
+      line-height: 1.2;
+    }
 
-/* Metadata Filters: compact, aligned spacing */
-.tada-metadata .tada-field-row + .tada-field-row { margin-top: 10px; }
-.tada-metadata .control-label { margin-bottom: 6px; }
-.tada-metadata .tada-box { margin-top: 10px; }
-.tada-metadata .tada-box > .control-label { display: block; margin-bottom: 8px; }
+    /* Metadata Filters: compact, aligned spacing */
+    .tada-metadata .tada-field-row + .tada-field-row { margin-top: 10px; }
+    .tada-metadata .control-label { margin-bottom: 6px; }
+    .tada-metadata .tada-box { margin-top: 10px; }
+    .tada-metadata .tada-box > .control-label { display: block; margin-bottom: 8px; }
   "))
     ),
     
@@ -403,7 +403,7 @@ mod_query_data_ui <- function(id) {
                         3,
                         shiny::selectInput(
                           ns("example_data"),
-                          "Use example data",
+                          "Select dataset to load",
                           choices = c("", names(example_data_map))
                         )
                       )
@@ -437,85 +437,89 @@ mod_query_data_ui <- function(id) {
       htmltools::h4("Select Location Parameters"),
       htmltools::p(
         class = "tada-note",
-        "Specify one or more location parameters to describe the spatial extent of the desired dataset. All fields are optional. If multiple options are used, the locations must be overlapping."
+        "Select one or more location parameters to define the spatial extent of your dataset. If you use multiple, they are combined with AND logic—results must fall within the overlap of all selected locations. All location fields are optional."
       ),
       
-      # State and County subgroup (lighter, connected)
-      htmltools::tags$fieldset(
-        class = "tada-fieldset",
-        htmltools::tags$legend(class = "tada-legend", "State and County"),
+      # Subtle background wrapper for the location cluster
+      htmltools::div(
+        class = "tada-subsection-bg",
+        
+        # State and County subgroup
+        htmltools::tags$fieldset(
+          class = "tada-fieldset",
+          htmltools::tags$legend(class = "tada-legend", "State and County"),
+          shiny::fluidRow(
+            class = "tada-field-row",
+            shiny::column(6, shiny::selectizeInput(ns("state"), "State", choices = NULL)),
+            shiny::column(6, shiny::selectizeInput(ns("county"), "County (pick state first)", choices = NULL))
+          )
+          ),
+        
+        # Site ID(s) immediately after State/County (tooltip on label)
         shiny::fluidRow(
           class = "tada-field-row",
           shiny::column(
-            6,
-            shiny::selectizeInput(ns("state"), "State", choices = NULL)
-          ),
-          shiny::column(
-            6,
-            shiny::selectizeInput(ns("county"), "County (pick state first)", choices = NULL)
+            12,
+            shiny::selectizeInput(
+              ns("siteid"),
+              shiny::tags$span(
+                "Site ID(s) ",
+                shiny::tags$i(
+                  class = "glyphicon glyphicon-info-sign",
+                  `data-toggle` = "tooltip",
+                  title = "If Site ID(s) are specified, the query is limited to those sites regardless of State, County, or Bounding Box."
+                )
+              ),
+              choices = NULL,
+              multiple = TRUE,
+              options = list(placeholder = "Start typing or use drop down menu")
+            )
           )
         ),
-        htmltools::p(
-          class = "tada-note",
-          "Pick a state to populate county choices."
-        )
-      ),
-      
-      # Site Type(s) on its own row
-      shiny::fluidRow(
-        class = "tada-field-row",
-        shiny::column(
-          12,
-          shiny::selectizeInput(
-            ns("type"),
-            "Site Type(s)",
-            choices = c(sitetype),
-            options = list(placeholder = "Start typing or use drop down menu"),
-            multiple = TRUE
+
+        # Site Type(s)
+        shiny::fluidRow(
+          class = "tada-field-row",
+          shiny::column(
+            12,
+            shiny::selectizeInput(
+              ns("type"),
+              "Site Type(s)",
+              choices = c(sitetype),
+              options = list(placeholder = "Start typing or use drop down menu"),
+              multiple = TRUE
+            )
+          )
+        ),
+        
+        # Bounding Box subgroup (map + coordinates; search pans only)
+        shiny::fluidRow(
+          class = "tada-field-row",
+          shiny::column(
+            12,
+            htmltools::tags$fieldset(
+              class = "tada-fieldset tada-bbox",
+              htmltools::tags$legend(class = "tada-legend", "Bounding Box — Map and Coordinates"),
+              htmltools::p(
+                class = "tada-note",
+                "Define a single bounding box by drawing on the map or entering North/West/East/South coordinates."
+              ),
+              mod_map_bboxUI(ns("BBox_map"))
+            )
           )
         )
-      ),
+      ), # end location cluster wrapper
       
-      # Row 2: Monitoring Location ID(s)
-      shiny::fluidRow(
-        class = "tada-field-row",
-        shiny::column(
-          12,
-          shiny::selectizeInput(
-            ns("siteid"),
-            "Site ID(s)",
-            choices = NULL,
-            multiple = TRUE,
-            options = list(placeholder = "Start typing or use drop down menu")
-          )
-        )
-      ),
-      
-      # Bounding Box subgroup (map and coordinates — search pans only)
-      shiny::fluidRow(
-        class = "tada-field-row",
-        shiny::column(
-          12,
-          htmltools::tags$fieldset(
-            class = "tada-fieldset tada-bbox",
-            htmltools::tags$legend(class = "tada-legend", "Bounding Box — Map and Coordinates"),
-            htmltools::p(
-              class = "tada-note",
-              "Define a single bounding box by drawing on the map or entering North/West/East/South coordinates."
-            ),
-            htmltools::p(
-              class = "tada-note",
-              "Note: “Search address or place” only pans/zooms the map and does not set the bounding box."
-            ),
-            mod_map_bboxUI(ns("BBox_map"))
-          )
-        )
-      ),
-      
-      # Metadata Filters
+      # Metadata Filters (with subtle background like Location Parameters)
       htmltools::h4("Filter Results"),
       htmltools::div(
-        class = "tada-metadata",
+        class = "tada-metadata tada-subsection-bg",
+        
+        # New description
+        htmltools::p(
+          class = "tada-note",
+          "Select one or more filters to narrow your query. If you use multiple, they are combined with AND logic—results must fall within the overlap of all selected filters. Note: Adjusting the Date Range is required; the default dates (today) will return no results."
+        ),
         
         # Row 1: Sample Media, Characteristic Group
         shiny::fluidRow(
@@ -525,10 +529,10 @@ mod_query_data_ui <- function(id) {
             shiny::selectizeInput(
               ns("media"),
               shiny::tags$span(
-                "Sample Media",
+                "Sample Media ",
                 shiny::tags$i(
                   class = "glyphicon glyphicon-info-sign",
-                  style = "color:#0072B2;",
+                  `data-toggle` = "tooltip",
                   title = "TADA is designed to work primarily with 'Water' data"
                 )
               ),
@@ -590,10 +594,20 @@ mod_query_data_ui <- function(id) {
           )
         ),
         
-        # Date Range subgroup
+        # Date Range subgroup (Required; tooltip on legend)
         htmltools::tags$fieldset(
           class = "tada-fieldset",
-          htmltools::tags$legend(class = "tada-legend", "Date Range"),
+          htmltools::tags$legend(
+            class = "tada-legend",
+            shiny::tags$span(
+              "Date Range (Required) ",
+              shiny::tags$i(
+                class = "glyphicon glyphicon-info-sign",
+                `data-toggle` = "tooltip",
+                title = "Default dates are today (returns no results). Enter a date range, or clear both dates if other filters sufficiently limit your query. For timeouts, shorten the range or add filters."
+              )
+            )
+          ),
           shiny::fluidRow(
             class = "tada-field-row",
             shiny::column(
@@ -614,108 +628,105 @@ mod_query_data_ui <- function(id) {
                 startview = "year"
               )
             )
-          ),
-          htmltools::p(
-            class = "tada-note",
-            "Filter results to a time window. Leave blank to include all dates."
           )
         )
-      ),
+        )
+      ,
       
-      # Data Source (aligned with other section headers)
+      # Data Source (with subtle background like Location Parameters)
       htmltools::h4("Data Source"),
-      shiny::fluidRow(
-        class = "tada-field-row",
-        shiny::column(
-          4,
-          shiny::radioButtons(
-            ns("providers"),
-            label = NULL,
-            c(
-              "USGS (Samples Data API)" = "NWIS",
-              "EPA (WQX)" = "STORET",
-              "Both (USGS and EPA)" = "all"
-            ),
-            selected = "all"
+      htmltools::div(
+        class = "tada-subsection-bg",
+        
+        shiny::fluidRow(
+          class = "tada-field-row",
+          shiny::column(
+            4,
+            shiny::radioButtons(
+              ns("providers"),
+              label = NULL,
+              c(
+                "USGS (Samples Data API)" = "NWIS",
+                "EPA (WQX)" = "STORET",
+                "Both (USGS and EPA)" = "all"
+              ),
+              selected = "all"
+            )
           )
-        )
-      ),
-      
-      # Hint when not WQX
-      shiny::conditionalPanel(
-        condition = sprintf("input['%s'] !== 'STORET'", ns("providers")),
-        htmltools::div(
-          class = "tada-note",
-          htmltools::HTML("<em>Select <strong>EPA (WQX)</strong> as the Data Source to enable additional filters below.</em>")
-        )
-      ),
-      
-      # Additional Filters (EPA WQX only)
-      shiny::conditionalPanel(
-        condition = sprintf("input['%s'] === 'STORET'", ns("providers")),
-        htmltools::tags$details(
-          class = "tada-details",
-          open = "open",
-          htmltools::tags$summary("Additional Filters Only Compatible With the EPA (WQX) Data Source"),
+        ),
+        
+        # Hint when not WQX
+        shiny::conditionalPanel(
+          condition = sprintf("input['%s'] !== 'STORET'", ns("providers")),
           htmltools::div(
-            # Filters row
-            shiny::fluidRow(class = "tada-field-row",
-                            shiny::column(
-                              4,
-                              shiny::selectizeInput(
-                                ns("countryocean"),
-                                "Country/Ocean(s)",
-                                choices = NULL,
-                                multiple = TRUE
-                              )
-                            ),
-                            shiny::column(
-                              4,
-                              shiny::selectizeInput(
-                                ns("org"),
-                                shiny::tags$span("Organization(s)"),
-                                choices = NULL,
-                                options = list(placeholder = "Start typing or use drop down menu"),
-                                multiple = TRUE
-                              )
-                            ),
-                            shiny::column(
-                              4,
-                              shiny::selectizeInput(
-                                ns("project"),
-                                "Project(s)",
-                                choices = NULL,
-                                options = list(placeholder = "Start typing or use drop down menu"),
-                                multiple = TRUE
-                              )
-                            )
-            ),
-            
-            # Tribal Data subsection (kept as .tada-box)
-            shiny::fluidRow(class = "tada-field-row",
-                            shiny::column(
-                              12,
-                              htmltools::h4("Tribal Data (requires both fields)"),
-                              htmltools::p("Step 1: Select a Tribal Data Layer. Step 2: Select a Tribe Name.")
-                            )
-            ),
+            class = "tada-note",
+            htmltools::HTML("<em>Select <strong>EPA (WQX)</strong> as the Data Source to enable additional filters below.</em>")
+          )
+        ),
+        
+        # Additional Filters (EPA WQX only)
+        shiny::conditionalPanel(
+          condition = sprintf("input['%s'] === 'STORET'", ns("providers")),
+          htmltools::tags$details(
+            class = "tada-details",
+            open = "open",
+            htmltools::tags$summary("Additional Filters Only Compatible With the EPA (WQX) Data Source"),
             htmltools::div(
-              class = "tada-box",
+              # Filters row
               shiny::fluidRow(
+                class = "tada-field-row",
                 shiny::column(
-                  5,
+                  4,
                   shiny::selectizeInput(
-                    ns("tribe_layer"),
-                    "Step 1 - Tribal Data Layer",
-                    choices = NULL
+                    ns("countryocean"),
+                    "Country/Ocean(s)",
+                    choices = NULL,
+                    multiple = TRUE
                   )
                 ),
                 shiny::column(
-                  7,
+                  4,
                   shiny::selectizeInput(
-                    ns("tribe_name"),
-                    "Step 2 - Tribe Name (pick a data layer first)",
-                    choices = NULL
+                    ns("org"),
+                    shiny::tags$span("Organization(s)"),
+                    choices = NULL,
+                    options = list(placeholder = "Start typing or use drop down menu"),
+                    multiple = TRUE
+                  )
+                ),
+                shiny::column(
+                  4,
+                  shiny::selectizeInput(
+                    ns("project"),
+                    "Project(s)",
+                    choices = NULL,
+                    options = list(placeholder = "Start typing or use drop down menu"),
+                    multiple = TRUE
+                  )
+                )
+              ),
+              
+              # Tribal Data subgroup (match fieldset look)
+              htmltools::tags$fieldset(
+                class = "tada-fieldset",
+                htmltools::tags$legend(class = "tada-legend", "Tribal Data (requires both fields)"),
+                shiny::fluidRow(
+                  class = "tada-field-row",
+                  shiny::column(
+                    5,
+                    shiny::selectizeInput(
+                      ns("tribe_layer"),
+                      "Step 1 - Tribal Data Layer",
+                      choices = NULL
+                    )
+                  ),
+                  shiny::column(
+                    7,
+                    shiny::selectizeInput(
+                      ns("tribe_name"),
+                      "Step 2 - Tribe Name",
+                      choices = NULL
+                    )
                   )
                 )
               )

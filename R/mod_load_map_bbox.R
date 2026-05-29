@@ -19,7 +19,17 @@ mod_map_bboxUI <- function(id, label = "Clear Drawing", step = 0.001) {
         width = 6, class = "tada-bbox-map",
         htmltools::div(
           class = "form-group",
-          htmltools::tags$label(class = "control-label", "Search address or place"),
+          htmltools::tags$label(
+            class = "control-label",
+            shiny::tags$span(
+              "Search address or place ",
+              shiny::tags$i(
+                class = "glyphicon glyphicon-info-sign",
+                `data-toggle` = "tooltip",
+                title = "“Search address or place” only pans/zooms the map and does not set the bounding box."
+              )
+            )
+          ),
           shiny::textInput(
             inputId = ns("addr"),
             label = NULL,
