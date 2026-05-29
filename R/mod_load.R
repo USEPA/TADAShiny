@@ -158,7 +158,7 @@ match_types <- c(
 )
 
 # start of UI
-# Updated UI with aligned sections and nested Characteristic(s) subsection
+# Updated UI with aligned sections and lighter subgroup styling (fieldset/legend)
 mod_query_data_ui <- function(id) {
   ns <- NS(id)
   tagList(
@@ -283,6 +283,22 @@ mod_query_data_ui <- function(id) {
       margin: 8px 0 12px;
       font-size: var(--tada-font-size-md);
       line-height: var(--tada-line-height);
+    }
+
+    /* New: lighter subgroup styling (fieldset/legend) */
+    .tada-fieldset {
+      border: 0;
+      margin: 8px 0 12px;
+      padding: 8px 0 0 12px;         /* slight indent */
+      border-left: 3px solid #c7d2fe; /* indigo-200 accent */
+    }
+    .tada-fieldset .tada-legend {
+      margin: 0 0 6px;
+      padding: 0;
+      font-size: var(--tada-font-size-md);
+      font-weight: 600;
+      line-height: 1.3;
+      color: var(--tada-text-color);
     }
 
     /* Buttons (actionButton, downloadButton) */
@@ -416,7 +432,7 @@ mod_query_data_ui <- function(id) {
         class = "tada-note",
         "Use the fields below to download a dataset directly from WQP. Fields with '(s)' in the label allow multiple selections. Be mindful that large queries may time out."
       ),
-
+      
       # Location Information
       htmltools::h4("Select Location Parameters"),
       htmltools::p(
@@ -424,10 +440,10 @@ mod_query_data_ui <- function(id) {
         "Specify one or more location parameters to describe the spatial extent of the desired dataset. All fields are optional. If multiple options are used, the locations must be overlapping."
       ),
       
-      # State and County subbox
-      htmltools::div(
-        class = "tada-box",
-        htmltools::tags$label(class = "control-label", "State and County"),
+      # State and County subgroup (lighter, connected)
+      htmltools::tags$fieldset(
+        class = "tada-fieldset",
+        htmltools::tags$legend(class = "tada-legend", "State and County"),
         shiny::fluidRow(
           class = "tada-field-row",
           shiny::column(
@@ -475,29 +491,21 @@ mod_query_data_ui <- function(id) {
         )
       ),
       
-      # Bounding Box (map and coordinates — search does not set the box)
+      # Bounding Box subgroup (map and coordinates — search pans only)
       shiny::fluidRow(
         class = "tada-field-row",
         shiny::column(
           12,
-          htmltools::div(
-            class = "tada-box tada-bbox",
-            htmltools::tags$label(
-              class = "control-label",
-              "Bounding Box — Map and Coordinates"
+          htmltools::tags$fieldset(
+            class = "tada-fieldset tada-bbox",
+            htmltools::tags$legend(class = "tada-legend", "Bounding Box — Map and Coordinates"),
+            htmltools::p(
+              class = "tada-note",
+              "Define a single bounding box by drawing on the map or entering North/West/East/South coordinates."
             ),
             htmltools::p(
               class = "tada-note",
-              "Define a single bounding box for this query using either of the following:"
-            ),
-            htmltools::tags$ul(
-              class = "tada-note",
-              htmltools::tags$li("Draw a rectangle on the map (Bounding Box Latitude and Longitude)"),
-              htmltools::tags$li("Enter North, West, East, South coordinates")
-            ),
-            htmltools::p(
-              class = "tada-note",
-              "Note: The “Search address or place” field only pans/zooms the map; it does not set the bounding box."
+              "Note: “Search address or place” only pans/zooms the map and does not set the bounding box."
             ),
             mod_map_bboxUI(ns("BBox_map"))
           )
@@ -541,10 +549,10 @@ mod_query_data_ui <- function(id) {
           )
         ),
         
-        # Characteristic(s) subsection
-        htmltools::div(
-          class = "tada-box",
-          htmltools::tags$label(class = "control-label", "Characteristic(s)"),
+        # Characteristic(s) subgroup
+        htmltools::tags$fieldset(
+          class = "tada-fieldset",
+          htmltools::tags$legend(class = "tada-legend", "Characteristic(s)"),
           shiny::fluidRow(
             class = "tada-field-row",
             shiny::column(
@@ -582,10 +590,10 @@ mod_query_data_ui <- function(id) {
           )
         ),
         
-        # Date Range subsection
-        htmltools::div(
-          class = "tada-box",
-          htmltools::tags$label(class = "control-label", "Date Range"),
+        # Date Range subgroup
+        htmltools::tags$fieldset(
+          class = "tada-fieldset",
+          htmltools::tags$legend(class = "tada-legend", "Date Range"),
           shiny::fluidRow(
             class = "tada-field-row",
             shiny::column(
@@ -683,7 +691,7 @@ mod_query_data_ui <- function(id) {
                             )
             ),
             
-            # Tribal Data subsection
+            # Tribal Data subsection (kept as .tada-box)
             shiny::fluidRow(class = "tada-field-row",
                             shiny::column(
                               12,
