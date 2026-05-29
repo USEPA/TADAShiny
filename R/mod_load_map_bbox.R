@@ -28,11 +28,6 @@ mod_map_bboxUI <- function(id, label = "Clear Drawing", step = 0.001) {
           )
         ),
         shiny::actionButton(ns("addr_find"), "Find", icon = shiny::icon("search")),
-        htmltools::tags$span(
-          class = "tada-note",
-          style = "margin-left: 8px;",
-          "Pans/zooms map; does not set the bounding box."
-        ),
         # Press Enter to trigger Find
         htmltools::tags$script(htmltools::HTML(sprintf("
   (function(){

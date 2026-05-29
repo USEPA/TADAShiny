@@ -158,6 +158,7 @@ match_types <- c(
 )
 
 # start of UI
+# Updated UI with aligned sections and nested Characteristic(s) subsection
 mod_query_data_ui <- function(id) {
   ns <- NS(id)
   tagList(
@@ -366,6 +367,12 @@ mod_query_data_ui <- function(id) {
   font-size: 0.75rem; /* ~12px */
   line-height: 1.2;
 }
+
+/* Metadata Filters: compact, aligned spacing */
+.tada-metadata .tada-field-row + .tada-field-row { margin-top: 10px; }
+.tada-metadata .control-label { margin-bottom: 6px; }
+.tada-metadata .tada-box { margin-top: 10px; }
+.tada-metadata .tada-box > .control-label { display: block; margin-bottom: 8px; }
   "))
     ),
     
@@ -407,176 +414,226 @@ mod_query_data_ui <- function(id) {
       ),
       htmltools::p(
         class = "tada-note",
-        "Use the fields below to download a dataset directly from WQP. Fields with '(s)' in the label allow multiple selections. Hydrologic Units may be at any scale, from subwatershed to region. However, be mindful that large queries may time out."
+        "Use the fields below to download a dataset directly from WQP. Fields with '(s)' in the label allow multiple selections. Be mindful that large queries may time out."
       ),
-      
-      # Date Range
-      htmltools::h4("Date Range"),
-      shiny::fluidRow(class = "tada-field-row",
-                      shiny::column(
-                        4,
-                        shiny::dateInput(
-                          ns("startDate"),
-                          "Start Date",
-                          format = "yyyy-mm-dd",
-                          startview = "year"
-                        )
-                      ),
-                      shiny::column(
-                        4,
-                        shiny::dateInput(
-                          ns("endDate"),
-                          "End Date",
-                          format = "yyyy-mm-dd",
-                          startview = "year"
-                        )
-                      )
-      ),
-      
+
       # Location Information
-      htmltools::h4("Location Information"),
+      htmltools::h4("Select Location Parameters"),
       htmltools::p(
         class = "tada-note",
-        "Choose at least one spatial location from the following options. If multiple options are used, the locations must be overlapping."
+        "Specify one or more location parameters to describe the spatial extent of the desired dataset. All fields are optional. If multiple options are used, the locations must be overlapping."
       ),
-      shiny::fluidRow(class = "tada-field-row",
-                      shiny::column(4, shiny::selectizeInput(ns("state"), "State", choices = NULL)),
-                      shiny::column(
-                        4,
-                        shiny::selectizeInput(ns("county"), "County (pick state first)", choices = NULL)
-                      ),
-                      shiny::column(
-                        4,
-                        shiny::selectizeInput(
-                          ns("siteid"),
-                          "Monitoring Location ID(s)",
-                          choices = NULL,
-                          multiple = TRUE
-                        )
-                      )
+      
+      # State and County subbox
+      htmltools::div(
+        class = "tada-box",
+        htmltools::tags$label(class = "control-label", "State and County"),
+        shiny::fluidRow(
+          class = "tada-field-row",
+          shiny::column(
+            6,
+            shiny::selectizeInput(ns("state"), "State", choices = NULL)
+          ),
+          shiny::column(
+            6,
+            shiny::selectizeInput(ns("county"), "County (pick state first)", choices = NULL)
+          )
+        ),
+        htmltools::p(
+          class = "tada-note",
+          "Pick a state to populate county choices."
+        )
       ),
+      
+      # Site Type(s) on its own row
       shiny::fluidRow(
         class = "tada-field-row",
         shiny::column(
           12,
-          # Label styled like other input labels
+          shiny::selectizeInput(
+            ns("type"),
+            "Site Type(s)",
+            choices = c(sitetype),
+            options = list(placeholder = "Start typing or use drop down menu"),
+            multiple = TRUE
+          )
+        )
+      ),
+      
+      # Row 2: Monitoring Location ID(s)
+      shiny::fluidRow(
+        class = "tada-field-row",
+        shiny::column(
+          12,
+          shiny::selectizeInput(
+            ns("siteid"),
+            "Site ID(s)",
+            choices = NULL,
+            multiple = TRUE,
+            options = list(placeholder = "Start typing or use drop down menu")
+          )
+        )
+      ),
+      
+      # Bounding Box (map and coordinates — search does not set the box)
+      shiny::fluidRow(
+        class = "tada-field-row",
+        shiny::column(
+          12,
           htmltools::div(
-            class = "form-group",
+            class = "tada-box tada-bbox",
             htmltools::tags$label(
               class = "control-label",
-              "Bounding Box Latitude and Longitude"
-            )
-          ),
-          htmltools::p(
-            class = "tada-note",
-            "Provide the latitude and longitude by drawing a rectangle on the map or typing in the coordinates in the input fields."
-          ),
-          mod_map_bboxUI(ns("BBox_map"))
+              "Bounding Box — Map and Coordinates"
+            ),
+            htmltools::p(
+              class = "tada-note",
+              "Define a single bounding box for this query using either of the following:"
+            ),
+            htmltools::tags$ul(
+              class = "tada-note",
+              htmltools::tags$li("Draw a rectangle on the map (Bounding Box Latitude and Longitude)"),
+              htmltools::tags$li("Enter North, West, East, South coordinates")
+            ),
+            htmltools::p(
+              class = "tada-note",
+              "Note: The “Search address or place” field only pans/zooms the map; it does not set the bounding box."
+            ),
+            mod_map_bboxUI(ns("BBox_map"))
+          )
         )
       ),
       
       # Metadata Filters
-      htmltools::h4("Metadata Filters"),
-      shiny::fluidRow(class = "tada-field-row",
-                      shiny::column(
-                        4,
-                        shiny::selectizeInput(
-                          ns("type"),
-                          "Site Type(s)",
-                          choices = c(sitetype),
-                          options = list(placeholder = "Start typing or use drop down menu"),
-                          multiple = TRUE
-                        )
-                      ),
-                      shiny::column(
-                        3,
-                        shiny::selectizeInput(
-                          ns("media"),
-                          shiny::tags$span(
-                            "Sample Media",
-                            shiny::tags$i(
-                              class = "glyphicon glyphicon-info-sign",
-                              style = "color:#0072B2;",
-                              title = "TADA is designed to work primarily with 'Water' data"
-                            )
-                          ),
-                          choices = c("", media),
-                          selected = c("Water"),
-                          multiple = TRUE
-                        )
-                      )
-      ),
-      shiny::fluidRow(class = "tada-field-row",
-                      shiny::column(
-                        5,
-                        # Characteristic(s)
-                        htmltools::h4("Characteristic(s)"),
-                        shiny::fluidRow(
-                          class = "tada-field-row",
-                          shiny::column(
-                            width = 3,
-                            shiny::selectizeInput(
-                              inputId = ns("match_type_selector"),
-                              label = "Match type:",
-                              choices = match_types,
-                              selected = "contains",
-                              multiple = FALSE
-                            )
-                          ),
-                          shiny::column(
-                            width = 3,
-                            shiny::textInput(
-                              inputId = ns("text_string"),
-                              label = "Search string:",
-                              value = ""
-                            )
-                          ),
-                          shiny::column(
-                            width = 6,
-                            shiny::selectizeInput(
-                              inputId = ns("characteristic_select"),
-                              label = "Select matching characteristics",
-                              choices = NULL,
-                              multiple = TRUE,
-                              options = list(
-                                placeholder = "Start typing or use drop down menu",
-                                openOnFocus = TRUE,
-                                plugins = list("remove_button")
-                              )
-                            )
-                          )
-                        )
-                      ),
-                      shiny::column(
-                        4,
-                        shiny::selectizeInput(
-                          ns("chargroup"),
-                          "Characteristic Group",
-                          choices = NULL,
-                          options = list(placeholder = "Start typing or use drop down menu"),
-                          multiple = TRUE
-                        )
-                      )
+      htmltools::h4("Filter Results"),
+      htmltools::div(
+        class = "tada-metadata",
+        
+        # Row 1: Sample Media, Characteristic Group
+        shiny::fluidRow(
+          class = "tada-field-row",
+          shiny::column(
+            6,
+            shiny::selectizeInput(
+              ns("media"),
+              shiny::tags$span(
+                "Sample Media",
+                shiny::tags$i(
+                  class = "glyphicon glyphicon-info-sign",
+                  style = "color:#0072B2;",
+                  title = "TADA is designed to work primarily with 'Water' data"
+                )
+              ),
+              choices = c("", media),
+              selected = c("Water"),
+              multiple = TRUE
+            )
+          ),
+          shiny::column(
+            6,
+            shiny::selectizeInput(
+              ns("chargroup"),
+              "Characteristic Group",
+              choices = NULL,
+              options = list(placeholder = "Start typing or use drop down menu"),
+              multiple = TRUE
+            )
+          )
+        ),
+        
+        # Characteristic(s) subsection
+        htmltools::div(
+          class = "tada-box",
+          htmltools::tags$label(class = "control-label", "Characteristic(s)"),
+          shiny::fluidRow(
+            class = "tada-field-row",
+            shiny::column(
+              width = 3,
+              shiny::selectizeInput(
+                inputId = ns("match_type_selector"),
+                label = "1. Match type",
+                choices = match_types,
+                selected = "contains",
+                multiple = FALSE
+              )
+            ),
+            shiny::column(
+              width = 3,
+              shiny::textInput(
+                inputId = ns("text_string"),
+                label = "2. Search string",
+                value = ""
+              )
+            ),
+            shiny::column(
+              width = 6,
+              shiny::selectizeInput(
+                inputId = ns("characteristic_select"),
+                label = "3. Select matching characteristics",
+                choices = NULL,
+                multiple = TRUE,
+                options = list(
+                  placeholder = "Start typing or use drop down menu",
+                  openOnFocus = TRUE,
+                  plugins = list("remove_button")
+                )
+              )
+            )
+          )
+        ),
+        
+        # Date Range subsection
+        htmltools::div(
+          class = "tada-box",
+          htmltools::tags$label(class = "control-label", "Date Range"),
+          shiny::fluidRow(
+            class = "tada-field-row",
+            shiny::column(
+              4,
+              shiny::dateInput(
+                ns("startDate"),
+                "Start Date",
+                format = "yyyy-mm-dd",
+                startview = "year"
+              )
+            ),
+            shiny::column(
+              4,
+              shiny::dateInput(
+                ns("endDate"),
+                "End Date",
+                format = "yyyy-mm-dd",
+                startview = "year"
+              )
+            )
+          ),
+          htmltools::p(
+            class = "tada-note",
+            "Filter results to a time window. Leave blank to include all dates."
+          )
+        )
       ),
       
-      # Data Source
-      shiny::fluidRow(class = "tada-field-row",
-                      shiny::column(
-                        4,
-                        shiny::radioButtons(
-                          ns("providers"),
-                          "Data Source",
-                          c(
-                            "USGS (Samples Data API)" = "NWIS",
-                            "EPA (WQX)" = "STORET",
-                            "Both (USGS and EPA)" = "all"
-                          ),
-                          selected = "all"
-                        )
-                      )
+      # Data Source (aligned with other section headers)
+      htmltools::h4("Data Source"),
+      shiny::fluidRow(
+        class = "tada-field-row",
+        shiny::column(
+          4,
+          shiny::radioButtons(
+            ns("providers"),
+            label = NULL,
+            c(
+              "USGS (Samples Data API)" = "NWIS",
+              "EPA (WQX)" = "STORET",
+              "Both (USGS and EPA)" = "all"
+            ),
+            selected = "all"
+          )
+        )
       ),
       
-      # Hint when not STORET
+      # Hint when not WQX
       shiny::conditionalPanel(
         condition = sprintf("input['%s'] !== 'STORET'", ns("providers")),
         htmltools::div(
