@@ -26,7 +26,7 @@ mod_map_bboxUI <- function(id, label = "Clear Drawing", step = 0.001) {
               shiny::tags$i(
                 class = "glyphicon glyphicon-info-sign",
                 `data-toggle` = "tooltip",
-                title = "“Search address or place” only pans/zooms the map and does not set the bounding box."
+                title = "'Search address or place' only pans/zooms the map and does not set the bounding box."
               )
             )
           ),
@@ -238,7 +238,7 @@ mod_map_bboxServer <- function(id, increment = 0.001, debounce_ms = 500) {
         return()
       }
       
-      # Rate limit: ≤ 1 req/sec
+      # Rate limit: <= 1 req/sec
       now <- as.numeric(Sys.time())
       if ((now - last_search()) < 1) {
         shiny::showNotification("Please wait a moment before searching again.", type = "message", duration = 3)

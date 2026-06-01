@@ -437,7 +437,7 @@ mod_query_data_ui <- function(id) {
       htmltools::h4("Select Location Parameters"),
       htmltools::p(
         class = "tada-note",
-        "Select one or more location parameters to define the spatial extent of your dataset. If you use multiple, they are combined with AND logic—results must fall within the overlap of all selected locations. All location fields are optional."
+        "Select one or more location parameters to define the spatial extent of your dataset. If you use multiple, they are combined with AND logic-results must fall within the overlap of all selected locations. All location fields are optional."
       ),
       
       # Subtle background wrapper for the location cluster
@@ -499,7 +499,7 @@ mod_query_data_ui <- function(id) {
             12,
             htmltools::tags$fieldset(
               class = "tada-fieldset tada-bbox",
-              htmltools::tags$legend(class = "tada-legend", "Bounding Box — Map and Coordinates"),
+              htmltools::tags$legend(class = "tada-legend", "Bounding Box - Map and Coordinates"),
               htmltools::p(
                 class = "tada-note",
                 "Define a single bounding box by drawing on the map or entering North/West/East/South coordinates."
@@ -518,7 +518,7 @@ mod_query_data_ui <- function(id) {
         # New description
         htmltools::p(
           class = "tada-note",
-          "Select one or more filters to narrow your query. If you use multiple, they are combined with AND logic—results must fall within the overlap of all selected filters. Note: Adjusting the Date Range is required; the default dates (today) will return no results."
+          "Select one or more filters to narrow your query. If you use multiple, they are combined with AND logic-results must fall within the overlap of all selected filters. Note: Adjusting the Date Range is required; the default dates (today) will return no results."
         ),
         
         # Row 1: Sample Media, Characteristic Group
@@ -1404,7 +1404,7 @@ mod_query_data_server <- function(id, tadat) {
       # call the function corresponding to the user's selection to get the dataset.
       raw <- example_data_map[[input$example_data]]()
 
-      # Clean → order → restrict → initialize
+      # Clean -> order -> restrict -> initialize
       raw <- EPATADA::TADA_AutoClean(raw)
       raw <- EPATADA::TADA_OrderCols(raw)
       raw <- restrict_to_keep_cols(raw, keep_cols = all.cols, verbose = TRUE)
