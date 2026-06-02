@@ -14,51 +14,32 @@ test_that("not_na works", {
 })
 
 test_that("drop_nulls works", {
-  expect_equal(
-    drop_nulls(
-      list(x = NULL, y = 2)
-    ),
-    list(y = 2)
-  )
+  expect_equal(drop_nulls(list(x = NULL, y = 2)), list(y = 2))
 })
 
 test_that("%||% works", {
-  expect_equal(
-    NULL %||% 1,
-    1
-  )
-  expect_equal(
-    2 %||% 1,
-    2
-  )
+  expect_equal(NULL %||% 1, 1)
+  expect_equal(2 %||% 1, 2)
 })
 
 test_that("%|NA|% works", {
-  expect_equal(
-    NA %|NA|% 1,
-    1
-  )
-  expect_equal(
-    2 %|NA|% 1,
-    2
-  )
+  expect_equal(NA %|NA|% 1, 1)
+  expect_equal(2 %|NA|% 1, 2)
 })
 
 test_that("rv and rvtl work", {
-  expect_true(
-    inherits(rv, "function")
-  )
-  expect_true(
-    inherits(rvtl, "function")
-  )
+  expect_true(inherits(rv, "function"))
+  expect_true(inherits(rvtl, "function"))
 })
 
 test_that("options() usage is safe and consistent", {
   # Resolve the package root
-  root <- tryCatch(
-    rprojroot::find_package_root_file(),
-    error = function(e) normalizePath(file.path(testthat::test_path(), "..", ".."), mustWork = FALSE)
-  )
+  root <- tryCatch(rprojroot::find_package_root_file(), error = function(e) {
+    normalizePath(
+      file.path(testthat::test_path(), "..", ".."),
+      mustWork = FALSE
+    )
+  })
 
   # Directories to scan
   dirs <- c(
@@ -71,9 +52,12 @@ test_that("options() usage is safe and consistent", {
   dirs <- dirs[dir.exists(dirs)]
 
   # Collect R files (flatten to character, clean up, then filter existing)
-  r_files <- unlist(lapply(dirs, function(d) {
-    list.files(d, pattern = "\\.[Rr]$", full.names = TRUE, recursive = TRUE)
-  }), use.names = FALSE)
+  r_files <- unlist(
+    lapply(dirs, function(d) {
+      list.files(d, pattern = "\\.[Rr]$", full.names = TRUE, recursive = TRUE)
+    }),
+    use.names = FALSE
+  )
 
   # Ensure character and clean
   r_files <- as.character(r_files)
@@ -93,7 +77,9 @@ test_that("options() usage is safe and consistent", {
   find_options_calls <- function(file) {
     calls <- list()
     exprs <- tryCatch(parse(file, keep.source = TRUE), error = function(e) NULL)
-    if (is.null(exprs)) return(calls)
+    if (is.null(exprs)) {
+      return(calls)
+    }
 
     walk <- function(e) {
       if (is.call(e)) {
@@ -103,9 +89,13 @@ test_that("options() usage is safe and consistent", {
           line <- if (!is.null(sr)) sr[1] else NA_integer_
           calls[[length(calls) + 1]] <<- list(call = e, line = line)
         }
-        for (i in seq_along(e)) walk(e[[i]])
+        for (i in seq_along(e)) {
+          walk(e[[i]])
+        }
       } else if (is.expression(e) || is.list(e)) {
-        for (i in seq_along(e)) walk(e[[i]])
+        for (i in seq_along(e)) {
+          walk(e[[i]])
+        }
       }
     }
     walk(exprs)
@@ -117,7 +107,11 @@ test_that("options() usage is safe and consistent", {
   for (f in r_files) {
     lines <- read_file_lines(f)
     calls <- find_options_calls(f)
-    has_withr_local_options <- any(grepl("withr::local_options", lines, fixed = TRUE))
+    has_withr_local_options <- any(grepl(
+      "withr::local_options",
+      lines,
+      fixed = TRUE
+    ))
 
     # Rule A: unnamed arguments to options()
     for (c in calls) {
@@ -136,10 +130,16 @@ test_that("options() usage is safe and consistent", {
           }
         }
         if (bad) {
-          snippet <- if (!is.na(line) && line <= length(lines)) lines[line] else deparse(call)
+          snippet <- if (!is.na(line) && line <= length(lines)) {
+            lines[line]
+          } else {
+            deparse(call)
+          }
           issues[[length(issues) + 1]] <- sprintf(
             "%s:%s: options() called with unnamed argument (e.g., options(old_warn)): %s",
-            f, ifelse(is.na(line), "?", line), snippet
+            f,
+            ifelse(is.na(line), "?", line),
+            snippet
           )
         }
       }
@@ -150,7 +150,9 @@ test_that("options() usage is safe and consistent", {
     for (ln in warn_get_lines) {
       issues[[length(issues) + 1]] <- sprintf(
         "%s:%s: Found options(\"warn\"). Prefer getOption(\"warn\"). Line: %s",
-        f, ln, trimws(lines[ln])
+        f,
+        ln,
+        trimws(lines[ln])
       )
     }
 
@@ -162,18 +164,26 @@ test_that("options() usage is safe and consistent", {
       window <- lines[window_lo:window_hi]
 
       nearby_withr <- any(grepl("withr::local_options", window, fixed = TRUE))
-      nearby_onexit_restore <- any(grepl("on\\.exit\\s*\\(\\s*options\\s*\\(\\s*warn\\s*=", window))
+      nearby_onexit_restore <- any(grepl(
+        "on\\.exit\\s*\\(\\s*options\\s*\\(\\s*warn\\s*=",
+        window
+      ))
 
       if (!nearby_withr && !nearby_onexit_restore && !has_withr_local_options) {
         issues[[length(issues) + 1]] <- sprintf(
           "%s:%s: options(warn = ...) without restoration or withr::local_options. Add withr::local_options(list(warn = ...)) or on.exit(options(warn = old_warn), add = TRUE). Line: %s",
-          f, ln, trimws(lines[ln])
+          f,
+          ln,
+          trimws(lines[ln])
         )
       }
     }
 
     # Rule D: interactive() guard + options(warn=...) warning
-    interactive_guard_lines <- grep("if\\s*\\(\\s*interactive\\s*\\(\\s*\\)\\s*\\)", lines)
+    interactive_guard_lines <- grep(
+      "if\\s*\\(\\s*interactive\\s*\\(\\s*\\)\\s*\\)",
+      lines
+    )
     if (length(interactive_guard_lines) > 0 && length(warn_set_lines) > 0) {
       issues[[length(issues) + 1]] <- sprintf(
         "%s: Found options(warn=...) in a file that uses interactive() guards. In Shiny, interactive() is often FALSE, leading to inconsistent warn behavior.",
@@ -202,13 +212,10 @@ test_that("options() usage is safe and consistent", {
 
 # Pre-load shiny and muffle warning related to environment/version mismatch
 local({
-  withCallingHandlers(
-    library(shiny),
-    warning = function(w) {
-      msg <- conditionMessage(w)
-      if (grepl("package 'shiny' was built under R version", msg)) {
-        invokeRestart("muffleWarning")
-      }
+  withCallingHandlers(library(shiny), warning = function(w) {
+    msg <- conditionMessage(w)
+    if (grepl("package 'shiny' was built under R version", msg)) {
+      invokeRestart("muffleWarning")
     }
-  )
+  })
 })

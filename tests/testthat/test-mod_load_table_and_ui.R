@@ -9,7 +9,11 @@ make_tadat_env <- function() {
 testthat::test_that("initializeTable marks tadat as reup when TADA.Remove present", {
   tadat <- make_tadat_env()
   # Create a raw data.frame that already has TADA.Remove column (simulating a previously worked-on dataset)
-  raw <- data.frame(A = 1:3, TADA.Remove = c(TRUE, FALSE, TRUE), stringsAsFactors = FALSE)
+  raw <- data.frame(
+    A = 1:3,
+    TADA.Remove = c(TRUE, FALSE, TRUE),
+    stringsAsFactors = FALSE
+  )
   # Mock shinyjs::enable so it does nothing (prevents errors)
   mock_enable <- function(...) NULL
   mockery::stub(initializeTable, "shinyjs::enable", mock_enable)
@@ -46,9 +50,15 @@ testthat::test_that("disableLoading calls shiny update functions and attempts to
     list(id = id)
   }
   mock_shinyjs_disable <- function(...) NULL
-  mock_insertUI <- function(selector, where, ui) list(selector = selector, where = where)
+  mock_insertUI <- function(selector, where, ui) {
+    list(selector = selector, where = where)
+  }
   # Stub the functions within disableLoading
-  mockery::stub(disableLoading, "shiny::updateSelectInput", mock_updateSelectInput)
+  mockery::stub(
+    disableLoading,
+    "shiny::updateSelectInput",
+    mock_updateSelectInput
+  )
   mockery::stub(disableLoading, "shinyjs::disable", mock_shinyjs_disable)
   mockery::stub(disableLoading, "shiny::insertUI", mock_insertUI)
 

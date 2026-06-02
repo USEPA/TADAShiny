@@ -6,7 +6,13 @@
 #'
 #' @noRd
 # Stored USGS map element names
-grp <- c("USGS Topo", "USGS Imagery Only", "USGS Imagery Topo", "USGS Shaded Relief", "Hydrography")
+grp <- c(
+  "USGS Topo",
+  "USGS Imagery Only",
+  "USGS Imagery Topo",
+  "USGS Shaded Relief",
+  "Hydrography"
+)
 
 att <- base::paste0(
   "<a href='https://www.usgs.gov/'>",
@@ -21,31 +27,53 @@ GetURL <- function(service, host = "basemap.nationalmap.gov") {
 }
 
 add_USGS_base <- function(x) {
-  x <- leaflet::addWMSTiles(x, GetURL("USGSTopo"),
-    group = grp[1], attribution = att, layers = "0"
+  x <- leaflet::addWMSTiles(
+    x,
+    GetURL("USGSTopo"),
+    group = grp[1],
+    attribution = att,
+    layers = "0"
   )
-  x <- leaflet::addWMSTiles(x, GetURL("USGSImageryOnly"),
-    group = grp[2], attribution = att, layers = "0"
+  x <- leaflet::addWMSTiles(
+    x,
+    GetURL("USGSImageryOnly"),
+    group = grp[2],
+    attribution = att,
+    layers = "0"
   )
-  x <- leaflet::addWMSTiles(x, GetURL("USGSImageryTopo"),
-    group = grp[3], attribution = att, layers = "0"
+  x <- leaflet::addWMSTiles(
+    x,
+    GetURL("USGSImageryTopo"),
+    group = grp[3],
+    attribution = att,
+    layers = "0"
   )
-  x <- leaflet::addWMSTiles(x, GetURL("USGSShadedReliefOnly"),
-    group = grp[4], attribution = att, layers = "0"
+  x <- leaflet::addWMSTiles(
+    x,
+    GetURL("USGSShadedReliefOnly"),
+    group = grp[4],
+    attribution = att,
+    layers = "0"
   )
 
   # Add the tiled overlay for the National Hydrography Dataset to the map widget:
   opt <- leaflet::WMSTileOptions(format = "image/png", transparent = TRUE)
-  x <- leaflet::addWMSTiles(x, GetURL("USGSHydroCached"),
-    group = grp[5], options = opt, layers = "0"
+  x <- leaflet::addWMSTiles(
+    x,
+    GetURL("USGSHydroCached"),
+    group = grp[5],
+    options = opt,
+    layers = "0"
   )
   x <- leaflet::hideGroup(x, grp[5])
 
   # Add layer control
   opt2 <- leaflet::layersControlOptions(collapsed = FALSE)
-  x <- leaflet::addLayersControl(x,
+  x <- leaflet::addLayersControl(
+    x,
     baseGroups = grp[1:4],
-    overlayGroups = grp[5], options = opt2,
+    overlayGroups = grp[5],
+    options = opt2,
     position = "topleft"
   )
 

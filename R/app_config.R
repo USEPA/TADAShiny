@@ -30,10 +30,7 @@ app_sys <- function(..., package = "TADAShiny") {
     c(as.list(segs), list(package = package, mustWork = FALSE))
   }
 
-  p <- tryCatch(
-    system.file(..., package = "TADAShiny"),
-    error = function(e) ""
-  )
+  p <- tryCatch(system.file(..., package = "TADAShiny"), error = function(e) "")
   if (nzchar(p)) {
     return(p)
   }
@@ -46,10 +43,7 @@ app_sys <- function(..., package = "TADAShiny") {
 
   # Join segments into a relative path for local fallbacks
   rel <- do.call(file.path, as.list(segs))
-  candidates <- c(
-    file.path("inst", rel),
-    rel
-  )
+  candidates <- c(file.path("inst", rel), rel)
 
   for (cand in candidates) {
     if (file.exists(cand)) {
@@ -109,13 +103,12 @@ get_golem_config <- function(
 
   # Defensive check (should always be length 1 here)
   if (length(f) != 1L) {
-    stop("Internal error: resolved config path must be a single string, got length ", length(f), ".")
+    stop(
+      "Internal error: resolved config path must be a single string, got length ",
+      length(f),
+      "."
+    )
   }
 
-  config::get(
-    value = value,
-    config = config,
-    file = f,
-    use_parent = use_parent
-  )
+  config::get(value = value, config = config, file = f, use_parent = use_parent)
 }

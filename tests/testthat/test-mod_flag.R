@@ -42,7 +42,8 @@ test_that("runFlags updates tadat$raw via applyFlags and unit conversion updates
   patches <- list(
     patch_ns_fun("TADAShiny", "checkFlagColumns", function(dataset) TRUE),
     patch_ns_fun("TADAShiny", "flagCensus", function(raw) {
-      out <- as.data.frame(matrix(FALSE,
+      out <- as.data.frame(matrix(
+        FALSE,
         nrow = nrow(raw),
         ncol = length(flag_types)
       ))
@@ -65,8 +66,10 @@ test_that("runFlags updates tadat$raw via applyFlags and unit conversion updates
   )
   on.exit(lapply(rev(patches), restore_ns_fun), add = TRUE)
 
-  shiny::testServer(mod_data_flagging_server,
-    args = list(id = "flag_1", tadat = tadat), {
+  shiny::testServer(
+    mod_data_flagging_server,
+    args = list(id = "flag_1", tadat = tadat),
+    {
       session$setInputs(runFlags = 1L)
       expect_true(all(tadat$raw$.__flags_ran__))
 
@@ -100,7 +103,8 @@ test_that("switch selection writes prefixed removals and updates TADA.RemovalRea
   patches <- list(
     patch_ns_fun("TADAShiny", "checkFlagColumns", function(dataset) TRUE),
     patch_ns_fun("TADAShiny", "flagCensus", function(raw) {
-      out <- as.data.frame(matrix(FALSE,
+      out <- as.data.frame(matrix(
+        FALSE,
         nrow = nrow(raw),
         ncol = length(flag_types)
       ))
@@ -118,8 +122,10 @@ test_that("switch selection writes prefixed removals and updates TADA.RemovalRea
 
   expected_col <- paste0(flag_prefix, flag_types[1])
 
-  shiny::testServer(mod_data_flagging_server,
-    args = list(id = "flag_1", tadat = tadat), {
+  shiny::testServer(
+    mod_data_flagging_server,
+    args = list(id = "flag_1", tadat = tadat),
+    {
       # Required switch observers run only when switch inputs exist.
       session$setInputs(switch_1 = TRUE)
 

@@ -10,50 +10,65 @@ mod_harmonize_np_ui <- function(id) {
   ns <- NS(id)
   tagList(
     htmltools::h3("1. Synonym Harmonization"),
-    htmltools::HTML("Use this section to harmonize characteristic-fraction-speciation synonyms.
+    htmltools::HTML(
+      "Use this section to harmonize characteristic-fraction-speciation synonyms.
                     Click 'Compose Synonym Table' and the table will appear below.
                     The table shows the characteristic-fraction-speciation combinations in your dataset
                     (original columns highlighted blue), as well as any changes that will be made to TADA metadata
                     to allow synonyms to be grouped appropriately (denoted by 'Target' and 'Conversion' columns).
                     Many of these harmonization decisions have been made and documented by the TADA Team
                     in the 'Assumptions' columns. You may edit this table manually and re-upload it (optional) in the
-                    file upload widget below."),
-    shiny::fluidRow(
-      column(
-        2, htmltools::div(style = "margin-top:20px"),
-        shiny::actionButton(ns("harm_go"),
-          "Compose Synonym Table",
-          style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
-        )
-      )
+                    file upload widget below."
     ),
+    shiny::fluidRow(column(
+      2,
+      htmltools::div(style = "margin-top:20px"),
+      shiny::actionButton(
+        ns("harm_go"),
+        "Compose Synonym Table",
+        style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
+      )
+    )),
     htmltools::br(),
     shiny::fluidRow(column(11, DT::DTOutput(ns("syn_table")))), # Table output
     htmltools::br(),
-    htmltools::HTML("<B>Optional:</B> After running the 'Compose Synonym Table' button (above),
+    htmltools::HTML(
+      "<B>Optional:</B> After running the 'Compose Synonym Table' button (above),
                     download the TADAShiny-generated synonym table using the csv button below,
                     customize the table to meet your harmonization needs.
-                    Upload your csv here before clicking 'Harmonize Data with Synonym Table'."),
+                    Upload your csv here before clicking 'Harmonize Data with Synonym Table'."
+    ),
     shiny::fluidRow(
-      column(2, htmltools::div(style = "margin-top:20px"), shiny::uiOutput(ns("harm_dwn"))) # Download button output
+      column(
+        2,
+        htmltools::div(style = "margin-top:20px"),
+        shiny::uiOutput(ns("harm_dwn"))
+      ) # Download button output
     ),
     htmltools::br(),
-    shiny::fluidRow(column(4, shiny::fileInput(ns("harm_file"), "Upload Custom Table (.csv only)"))), # File upload widget
-    htmltools::HTML("<B>Harmonize:</B> When you are ready to harmonize your dataset to the
+    shiny::fluidRow(column(
+      4,
+      shiny::fileInput(ns("harm_file"), "Upload Custom Table (.csv only)")
+    )), # File upload widget
+    htmltools::HTML(
+      "<B>Harmonize:</B> When you are ready to harmonize your dataset to the
                     synonym table target elements, click 'Harmonize Data with Synonym Table'.
                     This button only appears when a synonym table has been generated/loaded
-                    into this tab."),
+                    into this tab."
+    ),
     htmltools::br(),
     shiny::fluidRow(
       column(
-        2, htmltools::div(style = "margin-top:20px"),
+        2,
+        htmltools::div(style = "margin-top:20px"),
         shiny::uiOutput(ns("harm_apply"))
       ) # Harmonize button output
     ),
     htmltools::br(),
     shiny::fluidRow(
       column(
-        2, htmltools::div(style = "margin-top:20px"),
+        2,
+        htmltools::div(style = "margin-top:20px"),
         shiny::uiOutput(ns("undo_harm_apply"))
       ) # Undo button output
     ),
@@ -66,20 +81,26 @@ mod_harmonize_np_ui <- function(id) {
                  to rank and sum subspecies for a given day, location, depth, activity media subdivision, and unit.
                  Total Nitrogen and Total Phosphorus values are added as new results in the dataset.
                  Users may view the nutrient aggregation reference sheet by clicking 'See Summation Reference'.
-                 Once data are harmonized, the user may then summarize total N and P.", htmltools::strong("NOTE: "),
+                 Once data are harmonized, the user may then summarize total N and P.",
+      htmltools::strong("NOTE: "),
       "When two or more measurements of the same substance occur on the same day at the same location,
                  the function uses the maximum of the group of values to calculate a total nutrient value."
     ),
-    shiny::fluidRow(
-      column(3, htmltools::div(style = "margin-top:20px"), shiny::downloadButton(ns("sum_dwn"),
+    shiny::fluidRow(column(
+      3,
+      htmltools::div(style = "margin-top:20px"),
+      shiny::downloadButton(
+        ns("sum_dwn"),
         "See Summation Reference (.csv)",
         style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
-      ))
-    ),
+      )
+    )),
     htmltools::br(),
-    shiny::fluidRow(
-      column(3, htmltools::div(style = "margin-top:20px"), shiny::uiOutput(ns("sum_apply")))
-    ),
+    shiny::fluidRow(column(
+      3,
+      htmltools::div(style = "margin-top:20px"),
+      shiny::uiOutput(ns("sum_apply"))
+    )),
     htmltools::br()
   )
 }
@@ -113,7 +134,9 @@ mod_harmonize_np_server <- function(id, tadat) {
 
     # when user hits harm go button, runs TADA_GetSynonymRef and makes friendly column names for table.
     shiny::observeEvent(input$harm_go, {
-      ref <- EPATADA::TADA_GetSynonymRef(tadat$raw[tadat$raw$TADA.Remove == FALSE, ])
+      ref <- EPATADA::TADA_GetSynonymRef(tadat$raw[
+        tadat$raw$TADA.Remove == FALSE,
+      ])
       ref <- ref |>
         dplyr::arrange(
           Target.TADA.CharacteristicName,
@@ -170,24 +193,30 @@ mod_harmonize_np_server <- function(id, tadat) {
       # user uploaded data
       ref <- suppressWarnings(utils::read.csv(input$harm_file$datapath))
       if (all(cols %in% names(ref)) & dim(ref)[1] > 0) {
-        ref <- ref %>% dplyr::arrange(Target.TADA.CharacteristicName, Target.TADA.ResultSampleFractionText, Target.TADA.MethodSpeciationName)
+        ref <- ref %>%
+          dplyr::arrange(
+            Target.TADA.CharacteristicName,
+            Target.TADA.ResultSampleFractionText,
+            Target.TADA.MethodSpeciationName
+          )
         colns <- names(ref)
-        harm$colns <- colns %>% dplyr::recode(
-          TADA.CharacteristicName = "Characteristic",
-          Target.TADA.CharacteristicName = "Target Characteristic",
-          TADA.CharacteristicNameAssumptions = "Characteristic Assumptions",
-          TADA.ResultSampleFractionText = "Fraction",
-          Target.TADA.ResultSampleFractionText = "Target Fraction",
-          TADA.FractionAssumptions = "Fraction Assumptions",
-          TADA.MethodSpeciationName = "Speciation",
-          Target.TADA.MethodSpeciationName = "Target Speciation",
-          TADA.SpeciationAssumptions = "Speciation Assumptions",
-          Target.TADA.SpeciationConversionFactor = "Speciation Conversion Factor (to AS N or AS P)",
-          # TADA.ResultMeasure.MeasureUnitCode = "Unit",
-          # Target.TADA.ResultMeasure.MeasureUnitCode = "Target Unit",
-          # Target.TADA.UnitConversionFactor = "Unit Conversion Factor",
-          HarmonizationGroup = "Harmonization Group"
-        )
+        harm$colns <- colns %>%
+          dplyr::recode(
+            TADA.CharacteristicName = "Characteristic",
+            Target.TADA.CharacteristicName = "Target Characteristic",
+            TADA.CharacteristicNameAssumptions = "Characteristic Assumptions",
+            TADA.ResultSampleFractionText = "Fraction",
+            Target.TADA.ResultSampleFractionText = "Target Fraction",
+            TADA.FractionAssumptions = "Fraction Assumptions",
+            TADA.MethodSpeciationName = "Speciation",
+            Target.TADA.MethodSpeciationName = "Target Speciation",
+            TADA.SpeciationAssumptions = "Speciation Assumptions",
+            Target.TADA.SpeciationConversionFactor = "Speciation Conversion Factor (to AS N or AS P)",
+            # TADA.ResultMeasure.MeasureUnitCode = "Unit",
+            # Target.TADA.ResultMeasure.MeasureUnitCode = "Target Unit",
+            # Target.TADA.UnitConversionFactor = "Unit Conversion Factor",
+            HarmonizationGroup = "Harmonization Group"
+          )
         harm$ref <- ref
       } else {
         shiny::showModal(shiny::modalDialog(
@@ -200,7 +229,8 @@ mod_harmonize_np_server <- function(id, tadat) {
     # Button to apply synonym table to data
     output$harm_apply <- shiny::renderUI({
       shiny::req(harm$ref)
-      shiny::actionButton(ns("harm_apply"),
+      shiny::actionButton(
+        ns("harm_apply"),
         "Harmonize Data with Synonym Table",
         style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
       )
@@ -209,15 +239,14 @@ mod_harmonize_np_server <- function(id, tadat) {
     # Render data table of synonym ref
     output$syn_table <- DT::renderDT({
       shiny::req(harm$ref)
-      DT::datatable(harm$ref,
+      DT::datatable(
+        harm$ref,
         class = "cell-border stripe",
         colnames = harm$colns,
         filter = "top",
-        options = list(
-          dom = "Blftipr", scrollX = TRUE,
-          pageLength = 5
-        ),
-        selection = "none", rownames = FALSE
+        options = list(dom = "Blftipr", scrollX = TRUE, pageLength = 5),
+        selection = "none",
+        rownames = FALSE
       ) %>%
         DT::formatStyle(columns = names(harm$ref), `font-size` = "12px") %>%
         DT::formatStyle(
@@ -226,7 +255,8 @@ mod_harmonize_np_server <- function(id, tadat) {
             "TADA.ResultSampleFractionText",
             "TADA.MethodSpeciationName"
           ),
-          backgroundColor = "#2e6da4", color = "white"
+          backgroundColor = "#2e6da4",
+          color = "white"
         )
     })
 
@@ -263,23 +293,30 @@ mod_harmonize_np_server <- function(id, tadat) {
           tadat$raw <- EPATADA::TADA_OrderCols(tadat$raw)
 
           # Remove the modal spinner after processing
-          shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+          shinybusy::remove_modal_spinner(
+            session = shiny::getDefaultReactiveDomain()
+          )
 
           # Count harmonized entries and display success message
-          num <- length(dat$TADA.Harmonized.Flag[dat$TADA.Harmonized.Flag == TRUE])
+          num <- length(dat$TADA.Harmonized.Flag[
+            dat$TADA.Harmonized.Flag == TRUE
+          ])
           shinyjs::enable("undo_harm_apply")
           shiny::showModal(shiny::modalDialog(
             title = "Success! Harmonization Complete.",
             base::paste0(
               "Synonym reference table was successfully applied to TADA dataset. ",
-              scales::comma(num), " results were harmonized to fit into more informative characteristic-fraction-speciation-unit groups."
+              scales::comma(num),
+              " results were harmonized to fit into more informative characteristic-fraction-speciation-unit groups."
             ),
             easyClose = TRUE
           ))
         },
         error = function(e) {
           # Error handling: show error message and re-enable harmonize button
-          shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+          shinybusy::remove_modal_spinner(
+            session = shiny::getDefaultReactiveDomain()
+          )
           shiny::showModal(shiny::modalDialog(
             title = "Error",
             paste("An error occurred during harmonization:", e$message),
@@ -291,7 +328,8 @@ mod_harmonize_np_server <- function(id, tadat) {
 
       # Render UI for the undo button
       output$undo_harm_apply <- shiny::renderUI({
-        shiny::actionButton(ns("undo_harm_apply"),
+        shiny::actionButton(
+          ns("undo_harm_apply"),
           "Undo Harmonization",
           style = "color: #fff; background-color: #6c757d; border-color: #5a6268; margin-top: 10px;"
         )
@@ -316,13 +354,21 @@ mod_harmonize_np_server <- function(id, tadat) {
         "TADA_NPSummationKey.csv"
       },
       content = function(file) {
-        utils::write.csv(EPATADA::TADA_GetNutrientSummationRef(), file, row.names = FALSE)
+        utils::write.csv(
+          EPATADA::TADA_GetNutrientSummationRef(),
+          file,
+          row.names = FALSE
+        )
       }
     )
 
     output$sum_apply <- shiny::renderUI({
       if ("TADA.Harmonized.Flag" %in% names(tadat$raw)) {
-        shiny::actionButton(ns("sum_apply"), "Perform Total N and P Summations", style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
+        shiny::actionButton(
+          ns("sum_apply"),
+          "Perform Total N and P Summations",
+          style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
+        )
       }
     })
 
@@ -343,7 +389,10 @@ mod_harmonize_np_server <- function(id, tadat) {
       # add new measurements to tadat$removals, all equal FALSE
       ## NOTE THAT THIS ASSUMES NEWLY CREATED RESULTS FROM TOTAL NP WILL NECESSARILY BE ADDED TO END OF TADAT$RAW DATA FRAME
       ncols <- ncol(tadat$removals)
-      nrows <- length(dat$ResultIdentifier[grepl("TADA-", dat$ResultIdentifier)])
+      nrows <- length(dat$ResultIdentifier[grepl(
+        "TADA-",
+        dat$ResultIdentifier
+      )])
       new_df <- as.data.frame(matrix(FALSE, ncol = ncols, nrow = nrows))
       names(new_df) <- names(tadat$removals)
       tadat$removals <- plyr::rbind.fill(tadat$removals, new_df)
@@ -352,14 +401,22 @@ mod_harmonize_np_server <- function(id, tadat) {
       # Need to update TADA.NutrientSummation.Flag outputs in EPATADA R package function to differentiate TN and TP
       # nitrolen <- length(dat$TADA.NutrientSummation.Flag[dat$TADA.NutrientSummation.Flag %in% c("New row added: Nutrient summation from one or more subspecies.")])
       # phoslen <- length(dat$TADA.NutrientSummation.Flag[dat$TADA.NutrientSummation.Flag %in% c("New row added: Nutrient summation from one or more subspecies.")])
-      newrowlen <- length(dat$TADA.NutrientSummation.Flag[dat$TADA.NutrientSummation.Flag %in% c("New row added: Nutrient summation from one or more subspecies.")])
+      newrowlen <- length(dat$TADA.NutrientSummation.Flag[
+        dat$TADA.NutrientSummation.Flag %in%
+          c("New row added: Nutrient summation from one or more subspecies.")
+      ])
       # remove the modal once the dataset has been harmonized
-      shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+      shinybusy::remove_modal_spinner(
+        session = shiny::getDefaultReactiveDomain()
+      )
 
       shiny::showModal(shiny::modalDialog(
         title = "Success! Calculations Complete.",
         # base::paste0(scales::comma(nitrolen), " Total Nitrogen results calculated and ", scales::comma(phoslen), " Total Phosphorus results calculated.")
-        base::paste0(scales::comma(newrowlen), " Total Nitrogen and/or Total Phosphorus results calculated.")
+        base::paste0(
+          scales::comma(newrowlen),
+          " Total Nitrogen and/or Total Phosphorus results calculated."
+        )
       ))
       shinyjs::disable("sum_apply")
     })

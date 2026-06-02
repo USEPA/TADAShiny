@@ -12,80 +12,82 @@ mod_map_bboxUI <- function(id, label = "Clear Drawing") {
 
   bbox_increment <- 1
 
-  tagList(
-    shiny::fluidRow(
-      column(
-        width = 6,
-        leaflet::leafletOutput(ns("map_bbox")),
-        shiny::helpText("Click two opposite corners on the map to draw a bounding box.")
-      ),
-      column(
-        width = 6,
-        htmltools::h4("Bounding Box Latitude and Longitude"),
-        shiny::fluidRow(
-          column(
-            width = 3,
-            htmltools::br(),
-            htmltools::br(),
-            # West coordinate
-            shiny::numericInput(
-              inputId = ns("bb_W"),
-              label = "West:",
-              value = NULL,
-              min = -180,
-              max = 180,
-              step = bbox_increment
-            )
-          ),
-          column(
-            width = 3,
-            # North coordinate
-            shiny::numericInput(
-              inputId = ns("bb_N"),
-              label = "North:",
-              value = NULL,
-              min = -90,
-              max = 90,
-              step = bbox_increment
-            ),
-            htmltools::br(),
-            htmltools::br(),
-            # South coordinate
-            shiny::numericInput(
-              inputId = ns("bb_S"),
-              label = "South:",
-              value = NULL,
-              min = -90,
-              max = 90,
-              step = bbox_increment
-            )
-          ),
-          column(
-            width = 3,
-            htmltools::br(),
-            htmltools::br(),
-            # East coordinate
-            shiny::numericInput(
-              inputId = ns("bb_E"),
-              label = "East:",
-              value = NULL,
-              min = -180,
-              max = 180,
-              step = bbox_increment
-            )
+  tagList(shiny::fluidRow(
+    column(
+      width = 6,
+      leaflet::leafletOutput(ns("map_bbox")),
+      shiny::helpText(
+        "Click two opposite corners on the map to draw a bounding box."
+      )
+    ),
+    column(
+      width = 6,
+      htmltools::h4("Bounding Box Latitude and Longitude"),
+      shiny::fluidRow(
+        column(
+          width = 3,
+          htmltools::br(),
+          htmltools::br(),
+          # West coordinate
+          shiny::numericInput(
+            inputId = ns("bb_W"),
+            label = "West:",
+            value = NULL,
+            min = -180,
+            max = 180,
+            step = bbox_increment
           )
         ),
-        # Clear button
-        htmltools::br(),
-        shiny::fluidRow(
-          column(
-            width = 3,
-            shiny::actionButton(inputId = ns("clear_map"), label = label, width = "100%")
+        column(
+          width = 3,
+          # North coordinate
+          shiny::numericInput(
+            inputId = ns("bb_N"),
+            label = "North:",
+            value = NULL,
+            min = -90,
+            max = 90,
+            step = bbox_increment
+          ),
+          htmltools::br(),
+          htmltools::br(),
+          # South coordinate
+          shiny::numericInput(
+            inputId = ns("bb_S"),
+            label = "South:",
+            value = NULL,
+            min = -90,
+            max = 90,
+            step = bbox_increment
+          )
+        ),
+        column(
+          width = 3,
+          htmltools::br(),
+          htmltools::br(),
+          # East coordinate
+          shiny::numericInput(
+            inputId = ns("bb_E"),
+            label = "East:",
+            value = NULL,
+            min = -180,
+            max = 180,
+            step = bbox_increment
           )
         )
-      )
+      ),
+      # Clear button
+      htmltools::br(),
+      shiny::fluidRow(column(
+        width = 3,
+        shiny::actionButton(
+          inputId = ns("clear_map"),
+          label = label,
+          width = "100%"
+        )
+      ))
     )
-  )
+  ))
 }
 
 mod_map_bboxServer <- function(id) {
@@ -146,7 +148,9 @@ mod_map_bboxServer <- function(id) {
     # Two-click rectangle creation using map clicks
     shiny::observeEvent(input$map_bbox_click, {
       click <- input$map_bbox_click
-      if (is.null(click)) return()
+      if (is.null(click)) {
+        return()
+      }
 
       lng <- click$lng
       lat <- click$lat
@@ -157,7 +161,8 @@ mod_map_bboxServer <- function(id) {
         map_proxy |>
           leaflet::clearGroup("corner_pt") |>
           leaflet::addCircleMarkers(
-            lng = lng, lat = lat,
+            lng = lng,
+            lat = lat,
             radius = 6,
             color = "#FF5722",
             fillColor = "#FF5722",
@@ -171,25 +176,38 @@ mod_map_bboxServer <- function(id) {
       # Second click: compute bbox and draw rectangle
       lng1 <- draw_state$first_corner["lng"]
       lat1 <- draw_state$first_corner["lat"]
-      west  <- min(lng1, lng)
-      east  <- max(lng1, lng)
+      west <- min(lng1, lng)
+      east <- max(lng1, lng)
       south <- min(lat1, lat)
       north <- max(lat1, lat)
 
       # Validate bbox
-      if (west < east && south < north &&
-        west >= -180 && east <= 180 &&
-        south >= -90 && north <= 90) {
+      if (
+        west < east &&
+          south < north &&
+          west >= -180 &&
+          east <= 180 &&
+          south >= -90 &&
+          north <= 90
+      ) {
         map_proxy |>
           leaflet::clearGroup("corner_pt") |>
           leaflet::clearGroup("manual_bbox") |>
           leaflet::addRectangles(
-            lng1 = west, lat1 = south, lng2 = east, lat2 = north,
-            stroke = shape_opts$stroke, color = shape_opts$color,
-            weight = shape_opts$weight, opacity = shape_opts$opacity,
-            fill = shape_opts$fill, fillColor = shape_opts$fillColor,
-            fillOpacity = shape_opts$fillOpacity, smoothFactor = shape_opts$smoothFactor,
-            noClip = shape_opts$noClip, group = "manual_bbox"
+            lng1 = west,
+            lat1 = south,
+            lng2 = east,
+            lat2 = north,
+            stroke = shape_opts$stroke,
+            color = shape_opts$color,
+            weight = shape_opts$weight,
+            opacity = shape_opts$opacity,
+            fill = shape_opts$fill,
+            fillColor = shape_opts$fillColor,
+            fillOpacity = shape_opts$fillOpacity,
+            smoothFactor = shape_opts$smoothFactor,
+            noClip = shape_opts$noClip,
+            group = "manual_bbox"
           )
 
         # Update reactive bbox (numeric inputs will sync from this)
@@ -204,10 +222,26 @@ mod_map_bboxServer <- function(id) {
     shiny::observe({
       if (!is.null(bbox_reVal$bBox)) {
         sync_in_progress(TRUE)
-        shiny::updateNumericInput(session = session, inputId = "bb_W", value = bbox_reVal$bBox[1]) # west
-        shiny::updateNumericInput(session = session, inputId = "bb_S", value = bbox_reVal$bBox[2]) # south
-        shiny::updateNumericInput(session = session, inputId = "bb_E", value = bbox_reVal$bBox[3]) # east
-        shiny::updateNumericInput(session = session, inputId = "bb_N", value = bbox_reVal$bBox[4]) # north
+        shiny::updateNumericInput(
+          session = session,
+          inputId = "bb_W",
+          value = bbox_reVal$bBox[1]
+        ) # west
+        shiny::updateNumericInput(
+          session = session,
+          inputId = "bb_S",
+          value = bbox_reVal$bBox[2]
+        ) # south
+        shiny::updateNumericInput(
+          session = session,
+          inputId = "bb_E",
+          value = bbox_reVal$bBox[3]
+        ) # east
+        shiny::updateNumericInput(
+          session = session,
+          inputId = "bb_N",
+          value = bbox_reVal$bBox[4]
+        ) # north
         sync_in_progress(FALSE)
       }
     })
@@ -220,24 +254,40 @@ mod_map_bboxServer <- function(id) {
 
     shiny::observe({
       # Prevent feedback loop when we update inputs from the map
-      if (sync_in_progress()) return()
+      if (sync_in_progress()) {
+        return()
+      }
 
-      west  <- bb_W_debounce()
+      west <- bb_W_debounce()
       south <- bb_S_debounce()
-      east  <- bb_E_debounce()
+      east <- bb_E_debounce()
       north <- bb_N_debounce()
 
       # If any is missing, clear any drawn rectangle and corner marker
       if (is.na(west) || is.na(south) || is.na(east) || is.na(north)) {
-        map_proxy |> leaflet::clearGroup("manual_bbox") |> leaflet::clearGroup("corner_pt")
+        map_proxy |>
+          leaflet::clearGroup("manual_bbox") |>
+          leaflet::clearGroup("corner_pt")
         return()
       }
 
       # Validate bbox
-      if (west >= east) return()
-      if (south >= north) return()
-      if (west < -180 || west > 180 || east < -180 || east > 180 ||
-        south < -90 || south > 90 || north < -90 || north > 90) {
+      if (west >= east) {
+        return()
+      }
+      if (south >= north) {
+        return()
+      }
+      if (
+        west < -180 ||
+          west > 180 ||
+          east < -180 ||
+          east > 180 ||
+          south < -90 ||
+          south > 90 ||
+          north < -90 ||
+          north > 90
+      ) {
         return()
       }
 
@@ -246,7 +296,10 @@ mod_map_bboxServer <- function(id) {
         leaflet::clearGroup("manual_bbox") |>
         leaflet::clearGroup("corner_pt") |>
         leaflet::addRectangles(
-          lng1 = west, lat1 = south, lng2 = east, lat2 = north,
+          lng1 = west,
+          lat1 = south,
+          lng2 = east,
+          lat2 = north,
           stroke = shape_opts$stroke,
           color = shape_opts$color,
           weight = shape_opts$weight,
@@ -261,9 +314,13 @@ mod_map_bboxServer <- function(id) {
 
       # Keep reactive bbox in sync
       bbox_reVal$bBox <- c(west, south, east, north)
-    }) |> shiny::bindEvent(
-      bb_W_debounce(), bb_S_debounce(), bb_E_debounce(), bb_N_debounce()
-    )
+    }) |>
+      shiny::bindEvent(
+        bb_W_debounce(),
+        bb_S_debounce(),
+        bb_E_debounce(),
+        bb_N_debounce()
+      )
 
     return(bbox_reVal)
   })
