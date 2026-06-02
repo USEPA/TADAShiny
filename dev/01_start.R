@@ -29,16 +29,8 @@ golem::fill_desc(
       email = "mywaterway@epa.gov",
       comment = c(ORCID = "0000-0002-0615-6087")
     ),
-    person(
-      given = "Trip",
-      family = "Hook",
-      role = "aut"
-    ),
-    person(
-      given = "Elise",
-      family = "Hinman",
-      role = "aut"
-    )
+    person(given = "Trip", family = "Hook", role = "aut"),
+    person(given = "Elise", family = "Hinman", role = "aut")
   ),
   repo_url = "https://github.com/USEPA/TADAShiny" # The URL of the GitHub Repo (optional)
 )

@@ -62,7 +62,6 @@
 # golem::add_utils( "helpers" )
 # golem::add_fct("map")
 
-
 ## External resources
 ## Creates .js and .css files at inst/app/www
 # golem::add_js_file( "script" )

@@ -26,49 +26,69 @@
 .safe_fetch_county <- function(u) {
   txt <- .safe_req_string(u)
   cols <- c("STUSAB", "STATE", "COUNTY", "COUNTY_NAME", "COUNTY_ID")
-  # should be 
-  cols <- c("STATE_CD", "STATE_FIPS", "COUNTY_FIPS", "COUNTY_NAME", "COUNTY_FOOBAR")
+  # should be
+  cols <- c(
+    "STATE_CD",
+    "STATE_FIPS",
+    "COUNTY_FIPS",
+    "COUNTY_NAME",
+    "COUNTY_FOOBAR"
+  )
   # dataRetrieval::read_waterdata_samples needs "US:{STATE_FIPS}"
   # and "US:{STATE_FIPS}:{COUNTY_FIPS}"
   # and EPATADA::TADA_DataRetrieval needs "STATE_CD" and COUNTY_NAME
   if (is.null(txt)) {
     return(data.frame(
-      STATE_CD = character(), STATE_FIPS = character(), COUNTY_FIPS = character(),
-      COUNTY_NAME = character(), COUNTY_FOOBAR = character(), stringsAsFactors = FALSE
+      STATE_CD = character(),
+      STATE_FIPS = character(),
+      COUNTY_FIPS = character(),
+      COUNTY_NAME = character(),
+      COUNTY_FOOBAR = character(),
+      stringsAsFactors = FALSE
     ))
   }
   dt <- tryCatch(
-    data.table::fread(txt, header = FALSE, col.names = cols, showProgress = FALSE),
+    data.table::fread(
+      txt,
+      header = FALSE,
+      col.names = cols,
+      showProgress = FALSE
+    ),
     error = function(e) NULL
   )
   if (is.null(dt)) {
     return(data.frame(
-      STUSAB = character(), STATE = character(), COUNTY = character(),
-      COUNTY_NAME = character(), COUNTY_ID = character(), stringsAsFactors = FALSE
+      STUSAB = character(),
+      STATE = character(),
+      COUNTY = character(),
+      COUNTY_NAME = character(),
+      COUNTY_ID = character(),
+      stringsAsFactors = FALSE
     ))
   }
   as.data.frame(dt)
 }
 
 ### A function to construct the argument list for the NWIS function dataRetrieval::read_waterdata_samples(args_temp)
-nwis_args_create <- function(stateFips = NULL,
-                              countyFips = NULL,
-                              # countrycode = NULL,
-                              # huc = NULL,
-                              # siteid = NULL,
-                              # siteType = NULL,
-                              characteristic = NULL,
-                              characteristicGroup = NULL,
-                              activityMediaName = NULL,
-                              projectIdentifier = NULL,
-                              organizationIdentifier = NULL,
-                              activityStartDateLower = NULL,
-                              activityStartDateUpper = NULL,
-                              dataType = NULL,
-                              dataProfile = NULL,
-                              providers = NULL,
-                              bBox = NULL
-                              ) {
+nwis_args_create <- function(
+  stateFips = NULL,
+  countyFips = NULL,
+  # countrycode = NULL,
+  # huc = NULL,
+  # siteid = NULL,
+  # siteType = NULL,
+  characteristic = NULL,
+  characteristicGroup = NULL,
+  activityMediaName = NULL,
+  projectIdentifier = NULL,
+  organizationIdentifier = NULL,
+  activityStartDateLower = NULL,
+  activityStartDateUpper = NULL,
+  dataType = NULL,
+  dataProfile = NULL,
+  providers = NULL,
+  bBox = NULL
+) {
   # Construct the arguments for downloads
   args <- list(
     "stateFips" = stateFips,
@@ -99,7 +119,9 @@ nwis_args_create <- function(stateFips = NULL,
   return(args)
 }
 
-counties <- .safe_fetch_county("https://www2.census.gov/geo/docs/reference/codes/files/national_county.txt")
+counties <- .safe_fetch_county(
+  "https://www2.census.gov/geo/docs/reference/codes/files/national_county.txt"
+)
 
 start_date <- "2025-01-01"
 end_date <- "2025-12-01"
@@ -107,15 +129,22 @@ characteristic_name <- "pH"
 state_abbrev = 'CO'
 county_name = 'Chaffee County'
 # browser()
-county = counties[counties$STATE_CD == state_abbrev & counties$COUNTY_NAME == county_name,]
+county = counties[
+  counties$STATE_CD == state_abbrev & counties$COUNTY_NAME == county_name,
+]
 state_fips_arg = paste('US', sprintf("%02d", county$STATE_FIPS), sep = ':')
-county_fips_arg = paste('US', sprintf("%02d", county$STATE_FIPS), sprintf("%03d", county$COUNTY_FIPS), sep = ':')
+county_fips_arg = paste(
+  'US',
+  sprintf("%02d", county$STATE_FIPS),
+  sprintf("%03d", county$COUNTY_FIPS),
+  sep = ':'
+)
 
 
 # this does 2 queries of WQP
-#> GET: https://www.waterqualitydata.us/data/Result/ 
+#> GET: https://www.waterqualitydata.us/data/Result/
 #> GET: https://www.waterqualitydata.us/data/Station/
-# WQP3_results <- 
+# WQP3_results <-
 #   dataRetrieval::readWQPdata(statecode = county$STATE_CD,
 #                              countycode = county$COUNTY_NAME,
 #                              characteristicName = characteristic_name,
@@ -131,26 +160,26 @@ county_fips_arg = paste('US', sprintf("%02d", county$STATE_FIPS), sprintf("%03d"
 # this does not use WQP
 # GET: https://api.waterdata.usgs.gov/samples-data/results/
 
-        args_temp <- nwis_args_create(
-          stateFips = state_fips_arg,
-          countyFips = county_fips_arg,
-          # countrycode = tadat$countrycode,
-          # siteid = tadat$siteid,
-          # siteType = tadat$siteType,
-          characteristic = characteristic_name,
-          # characteristicGroup = tadat$characteristicType,
-          # activityMediaName = tadat$sampleMedia,
-          # projectIdentifier = tadat$project,
-          # organizationIdentifier = tadat$organization,
-          activityStartDateLower = start_date,
-          activityStartDateUpper = end_date,
-          # providers = tadat$providers,
-          # bBox = bbox_reactive(),
-          dataType = "results",
-          dataProfile = "fullphyschem"
-        )
+args_temp <- nwis_args_create(
+  stateFips = state_fips_arg,
+  countyFips = county_fips_arg,
+  # countrycode = tadat$countrycode,
+  # siteid = tadat$siteid,
+  # siteType = tadat$siteType,
+  characteristic = characteristic_name,
+  # characteristicGroup = tadat$characteristicType,
+  # activityMediaName = tadat$sampleMedia,
+  # projectIdentifier = tadat$project,
+  # organizationIdentifier = tadat$organization,
+  activityStartDateLower = start_date,
+  activityStartDateUpper = end_date,
+  # providers = tadat$providers,
+  # bBox = bbox_reactive(),
+  dataType = "results",
+  dataProfile = "fullphyschem"
+)
 
-        NWIS_results <- do.call(dataRetrieval::read_waterdata_samples, args_temp)
+NWIS_results <- do.call(dataRetrieval::read_waterdata_samples, args_temp)
 
 # this field is all NA but still needs to be recast as date
 NWIS_results$Activity_EndDate <- as.Date(NWIS_results$Activity_EndDate)

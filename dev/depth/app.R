@@ -8,15 +8,13 @@ library(DT)
 
 `%||%` <- function(a, b) if (!is.null(a)) a else b
 fixed_port <- 6150
- 
+
 # Defaults
 default_start_date <- "2025-04-28"
 default_end_date <- "2026-06-05"
- 
+
 default_siteid <- "REDLAKE_WQX-LRC"
-default_organizations <- c(
-  "REDLAKE_WQX", "21CABCH", "21WIBCH", "21GPBCH"
-)
+default_organizations <- c("REDLAKE_WQX", "21CABCH", "21WIBCH", "21GPBCH")
 default_organization <- c("REDLAKE_WQX")
 
 # Preferred defaults (priority order)
@@ -26,7 +24,7 @@ preferred_characteristics <- c(
   "CONDUCTIVITY_NA_NA_US/CM",
   "PH_NA_NA_NONE"
 )
- 
+
 # reactive storage
 tadat <- shiny::reactiveValues(
   raw = NULL,
@@ -40,19 +38,21 @@ tadat <- shiny::reactiveValues(
 )
 
 depth_profile <- shiny::reactiveValues(
-    tada_data_loaded = FALSE,
-    depth_categorized_df = NULL,
-    site_date_char_groups_df = NULL,
-    site_date_pairs = NULL,
-    available_characteristics_df = NULL,
-    loaded = FALSE,
-    no_data = NULL
+  tada_data_loaded = FALSE,
+  depth_categorized_df = NULL,
+  site_date_char_groups_df = NULL,
+  site_date_pairs = NULL,
+  available_characteristics_df = NULL,
+  loaded = FALSE,
+  no_data = NULL
 )
 
 # Helper to split semicolon-separated characteristic lists (robust)
 split_characteristics <- function(vec) {
   vec <- stats::na.omit(as.character(vec))
-  if (length(vec) == 0) return(character(0))
+  if (length(vec) == 0) {
+    return(character(0))
+  }
   parts <- unlist(strsplit(vec, ";", fixed = TRUE))
   parts <- trimws(parts)
   parts <- parts[parts != ""]
@@ -78,7 +78,9 @@ extract_trailing_count <- function(token) {
   token <- as.character(token)
   m <- regexec(".*?\\((\\d+)\\)\\s*$", token)
   r <- regmatches(token, m)
-  if (length(r) == 0 || length(r[[1]]) < 2) return(NA_integer_)
+  if (length(r) == 0 || length(r[[1]]) < 2) {
+    return(NA_integer_)
+  }
   val <- as.integer(r[[1]][2])
   if (is.na(val)) NA_integer_ else val
 }
@@ -90,10 +92,17 @@ safe_message_plot <- function(msg) {
       title = msg,
       xaxis = list(visible = FALSE),
       yaxis = list(visible = FALSE),
-      annotations = list(list(text = msg,
-                              x = 0.5, xref = "paper", xanchor = "center",
-                              y = 0.5, yref = "paper", yanchor = "middle",
-                              showarrow = FALSE, font = list(size = 14)))
+      annotations = list(list(
+        text = msg,
+        x = 0.5,
+        xref = "paper",
+        xanchor = "center",
+        y = 0.5,
+        yref = "paper",
+        yanchor = "middle",
+        showarrow = FALSE,
+        font = list(size = 14)
+      ))
     )
 }
 
@@ -101,7 +110,8 @@ safe_message_plot <- function(msg) {
 ui <- fluidPage(
   tags$head(
     # make the page use full height and remove small margins
-    tags$style(HTML("
+    tags$style(HTML(
+      "
       /* Keep page full-height */
       html, body, .container-fluid { height: 100%; }
 
@@ -132,219 +142,317 @@ ui <- fluidPage(
       /* Keep selectize dropdown wide */
       .selectize-dropdown { z-index: 2000; }
 
-    "))
+    "
+    ))
   ),
 
   titlePanel("TADA Depth Profile Viewer"),
 
   # Top area: controls and the Available Characteristics table
-  shiny::fluidRow(
-    column(
-      width = 12,
-      shiny::wellPanel(class = "top-controls",
+  shiny::fluidRow(column(
+    width = 12,
+    shiny::wellPanel(
+      class = "top-controls",
 
-        # FIRST ROW: Start date | End date  (never wrap)
-        shiny::div(class = "row-no-wrap control-row",
-            shiny::div(class = "col-fixed",
-                shiny::div(style = "display:flex; flex-direction:column;",
-                    tags$label("Start date", `for` = "start_date"),
-                    dateInput("start_date", NULL, value = default_start_date, width = "100%")
-                )
-            ),
-            shiny::div(class = "col-fixed",
-                shiny::div(style = "display:flex; flex-direction:column;",
-                    tags$label("End date", `for` = "end_date"),
-                    dateInput("end_date", NULL, value = default_end_date, width = "100%")
-                )
+      # FIRST ROW: Start date | End date  (never wrap)
+      shiny::div(
+        class = "row-no-wrap control-row",
+        shiny::div(
+          class = "col-fixed",
+          shiny::div(
+            style = "display:flex; flex-direction:column;",
+            tags$label("Start date", `for` = "start_date"),
+            dateInput(
+              "start_date",
+              NULL,
+              value = default_start_date,
+              width = "100%"
             )
-        ),
-
-        # SECOND ROW: Site ID | Organizations (never wrap)
-        shiny::div(class = "row-no-wrap control-row",
-            shiny::div(class = "col-fixed",
-                shiny::div(style = "display:flex; flex-direction:column;",
-                    tags$label("Site ID (siteid)", `for` = "siteid"),
-                    textInput("siteid", NULL, value = default_siteid, width = "100%")
-                )
-            ),
-            shiny::div(class = "col-fixed",
-                shiny::div(style = "display:flex; flex-direction:column;",
-                    tags$label("Up to 6 organizations", `for` = "organizations"),
-                    shiny::selectizeInput("organizations", NULL,
-                                   choices = default_organizations,
-                                   multiple = TRUE,
-                                   selected = default_organization,
-                                   options = list(maxItems = 6, plugins = list("remove_button")),
-                                   width = "100%")
-                )
-            )
-        ),
-
-        # THIRD ROW: Load button (always below the Site/Org row)
-        shiny::fluidRow(class = "control-row",
-          column(12,
-                 shiny::div(style = "display:flex; align-items:flex-start;",
-                     shiny::actionButton("load_data", "Load data",
-                                  icon = icon("download"),
-                                  class = "btn btn-default", style = "width:260px;")
-                 )
           )
         ),
+        shiny::div(
+          class = "col-fixed",
+          shiny::div(
+            style = "display:flex; flex-direction:column;",
+            tags$label("End date", `for` = "end_date"),
+            dateInput(
+              "end_date",
+              NULL,
+              value = default_end_date,
+              width = "100%"
+            )
+          )
+        )
+      ),
+
+      # SECOND ROW: Site ID | Organizations (never wrap)
+      shiny::div(
+        class = "row-no-wrap control-row",
+        shiny::div(
+          class = "col-fixed",
+          shiny::div(
+            style = "display:flex; flex-direction:column;",
+            tags$label("Site ID (siteid)", `for` = "siteid"),
+            textInput("siteid", NULL, value = default_siteid, width = "100%")
+          )
+        ),
+        shiny::div(
+          class = "col-fixed",
+          shiny::div(
+            style = "display:flex; flex-direction:column;",
+            tags$label("Up to 6 organizations", `for` = "organizations"),
+            shiny::selectizeInput(
+              "organizations",
+              NULL,
+              choices = default_organizations,
+              multiple = TRUE,
+              selected = default_organization,
+              options = list(maxItems = 6, plugins = list("remove_button")),
+              width = "100%"
+            )
+          )
+        )
+      ),
+
+      # THIRD ROW: Load button (always below the Site/Org row)
+      shiny::fluidRow(
+        class = "control-row",
+        column(
+          12,
+          shiny::div(
+            style = "display:flex; align-items:flex-start;",
+            shiny::actionButton(
+              "load_data",
+              "Load data",
+              icon = icon("download"),
+              class = "btn btn-default",
+              style = "width:260px;"
+            )
+          )
+        )
+      ),
     ),
     shiny::conditionalPanel(
       condition = "output.no_depth_profile_data == true",
       # Show only the loading message when data is not loaded
-      shiny::div(style = "margin-top:20px; color: #666;font-size: large;font-weight: bolder;",
-          "After retrieval and data cleaning, there are no usable water quality records with data collected in a Depth Profile."
+      shiny::div(
+        style = "margin-top:20px; color: #666;font-size: large;font-weight: bolder;",
+        "After retrieval and data cleaning, there are no usable water quality records with data collected in a Depth Profile."
       )
     ),
     shiny::conditionalPanel(
       condition = "output.tada_data_loaded == true",
-              # NOTE: Users first decide which columns will define "groups" for analysis and visualization.
+      # NOTE: Users first decide which columns will define "groups" for analysis and visualization.
       # TIP: Defaulting to TADA.ComparableDataIdentifier keeps groups aligned with comparable data logic.
       htmltools::h3("1. Determine If there is sufficient data"),
-      htmltools::HTML("First, hit the Review Depth Data button to check if there is sufficient data
+      htmltools::HTML(
+        "First, hit the Review Depth Data button to check if there is sufficient data
                       to do a Depth (water column depth) analysis.  TODO: add UI elements for bycategory, bottomvalue, 
-                      surfacevalue, and dailyagg"),
+                      surfacevalue, and dailyagg"
+      ),
       htmltools::div(style = "margin-bottom:10px"),
       shiny::fluidRow(column(
         3,
-        shiny::actionButton("review_depth_profile_data",
+        shiny::actionButton(
+          "review_depth_profile_data",
           "Review Depth Data",
           style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
         )
       )),
       tags$hr()
     ),
-     # Show the rest of the UI only after data is loaded
+    # Show the rest of the UI only after data is loaded
     shiny::conditionalPanel(
-        condition = "output.depth_profile_loaded == true",
-        # Instruction text
-        shiny::div(style = "margin-bottom:8px; color: #666;font-size: large;font-weight: bolder;",
-            "The map shows all the sites that have data collected in a Depth profile.
+      condition = "output.depth_profile_loaded == true",
+      # Instruction text
+      shiny::div(
+        style = "margin-bottom:8px; color: #666;font-size: large;font-weight: bolder;",
+        "The map shows all the sites that have data collected in a Depth profile.
             After loading: choose a Site ID, then choose a Visit Date.
             Then pick up to 3 characteristics and click 'Update plot'."
-        ),
-        # map
-        shiny::fluidRow(
-          column(12,
-                 shinycssloaders::withSpinner(leaflet::leafletOutput(
-                                                "sites_map",
-                                                height = "500px")
-                                              )
-                 )
-        ),
-        # Site and date selects (same row)
-        shiny::fluidRow(class = "control-row",
-          column(6,
-                 shiny::div(style = "display:flex; flex-direction:column; ",
-                     tags$label("Site ID", `for` = "depth_profile_site_id"),
-                     shiny::selectInput("depth_profile_site_id", NULL, choices = NULL, width = "100%")
-                 )
-          ),
-          column(6,
-                 shiny::div(style = "display:flex; flex-direction:column;",
-                     tags$label("Visit date", `for` = "activity_date"),
-                     shiny::selectInput("activity_date", NULL, choices = NULL, width = "100%")
-                 )
+      ),
+      # map
+      shiny::fluidRow(column(
+        12,
+        shinycssloaders::withSpinner(leaflet::leafletOutput(
+          "sites_map",
+          height = "500px"
+        ))
+      )),
+      # Site and date selects (same row)
+      shiny::fluidRow(
+        class = "control-row",
+        column(
+          6,
+          shiny::div(
+            style = "display:flex; flex-direction:column; ",
+            tags$label("Site ID", `for` = "depth_profile_site_id"),
+            shiny::selectInput(
+              "depth_profile_site_id",
+              NULL,
+              choices = NULL,
+              width = "100%"
+            )
           )
         ),
+        column(
+          6,
+          shiny::div(
+            style = "display:flex; flex-direction:column;",
+            tags$label("Visit date", `for` = "activity_date"),
+            shiny::selectInput(
+              "activity_date",
+              NULL,
+              choices = NULL,
+              width = "100%"
+            )
+          )
+        )
+      ),
 
-        shiny::br(),
+      shiny::br(),
 
-        # Available characteristics table
-        shiny::fluidRow(class = "control-row",
-          column(12, DT::DTOutput("available_characteristics"))
-        ),
+      # Available characteristics table
+      shiny::fluidRow(
+        class = "control-row",
+        column(12, DT::DTOutput("available_characteristics"))
+      ),
 
-        tags$hr(),
+      tags$hr(),
 
-        # Options row: depthcat, surfacevalue, bottomvalue
-        shiny::fluidRow(class = "control-row",
-          column(4,
-                 shiny::div(style = "display:flex; flex-direction:column;",
-                     tags$label("Depth category"),
-                     shiny::checkboxInput("depthcat", NULL, value = TRUE)
-                 )
-          ),
-          column(4,
-                 shiny::div(style = "display:flex; flex-direction:column;",
-                     tags$label("Surface (depth below surface)"),
-                     shiny::numericInput("surfacevalue", NULL, value = 2, min = 0, width = "100%")
-                 )
-          ),
-          column(4,
-                 shiny::div(style = "display:flex; flex-direction:column;",
-                     tags$label("Bottom (height above bottom) (m)"),
-                     shiny::numericInput("bottomvalue", NULL, value = 2, min = 0, width = "100%")
-                 )
+      # Options row: depthcat, surfacevalue, bottomvalue
+      shiny::fluidRow(
+        class = "control-row",
+        column(
+          4,
+          shiny::div(
+            style = "display:flex; flex-direction:column;",
+            tags$label("Depth category"),
+            shiny::checkboxInput("depthcat", NULL, value = TRUE)
           )
         ),
+        column(
+          4,
+          shiny::div(
+            style = "display:flex; flex-direction:column;",
+            tags$label("Surface (depth below surface)"),
+            shiny::numericInput(
+              "surfacevalue",
+              NULL,
+              value = 2,
+              min = 0,
+              width = "100%"
+            )
+          )
+        ),
+        column(
+          4,
+          shiny::div(
+            style = "display:flex; flex-direction:column;",
+            tags$label("Bottom (height above bottom) (m)"),
+            shiny::numericInput(
+              "bottomvalue",
+              NULL,
+              value = 2,
+              min = 0,
+              width = "100%"
+            )
+          )
+        )
+      ),
 
-        # Update button full-width
-        shiny::fluidRow(class = "control-row",
-          column(12, shiny::actionButton("update",
-                                  "Update plot",
-                                  icon = icon("chart-area"), class = "btn btn-primary", style = "width:25%;"))
+      # Update button full-width
+      shiny::fluidRow(
+        class = "control-row",
+        column(
+          12,
+          shiny::actionButton(
+            "update",
+            "Update plot",
+            icon = icon("chart-area"),
+            class = "btn btn-primary",
+            style = "width:25%;"
+          )
         )
       )
     )
-  ),
+  )),
 
   # Middle: the plot (map) — use viewport height so it fills much of the window
-  shiny::fluidRow(
-    column(width = 12,
-           # 70vh => 70% of viewport height; adjust to taste
-           plotly::plotlyOutput("depthPlotly", height = "70vh")
-    )
-  ),
-  
+  shiny::fluidRow(column(
+    width = 12,
+    # 70vh => 70% of viewport height; adjust to taste
+    plotly::plotlyOutput("depthPlotly", height = "70vh")
+  )),
+
   # Middle: the data table of the data shown in the plot
-  shiny::fluidRow(
-    column(width = 12,
-           div(style = "width:70%; margin-left: auto; margin-right: auto; overflow-x: auto;",
-            column(12, DT::DTOutput("depth_plot_data_table"))
-           )
+  shiny::fluidRow(column(
+    width = 12,
+    div(
+      style = "width:70%; margin-left: auto; margin-right: auto; overflow-x: auto;",
+      column(12, DT::DTOutput("depth_plot_data_table"))
     )
-  ),
+  )),
 
   # Bottom: debug information occupying full width
-  shiny::fluidRow(
-    column(width = 12,
-           tags$hr(),
-           shiny::verbatimTextOutput("debug_text")
-    )
-  )
+  shiny::fluidRow(column(
+    width = 12,
+    tags$hr(),
+    shiny::verbatimTextOutput("debug_text")
+  ))
 )
 
 
 server <- function(input, output, session) {
-
   # this a reactive list created to hold all the reactive objects specific to this module.
   mapdat <- shiny::reactiveValues()
 
-    # ibid
-  output$tada_data_loaded <- shiny::reactive({ depth_profile$tada_data_loaded })
+  # ibid
+  output$tada_data_loaded <- shiny::reactive({
+    depth_profile$tada_data_loaded
+  })
   # ibid
   shiny::outputOptions(output, "tada_data_loaded", suspendWhenHidden = FALSE)
-  
+
   # expose the loaded flag to conditionalPanel in UI
-  output$no_depth_profile_data <- shiny::reactive({ depth_profile$no_data })
+  output$no_depth_profile_data <- shiny::reactive({
+    depth_profile$no_data
+  })
   # ensure the output is not suspended when hidden, so UI sees the change
-  shiny::outputOptions(output, "no_depth_profile_data", suspendWhenHidden = FALSE)
+  shiny::outputOptions(
+    output,
+    "no_depth_profile_data",
+    suspendWhenHidden = FALSE
+  )
 
   # ibid
-  output$depth_profile_loaded <- shiny::reactive({ depth_profile$loaded })
+  output$depth_profile_loaded <- shiny::reactive({
+    depth_profile$loaded
+  })
   # ibid
-  shiny::outputOptions(output, "depth_profile_loaded", suspendWhenHidden = FALSE)
+  shiny::outputOptions(
+    output,
+    "depth_profile_loaded",
+    suspendWhenHidden = FALSE
+  )
 
   # Data load and processing when user clicks load_data
   shiny::observeEvent(input$load_data, {
     if (is.na(as.Date(input$start_date)) || is.na(as.Date(input$end_date))) {
-      showModal(modalDialog(title = "Invalid dates", "Provide valid start and end dates.", easyClose = TRUE)); return()
+      showModal(modalDialog(
+        title = "Invalid dates",
+        "Provide valid start and end dates.",
+        easyClose = TRUE
+      ))
+      return()
     }
     if (as.Date(input$start_date) > as.Date(input$end_date)) {
-      showModal(modalDialog(title = "Invalid date range", "Start date must be <= end date.", easyClose = TRUE)); return()
+      showModal(modalDialog(
+        title = "Invalid date range",
+        "Start date must be <= end date.",
+        easyClose = TRUE
+      ))
+      return()
     }
 
     # ui triggers to hide existing stuff
@@ -353,77 +461,125 @@ server <- function(input, output, session) {
 
     shiny::withProgress(message = "Retrieving and processing data", value = 0, {
       incProgress(0.10, detail = "Retrieving data (TADA_DataRetrieval)")
-      input_raw_df <- tryCatch({
-        EPATADA::TADA_DataRetrieval(
-         organization = input$organizations,
-         # siteid = input$siteid,
-         startDate = as.character(input$start_date),
-         endDate = as.character(input$end_date),
-         ask = FALSE
-        )
-      }, error = function(e) {
-        shiny::showModal(shiny::modalDialog(title = "Data retrieval error", paste0("TADA_DataRetrieval failed: ", e$message), easyClose = TRUE))
-        return(NULL)
-      })
+      input_raw_df <- tryCatch(
+        {
+          EPATADA::TADA_DataRetrieval(
+            organization = input$organizations,
+            # siteid = input$siteid,
+            startDate = as.character(input$start_date),
+            endDate = as.character(input$end_date),
+            ask = FALSE
+          )
+        },
+        error = function(e) {
+          shiny::showModal(shiny::modalDialog(
+            title = "Data retrieval error",
+            paste0("TADA_DataRetrieval failed: ", e$message),
+            easyClose = TRUE
+          ))
+          return(NULL)
+        }
+      )
       if (is.null(input_raw_df) || nrow(input_raw_df) == 0) {
         depth_profile$no_data <- NULL
-        shiny::showModal(shiny::modalDialog(title = "No data", "No records retrieved for the chosen organizations/dates.", easyClose = TRUE)); return()
+        shiny::showModal(shiny::modalDialog(
+          title = "No data",
+          "No records retrieved for the chosen organizations/dates.",
+          easyClose = TRUE
+        ))
+        return()
       } else {
         depth_profile$tada_data_loaded <- TRUE
         tadat$raw <- input_raw_df
       }
     })
   })
-    
-  
+
   shiny::observeEvent(input$review_depth_profile_data, {
     # if TADA.Remove column exists, filter out records where TADA.Remove == TRUE;
     # if it doesn't exist, keep all records (don't filter)
     input_raw_df <- tadat$raw %>%
       {
-        if("TADA.Remove" %in% names(.)) {
+        if ("TADA.Remove" %in% names(.)) {
           dplyr::filter(., TADA.Remove == FALSE)
         } else {
           . # Return the original data frame unchanged
         }
       }
 
-    incProgress(0.40, detail = "Flagging depth categories (TADA_FlagDepthCategory)")
-    depth_categorized_df <- tryCatch({
-      EPATADA::TADA_FlagDepthCategory(input_raw_df,
-                                      bycategory = "no",
-                                      bottomvalue = input$bottomvalue,
-                                      surfacevalue = input$surfacevalue,
-                                      dailyagg = "none",
-                                      clean = FALSE)
-    }, error = function(e) {
-      shiny::showModal(shiny::modalDialog(title = "Depth categorization error",
-                            paste0("TADA_FlagDepthCategory failed: ", e$message), easyClose = TRUE))
-      return(NULL)
-    })
+    incProgress(
+      0.40,
+      detail = "Flagging depth categories (TADA_FlagDepthCategory)"
+    )
+    depth_categorized_df <- tryCatch(
+      {
+        EPATADA::TADA_FlagDepthCategory(
+          input_raw_df,
+          bycategory = "no",
+          bottomvalue = input$bottomvalue,
+          surfacevalue = input$surfacevalue,
+          dailyagg = "none",
+          clean = FALSE
+        )
+      },
+      error = function(e) {
+        shiny::showModal(shiny::modalDialog(
+          title = "Depth categorization error",
+          paste0("TADA_FlagDepthCategory failed: ", e$message),
+          easyClose = TRUE
+        ))
+        return(NULL)
+      }
+    )
 
     # filter out records with NA depth category and groups with < 3 records (per TADA_IDDepthProfiles requirements)
-    depth_categorized_df <- depth_categorized_df[!is.na(depth_categorized_df$TADA.ConsolidatedDepth), , drop = FALSE]
+    depth_categorized_df <- depth_categorized_df[
+      !is.na(depth_categorized_df$TADA.ConsolidatedDepth),
+      ,
+      drop = FALSE
+    ]
     depth_categorized_df <- depth_categorized_df %>%
       group_by(TADA.ComparableDataIdentifier) %>%
       filter(n() >= 3) %>%
       ungroup()
 
     if (is.null(depth_categorized_df) || nrow(depth_categorized_df) == 0) {
-      showModal(modalDialog(title = "No usable records", "No usable depth records after cleaning.", easyClose = TRUE)); return()
+      showModal(modalDialog(
+        title = "No usable records",
+        "No usable depth records after cleaning.",
+        easyClose = TRUE
+      ))
+      return()
     }
 
     incProgress(0.75, detail = "Computing ID combos (TADA_IDDepthProfiles)")
-    site_date_char_groups_df <- tryCatch({
-      EPATADA::TADA_IDDepthProfiles(depth_categorized_df,
-                                    nresults = TRUE,
-                                    nvalue = 2,
-                                    aggregates = FALSE)
-    }, error = function(e) {
-      shiny::showModal(shiny::modalDialog(title = "IDDepthProfiles error", paste0("TADA_IDDepthProfiles failed: ", e$message), easyClose = TRUE)); return(NULL)
-    })
-    if (is.null(site_date_char_groups_df) || nrow(site_date_char_groups_df) == 0) {
-      shiny::showModal(shiny::modalDialog(title = "No ID combos", "TADA_IDDepthProfiles returned no rows.", easyClose = TRUE)); return()
+    site_date_char_groups_df <- tryCatch(
+      {
+        EPATADA::TADA_IDDepthProfiles(
+          depth_categorized_df,
+          nresults = TRUE,
+          nvalue = 2,
+          aggregates = FALSE
+        )
+      },
+      error = function(e) {
+        shiny::showModal(shiny::modalDialog(
+          title = "IDDepthProfiles error",
+          paste0("TADA_IDDepthProfiles failed: ", e$message),
+          easyClose = TRUE
+        ))
+        return(NULL)
+      }
+    )
+    if (
+      is.null(site_date_char_groups_df) || nrow(site_date_char_groups_df) == 0
+    ) {
+      shiny::showModal(shiny::modalDialog(
+        title = "No ID combos",
+        "TADA_IDDepthProfiles returned no rows.",
+        easyClose = TRUE
+      ))
+      return()
     }
     depth_profile$site_date_char_groups_df <- site_date_char_groups_df
 
@@ -436,11 +592,18 @@ server <- function(input, output, session) {
     depth_categorized_filtered_df <- depth_categorized_df %>%
       inner_join(
         site_date_char_groups_df %>%
-          select(OrganizationIdentifier, TADA.MonitoringLocationIdentifier, ActivityStartDate) %>%
+          select(
+            OrganizationIdentifier,
+            TADA.MonitoringLocationIdentifier,
+            ActivityStartDate
+          ) %>%
           distinct(),
-        by = c("OrganizationIdentifier", "TADA.MonitoringLocationIdentifier", "ActivityStartDate")
+        by = c(
+          "OrganizationIdentifier",
+          "TADA.MonitoringLocationIdentifier",
+          "ActivityStartDate"
+        )
       )
-
 
     # this is when the map get populated
     # depth_profile$depth_categorized_df <- depth_categorized_df
@@ -451,36 +614,69 @@ server <- function(input, output, session) {
     incProgress(0.95, detail = "Extracting unique (site, date) pairs")
 
     # find columns robustly
-    loc_col  <- "TADA.MonitoringLocationIdentifier"
+    loc_col <- "TADA.MonitoringLocationIdentifier"
     date_col <- "ActivityStartDate"
 
     pairs_df <- data.frame(
-      MonitoringLocationIdentifier =
-        if (!is.na(loc_col)) as.character(site_date_char_groups_df[[loc_col]]) else NA_character_,
-      ActivityStartDate =
-        if (!is.na(date_col)) as.character(site_date_char_groups_df[[date_col]]) else NA_character_,
+      MonitoringLocationIdentifier = if (!is.na(loc_col)) {
+        as.character(site_date_char_groups_df[[loc_col]])
+      } else {
+        NA_character_
+      },
+      ActivityStartDate = if (!is.na(date_col)) {
+        as.character(site_date_char_groups_df[[date_col]])
+      } else {
+        NA_character_
+      },
       stringsAsFactors = FALSE
     )
     pairs_df <- unique(pairs_df)
-    suppressWarnings({ dt_parsed <- as.Date(pairs_df$ActivityStartDate) })
+    suppressWarnings({
+      dt_parsed <- as.Date(pairs_df$ActivityStartDate)
+    })
     if (!all(is.na(dt_parsed))) {
-      pairs_df <- pairs_df[order(dt_parsed, decreasing = TRUE, na.last = TRUE), , drop = FALSE]
+      pairs_df <- pairs_df[
+        order(dt_parsed, decreasing = TRUE, na.last = TRUE),
+        ,
+        drop = FALSE
+      ]
     }
 
     depth_profile$site_date_pairs <- pairs_df
-    depth_profile$available_characteristics_df <- data.frame(Characteristic = character(0), stringsAsFactors = FALSE)
+    depth_profile$available_characteristics_df <- data.frame(
+      Characteristic = character(0),
+      stringsAsFactors = FALSE
+    )
     depth_profile$loaded <- TRUE
 
     # Populate the site and date selectInputs
-    found_site_id_choices <- if (!is.null(pairs_df) && nrow(pairs_df) > 0) sort(unique(as.character(pairs_df$MonitoringLocationIdentifier))) else character(0)
-    all_dates <- if (!is.null(pairs_df) && nrow(pairs_df) > 0) sort(unique(as.character(pairs_df$ActivityStartDate))) else character(0)
+    found_site_id_choices <- if (!is.null(pairs_df) && nrow(pairs_df) > 0) {
+      sort(unique(as.character(pairs_df$MonitoringLocationIdentifier)))
+    } else {
+      character(0)
+    }
+    all_dates <- if (!is.null(pairs_df) && nrow(pairs_df) > 0) {
+      sort(unique(as.character(pairs_df$ActivityStartDate)))
+    } else {
+      character(0)
+    }
 
-    shiny::updateSelectInput(session, "depth_profile_site_id",
-                      choices = found_site_id_choices,
-                      selected = if (length(found_site_id_choices) > 0) found_site_id_choices[1] else NA)
-    shiny::updateSelectInput(session, "activity_date",
-                      choices = all_dates,
-                      selected = if (length(all_dates) > 0) all_dates[1] else NA)
+    shiny::updateSelectInput(
+      session,
+      "depth_profile_site_id",
+      choices = found_site_id_choices,
+      selected = if (length(found_site_id_choices) > 0) {
+        found_site_id_choices[1]
+      } else {
+        NA
+      }
+    )
+    shiny::updateSelectInput(
+      session,
+      "activity_date",
+      choices = all_dates,
+      selected = if (length(all_dates) > 0) all_dates[1] else NA
+    )
 
     incProgress(1, detail = "Done")
   }) # end shiny::observeEvent(input$review_depth_profile_data, { ... })
@@ -492,7 +688,7 @@ server <- function(input, output, session) {
   })
 
   # create dataset for map and histogram using raw data
-  shiny::observe( {
+  shiny::observe({
     shiny::req(depth_profile$depth_categorized_df)
     # create gray text tile info
     mapdat$text <- depth_profile$depth_categorized_df %>%
@@ -510,33 +706,40 @@ server <- function(input, output, session) {
       # dplyr::filter(TADA.Remove == FALSE) %>%
       dplyr::group_by(TADA.CharacteristicName) %>%
       dplyr::summarise("Result_Count" = length(unique(ResultIdentifier)))
-    
-    topslice <-
-      map_characteristics %>% dplyr::slice_max(order_by = Result_Count, n = 10)
-    
+
+    topslice <- map_characteristics %>%
+      dplyr::slice_max(order_by = Result_Count, n = 10)
+
     bottomslice <- map_characteristics %>%
       dplyr::ungroup() %>%
-      dplyr::filter(!TADA.CharacteristicName %in% topslice$TADA.CharacteristicName) %>%
+      dplyr::filter(
+        !TADA.CharacteristicName %in% topslice$TADA.CharacteristicName
+      ) %>%
       dplyr::select("Result_Count") %>%
       dplyr::summarise("Result_Count" = sum(Result_Count)) %>%
       dplyr::mutate("TADA.CharacteristicName" = "ALL OTHERS")
-    
-    map_characteristics <-
-      plyr::rbind.fill(topslice, bottomslice) %>% dplyr::filter(Result_Count > 0)
-    
-    map_characteristics <-
-      map_characteristics %>% dplyr::mutate(TADA.Chars = substr(TADA.CharacteristicName, 1, 22))
-    
-    map_characteristics$TADA.Chars <-
-      ifelse(
-        nchar(map_characteristics$TADA.CharacteristicName) > 22,
-        base::paste0(map_characteristics$TADA.Chars, "..."),
-        map_characteristics$TADA.Chars
+
+    map_characteristics <- plyr::rbind.fill(topslice, bottomslice) %>%
+      dplyr::filter(Result_Count > 0)
+
+    map_characteristics <- map_characteristics %>%
+      dplyr::mutate(TADA.Chars = substr(TADA.CharacteristicName, 1, 22))
+
+    map_characteristics$TADA.Chars <- ifelse(
+      nchar(map_characteristics$TADA.CharacteristicName) > 22,
+      base::paste0(map_characteristics$TADA.Chars, "..."),
+      map_characteristics$TADA.Chars
+    )
+
+    map_characteristics <- map_characteristics %>%
+      dplyr::mutate(
+        TADA.Chars = forcats::fct_reorder(
+          TADA.Chars,
+          Result_Count,
+          .desc = TRUE
+        )
       )
-    
-    map_characteristics <-
-      map_characteristics %>% dplyr::mutate(TADA.Chars = forcats::fct_reorder(TADA.Chars, Result_Count, .desc = TRUE))
-    
+
     mapdat$chars <- map_characteristics
   })
 
@@ -563,253 +766,443 @@ server <- function(input, output, session) {
     "});"
   )
 
-  # 'Characteristic' table - render with available characteristics for selected site/date, 
+  # 'Characteristic' table - render with available characteristics for selected site/date,
   #  allow multiple selection, and use callback to enforce max 3 selections
-  output$available_characteristics <- DT::renderDT({
-    req(depth_profile$loaded)
-    df_full <- depth_profile$available_characteristics_df
-    if (is.null(df_full) || nrow(df_full) == 0) {
-      datatable(data.frame(Message = "No available characteristics. Select a Site and Date above."),
-                options = list(dom = 't'))
-    } else {
-      # Prepare display df: include Characteristic, N, Unit only (if Unit exists)
-      disp_cols <- c("Characteristic", "N")
-      if ("Unit" %in% names(df_full)) disp_cols <- c(disp_cols, "Unit")
-      display_df <- df_full[, intersect(disp_cols, names(df_full)), drop = FALSE]
+  output$available_characteristics <- DT::renderDT(
+    {
+      req(depth_profile$loaded)
+      df_full <- depth_profile$available_characteristics_df
+      if (is.null(df_full) || nrow(df_full) == 0) {
+        datatable(
+          data.frame(
+            Message = "No available characteristics. Select a Site and Date above."
+          ),
+          options = list(dom = 't')
+        )
+      } else {
+        # Prepare display df: include Characteristic, N, Unit only (if Unit exists)
+        disp_cols <- c("Characteristic", "N")
+        if ("Unit" %in% names(df_full)) {
+          disp_cols <- c(disp_cols, "Unit")
+        }
+        display_df <- df_full[,
+          intersect(disp_cols, names(df_full)),
+          drop = FALSE
+        ]
 
-      datatable(
-        display_df,
-        rownames = FALSE,
-        selection = list(mode = "multiple"),
-        options = list(pageLength = 6, scrollY = "100%", dom = 't'),
-        callback = available_chars_callback
-      )
-    }
-  }, server = FALSE)
+        datatable(
+          display_df,
+          rownames = FALSE,
+          selection = list(mode = "multiple"),
+          options = list(pageLength = 6, scrollY = "100%", dom = 't'),
+          callback = available_chars_callback
+        )
+      }
+    },
+    server = FALSE
+  )
 
   # When user changes selected site, update the activity_date choices
   observeEvent(input$depth_profile_site_id, {
     req(depth_profile$loaded)
     site_in <- input$depth_profile_site_id
     if (is.null(site_in) || !nzchar(site_in)) {
-      shiny::updateSelectInput(session, "activity_date", choices = character(0), selected = NA)
+      shiny::updateSelectInput(
+        session,
+        "activity_date",
+        choices = character(0),
+        selected = NA
+      )
       return()
     }
     pairs_df <- depth_profile$site_date_pairs
     if (is.null(pairs_df) || nrow(pairs_df) == 0) {
-      shiny::updateSelectInput(session, "activity_date", choices = character(0), selected = NA)
+      shiny::updateSelectInput(
+        session,
+        "activity_date",
+        choices = character(0),
+        selected = NA
+      )
       return()
     }
-    site_dates <- sort(unique(as.character(pairs_df$ActivityStartDate[pairs_df$MonitoringLocationIdentifier == site_in])))
-    shiny::updateSelectInput(session, "activity_date", choices = site_dates, selected = if (length(site_dates) > 0) site_dates[1] else NA)
+    site_dates <- sort(unique(as.character(pairs_df$ActivityStartDate[
+      pairs_df$MonitoringLocationIdentifier == site_in
+    ])))
+    shiny::updateSelectInput(
+      session,
+      "activity_date",
+      choices = site_dates,
+      selected = if (length(site_dates) > 0) site_dates[1] else NA
+    )
   })
 
   # When user selects an activity_date (after site chosen), compute available characteristics
-  observeEvent(input$activity_date, {
-    req(depth_profile$loaded)
-    sel_site <- input$depth_profile_site_id
-    sel_date <- input$activity_date
-    if (is.null(sel_site) || !nzchar(sel_site) || is.null(sel_date) || !nzchar(sel_date)) {
-      depth_profile$available_characteristics_df <- data.frame(Characteristic = character(0), stringsAsFactors = FALSE)
-      return()
-    }
+  observeEvent(
+    input$activity_date,
+    {
+      req(depth_profile$loaded)
+      sel_site <- input$depth_profile_site_id
+      sel_date <- input$activity_date
+      if (
+        is.null(sel_site) ||
+          !nzchar(sel_site) ||
+          is.null(sel_date) ||
+          !nzchar(sel_date)
+      ) {
+        depth_profile$available_characteristics_df <- data.frame(
+          Characteristic = character(0),
+          stringsAsFactors = FALSE
+        )
+        return()
+      }
 
-    df <- depth_profile$site_date_char_groups_df
-    if (is.null(df)) df <- depth_profile$depth_categorized_df
-    if (is.null(df)) {
-      depth_profile$available_characteristics_df <- data.frame(Characteristic = character(0), stringsAsFactors = FALSE)
-      return()
-    }
+      df <- depth_profile$site_date_char_groups_df
+      if (is.null(df)) {
+        df <- depth_profile$depth_categorized_df
+      }
+      if (is.null(df)) {
+        depth_profile$available_characteristics_df <- data.frame(
+          Characteristic = character(0),
+          stringsAsFactors = FALSE
+        )
+        return()
+      }
 
-    loc_col  <- "TADA.MonitoringLocationIdentifier"
-    date_col <- "ActivityStartDate"
-    char_col <- "TADA.CharacteristicsForDepthProfile"
+      loc_col <- "TADA.MonitoringLocationIdentifier"
+      date_col <- "ActivityStartDate"
+      char_col <- "TADA.CharacteristicsForDepthProfile"
 
-    if (is.na(loc_col) || is.na(date_col) || is.na(char_col)) {
-      depth_profile$available_characteristics_df <- data.frame(Characteristic = character(0), stringsAsFactors = FALSE)
-      return()
-    }
+      if (is.na(loc_col) || is.na(date_col) || is.na(char_col)) {
+        depth_profile$available_characteristics_df <- data.frame(
+          Characteristic = character(0),
+          stringsAsFactors = FALSE
+        )
+        return()
+      }
 
-    df_sel <- df[as.character(df[[loc_col]]) == sel_site & as.character(df[[date_col]]) == sel_date, , drop = FALSE]
-    if (nrow(df_sel) == 0) {
-      depth_profile$available_characteristics_df <- data.frame(Characteristic = character(0), stringsAsFactors = FALSE)
-      return()
-    }
+      df_sel <- df[
+        as.character(df[[loc_col]]) == sel_site &
+          as.character(df[[date_col]]) == sel_date,
+        ,
+        drop = FALSE
+      ]
+      if (nrow(df_sel) == 0) {
+        depth_profile$available_characteristics_df <- data.frame(
+          Characteristic = character(0),
+          stringsAsFactors = FALSE
+        )
+        return()
+      }
 
-    # Extract tokens from char_col and compute N per-token
-    raw_vals <- as.character(df_sel[[char_col]])
-    char_choices <- split_characteristics(raw_vals)
-    if (length(char_choices) == 0) char_choices <- sort(unique(stats::na.omit(raw_vals)))
-    if (length(char_choices) == 0) {
-      depth_profile$available_characteristics_df <- data.frame(Characteristic = character(0), stringsAsFactors = FALSE)
-      return()
-    }
+      # Extract tokens from char_col and compute N per-token
+      raw_vals <- as.character(df_sel[[char_col]])
+      char_choices <- split_characteristics(raw_vals)
+      if (length(char_choices) == 0) {
+        char_choices <- sort(unique(stats::na.omit(raw_vals)))
+      }
+      if (length(char_choices) == 0) {
+        depth_profile$available_characteristics_df <- data.frame(
+          Characteristic = character(0),
+          stringsAsFactors = FALSE
+        )
+        return()
+      }
 
-    tokens_display <- vapply(char_choices, normalize_token, FUN.VALUE = character(1), USE.NAMES = FALSE)
-    tokens_display <- vapply(tokens_display, normalize_NA_token, FUN.VALUE = character(1), USE.NAMES = FALSE)
+      tokens_display <- vapply(
+        char_choices,
+        normalize_token,
+        FUN.VALUE = character(1),
+        USE.NAMES = FALSE
+      )
+      tokens_display <- vapply(
+        tokens_display,
+        normalize_NA_token,
+        FUN.VALUE = character(1),
+        USE.NAMES = FALSE
+      )
 
-    counts <- integer(length(char_choices))
-    unit_col_candidates <- names(df_sel)[grepl("unit", names(df_sel), ignore.case = TRUE)]
-    unit_col <- if (length(unit_col_candidates) > 0) unit_col_candidates[1] else NA_character_
-    units <- rep(NA_character_, length(char_choices))
+      counts <- integer(length(char_choices))
+      unit_col_candidates <- names(df_sel)[grepl(
+        "unit",
+        names(df_sel),
+        ignore.case = TRUE
+      )]
+      unit_col <- if (length(unit_col_candidates) > 0) {
+        unit_col_candidates[1]
+      } else {
+        NA_character_
+      }
+      units <- rep(NA_character_, length(char_choices))
 
-    for (i in seq_along(char_choices)) {
-      ch <- char_choices[i]
-      explicit_total <- 0L
-      explicit_found <- FALSE
-      row_match_flags <- rep(FALSE, nrow(df_sel))
+      for (i in seq_along(char_choices)) {
+        ch <- char_choices[i]
+        explicit_total <- 0L
+        explicit_found <- FALSE
+        row_match_flags <- rep(FALSE, nrow(df_sel))
 
-      for (j in seq_len(nrow(df_sel))) {
-        pv <- as.character(df_sel[[char_col]][j])
-        if (!is.na(pv) && nzchar(pv)) {
-          toks <- split_characteristics(pv)
-          if (length(toks) > 0) {
-            for (tok in toks) {
-              if (normalize_token(tok) == normalize_token(ch)) {
-                cnt <- extract_trailing_count(tok)
-                if (!is.na(cnt)) {
-                  explicit_total <- explicit_total + cnt
-                  explicit_found <- TRUE
-                } else {
-                  row_match_flags[j] <- TRUE
+        for (j in seq_len(nrow(df_sel))) {
+          pv <- as.character(df_sel[[char_col]][j])
+          if (!is.na(pv) && nzchar(pv)) {
+            toks <- split_characteristics(pv)
+            if (length(toks) > 0) {
+              for (tok in toks) {
+                if (normalize_token(tok) == normalize_token(ch)) {
+                  cnt <- extract_trailing_count(tok)
+                  if (!is.na(cnt)) {
+                    explicit_total <- explicit_total + cnt
+                    explicit_found <- TRUE
+                  } else {
+                    row_match_flags[j] <- TRUE
+                  }
+                  break
                 }
-                break
               }
             }
           }
         }
+
+        if (explicit_found && explicit_total > 0L) {
+          counts[i] <- explicit_total
+        } else {
+          counts[i] <- sum(row_match_flags, na.rm = TRUE)
+        }
+
+        if (
+          !is.na(unit_col) &&
+            any(
+              (!is.na(row_match_flags) & row_match_flags) &
+                !is.na(df_sel[[unit_col]])
+            )
+        ) {
+          uu <- as.character(df_sel[[unit_col]][row_match_flags])
+          uu <- uu[!is.na(uu)]
+          if (length(uu) > 0) {
+            units[i] <- names(sort(table(uu), decreasing = TRUE))[1]
+          }
+        }
       }
 
-      if (explicit_found && explicit_total > 0L) {
-        counts[i] <- explicit_total
-      } else {
-        counts[i] <- sum(row_match_flags, na.rm = TRUE)
+      df_chars <- data.frame(
+        Characteristic = tokens_display,
+        N = counts,
+        stringsAsFactors = FALSE
+      )
+      df_chars$CompID <- vapply(
+        char_choices,
+        normalize_token,
+        FUN.VALUE = character(1),
+        USE.NAMES = FALSE
+      )
+      if (!all(is.na(units))) {
+        df_chars$Unit <- units
       }
 
-      if (!is.na(unit_col) && any((!is.na(row_match_flags) & row_match_flags) & !is.na(df_sel[[unit_col]]))) {
-        uu <- as.character(df_sel[[unit_col]][row_match_flags])
-        uu <- uu[!is.na(uu)]
-        if (length(uu) > 0) units[i] <- names(sort(table(uu), decreasing = TRUE))[1]
+      depth_profile$available_characteristics_df <- df_chars
+
+      # Pre-select defaults by priority (match normalized preferred_characteristics)
+      df_chars_local <- depth_profile$available_characteristics_df
+      sel_rows <- integer(0)
+      for (pc in preferred_characteristics) {
+        pc_clean <- normalize_token(pc)
+        idx <- which(
+          df_chars_local$CompID == pc_clean |
+            df_chars_local$Characteristic == pc_clean
+        )
+        if (length(idx) > 0) {
+          sel_rows <- c(sel_rows, idx[1])
+        }
+        if (length(sel_rows) >= 3) break()
       }
-    }
-
-    df_chars <- data.frame(
-      Characteristic = tokens_display,
-      N = counts,
-      stringsAsFactors = FALSE
-    )
-    df_chars$CompID <- vapply(char_choices, normalize_token, FUN.VALUE = character(1), USE.NAMES = FALSE)
-    if (!all(is.na(units))) df_chars$Unit <- units
-
-    depth_profile$available_characteristics_df <- df_chars
-
-    # Pre-select defaults by priority (match normalized preferred_characteristics)
-    df_chars_local <- depth_profile$available_characteristics_df
-    sel_rows <- integer(0)
-    for (pc in preferred_characteristics) {
-      pc_clean <- normalize_token(pc)
-      idx <- which(df_chars_local$CompID == pc_clean | df_chars_local$Characteristic == pc_clean)
-      if (length(idx) > 0) sel_rows <- c(sel_rows, idx[1])
-      if (length(sel_rows) >= 3) break()
-    }
-    if (length(sel_rows) < 3) {
-      more_idx <- setdiff(seq_len(nrow(df_chars_local)), sel_rows)
-      if (length(more_idx) > 0) sel_rows <- c(sel_rows, head(more_idx, 3 - length(sel_rows)))
-    }
-    sel_rows <- unique(sel_rows)
-    if (length(sel_rows) > 0) {
-      try({ selectRows(available_chars_proxy, sel_rows) }, silent = TRUE)
-    }
-
-  }, ignoreNULL = TRUE)
+      if (length(sel_rows) < 3) {
+        more_idx <- setdiff(seq_len(nrow(df_chars_local)), sel_rows)
+        if (length(more_idx) > 0) {
+          sel_rows <- c(sel_rows, head(more_idx, 3 - length(sel_rows)))
+        }
+      }
+      sel_rows <- unique(sel_rows)
+      if (length(sel_rows) > 0) {
+        try(
+          {
+            selectRows(available_chars_proxy, sel_rows)
+          },
+          silent = TRUE
+        )
+      }
+    },
+    ignoreNULL = TRUE
+  )
 
   # Notify when client-side over-limit attempted
   observeEvent(input$available_chars_overlimit, {
-    showNotification("You may select up to 3 characteristics.", type = "warning", duration = 3)
+    showNotification(
+      "You may select up to 3 characteristics.",
+      type = "warning",
+      duration = 3
+    )
   })
 
   # Safety trim if >3 selected
-  observeEvent(input$available_characteristics_rows_selected, {
-    sel <- input$available_characteristics_rows_selected
-    if (is.null(sel) || length(sel) <= 3) return()
-    new_sel <- sel[seq_len(3)]
-    selectRows(available_chars_proxy, new_sel)
-    showNotification("Selection limited to 3 characteristics (trimmed).", type = "warning", duration = 3)
-  }, ignoreNULL = FALSE)
+  observeEvent(
+    input$available_characteristics_rows_selected,
+    {
+      sel <- input$available_characteristics_rows_selected
+      if (is.null(sel) || length(sel) <= 3) {
+        return()
+      }
+      new_sel <- sel[seq_len(3)]
+      selectRows(available_chars_proxy, new_sel)
+      showNotification(
+        "Selection limited to 3 characteristics (trimmed).",
+        type = "warning",
+        duration = 3
+      )
+    },
+    ignoreNULL = FALSE
+  )
 
   # Build plot on Update
   depth_plot_obj <- eventReactive(input$update, {
     if (!depth_profile$loaded || is.null(depth_profile$depth_categorized_df)) {
-      showModal(modalDialog(title = "Data not loaded", "Please click Load data first.", easyClose = TRUE))
+      showModal(modalDialog(
+        title = "Data not loaded",
+        "Please click Load data first.",
+        easyClose = TRUE
+      ))
       return(NULL)
     }
 
-    sel_site <- if (!is.null(input$depth_profile_site_id) && nzchar(as.character(input$depth_profile_site_id))) input$depth_profile_site_id else input$siteid
+    sel_site <- if (
+      !is.null(input$depth_profile_site_id) &&
+        nzchar(as.character(input$depth_profile_site_id))
+    ) {
+      input$depth_profile_site_id
+    } else {
+      input$siteid
+    }
     sel_date <- input$activity_date
 
-    if (is.null(sel_site) || !nzchar(as.character(sel_site)) || is.null(sel_date) || !nzchar(as.character(sel_date))) {
+    if (
+      is.null(sel_site) ||
+        !nzchar(as.character(sel_site)) ||
+        is.null(sel_date) ||
+        !nzchar(as.character(sel_date))
+    ) {
       return(safe_message_plot("Please select Site and Date first."))
     }
 
     # gather selected characteristics comp IDs
     chars_idx <- input$available_characteristics_rows_selected
     characteristics <- character(0)
-    if (!is.null(chars_idx) && length(chars_idx) > 0 &&
-        !is.null(depth_profile$available_characteristics_df) && nrow(depth_profile$available_characteristics_df) > 0) {
+    if (
+      !is.null(chars_idx) &&
+        length(chars_idx) > 0 &&
+        !is.null(depth_profile$available_characteristics_df) &&
+        nrow(depth_profile$available_characteristics_df) > 0
+    ) {
       if ("CompID" %in% names(depth_profile$available_characteristics_df)) {
-        characteristics <- as.character(depth_profile$available_characteristics_df$CompID[chars_idx])
+        characteristics <- as.character(depth_profile$available_characteristics_df$CompID[
+          chars_idx
+        ])
       } else {
-        characteristics <- as.character(depth_profile$available_characteristics_df$Characteristic[chars_idx])
+        characteristics <- as.character(depth_profile$available_characteristics_df$Characteristic[
+          chars_idx
+        ])
       }
     }
 
     # fallback defaults
     if (length(characteristics) == 0) {
-      if (!is.null(depth_profile$available_characteristics_df) && nrow(depth_profile$available_characteristics_df) > 0) {
+      if (
+        !is.null(depth_profile$available_characteristics_df) &&
+          nrow(depth_profile$available_characteristics_df) > 0
+      ) {
         if ("CompID" %in% names(depth_profile$available_characteristics_df)) {
-          characteristics <- head(as.character(depth_profile$available_characteristics_df$CompID), 3)
+          characteristics <- head(
+            as.character(depth_profile$available_characteristics_df$CompID),
+            3
+          )
         } else {
-          characteristics <- head(as.character(depth_profile$available_characteristics_df$Characteristic), 3)
+          characteristics <- head(
+            as.character(
+              depth_profile$available_characteristics_df$Characteristic
+            ),
+            3
+          )
         }
       } else {
-        characteristics <- head(unique(depth_profile$depth_categorized_df$TADA.ComparableDataIdentifier %||% character(0)), 3)
-        if (length(characteristics) == 0) return(safe_message_plot("No characteristic selected"))
+        characteristics <- head(
+          unique(
+            depth_profile$depth_categorized_df$TADA.ComparableDataIdentifier %||%
+              character(0)
+          ),
+          3
+        )
+        if (length(characteristics) == 0) {
+          return(safe_message_plot("No characteristic selected"))
+        }
       }
     }
 
     # determine matching columns
     df_all <- depth_profile$depth_categorized_df
-    loc_col  <- "TADA.MonitoringLocationIdentifier"
+    loc_col <- "TADA.MonitoringLocationIdentifier"
     date_col <- "ActivityStartDate"
     char_col <- "TADA.ComparableDataIdentifier"
 
     # filter by site/date
     df_sel <- df_all
-    if (!is.na(loc_col) && !is.null(sel_site) && nzchar(as.character(sel_site))) {
-      df_sel <- df_sel[as.character(df_sel[[loc_col]]) == as.character(sel_site), , drop = FALSE]
+    if (
+      !is.na(loc_col) && !is.null(sel_site) && nzchar(as.character(sel_site))
+    ) {
+      df_sel <- df_sel[
+        as.character(df_sel[[loc_col]]) == as.character(sel_site),
+        ,
+        drop = FALSE
+      ]
     }
-    if (!is.na(date_col) && !is.null(sel_date) && nzchar(as.character(sel_date))) {
-      df_sel <- df_sel[as.character(df_sel[[date_col]]) == as.character(sel_date), , drop = FALSE]
+    if (
+      !is.na(date_col) && !is.null(sel_date) && nzchar(as.character(sel_date))
+    ) {
+      df_sel <- df_sel[
+        as.character(df_sel[[date_col]]) == as.character(sel_date),
+        ,
+        drop = FALSE
+      ]
     }
 
     if (nrow(df_sel) == 0) {
-      return(safe_message_plot(sprintf("No records for site %s on %s", sel_site %||% "<none>", sel_date %||% "<none>")))
+      return(safe_message_plot(sprintf(
+        "No records for site %s on %s",
+        sel_site %||% "<none>",
+        sel_date %||% "<none>"
+      )))
     }
 
     # normalize selected tokens
-    characteristics_norm <- vapply(characteristics, normalize_token, FUN.VALUE = character(1), USE.NAMES = FALSE)
+    characteristics_norm <- vapply(
+      characteristics,
+      normalize_token,
+      FUN.VALUE = character(1),
+      USE.NAMES = FALSE
+    )
 
     # prepare df_sel normalized copy for char_col
     df_sel_norm <- df_sel
     if (!is.na(char_col) && char_col %in% names(df_sel_norm)) {
-      df_sel_norm[[char_col]] <- vapply(as.character(df_sel_norm[[char_col]]), normalize_token, FUN.VALUE = character(1), USE.NAMES = FALSE)
+      df_sel_norm[[char_col]] <- vapply(
+        as.character(df_sel_norm[[char_col]]),
+        normalize_token,
+        FUN.VALUE = character(1),
+        USE.NAMES = FALSE
+      )
     }
 
     keep_idx <- rep(FALSE, nrow(df_sel_norm))
 
     # match normalized char_col
     if (!is.na(char_col) && char_col %in% names(df_sel_norm)) {
-      keep_idx <- keep_idx | (as.character(df_sel_norm[[char_col]]) %in% characteristics_norm)
+      keep_idx <- keep_idx |
+        (as.character(df_sel_norm[[char_col]]) %in% characteristics_norm)
     }
 
     # match normalized tokens from char_col (split per-row)
@@ -817,54 +1210,96 @@ server <- function(input, output, session) {
       prof_vals <- as.character(df_sel_norm[[char_col]])
       for (i in seq_along(prof_vals)) {
         rvchars <- split_characteristics(prof_vals[i])
-        if (length(rvchars) > 0) rvchars <- vapply(rvchars, normalize_token, FUN.VALUE = character(1), USE.NAMES = FALSE)
-        if (length(intersect(rvchars, characteristics_norm)) > 0) keep_idx[i] <- TRUE
+        if (length(rvchars) > 0) {
+          rvchars <- vapply(
+            rvchars,
+            normalize_token,
+            FUN.VALUE = character(1),
+            USE.NAMES = FALSE
+          )
+        }
+        if (length(intersect(rvchars, characteristics_norm)) > 0) {
+          keep_idx[i] <- TRUE
+        }
       }
     }
 
     # fallback regex match if nothing matched (escape specials)
     if (!any(keep_idx)) {
-      esc <- gsub("([.|()\\^{}+$*?\\[\\]\\\\])", "\\\\\\1", characteristics_norm)
+      esc <- gsub(
+        "([.|()\\^{}+$*?\\[\\]\\\\])",
+        "\\\\\\1",
+        characteristics_norm
+      )
       pattern <- paste0("^(", paste0(esc, collapse = "|"), ")$")
       if (!is.na(char_col) && char_col %in% names(df_sel_norm)) {
-        keep_idx <- keep_idx | grepl(pattern, as.character(df_sel_norm[[char_col]]), ignore.case = TRUE)
+        keep_idx <- keep_idx |
+          grepl(
+            pattern,
+            as.character(df_sel_norm[[char_col]]),
+            ignore.case = TRUE
+          )
       }
       if (!is.na(char_col) && char_col %in% names(df_sel_norm)) {
-        keep_idx <- keep_idx | grepl(pattern, as.character(df_sel_norm[[char_col]]), ignore.case = TRUE)
+        keep_idx <- keep_idx |
+          grepl(
+            pattern,
+            as.character(df_sel_norm[[char_col]]),
+            ignore.case = TRUE
+          )
       }
     }
 
     df_plot_prep <- df_sel[keep_idx, , drop = FALSE]
     if (nrow(df_plot_prep) == 0) {
-      return(safe_message_plot("No records match the selected characteristics for that site/date."))
+      return(safe_message_plot(
+        "No records match the selected characteristics for that site/date."
+      ))
     }
 
-    val_col <- intersect(c("TADA.ResultMeasureValue", "ResultMeasureValue", "ResultMeasure"), names(df_plot_prep))[1]
-    depth_col <- intersect(c("TADA.ConsolidatedDepth", "ConsolidatedDepth", "Depth"), names(df_plot_prep))[1]
+    val_col <- intersect(
+      c("TADA.ResultMeasureValue", "ResultMeasureValue", "ResultMeasure"),
+      names(df_plot_prep)
+    )[1]
+    depth_col <- intersect(
+      c("TADA.ConsolidatedDepth", "ConsolidatedDepth", "Depth"),
+      names(df_plot_prep)
+    )[1]
 
     good_vals <- FALSE
     if (!is.na(val_col) && !is.na(depth_col)) {
-      num_val <- suppressWarnings(as.numeric(as.character(df_plot_prep[[val_col]])))
-      num_depth <- suppressWarnings(as.numeric(as.character(df_plot_prep[[depth_col]])))
+      num_val <- suppressWarnings(as.numeric(as.character(df_plot_prep[[
+        val_col
+      ]])))
+      num_depth <- suppressWarnings(as.numeric(as.character(df_plot_prep[[
+        depth_col
+      ]])))
       if (any(!is.na(num_val)) && any(!is.na(num_depth))) good_vals <- TRUE
     }
 
     if (!good_vals) {
-      return(safe_message_plot("Selected combination has no numeric measure or depth values to plot."))
+      return(safe_message_plot(
+        "Selected combination has no numeric measure or depth values to plot."
+      ))
     }
 
     # All checks passed: call EPATADA plotting function
-    p <- tryCatch({
-      EPATADA::TADA_DepthProfilePlot(df_sel,
-                                    groups = characteristics,
-                                    location = sel_site,
-                                    activity_date = sel_date,
-                                    depthcat = input$depthcat,
-                                    surfacevalue = input$surfacevalue,
-                                    bottomvalue = input$bottomvalue)
-    }, error = function(e) {
-      safe_message_plot(paste0("Plot error: ", e$message))
-    })
+    p <- tryCatch(
+      {
+        EPATADA::TADA_DepthProfilePlot(
+          df_sel,
+          groups = characteristics,
+          location = sel_site,
+          activity_date = sel_date,
+          depthcat = input$depthcat,
+          surfacevalue = input$surfacevalue,
+          bottomvalue = input$bottomvalue
+        )
+      },
+      error = function(e) {
+        safe_message_plot(paste0("Plot error: ", e$message))
+      }
+    )
 
     p
   })
@@ -873,11 +1308,15 @@ server <- function(input, output, session) {
   output$depthPlotly <- plotly::renderPlotly({
     p <- depth_plot_obj()
     req(p)
-    if (inherits(p, "plotly") || inherits(p, "htmlwidget")) return(p)
-    if (inherits(p, "ggplot")) return(ggplotly(p))
+    if (inherits(p, "plotly") || inherits(p, "htmlwidget")) {
+      return(p)
+    }
+    if (inherits(p, "ggplot")) {
+      return(ggplotly(p))
+    }
     safe_message_plot("Unable to render plot object.")
   })
-  
+
   # Create a reactive data.frame that contains the same underlying data the plot
   # uses, but in "wide" form: one column per selected characteristic and rows = depths.
   depth_plot_data <- shiny::reactive({
@@ -886,130 +1325,260 @@ server <- function(input, output, session) {
     req(depth_profile$loaded)
     req(input$activity_date)
     # site must be selected
-    sel_site <- if (!is.null(input$depth_profile_site_id) && nzchar(as.character(input$depth_profile_site_id))) input$depth_profile_site_id else input$siteid
+    sel_site <- if (
+      !is.null(input$depth_profile_site_id) &&
+        nzchar(as.character(input$depth_profile_site_id))
+    ) {
+      input$depth_profile_site_id
+    } else {
+      input$siteid
+    }
     sel_date <- input$activity_date
-    if (is.null(sel_site) || !nzchar(as.character(sel_site)) || is.null(sel_date) || !nzchar(as.character(sel_date))) {
+    if (
+      is.null(sel_site) ||
+        !nzchar(as.character(sel_site)) ||
+        is.null(sel_date) ||
+        !nzchar(as.character(sel_date))
+    ) {
       return(NULL)
     }
 
     # gather selected characteristics comp IDs (same source as depth_plot_obj)
     chars_idx <- input$available_characteristics_rows_selected
     characteristics <- character(0)
-    if (!is.null(chars_idx) && length(chars_idx) > 0 &&
-        !is.null(depth_profile$available_characteristics_df) && nrow(depth_profile$available_characteristics_df) > 0) {
+    if (
+      !is.null(chars_idx) &&
+        length(chars_idx) > 0 &&
+        !is.null(depth_profile$available_characteristics_df) &&
+        nrow(depth_profile$available_characteristics_df) > 0
+    ) {
       if ("CompID" %in% names(depth_profile$available_characteristics_df)) {
-        characteristics <- as.character(depth_profile$available_characteristics_df$CompID[chars_idx])
+        characteristics <- as.character(depth_profile$available_characteristics_df$CompID[
+          chars_idx
+        ])
       } else {
-        characteristics <- as.character(depth_profile$available_characteristics_df$Characteristic[chars_idx])
+        characteristics <- as.character(depth_profile$available_characteristics_df$Characteristic[
+          chars_idx
+        ])
       }
     }
 
     # fallback defaults (same as plot)
     if (length(characteristics) == 0) {
-      if (!is.null(depth_profile$available_characteristics_df) && nrow(depth_profile$available_characteristics_df) > 0) {
+      if (
+        !is.null(depth_profile$available_characteristics_df) &&
+          nrow(depth_profile$available_characteristics_df) > 0
+      ) {
         if ("CompID" %in% names(depth_profile$available_characteristics_df)) {
-          characteristics <- head(as.character(depth_profile$available_characteristics_df$CompID), 3)
+          characteristics <- head(
+            as.character(depth_profile$available_characteristics_df$CompID),
+            3
+          )
         } else {
-          characteristics <- head(as.character(depth_profile$available_characteristics_df$Characteristic), 3)
+          characteristics <- head(
+            as.character(
+              depth_profile$available_characteristics_df$Characteristic
+            ),
+            3
+          )
         }
       } else {
-        characteristics <- head(unique(depth_profile$depth_categorized_df$TADA.ComparableDataIdentifier %||% character(0)), 3)
+        characteristics <- head(
+          unique(
+            depth_profile$depth_categorized_df$TADA.ComparableDataIdentifier %||%
+              character(0)
+          ),
+          3
+        )
         if (length(characteristics) == 0) return(NULL)
       }
     }
 
     # Filter the depth_categorized_df similarly to depth_plot_obj
     df_all <- depth_profile$depth_categorized_df
-    if (is.null(df_all) || nrow(df_all) == 0) return(NULL)
+    if (is.null(df_all) || nrow(df_all) == 0) {
+      return(NULL)
+    }
 
-    loc_col  <- "TADA.MonitoringLocationIdentifier"
+    loc_col <- "TADA.MonitoringLocationIdentifier"
     date_col <- "ActivityStartDate"
     char_col <- "TADA.ComparableDataIdentifier"
 
     df_sel <- df_all
-    if (!is.na(loc_col) && !is.null(sel_site) && nzchar(as.character(sel_site))) {
-      df_sel <- df_sel[as.character(df_sel[[loc_col]]) == as.character(sel_site), , drop = FALSE]
+    if (
+      !is.na(loc_col) && !is.null(sel_site) && nzchar(as.character(sel_site))
+    ) {
+      df_sel <- df_sel[
+        as.character(df_sel[[loc_col]]) == as.character(sel_site),
+        ,
+        drop = FALSE
+      ]
     }
-    if (!is.na(date_col) && !is.null(sel_date) && nzchar(as.character(sel_date))) {
-      df_sel <- df_sel[as.character(df_sel[[date_col]]) == as.character(sel_date), , drop = FALSE]
+    if (
+      !is.na(date_col) && !is.null(sel_date) && nzchar(as.character(sel_date))
+    ) {
+      df_sel <- df_sel[
+        as.character(df_sel[[date_col]]) == as.character(sel_date),
+        ,
+        drop = FALSE
+      ]
     }
 
-    if (nrow(df_sel) == 0) return(NULL)
+    if (nrow(df_sel) == 0) {
+      return(NULL)
+    }
 
     # normalize selected tokens
-    characteristics_norm <- vapply(characteristics, normalize_token, FUN.VALUE = character(1), USE.NAMES = FALSE)
+    characteristics_norm <- vapply(
+      characteristics,
+      normalize_token,
+      FUN.VALUE = character(1),
+      USE.NAMES = FALSE
+    )
 
     # prepare df_sel normalized copy for char_col
     df_sel_norm <- df_sel
     if (!is.na(char_col) && char_col %in% names(df_sel_norm)) {
-      df_sel_norm[[char_col]] <- vapply(as.character(df_sel_norm[[char_col]]), normalize_token, FUN.VALUE = character(1), USE.NAMES = FALSE)
+      df_sel_norm[[char_col]] <- vapply(
+        as.character(df_sel_norm[[char_col]]),
+        normalize_token,
+        FUN.VALUE = character(1),
+        USE.NAMES = FALSE
+      )
     }
 
     # build keep index again (same matching strategy)
     keep_idx <- rep(FALSE, nrow(df_sel_norm))
 
     if (!is.na(char_col) && char_col %in% names(df_sel_norm)) {
-      keep_idx <- keep_idx | (as.character(df_sel_norm[[char_col]]) %in% characteristics_norm)
+      keep_idx <- keep_idx |
+        (as.character(df_sel_norm[[char_col]]) %in% characteristics_norm)
     }
 
     if (!is.na(char_col) && char_col %in% names(df_sel_norm)) {
       prof_vals <- as.character(df_sel_norm[[char_col]])
       for (i in seq_along(prof_vals)) {
         rvchars <- split_characteristics(prof_vals[i])
-        if (length(rvchars) > 0) rvchars <- vapply(rvchars, normalize_token, FUN.VALUE = character(1), USE.NAMES = FALSE)
-        if (length(intersect(rvchars, characteristics_norm)) > 0) keep_idx[i] <- TRUE
+        if (length(rvchars) > 0) {
+          rvchars <- vapply(
+            rvchars,
+            normalize_token,
+            FUN.VALUE = character(1),
+            USE.NAMES = FALSE
+          )
+        }
+        if (length(intersect(rvchars, characteristics_norm)) > 0) {
+          keep_idx[i] <- TRUE
+        }
       }
     }
 
     # fallback regex if needed (same as plot)
     if (!any(keep_idx)) {
-      esc <- gsub("([.|()\\^{}+$*?\\[\\]\\\\])", "\\\\\\1", characteristics_norm)
+      esc <- gsub(
+        "([.|()\\^{}+$*?\\[\\]\\\\])",
+        "\\\\\\1",
+        characteristics_norm
+      )
       pattern <- paste0("^(", paste0(esc, collapse = "|"), ")$")
       if (!is.na(char_col) && char_col %in% names(df_sel_norm)) {
-        keep_idx <- keep_idx | grepl(pattern, as.character(df_sel_norm[[char_col]]), ignore.case = TRUE)
+        keep_idx <- keep_idx |
+          grepl(
+            pattern,
+            as.character(df_sel_norm[[char_col]]),
+            ignore.case = TRUE
+          )
       }
     }
 
     df_plot_prep <- df_sel[keep_idx, , drop = FALSE]
-    if (nrow(df_plot_prep) == 0) return(NULL)
+    if (nrow(df_plot_prep) == 0) {
+      return(NULL)
+    }
 
     # identify value and depth columns as used in the plotting code
-    val_col <- intersect(c("TADA.ResultMeasureValue", "ResultMeasureValue", "ResultMeasure"), names(df_plot_prep))[1]
-    depth_col <- intersect(c("TADA.ConsolidatedDepth", "ConsolidatedDepth", "Depth"), names(df_plot_prep))[1]
+    val_col <- intersect(
+      c("TADA.ResultMeasureValue", "ResultMeasureValue", "ResultMeasure"),
+      names(df_plot_prep)
+    )[1]
+    depth_col <- intersect(
+      c("TADA.ConsolidatedDepth", "ConsolidatedDepth", "Depth"),
+      names(df_plot_prep)
+    )[1]
 
-    if (is.null(val_col) || is.null(depth_col)) return(NULL)
+    if (is.null(val_col) || is.null(depth_col)) {
+      return(NULL)
+    }
 
     # Prepare a tidy long table containing characteristic, depth, value
     # We will try to get a characteristic label for each row: prefer normalized char_col, otherwise try TADA.CharacteristicName
     char_label_col <- NULL
-    if (!is.na(char_col) && char_col %in% names(df_plot_prep)) char_label_col <- char_col
-    alt_char_name_col <- intersect(c("TADA.CharacteristicName", "CharacteristicName", "Characteristic"), names(df_plot_prep))[1]
+    if (!is.na(char_col) && char_col %in% names(df_plot_prep)) {
+      char_label_col <- char_col
+    }
+    alt_char_name_col <- intersect(
+      c("TADA.CharacteristicName", "CharacteristicName", "Characteristic"),
+      names(df_plot_prep)
+    )[1]
 
     # Ensure depth and value numeric
     df_plot_prep <- df_plot_prep %>%
       dplyr::mutate(
-        .depth_num = suppressWarnings(as.numeric(as.character(.data[[depth_col]]))),
-        .value_num = suppressWarnings(as.numeric(as.character(.data[[val_col]])))
+        .depth_num = suppressWarnings(as.numeric(as.character(.data[[
+          depth_col
+        ]]))),
+        .value_num = suppressWarnings(as.numeric(as.character(.data[[
+          val_col
+        ]])))
       )
 
     # Create a character label to pivot on
     if (!is.null(char_label_col)) {
       df_plot_prep <- df_plot_prep %>%
-        dplyr::mutate(.char_label = vapply(as.character(.data[[char_label_col]]), normalize_token, FUN.VALUE = character(1), USE.NAMES = FALSE))
+        dplyr::mutate(
+          .char_label = vapply(
+            as.character(.data[[char_label_col]]),
+            normalize_token,
+            FUN.VALUE = character(1),
+            USE.NAMES = FALSE
+          )
+        )
     } else if (!is.null(alt_char_name_col)) {
       df_plot_prep <- df_plot_prep %>%
-        dplyr::mutate(.char_label = vapply(as.character(.data[[alt_char_name_col]]), normalize_token, FUN.VALUE = character(1), USE.NAMES = FALSE))
+        dplyr::mutate(
+          .char_label = vapply(
+            as.character(.data[[alt_char_name_col]]),
+            normalize_token,
+            FUN.VALUE = character(1),
+            USE.NAMES = FALSE
+          )
+        )
     } else {
       # fallback: use ComparableDataIdentifier if present or ResultIdentifier
-      fallback_char <- intersect(c("TADA.ComparableDataIdentifier", "TADA.ResultIdentifier", "ResultIdentifier"), names(df_plot_prep))[1]
+      fallback_char <- intersect(
+        c(
+          "TADA.ComparableDataIdentifier",
+          "TADA.ResultIdentifier",
+          "ResultIdentifier"
+        ),
+        names(df_plot_prep)
+      )[1]
       df_plot_prep <- df_plot_prep %>%
-        dplyr::mutate(.char_label = if (!is.null(fallback_char)) as.character(.data[[fallback_char]]) else "value")
+        dplyr::mutate(
+          .char_label = if (!is.null(fallback_char)) {
+            as.character(.data[[fallback_char]])
+          } else {
+            "value"
+          }
+        )
     }
 
     # Filter out rows missing depth and value
     df_plot_prep <- df_plot_prep %>% dplyr::filter(!is.na(.depth_num))
 
-    if (nrow(df_plot_prep) == 0) return(NULL)
+    if (nrow(df_plot_prep) == 0) {
+      return(NULL)
+    }
 
     # If multiple observations for same depth & characteristic exist, choose summary (mean)
     tidy_long <- df_plot_prep %>%
@@ -1025,38 +1594,40 @@ server <- function(input, output, session) {
       # pivot_wider will keep .depth_num as a column; rename if needed
     }
     # after pivot_wider and before returning tidy_wide, do:
-    
+
     # 1) Rename depth column to "Depth (m)" and sort by depth (ascending)
     tidy_wide <- tidy_wide %>%
       dplyr::rename(`Depth (m)` = .data$.depth_num) %>%
       dplyr::arrange(`Depth (m)`)
-    
+
     # 2) Sanitize the other column names (characteristic columns) using your helper
     #    normalize_NA_token (optionally also normalize_token if desired).
     all_cols <- names(tidy_wide)
-    
+
     # Keep the depth column name unchanged
     depth_col_name <- "Depth (m)"
-    
+
     # Identify non-depth columns to sanitize
     other_cols <- setdiff(all_cols, depth_col_name)
-    
+
     if (length(other_cols) > 0) {
       # Apply normalization: first normalize_token (trim/strip trailing counts), then normalize_NA_token
-      sanitized <- vapply(other_cols,
-                          FUN.VALUE = character(1),
-                          FUN = function(x) {
-                            nm <- normalize_token(x)
-                            nm <- normalize_NA_token(nm)
-                            nm
-                          })
-    
+      sanitized <- vapply(
+        other_cols,
+        FUN.VALUE = character(1),
+        FUN = function(x) {
+          nm <- normalize_token(x)
+          nm <- normalize_NA_token(nm)
+          nm
+        }
+      )
+
       # Ensure uniqueness (append suffixes if necessary)
       if (any(duplicated(sanitized))) {
         # make unique while preserving order (like make.names(unique=TRUE) but keep nicer labels)
         sanitized <- make.unique(sanitized, sep = "_")
       }
-    
+
       # Build final names vector and assign
       new_names <- all_cols
       new_names[match(other_cols, all_cols)] <- sanitized
@@ -1066,42 +1637,56 @@ server <- function(input, output, session) {
     # Return the wide df (depth first)
     tidy_wide
   })
-  
+
   # Render the depth plot data table (one column per selected characteristic, rows = depths)
-  output$depth_plot_data_table <- DT::renderDT({
-    df <- depth_plot_data()
-    if (is.null(df) || nrow(df) == 0) {
-      datatable(data.frame(Message = "No data to show. Click Update plot or select a Site/Date and characteristics."),
-                options = list(dom = 't'))
-    } else {
-      # Format numeric columns reasonably
-      # Use server = TRUE if you expect many rows; small tables fine server = FALSE
-      datatable(
-        df,
-        rownames = FALSE,
-        options = list(pageLength = 15, scrollX = TRUE, dom = 't')
-      )
-    }
-  }, server = FALSE)
-  
-  
+  output$depth_plot_data_table <- DT::renderDT(
+    {
+      df <- depth_plot_data()
+      if (is.null(df) || nrow(df) == 0) {
+        datatable(
+          data.frame(
+            Message = "No data to show. Click Update plot or select a Site/Date and characteristics."
+          ),
+          options = list(dom = 't')
+        )
+      } else {
+        # Format numeric columns reasonably
+        # Use server = TRUE if you expect many rows; small tables fine server = FALSE
+        datatable(
+          df,
+          rownames = FALSE,
+          options = list(pageLength = 15, scrollX = TRUE, dom = 't')
+        )
+      }
+    },
+    server = FALSE
+  )
 
   output$debug_text <- shiny::renderText({
     paste0(
-      "loaded: ", depth_profile$loaded, "\n",
-      "selected site: ", ifelse(is.null(input$depth_profile_site_id), 
-                                "<none>", 
-                                input$depth_profile_site_id), "\n",
-      "selected date: ", ifelse(is.null(input$activity_date), 
-                                "<none>", 
-                                input$activity_date), "\n",
-      "available_characteristics rows: ", ifelse(is.null(depth_profile$available_characteristics_df), 
-                                                 "NULL", 
-                                                 nrow(depth_profile$available_characteristics_df))
+      "loaded: ",
+      depth_profile$loaded,
+      "\n",
+      "selected site: ",
+      ifelse(
+        is.null(input$depth_profile_site_id),
+        "<none>",
+        input$depth_profile_site_id
+      ),
+      "\n",
+      "selected date: ",
+      ifelse(is.null(input$activity_date), "<none>", input$activity_date),
+      "\n",
+      "available_characteristics rows: ",
+      ifelse(
+        is.null(depth_profile$available_characteristics_df),
+        "NULL",
+        nrow(depth_profile$available_characteristics_df)
+      )
     )
   })
 }
- 
+
 app <- shinyApp(ui = ui, server = server)
 
 if (interactive()) {
