@@ -15,12 +15,12 @@ mod_figures_ui <- function(id) {
     htmltools::br(),
     htmltools::br(),
     shiny::fluidRow(
-      column(
+      shiny::column(
         10, # column containing drop down and button to select grouping columns
         # NOTE: Using uiOutput so the choices can be updated dynamically after data load.
         shiny::uiOutput(ns("groupingcols"))
       ),
-      column(
+      shiny::column(
         2, # uiOutput is used when the widget depends upon something the user does/reactivity in the app
         # NOTE: "Generate Groups" appears only when the names are available in react.
         shiny::uiOutput(ns("groupinggo"))
@@ -29,7 +29,7 @@ mod_figures_ui <- function(id) {
     # this part contains the grouping field and button that show up after the groups have been established
     shiny::uiOutput(ns("mapplotgroup")),
     # map
-    shiny::fluidRow(column(12, shinycssloaders::withSpinner(leaflet::leafletOutput(ns("sites_map"), height = "500px")))),
+    shiny::fluidRow(shiny::column(12, shinycssloaders::withSpinner(leaflet::leafletOutput(ns("sites_map"), height = "500px")))),
     htmltools::br(),
     htmltools::br(),
     # site selection field and button
@@ -155,11 +155,11 @@ mod_figures_server <- function(id, tadat) {
           htmltools::HTML("Use the drop down to pick the characteristic group(s) (max of 2) you'd like to map/plot and then click 'Generate Map'. If you have <B>one</B> group selected, the map will display site markers with radii that reflect the mean result measure value at each site: larger site markers correspond to higher mean result measure values. If you have <B>two</B> results selected, the map will display which sites have data for one or both of the selected groups."),
           htmltools::br(),
           htmltools::br(), # the object choices, created above, is used as the vector of choices in this final select input
-          column(
+          shiny::column(
             6, # column containing drop down menu for all grouping column combinations
             shiny::selectizeInput(ns("mapplotgroup"), "Select up to TWO groups", choices = NULL, multiple = TRUE, options = list(maxItems = 2), width = "100%")
           ),
-          column(
+          shiny::column(
             1,
             shiny::actionButton(ns("mapplotgroupgo"), "Generate Map", shiny::icon("wand-sparkles"),
               style = "color: #fff; background-color: #337ab7; border-color: #2e6da4; margin-top:30px"
@@ -333,7 +333,7 @@ mod_figures_server <- function(id, tadat) {
                                histogram, and boxplot show the first characteristic from the
                                drop down above the map: <B>", react$groups[1], "</B>.")),
         htmltools::br(),
-        column(
+        shiny::column(
           6, # column containing drop down menu for all grouping column combinations
           shiny::selectizeInput(ns("selsites1"),
             "Select sites",
@@ -342,7 +342,7 @@ mod_figures_server <- function(id, tadat) {
             width = "100%"
           )
         ),
-        column(
+        shiny::column(
           1,
           shiny::actionButton(ns("selsitesgo"), "Generate Plots", shiny::icon("wand-sparkles"),
             style = "color: #fff; background-color: #337ab7; border-color: #2e6da4; margin-top:30px"
@@ -386,8 +386,8 @@ mod_figures_server <- function(id, tadat) {
     output$benchmarks <- shiny::renderUI({
       shiny::req(react$plotdata)
       shiny::fluidRow(
-        column(3, shiny::numericInput(ns("benchmark1"), "Benchmark 1", value = 0)),
-        column(3, shiny::numericInput(ns("benchmark2"), "Benchmark 2", value = 0))
+        shiny::column(3, shiny::numericInput(ns("benchmark1"), "Benchmark 1", value = 0)),
+        shiny::column(3, shiny::numericInput(ns("benchmark2"), "Benchmark 2", value = 0))
       )
       # TIP: Add units or labels for benchmarks to match the characteristic units.
     })

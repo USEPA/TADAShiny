@@ -9,8 +9,6 @@
 mod_TADA_summary_ui <- function(id) {
   ns <- shiny::NS(id)
   tagList(shiny::fluidRow(
-    # column(
-    # 6,
     style = "padding-left:20px",
     shiny::wellPanel(
       htmltools::h3("Results Summary"),
@@ -47,7 +45,7 @@ mod_TADA_summary_ui <- function(id) {
         in this output but is only available here after running the 'Load Review Data'
         button on the 'Review' tab.<br><br>"
       ),
-      shiny::fluidRow(column(
+      shiny::fluidRow(shiny::column(
         6,
         shiny::actionButton(
           ns("download_working_button"),
@@ -59,7 +57,7 @@ mod_TADA_summary_ui <- function(id) {
         "Download the final dataset as a .xlsx file. This has been filtered to remove
           all results that the user flagged for removal throughout the application.<br><br>"
       ),
-      shiny::fluidRow(column(
+      shiny::fluidRow(shiny::column(
         6,
         shiny::actionButton(
           ns("download_final_button"),
@@ -75,7 +73,7 @@ mod_TADA_summary_ui <- function(id) {
     ),
     shiny::conditionalPanel("false", shiny::downloadButton(ns("dwn_working"), "Download Working")),
     shiny::conditionalPanel("false", shiny::downloadButton(ns("dwn_final"), "Download Final")),
-    shiny::fluidRow(column(
+    shiny::fluidRow(shiny::column(
       2, shiny::actionButton(ns("disclaimer"), "DISCLAIMER")
     )),
     htmltools::br(),

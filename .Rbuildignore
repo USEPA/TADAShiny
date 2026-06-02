@@ -24,4 +24,3 @@ _disable_autoload.R
 ^\.positai$
 ^\.claude$
 .pre-commit-config.yaml
-

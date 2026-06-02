@@ -19,7 +19,7 @@ mod_harmonize_np_ui <- function(id) {
                     in the 'Assumptions' columns. You may edit this table manually and re-upload it (optional) in the
                     file upload widget below."),
     shiny::fluidRow(
-      column(
+      shiny::column(
         2, htmltools::div(style = "margin-top:20px"),
         shiny::actionButton(ns("harm_go"),
           "Compose Synonym Table",
@@ -28,31 +28,31 @@ mod_harmonize_np_ui <- function(id) {
       )
     ),
     htmltools::br(),
-    shiny::fluidRow(column(11, DT::DTOutput(ns("syn_table")))), # Table output
+    shiny::fluidRow(shiny::column(11, DT::DTOutput(ns("syn_table")))), # Table output
     htmltools::br(),
     htmltools::HTML("<B>Optional:</B> After running the 'Compose Synonym Table' button (above),
                     download the TADAShiny-generated synonym table using the csv button below,
                     customize the table to meet your harmonization needs.
                     Upload your csv here before clicking 'Harmonize Data with Synonym Table'."),
     shiny::fluidRow(
-      column(2, htmltools::div(style = "margin-top:20px"), shiny::uiOutput(ns("harm_dwn"))) # Download button output
+      shiny::column(2, htmltools::div(style = "margin-top:20px"), shiny::uiOutput(ns("harm_dwn"))) # Download button output
     ),
     htmltools::br(),
-    shiny::fluidRow(column(4, shiny::fileInput(ns("harm_file"), "Upload Custom Table (.csv only)"))), # File upload widget
+    shiny::fluidRow(shiny::column(4, shiny::fileInput(ns("harm_file"), "Upload Custom Table (.csv only)"))), # File upload widget
     htmltools::HTML("<B>Harmonize:</B> When you are ready to harmonize your dataset to the
                     synonym table target elements, click 'Harmonize Data with Synonym Table'.
                     This button only appears when a synonym table has been generated/loaded
                     into this tab."),
     htmltools::br(),
     shiny::fluidRow(
-      column(
+      shiny::column(
         2, htmltools::div(style = "margin-top:20px"),
         shiny::uiOutput(ns("harm_apply"))
       ) # Harmonize button output
     ),
     htmltools::br(),
     shiny::fluidRow(
-      column(
+      shiny::column(
         2, htmltools::div(style = "margin-top:20px"),
         shiny::uiOutput(ns("undo_harm_apply"))
       ) # Undo button output
@@ -71,14 +71,14 @@ mod_harmonize_np_ui <- function(id) {
                  the function uses the maximum of the group of values to calculate a total nutrient value."
     ),
     shiny::fluidRow(
-      column(3, htmltools::div(style = "margin-top:20px"), shiny::downloadButton(ns("sum_dwn"),
+      shiny::column(3, htmltools::div(style = "margin-top:20px"), shiny::downloadButton(ns("sum_dwn"),
         "See Summation Reference (.csv)",
         style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
       ))
     ),
     htmltools::br(),
     shiny::fluidRow(
-      column(3, htmltools::div(style = "margin-top:20px"), shiny::uiOutput(ns("sum_apply")))
+      shiny::column(3, htmltools::div(style = "margin-top:20px"), shiny::uiOutput(ns("sum_apply")))
     ),
     htmltools::br()
   )

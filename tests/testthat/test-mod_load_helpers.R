@@ -45,28 +45,3 @@ testthat::test_that("return_tribal_sf filters a provided tribal_list by layer an
   testthat::expect_equal(nrow(res), 1)
   testthat::expect_equal(res$TRIBE_NAME, "Foo")
 })
-
-# testthat::test_that(".safe_fetch_* functions return defaults when offline", {
-#   # Force offline so no network calls are attempted
-#   withr::with_envvar(c(TADAS_OFFLINE = "true"), {
-#     testthat::expect_equal(.safe_fetch_csv_column("https://example.invalid/test.csv", "ID", default = c("a")), c("a"))
-#     testthat::expect_equal(.safe_fetch_projects("https://example.invalid/projects.csv"), character())
-#     testthat::expect_equal(.safe_fetch_sitetypes("https://example.invalid/sitetype.json"), character())
-#     cnty <- .safe_fetch_county("https://example.invalid/national_county.txt")
-#     # Should be a data.frame with the expected columns when offline
-#     testthat::expect_true(is.data.frame(cnty))
-#     # Expect zero rows
-#     testthat::expect_equal(nrow(cnty), 0)
-#     # columns present and character type
-#     testthat::expect_true(all(c("STATE_CD", "STATE_FIPS", "COUNTY_FIPS", "COUNTY_NAME", "COUNTY_FOOBAR") %in% names(cnty)))
-#   })
-# })
-
-# testthat::test_that(".safe_fetch_sitetypes reads JSON-like input", {
-#   # Provide JSON text where jsonlite::fromJSON would parse it to a data.frame/list with codes$value
-#   json_text <- jsonlite::toJSON(list(codes = list(value = c("A","B","A"))), auto_unbox = TRUE)
-#   # stub jsonlite::fromJSON inside .safe_fetch_sitetypes to return an R list
-#   mockery::stub(.safe_fetch_sitetypes, "jsonlite::fromJSON", function(u) list(codes = data.frame(value = c("A","B","A"))))
-#   res <- .safe_fetch_sitetypes("ignored")
-#   testthat::expect_setequal(res, c("A","B"))
-# })

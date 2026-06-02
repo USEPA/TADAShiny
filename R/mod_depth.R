@@ -70,7 +70,7 @@ mod_depth_ui <- function(id) {
       ),
       # map
       shiny::fluidRow(
-        column(12,
+        shiny::column(12,
           shinycssloaders::withSpinner(leaflet::leafletOutput(
             ns("depth_profile_sites_map"),
             height = "500px")
@@ -79,13 +79,13 @@ mod_depth_ui <- function(id) {
       ),
       # Site and date selects (same row)
       shiny::fluidRow(class = "control-row", style="width: 50%; padding-top: 10px;",
-        column(8,
+        shiny::column(8,
           shiny::div(style = "display:flex; flex-direction:column; ",
             tags$label("Site ID", `for` = "depth_profile_site_id"),
             shiny::selectInput(ns("depth_profile_site_id"), NULL, choices = NULL, width = "100%")
           )
         ),
-        column(4,
+        shiny::column(4,
           shiny::div(style = "display:flex; flex-direction:column;",
             tags$label("Visit date", `for` = "activity_date"),
             shiny::selectInput(ns("activity_date"), NULL, choices = NULL, width = "100%")
@@ -97,26 +97,26 @@ mod_depth_ui <- function(id) {
 
       # Available characteristics table
       shiny::fluidRow(class = "control-row",
-        column(12, DT::DTOutput(ns("available_characteristics")))
+        shiny::column(12, DT::DTOutput(ns("available_characteristics")))
       ),
 
       tags$hr(),
 
       # Options row: depthcat, surfacevalue, bottomvalue
       shiny::fluidRow(class = "control-row", style="width: 30%;",
-        column(4,
+        shiny::column(4,
           shiny::div(style = "display:flex; flex-direction:column;",
             tags$label("Depth category"),
             shiny::checkboxInput(ns("depthcat"), NULL, value = TRUE)
           )
         ),
-        column(4,
+        shiny::column(4,
           shiny::div(style = "display:flex; flex-direction:column;",
             tags$label("Surface (depth below surface)"),
             shiny::numericInput(ns("surfacevalue"), NULL, value = 2, min = 0, width = "100%")
           )
         ),
-        column(4,
+        shiny::column(4,
           shiny::div(style = "display:flex; flex-direction:column;",
             tags$label("Bottom (height above bottom) (m)"),
             shiny::numericInput(ns("bottomvalue"), NULL, value = 2, min = 0, width = "100%")
@@ -126,22 +126,22 @@ mod_depth_ui <- function(id) {
 
       # Update button full-width
       shiny::fluidRow(class = "control-row",
-        column(12, shiny::actionButton(ns("update"),
+        shiny::column(12, shiny::actionButton(ns("update"),
           "Update plot",
           icon = shiny::icon("chart-area"), class = "btn btn-primary", style = "width:10%; padding-top: 10px;"))
       ),
       # Middle: the plot (map) — use viewport height so it fills much of the window
       shiny::fluidRow(
-        column(width = 12,
+        shiny::column(width = 12,
           # 70vh => 70% of viewport height; adjust to taste
           plotly::plotlyOutput(ns("depthPlotly"), height = "70vh")
         )
       ),
       # Middle: the data table of the data shown in the plot
       shiny::fluidRow(
-        column(width = 12,
+        shiny::column(width = 12,
           shiny::div(style = "width:70%; margin-left: auto; margin-right: auto; overflow-x: auto;",
-            column(12, DT::DTOutput(ns("depth_plot_data_table"))
+            shiny::column(12, DT::DTOutput(ns("depth_plot_data_table"))
             )
         ))
       ),
@@ -149,7 +149,7 @@ mod_depth_ui <- function(id) {
 
       # Bottom: debug information occupying full width
       shiny::fluidRow(
-        column(width = 12,
+        shiny::column(width = 12,
           tags$hr(),
           shiny::verbatimTextOutput(ns("debug_text"))
         )
@@ -160,6 +160,22 @@ mod_depth_ui <- function(id) {
 
 
 # --- Depth module helper functions (module-level so they are testable) ---
+
+# Ensure plotly traces have explicit type/mode when x/y are present
+ensure_plotly_scatter_defaults <- function(p) {
+  if (!inherits(p, "plotly") || is.null(p$x$data)) return(p)
+  for (i in seq_along(p$x$data)) {
+    tr <- p$x$data[[i]]
+    has_xy <- !is.null(tr$x) || !is.null(tr$y)
+    if (is.null(tr$type) && has_xy) tr$type <- "scatter"
+    if (identical(tr$type, "scatter") && is.null(tr$mode)) {
+      # Choose a reasonable default; lines+markers works well for profiles
+      tr$mode <- "lines+markers"
+    }
+    p$x$data[[i]] <- tr
+  }
+  p
+}
 
 # Helper to split semicolon-separated characteristic lists (robust)
 split_characteristics <- function(vec) {
@@ -212,18 +228,22 @@ mod_depth_server <- function(id, tadat) {
     )
 
 
-    # Safe message for plot area (plotly)
+    # Safe message for plot area (plotly) — zero traces, no warnings
     safe_message_plot <- function(msg) {
-      plotly::plot_ly() %>%
+      p <- plotly::plot_ly() %>% 
         plotly::layout(
-          title = msg,
-          xaxis = list(visible = FALSE),
-          yaxis = list(visible = FALSE),
-          annotations = list(list(text = msg,
+          title = list(text = msg),
+          xaxis = list(visible = FALSE, title = NULL, zeroline = FALSE),
+          yaxis = list(visible = FALSE, title = NULL, zeroline = FALSE),
+          annotations = list(list(
+            text = msg,
             x = 0.5, xref = "paper", xanchor = "center",
             y = 0.5, yref = "paper", yanchor = "middle",
-            showarrow = FALSE, font = list(size = 14)))
+            showarrow = FALSE, font = list(size = 14)
+          ))
         )
+      # Optional: cleaner look for message cards
+      plotly::config(p, displayModeBar = FALSE)
     }
 
     # this a reactive list created to hold all the reactive objects specific to this module.
@@ -778,9 +798,6 @@ mod_depth_server <- function(id, tadat) {
         if (!is.na(char_col) && char_col %in% names(df_sel_norm)) {
           keep_idx <- keep_idx | grepl(pattern, as.character(df_sel_norm[[char_col]]), ignore.case = TRUE)
         }
-        if (!is.na(char_col) && char_col %in% names(df_sel_norm)) {
-          keep_idx <- keep_idx | grepl(pattern, as.character(df_sel_norm[[char_col]]), ignore.case = TRUE)
-        }
       }
 
       df_plot_prep <- df_sel[keep_idx, , drop = FALSE]
@@ -804,26 +821,48 @@ mod_depth_server <- function(id, tadat) {
 
       # All checks passed: call EPATADA plotting function
       p <- tryCatch({
-        EPATADA::TADA_DepthProfilePlot(df_sel,
+        EPATADA::TADA_DepthProfilePlot(
+          df_sel,
           groups = characteristics,
           location = sel_site,
           activity_date = sel_date,
           depthcat = input$depthcat,
           surfacevalue = input$surfacevalue,
-          bottomvalue = input$bottomvalue)
+          bottomvalue = input$bottomvalue
+        )
       }, error = function(e) {
         safe_message_plot(paste0("Plot error: ", e$message))
       })
+      
+      # If it's already a plotly object, set defaults to avoid hints
+      if (inherits(p, "plotly")) {
+        p <- ensure_plotly_scatter_defaults(p)
+      }
 
       p
     })
 
-    # Render plotly (or convert ggplot to plotly)
+    # Render plotly
     output$depthPlotly <- plotly::renderPlotly({
       p <- depth_plot_obj()
       shiny::req(p)
-      if (inherits(p, "plotly") || inherits(p, "htmlwidget")) return(p)
-      if (inherits(p, "ggplot")) return(plotly::ggplotly(p))
+      
+      # Convert ggplot to plotly if needed
+      if (inherits(p, "ggplot")) {
+        p <- plotly::ggplotly(p)
+      }
+      
+      # If it’s plotly/htmlwidget at this point, apply defaults as needed
+      if (inherits(p, "plotly")) {
+        p <- ensure_plotly_scatter_defaults(p)
+        return(p)
+      }
+      
+      if (inherits(p, "htmlwidget")) {
+        # leave other htmlwidgets untouched
+        return(p)
+      }
+      
       safe_message_plot("Unable to render plot object.")
     })
 

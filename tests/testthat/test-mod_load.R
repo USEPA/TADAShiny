@@ -1,31 +1,19 @@
-shiny::testServer(
-  mod_query_data_server,
-  # Add here your module params
-  args = list(),
-  {
-    ns <- session$ns
-    expect_true(
-      inherits(ns, "function")
-    )
-    expect_true(
-      grepl(id, ns(""))
-    )
-    expect_true(
-      grepl("test", ns("test"))
-    )
-    # Here are some examples of tests you can
-    # run on your module
-    # - Testing the setting of inputs
-    # session$setInputs(x = 1)
-    # expect_true(input$x == 1)
-    # - If ever your input updates a reactiveValues
-    # - Note that this reactiveValues must be passed
-    # - to the testServer function via args = list()
-    # expect_true(r$x == 1)
-    # - Testing output
-    # expect_true(inherits(output$tbl$html, "html"))
-  }
-)
+# Basic wiring: run a minimal server check inside a test block
+testthat::test_that("mod_query_data_server basic NS wiring", {
+  shiny::testServer(
+    mod_query_data_server,
+    args = list(),
+    {
+      ns <- session$ns
+      expect_true(inherits(ns, "function"))
+      expect_true(grepl(id, ns("")))
+      expect_true(grepl("test", ns("test")))
+      # Examples for future tests:
+      # session$setInputs(x = 1)
+      # expect_true(input$x == 1)
+    }
+  )
+})
 
 testthat::test_that("module ui works", {
   ui <- mod_query_data_ui(id = "test")
@@ -38,7 +26,7 @@ testthat::test_that("module ui works", {
 })
 
 # tests/testthat/test-example-data-map.R
-test_that("example data map returns data for each entry", {
+testthat::test_that("example data map returns data for each entry", {
   testthat::skip_if_not_installed("EPATADA")
   
   m <- get_example_data_map()
@@ -238,22 +226,21 @@ testthat::test_that("mod_query_data_server loads example data and initializes ta
   
   # Mock the bbox submodule so it doesn't need a real UI
   testthat::local_mocked_bindings(
-    mod_map_bboxServer = function(id) {
+    mod_map_bboxServer = function(id, ...) {
       # match the shape your server expects
       list(bBox = NULL)
     },
-    .env = environment(mod_query_data_server)
+    .env = asNamespace("TADAShiny")
   )
   
   # A fresh reactiveValues store for the module to populate
   tadat <- shiny::reactiveValues()
   
   shiny::testServer(mod_query_data_server, args = list(tadat = tadat), {
-    # Seed inputs that the server uses in if(...) checks to avoid NULL -> length-0 logical errors
+    # Seed inputs to avoid NULL -> length-0 logical errors
     session$setInputs(
       match_type_selector = "contains",
       text_string = "",
-      # These aren’t required for the example path, but make other observers safe
       media = NULL,
       org = NULL,
       project = NULL,

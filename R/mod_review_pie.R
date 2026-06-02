@@ -13,15 +13,15 @@ mod_review_data_ui <- function(id) {
     htmltools::HTML(
       "Use this tab to review flagging and filter decisions and explore the filtered dataset. Click the button below to begin."
     ),
-    shiny::fluidRow(column(
+    shiny::fluidRow(shiny::column(
       4,
       shiny::actionButton(ns("review_go"), "Load Review Data", style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
     )),
     htmltools::br(),
-    shiny::fluidRow(column(
+    shiny::fluidRow(shiny::column(
       8, shiny::plotOutput(ns("review_barchar"), height = "500px")
     )),
-    shiny::fluidRow(column(12, shiny::plotOutput(ns(
+    shiny::fluidRow(shiny::column(12, shiny::plotOutput(ns(
       "reason_pie"
     )))),
     htmltools::HTML(
