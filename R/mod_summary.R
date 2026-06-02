@@ -42,7 +42,10 @@ mod_summary_server <- function(id, tadat) {
       } else {
         # Apply the instance specific processing to the dataframe and render
         # use TADA R package for table contents
-        import_summary_table <- EPATADA::TADA_SummarizeColumn(tadat$raw, col = "TADA.CharacteristicName")
+        import_summary_table <- EPATADA::TADA_SummarizeColumn(
+          tadat$raw,
+          col = "TADA.CharacteristicName"
+        )
 
         return(import_summary_table)
       }

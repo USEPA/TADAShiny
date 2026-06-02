@@ -4,15 +4,9 @@ shiny::testServer(
   args = list(),
   {
     ns <- session$ns
-    expect_true(
-      inherits(ns, "function")
-    )
-    expect_true(
-      grepl(id, ns(""))
-    )
-    expect_true(
-      grepl("test", ns("test"))
-    )
+    expect_true(inherits(ns, "function"))
+    expect_true(grepl(id, ns("")))
+    expect_true(grepl("test", ns("test")))
     # Here are some examples of tests you can
     # run on your module
     # - Testing the setting of inputs

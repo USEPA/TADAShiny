@@ -15,15 +15,18 @@ mod_review_data_ui <- function(id) {
     ),
     shiny::fluidRow(shiny::column(
       4,
-      shiny::actionButton(ns("review_go"), "Load Review Data", style = "color: #fff; background-color: #337ab7; border-color: #2e6da4")
+      shiny::actionButton(
+        ns("review_go"),
+        "Load Review Data",
+        style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
+      )
     )),
     htmltools::br(),
     shiny::fluidRow(shiny::column(
-      8, shiny::plotOutput(ns("review_barchar"), height = "500px")
+      8,
+      shiny::plotOutput(ns("review_barchar"), height = "500px")
     )),
-    shiny::fluidRow(shiny::column(12, shiny::plotOutput(ns(
-      "reason_pie"
-    )))),
+    shiny::fluidRow(shiny::column(12, shiny::plotOutput(ns("reason_pie")))),
     htmltools::HTML(
       "<B>Note:</B> This pie chart shows the number of results flagged/filtered for each reason. Some results may be removed for multiple reasons. Because of this, the total number of flagged results in this pie chart is equal to or greater than the number of unique results removed."
     )
@@ -43,41 +46,47 @@ mod_review_data_server <- function(id, tadat) {
       # data for bar chart
       step_rems <- sort_removals(tadat$removals)
       total <- dim(tadat$raw)[1]
-      flag <-
-        ifelse(length(step_rems$Count[step_rems$Reason %in% "Flag only"]) > 0, step_rems$Count[step_rems$Reason %in% "Flag only"], 0)
-      filtflag <-
-        ifelse(length(step_rems$Count[step_rems$Reason %in% "Flag and Filter"]) > 0, step_rems$Count[step_rems$Reason %in% "Flag and Filter"], 0)
-      filter <-
-        ifelse(length(step_rems$Count[step_rems$Reason %in% "Filter only"]) > 0, step_rems$Count[step_rems$Reason %in% "Filter only"], 0)
+      flag <- ifelse(
+        length(step_rems$Count[step_rems$Reason %in% "Flag only"]) > 0,
+        step_rems$Count[step_rems$Reason %in% "Flag only"],
+        0
+      )
+      filtflag <- ifelse(
+        length(step_rems$Count[step_rems$Reason %in% "Flag and Filter"]) > 0,
+        step_rems$Count[step_rems$Reason %in% "Flag and Filter"],
+        0
+      )
+      filter <- ifelse(
+        length(step_rems$Count[step_rems$Reason %in% "Filter only"]) > 0,
+        step_rems$Count[step_rems$Reason %in% "Filter only"],
+        0
+      )
       mrfl <- total - flag - filtflag
       mrfi <- mrfl - filter
 
-      step_rems_plot <-
-        data.frame(
-          Step = c(
-            "Starting Total",
-            "Measurements Retained After Flagging",
-            "Measurements Retained After Filtering"
-          ),
-          Count = c(total, mrfl, mrfi)
+      step_rems_plot <- data.frame(
+        Step = c(
+          "Starting Total",
+          "Measurements Retained After Flagging",
+          "Measurements Retained After Filtering"
+        ),
+        Count = c(total, mrfl, mrfi)
+      )
+      step_rems_plot$Step <- factor(
+        step_rems_plot$Step,
+        levels = c(
+          "Starting Total",
+          "Measurements Retained After Flagging",
+          "Measurements Retained After Filtering"
         )
-      step_rems_plot$Step <-
-        factor(
-          step_rems_plot$Step,
-          levels = c(
-            "Starting Total",
-            "Measurements Retained After Flagging",
-            "Measurements Retained After Filtering"
-          )
-        )
+      )
       review_things$step_rems_plot <- step_rems_plot
 
       # data for pie chart
-      rem_reas <-
-        data.frame(
-          Reason = names(tadat$removals),
-          Count = apply(tadat$removals, 2, sum)
-        )
+      rem_reas <- data.frame(
+        Reason = names(tadat$removals),
+        Count = apply(tadat$removals, 2, sum)
+      )
       rem_reas <- subset(rem_reas, rem_reas$Count > 0)
       if (nrow(rem_reas) > 0) {
         review_things$rem_reas <- rem_reas
@@ -99,9 +108,15 @@ mod_review_data_server <- function(id, tadat) {
           color = "black"
         ) +
         ggplot2::scale_y_discrete(limits = rev) +
-        ggplot2::labs(title = "Results Retained Following Flagging/Filtering Steps", x = "Results Count", y = "") +
+        ggplot2::labs(
+          title = "Results Retained Following Flagging/Filtering Steps",
+          x = "Results Count",
+          y = ""
+        ) +
         ggplot2::theme_classic(base_size = 16) +
-        ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1)) +
+        ggplot2::theme(
+          axis.text.x = ggplot2::element_text(angle = 45, hjust = 1)
+        ) +
         ggplot2::geom_text(
           ggplot2::aes(
             x = Count + (0.07 * max(Count)),
@@ -129,12 +144,17 @@ mod_review_data_server <- function(id, tadat) {
       colorCount <- length(unique(dat$Legend))
 
       # define color palette
-      getPalette <-
-        grDevices::colorRampPalette(RColorBrewer::brewer.pal(8, "Set2"))
+      getPalette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(
+        8,
+        "Set2"
+      ))
 
       # create pie chart
       ggplot2::ggplot(dat, ggplot2::aes(x = "", y = Count, fill = Legend)) +
-        ggplot2::scale_fill_manual(values = getPalette(colorCount), name = "Removal Reasons") +
+        ggplot2::scale_fill_manual(
+          values = getPalette(colorCount),
+          name = "Removal Reasons"
+        ) +
         ggplot2::geom_bar(stat = "identity", width = 1) +
         ggplot2::coord_polar("y", start = 0) +
         ggplot2::theme_void() +

@@ -25,7 +25,11 @@ app_server <- function(input, output, session) {
   shiny::observeEvent(tadat$raw, {
     if (!is.null(tadat$raw) && is.null(tadat$removals)) {
       # Initialize removals with the same number of rows as raw data, all FALSE
-      tadat$removals <- data.frame(matrix(FALSE, nrow = nrow(tadat$raw), ncol = 0))
+      tadat$removals <- data.frame(matrix(
+        FALSE,
+        nrow = nrow(tadat$raw),
+        ncol = 0
+      ))
     }
   })
 
@@ -78,7 +82,9 @@ app_server <- function(input, output, session) {
     # browser()
     shiny::showModal(shiny::modalDialog(
       title = "Data Loaded",
-      shiny::HTML(paste0("A total of <strong>", scales::comma(length(tadat$raw$ResultIdentifier)),
+      shiny::HTML(paste0(
+        "A total of <strong>",
+        scales::comma(length(tadat$raw$ResultIdentifier)),
         "</strong> results at <strong>",
         scales::comma(length(unique(tadat$raw$MonitoringLocationIdentifier))),
         "</strong> sites were successfully loaded into the app and are displayed on the Overview tab.
@@ -89,10 +95,15 @@ app_server <- function(input, output, session) {
       <li> harmonized result and depth units to TADA defaults, and
       <li> replaced retired characteristic names with current names.
       </ol>
-      See summary information about your dataset in the gray box at the bottom of the webpage.")),
+      See summary information about your dataset in the gray box at the bottom of the webpage."
+      )),
       easyClose = TRUE
     ))
-    shiny::updateTabsetPanel(session = session, inputId = "tabbar", selected = "Overview")
+    shiny::updateTabsetPanel(
+      session = session,
+      inputId = "tabbar",
+      selected = "Overview"
+    )
     tadat$new <- NULL
   })
 

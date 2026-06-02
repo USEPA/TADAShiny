@@ -5,19 +5,19 @@ test_that("mod_map_bboxUI renders expected controls with 0.001 step and address 
   ui <- mod_map_bboxUI("bbox", step = 0.001)
   tq <- htmltools::tagQuery(ui)
   ns <- shiny::NS("bbox")
-  
+
   # Leaflet output present (allow >= 1 due to wrapper duplication)
   expect_gte(length(tq$find(sprintf("#%s", ns("map_bbox")))$all()), 1L)
-  
+
   # Address input and Find button present
   expect_gte(length(tq$find(sprintf("#%s", ns("addr")))$all()), 1L)
   expect_gte(length(tq$find(sprintf("#%s", ns("addr_find")))$all()), 1L)
-  
+
   # Numeric inputs present; verify the <input type="number"> has step 0.001
   for (id in c("bb_N", "bb_S", "bb_W", "bb_E")) {
     node <- tq$find(sprintf("#%s", ns(id)))
     expect_gte(length(node$all()), 1L)
-    
+
     # Find the actual input tag among selected tags
     tags <- node$selectedTags()
     input_tag <- NULL
