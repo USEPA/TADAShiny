@@ -103,7 +103,10 @@ example_data_map <- get_example_data_map()
   )
   if (is.null(dt)) {
     return(data.frame(
-      STATE_CD = character(),      STATE_FIPS = character(),      COUNTY_FIPS = character(),COUNTY_NAME = character(),
+      STATE_CD = character(),
+      STATE_FIPS = character(),
+      COUNTY_FIPS = character(),
+      COUNTY_NAME = character(),
       COUNTY_FOOBAR = character(),
       stringsAsFactors = FALSE
     ))
