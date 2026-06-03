@@ -502,7 +502,11 @@ mod_query_data_ui <- function(id) {
       htmltools::h4("Select Location Parameters"),
       htmltools::p(
         class = "tada-note",
-        "Select one or more location parameters to define the spatial extent of your dataset. If you use multiple, they are combined with AND logic-results must fall within the overlap of all selected locations. All location fields are optional."
+        "Select one or more location parameters to define the spatial extent of your dataset. ",
+        "If you use multiple, they are combined with ",
+        htmltools::strong("AND logic"),
+        "-results must fall within the overlap of all selected locations. ",
+        "All location fields are optional."
       ),
 
       # Subtle background wrapper for the location cluster
@@ -598,7 +602,11 @@ mod_query_data_ui <- function(id) {
         # New description
         htmltools::p(
           class = "tada-note",
-          "Select one or more filters to narrow your query. If you use multiple, they are combined with AND logic-results must fall within the overlap of all selected filters. Note: Adjusting the Date Range is required; the default dates (today) will return no results."
+          "Select one or more filters to narrow your query. ",
+          "If you use multiple, they are combined with ",
+          htmltools::strong("AND logic"),
+          "-results must fall within the overlap of all selected filters. ",
+          "Note: Adjusting the Date Range is required; the default dates (today) will return no results."
         ),
 
         # Row 1: Sample Media, Characteristic Group
