@@ -4,8 +4,11 @@ new_tadat <- function(raw_df) {
   rv$raw <- raw_df
   rv$removals <- data.frame(matrix(nrow = nrow(raw_df), ncol = 0))
   rv$selected_filters <- data.frame(
-    Fields = character(), Value = character(), Filter = character(),
-    Count = integer(), stringsAsFactors = FALSE
+    Fields = character(),
+    Value = character(),
+    Filter = character(),
+    Count = integer(),
+    stringsAsFactors = FALSE
   )
   rv
 }
@@ -22,8 +25,12 @@ tiny_data <- function() {
 wait_until <- function(expr, session, timeout_ms = 6000, step_ms = 25) {
   start <- as.numeric(Sys.time()) * 1000
   repeat {
-    if (isTRUE(expr())) return(TRUE)
-    if ((as.numeric(Sys.time()) * 1000 - start) > timeout_ms) return(FALSE)
+    if (isTRUE(expr())) {
+      return(TRUE)
+    }
+    if ((as.numeric(Sys.time()) * 1000 - start) > timeout_ms) {
+      return(FALSE)
+    }
     session$flushReact()
     Sys.sleep(step_ms / 1000)
   }
@@ -53,7 +60,12 @@ test_that("'Remove All Filters' clears per-field removals and restores Step 2 va
     expect_gt(nrow(shiny::isolate(tadat$selected_filters)), 0)
 
     ok <- wait_until(
-      expr = function() any(startsWith(colnames(tadat$removals), paste0(prefix, "Exclude FieldA"))),
+      expr = function() {
+        any(startsWith(
+          colnames(tadat$removals),
+          paste0(prefix, "Exclude FieldA")
+        ))
+      },
       session = session
     )
     expect_true(ok)
@@ -73,7 +85,12 @@ test_that("'Remove All Filters' clears per-field removals and restores Step 2 va
     session$flushReact()
 
     ok2 <- wait_until(
-      expr = function() !any(startsWith(colnames(tadat$removals), paste0(prefix, "Exclude FieldA"))),
+      expr = function() {
+        !any(startsWith(
+          colnames(tadat$removals),
+          paste0(prefix, "Exclude FieldA")
+        ))
+      },
       session = session
     )
     expect_true(ok2)
@@ -102,7 +119,7 @@ test_that("Exclude and Include Only update selected_filters and per-field remova
     session$flushReact()
 
     vals <- shiny::isolate(filter_values())
-    i_x  <- which(vals$Value_label == "x")
+    i_x <- which(vals$Value_label == "x")
     i_na <- which(vals$Value_label == "NA - Not Available")
 
     add_filters_exclude(rows = i_x)
@@ -110,7 +127,12 @@ test_that("Exclude and Include Only update selected_filters and per-field remova
     expect_gt(nrow(shiny::isolate(tadat$selected_filters)), 0)
 
     ok <- wait_until(
-      expr = function() any(startsWith(colnames(tadat$removals), paste0(prefix, "Exclude FieldA"))),
+      expr = function() {
+        any(startsWith(
+          colnames(tadat$removals),
+          paste0(prefix, "Exclude FieldA")
+        ))
+      },
       session = session
     )
     expect_true(ok)
@@ -130,9 +152,11 @@ test_that("Exclude and Include Only update selected_filters and per-field remova
     expect_gt(nrow(shiny::isolate(tadat$selected_filters)), 0)
 
     ok2 <- wait_until(
-      expr = function() nrow(tadat$selected_filters) > 0 &&
-        all(tadat$selected_filters$Fields == "FieldA") &&
-        all(tadat$selected_filters$Filter == "Exclude"),
+      expr = function() {
+        nrow(tadat$selected_filters) > 0 &&
+          all(tadat$selected_filters$Fields == "FieldA") &&
+          all(tadat$selected_filters$Filter == "Exclude")
+      },
       session = session
     )
     expect_true(ok2)
@@ -141,8 +165,10 @@ test_that("Exclude and Include Only update selected_filters and per-field remova
     expect_false("NA - Not Available" %in% sf2$Value)
 
     ok3 <- wait_until(
-      expr = function() is.character(tadat$raw$TADA.RemovalReason) &&
-        length(tadat$raw$TADA.RemovalReason) == nrow(tadat$raw),
+      expr = function() {
+        is.character(tadat$raw$TADA.RemovalReason) &&
+          length(tadat$raw$TADA.RemovalReason) == nrow(tadat$raw)
+      },
       session = session
     )
     expect_true(ok3)
@@ -183,14 +209,22 @@ test_that("Labelization aggregates NA-like values and pie source reflects applie
 
     # Ensure removals applied (observer ran) before reading pie source
     ok <- wait_until(
-      expr = function() any(startsWith(colnames(tadat$removals), paste0(prefix, "Exclude FieldA"))),
+      expr = function() {
+        any(startsWith(
+          colnames(tadat$removals),
+          paste0(prefix, "Exclude FieldA")
+        ))
+      },
       session = session
     )
     expect_true(ok)
 
     # Expected pie count for "x" based on current removals (including own-field)
     keep_all <- keep_mask_for(NULL)
-    expected_x_after <- sum(labelize(tadat$raw$FieldA)[keep_all] == "x", na.rm = TRUE)
+    expected_x_after <- sum(
+      labelize(tadat$raw$FieldA)[keep_all] == "x",
+      na.rm = TRUE
+    )
 
     # Pie source reflects applied removals
     pie_src <- shiny::isolate(pie_source())
@@ -200,10 +234,14 @@ test_that("Labelization aggregates NA-like values and pie source reflects applie
 })
 
 test_that("mod_filtering_server: field list observer is robust to empty/missing FieldCounts", {
-
   # Helper to extract the underlying data.frame from a DT htmlwidget
   extract_dt_data <- function(widget) {
-    if (is.list(widget) && !is.null(widget$x) && is.list(widget$x) && !is.null(widget$x$data)) {
+    if (
+      is.list(widget) &&
+        !is.null(widget$x) &&
+        is.list(widget$x) &&
+        !is.null(widget$x$data)
+    ) {
       widget$x$data
     } else {
       NULL
@@ -212,14 +250,16 @@ test_that("mod_filtering_server: field list observer is robust to empty/missing 
 
   # Case 1: Empty dataset (nrow = 0) -> should not call FieldCounts and should not error
   tadat1 <- shiny::reactiveValues(
-    raw = data.frame(),            # 0-row df
+    raw = data.frame(), # 0-row df
     removals = NULL,
     selected_filters = NULL,
     field_sel = NULL
   )
 
-  expect_silent(
-    shiny::testServer(mod_filtering_server, args = list(tadat = tadat1), {
+  expect_silent(shiny::testServer(
+    mod_filtering_server,
+    args = list(tadat = tadat1),
+    {
       session$setInputs(field_sel = "key")
       session$flushReact()
 
@@ -233,8 +273,8 @@ test_that("mod_filtering_server: field list observer is robust to empty/missing 
         # empty dataset => likely 0 rows
         expect_equal(nrow(dt_data), 0)
       }
-    })
-  )
+    }
+  ))
 
   # Case 2: Non-empty dataset but EPATADA::TADA_FieldCounts likely unavailable
   # The tryCatch should yield an empty 'Fields' data frame with a Description column.
@@ -245,8 +285,10 @@ test_that("mod_filtering_server: field list observer is robust to empty/missing 
     field_sel = NULL
   )
 
-  expect_silent(
-    shiny::testServer(mod_filtering_server, args = list(tadat = tadat2), {
+  expect_silent(shiny::testServer(
+    mod_filtering_server,
+    args = list(tadat = tadat2),
+    {
       session$setInputs(field_sel = "most")
       session$flushReact()
 
@@ -257,6 +299,6 @@ test_that("mod_filtering_server: field list observer is robust to empty/missing 
         # Without EPATADA available, tryCatch path returns 0-row data
         expect_equal(nrow(dt_data), 0)
       }
-    })
-  )
+    }
+  ))
 })

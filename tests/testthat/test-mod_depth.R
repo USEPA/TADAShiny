@@ -13,14 +13,18 @@
 #' @return data.frame
 #' @examples
 #' sample_raw <- make_sample_raw()
-make_depth_profile_sample_raw <- function(n_sites = 2,
-                                          n_dates = 2,
-                                          depths = c(0.5, 1.5, 3.0),
-                                          characteristics = c("TEMPERATURE, WATER_NA_NA_DEG C",
-                                            "DISSOLVED OXYGEN (DO)_NA_NA_MG/L",
-                                            "PH_NA_NA_NONE"),
-                                          org = "REDLAKE_WQX",
-                                          start_date = "2025-06-01") {
+make_depth_profile_sample_raw <- function(
+  n_sites = 2,
+  n_dates = 2,
+  depths = c(0.5, 1.5, 3.0),
+  characteristics = c(
+    "TEMPERATURE, WATER_NA_NA_DEG C",
+    "DISSOLVED OXYGEN (DO)_NA_NA_MG/L",
+    "PH_NA_NA_NONE"
+  ),
+  org = "REDLAKE_WQX",
+  start_date = "2025-06-01"
+) {
   # ensure character representations
   start_date <- as.Date(start_date)
   site_ids <- paste0("SITE_", seq_len(n_sites))
@@ -38,7 +42,11 @@ make_depth_profile_sample_raw <- function(n_sites = 2,
             TADA.MonitoringLocationIdentifier = as.character(sid),
             ActivityStartDate = as.character(d),
             # TADA.ComparableDataIdentifier used in many places for matching; include a per-characteristic token
-            TADA.ComparableDataIdentifier = as.character(gsub("[^A-Z0-9_]", "_", toupper(characteristics[ch]))),
+            TADA.ComparableDataIdentifier = as.character(gsub(
+              "[^A-Z0-9_]",
+              "_",
+              toupper(characteristics[ch])
+            )),
             # Store a user-facing characteristic name too
             TADA.CharacteristicName = as.character(characteristics[ch]),
             # Result value: make numeric but stored as character in many pipelines
@@ -46,8 +54,16 @@ make_depth_profile_sample_raw <- function(n_sites = 2,
             # Depth as character
             TADA.ConsolidatedDepth = as.character(depth),
             # generic columns that module may search for (units)
-            ResultMeasure.MeasureUnitCode = ifelse(ch == 1, "deg C", ifelse(ch == 2, "mg/L", NA_character_)),
-            Unit = ifelse(ch == 1, "deg C", ifelse(ch == 2, "mg/L", NA_character_)),
+            ResultMeasure.MeasureUnitCode = ifelse(
+              ch == 1,
+              "deg C",
+              ifelse(ch == 2, "mg/L", NA_character_)
+            ),
+            Unit = ifelse(
+              ch == 1,
+              "deg C",
+              ifelse(ch == 2, "mg/L", NA_character_)
+            ),
             # Identifier columns
             ResultIdentifier = paste0("R", formatC(rid, width = 4, flag = "0")),
             stringsAsFactors = FALSE
@@ -63,8 +79,12 @@ make_depth_profile_sample_raw <- function(n_sites = 2,
   # Ensure column order and types similar to real data (character for many fields)
   df[] <- lapply(df, function(x) if (is.factor(x)) as.character(x) else x)
   # Provide some other optional columns downstream code might inspect
-  if (!"OrganizationFormalName" %in% names(df)) df$OrganizationFormalName <- df$OrganizationIdentifier
-  if (!"MonitoringLocationName" %in% names(df)) df$MonitoringLocationName <- df$TADA.MonitoringLocationIdentifier
+  if (!"OrganizationFormalName" %in% names(df)) {
+    df$OrganizationFormalName <- df$OrganizationIdentifier
+  }
+  if (!"MonitoringLocationName" %in% names(df)) {
+    df$MonitoringLocationName <- df$TADA.MonitoringLocationIdentifier
+  }
 
   # Make sure we have at least 3 rows per (site, date) so TADA_IDDepthProfiles grouping passes
   # (the nested loop above with depths length >= 3 ensures this by default)
@@ -140,7 +160,7 @@ describe("normalize_NA_token", {
 
   it("trims whitespace after replacement", {
     result <- normalize_NA_token("FOO_NONE_NONE_BAR")
-    expect_false(grepl("  ", result))  # No double spaces
+    expect_false(grepl("  ", result)) # No double spaces
   })
 
   it("handles empty string", {
@@ -173,7 +193,7 @@ describe("extract_trailing_count", {
   it("extracts first count if multiple parens", {
     result <- extract_trailing_count("CHAR (1) (2)")
     # Should match the final trailing count pattern
-    expect_true(!is.na(result) || is.na(result))  # Depends on regex specifics
+    expect_true(!is.na(result) || is.na(result)) # Depends on regex specifics
   })
 
   it("handles whitespace around parens", {
@@ -189,15 +209,9 @@ shiny::testServer(
   args = list(),
   {
     ns <- session$ns
-    expect_true(
-      inherits(ns, "function")
-    )
-    expect_true(
-      grepl(id, ns(""))
-    )
-    expect_true(
-      grepl("test", ns("test"))
-    )
+    expect_true(inherits(ns, "function"))
+    expect_true(grepl(id, ns("")))
+    expect_true(grepl("test", ns("test")))
     # Here are some examples of tests you can
     # run on your module
     # - Testing the setting of inputs
@@ -295,8 +309,7 @@ test_that("selecting site/date computes available_characteristics_df and update 
     OrganizationIdentifier = "ORG1",
     TADA.MonitoringLocationIdentifier = "SITE1",
     ActivityStartDate = as.character(Sys.Date()),
-    TADA.CharacteristicsForDepthProfile =
-      "TEMPERATURE, WATER_NA_NA_DEG C (1); DISSOLVED OXYGEN (DO)_NA_NA_MG/L (1)",
+    TADA.CharacteristicsForDepthProfile = "TEMPERATURE, WATER_NA_NA_DEG C (1); DISSOLVED OXYGEN (DO)_NA_NA_MG/L (1)",
     stringsAsFactors = FALSE
   )
 
@@ -329,24 +342,28 @@ test_that("selecting site/date computes available_characteristics_df and update 
     add = TRUE
   )
 
-  shiny::testServer(mod_depth_server, args = list(id = "depth_1", tadat = tadat), {
-    session$setInputs(depth_profile_site_id = "SITE1")
-    session$setInputs(activity_date = as.character(Sys.Date()))
+  shiny::testServer(
+    mod_depth_server,
+    args = list(id = "depth_1", tadat = tadat),
+    {
+      session$setInputs(depth_profile_site_id = "SITE1")
+      session$setInputs(activity_date = as.character(Sys.Date()))
 
-    expect_s3_class(depth_profile$available_characteristics_df, "data.frame")
-    expect_gte(nrow(depth_profile$available_characteristics_df), 1)
-    expect_true(
-      all(c("Characteristic", "N", "CompID") %in%
-        names(depth_profile$available_characteristics_df))
-    )
+      expect_s3_class(depth_profile$available_characteristics_df, "data.frame")
+      expect_gte(nrow(depth_profile$available_characteristics_df), 1)
+      expect_true(all(
+        c("Characteristic", "N", "CompID") %in%
+          names(depth_profile$available_characteristics_df)
+      ))
 
-    session$setInputs(available_characteristics_rows_selected = c(1L))
-    session$setInputs(update = 1L)
+      session$setInputs(available_characteristics_rows_selected = c(1L))
+      session$setInputs(update = 1L)
 
-    plot_obj <- output$depthPlotly
-    expect_false(is.null(plot_obj))
-    expect_gte(length(plot_obj), 1)
-  })
+      plot_obj <- output$depthPlotly
+      expect_false(is.null(plot_obj))
+      expect_gte(length(plot_obj), 1)
+    }
+  )
 })
 
 test_that("depthPlotly returns safe message when no numeric values present", {
@@ -378,15 +395,19 @@ test_that("depthPlotly returns safe message when no numeric values present", {
     stringsAsFactors = FALSE
   )
 
-  shiny::testServer(mod_depth_server, args = list(id = "depth_1", tadat = tadat), {
-    session$setInputs(depth_profile_site_id = "SITE1")
-    session$setInputs(activity_date = as.character(Sys.Date()))
-    session$setInputs(update = 1L)
+  shiny::testServer(
+    mod_depth_server,
+    args = list(id = "depth_1", tadat = tadat),
+    {
+      session$setInputs(depth_profile_site_id = "SITE1")
+      session$setInputs(activity_date = as.character(Sys.Date()))
+      session$setInputs(update = 1L)
 
-    plot_obj <- output$depthPlotly
-    expect_false(is.null(plot_obj))
-    expect_gte(length(plot_obj), 1)
-  })
+      plot_obj <- output$depthPlotly
+      expect_false(is.null(plot_obj))
+      expect_gte(length(plot_obj), 1)
+    }
+  )
 })
 
 # test-mod_depth.R review and load
@@ -413,18 +434,38 @@ augment_for_depth_map <- function(df) {
   df
 }
 
-patch_depth_review_dependencies <- function(depth_flagged, site_date_char_groups_df) {
+patch_depth_review_dependencies <- function(
+  depth_flagged,
+  site_date_char_groups_df
+) {
   old_flag <- get("TADA_FlagDepthCategory", envir = asNamespace("EPATADA"))
   old_id <- get("TADA_IDDepthProfiles", envir = asNamespace("EPATADA"))
   old_show <- get("show_modal_spinner", envir = asNamespace("shinybusy"))
   old_remove <- get("remove_modal_spinner", envir = asNamespace("shinybusy"))
 
-  assignInNamespace("TADA_FlagDepthCategory", function(df, ...) depth_flagged, ns = "EPATADA")
-  assignInNamespace("TADA_IDDepthProfiles", function(df, ...) site_date_char_groups_df, ns = "EPATADA")
+  assignInNamespace(
+    "TADA_FlagDepthCategory",
+    function(df, ...) depth_flagged,
+    ns = "EPATADA"
+  )
+  assignInNamespace(
+    "TADA_IDDepthProfiles",
+    function(df, ...) site_date_char_groups_df,
+    ns = "EPATADA"
+  )
   assignInNamespace("show_modal_spinner", function(...) NULL, ns = "shinybusy")
-  assignInNamespace("remove_modal_spinner", function(...) NULL, ns = "shinybusy")
+  assignInNamespace(
+    "remove_modal_spinner",
+    function(...) NULL,
+    ns = "shinybusy"
+  )
 
-  list(old_flag = old_flag, old_id = old_id, old_show = old_show, old_remove = old_remove)
+  list(
+    old_flag = old_flag,
+    old_id = old_id,
+    old_show = old_show,
+    old_remove = old_remove
+  )
 }
 
 restore_depth_review_dependencies <- function(old) {
@@ -458,15 +499,22 @@ test_that("depth module handles sample raw", {
     stringsAsFactors = FALSE
   )
 
-  old <- patch_depth_review_dependencies(depth_flagged, site_date_char_groups_df)
+  old <- patch_depth_review_dependencies(
+    depth_flagged,
+    site_date_char_groups_df
+  )
   on.exit(restore_depth_review_dependencies(old), add = TRUE)
 
-  shiny::testServer(mod_depth_server, args = list(id = "depth_1", tadat = tadat), {
-    expect_no_error(session$setInputs(review_depth_profile_data = 1))
-    expect_true(isTRUE(depth_profile$loaded))
-    expect_false(isTRUE(depth_profile$no_data))
-    expect_s3_class(depth_profile$site_date_pairs, "data.frame")
-  })
+  shiny::testServer(
+    mod_depth_server,
+    args = list(id = "depth_1", tadat = tadat),
+    {
+      expect_no_error(session$setInputs(review_depth_profile_data = 1))
+      expect_true(isTRUE(depth_profile$loaded))
+      expect_false(isTRUE(depth_profile$no_data))
+      expect_s3_class(depth_profile$site_date_pairs, "data.frame")
+    }
+  )
 })
 
 test_that("review_depth_profile_data loads when EPATADA functions return expected results", {
@@ -498,16 +546,25 @@ test_that("review_depth_profile_data loads when EPATADA functions return expecte
     stringsAsFactors = FALSE
   )
 
-  old <- patch_depth_review_dependencies(depth_flagged, site_date_char_groups_df)
+  old <- patch_depth_review_dependencies(
+    depth_flagged,
+    site_date_char_groups_df
+  )
   on.exit(restore_depth_review_dependencies(old), add = TRUE)
 
-  shiny::testServer(mod_depth_server, args = list(id = "depth_1", tadat = tadat), {
-    session$setInputs(review_depth_profile_data = 1)
-    expect_true(isTRUE(depth_profile$loaded))
-    expect_false(isTRUE(depth_profile$no_data))
-    expect_true(is.data.frame(depth_profile$site_date_pairs))
-    expect_true("MonitoringLocationIdentifier" %in% names(depth_profile$site_date_pairs))
-    expect_true(nrow(depth_profile$site_date_pairs) >= 1)
-    expect_true(is.data.frame(depth_profile$available_characteristics_df))
-  })
+  shiny::testServer(
+    mod_depth_server,
+    args = list(id = "depth_1", tadat = tadat),
+    {
+      session$setInputs(review_depth_profile_data = 1)
+      expect_true(isTRUE(depth_profile$loaded))
+      expect_false(isTRUE(depth_profile$no_data))
+      expect_true(is.data.frame(depth_profile$site_date_pairs))
+      expect_true(
+        "MonitoringLocationIdentifier" %in% names(depth_profile$site_date_pairs)
+      )
+      expect_true(nrow(depth_profile$site_date_pairs) >= 1)
+      expect_true(is.data.frame(depth_profile$available_characteristics_df))
+    }
+  )
 })
