@@ -24,6 +24,8 @@
 
 # This is how to deploy, works for both TT shinyappsio and EPA posit connect
 
+# First, run the code in make_extdata.R to update the Load tab WQP query options
+
 # Detach all loaded packages and clean your environment
 golem::detach_all_attached()
 
@@ -44,7 +46,7 @@ rsconnect::deployApp(
   appTitle = "TADAShiny Module 1 WQP Data Discovery and Cleaning",
   launch.browser = TRUE,
   forceUpdate = TRUE
-  # appId = 11684
+  # appId = 1473
 )
 
 # To deploy to EPA posit connect production (public)

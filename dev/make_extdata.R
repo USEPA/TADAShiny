@@ -30,7 +30,7 @@ saveRDS(tribal_list, file.path("inst", "extdata", "tribal_list.rds"))
 saveRDS(TADA_download_temp, file.path("inst", "extdata", "TADA_download_temp.rds"))
 saveRDS(TADA_download_temp_type, file.path("inst", "extdata", "TADA_download_temp_type.rds"))
 
-# call file inside a function or server code
+# Call file inside a function or server code
 filter_dat <- readRDS(system.file("extdata", "filter_descriptions.rds", package = "TADAShiny"))
 statecodes_df <- readRDS(system.file("extdata", "statecodes_df.rds", package = "TADAShiny"))
 mlids <- readRDS(system.file("extdata", "mlids.rds", package = "TADAShiny"))

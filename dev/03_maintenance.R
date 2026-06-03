@@ -14,22 +14,22 @@
 ##############
 
 # spell check
-library(spelling)
-spelling::spell_check_package(pkg = ".", vignettes = TRUE)
-spelling::get_wordlist()
+# library(spelling)
+# spelling::spell_check_package(pkg = ".", vignettes = TRUE)
+# spelling::get_wordlist()
 # # run to update spelling word list
 # spelling::update_wordlist() # do not run until after checking wordlist & fixing spelling issues!
 
 ##############
 
-library(styler)
-style_pkg(
-  transformers = tidyverse_style(
-    scope = I(c("tokens", "indention")),
-    indent_by = 2,
-    strict = FALSE # turn off aggressive alignment
-  )
-)
+# library(styler)
+# style_pkg(
+#   transformers = tidyverse_style(
+#     scope = I(c("tokens", "indention")),
+#     indent_by = 2,
+#     strict = FALSE # turn off aggressive alignment
+#   )
+# )
 
 ##############
 
