@@ -191,6 +191,9 @@ mod_TADA_summary_server <- function(id, tadat) {
           # remove columns
           out_data <- subset(out_data, select = -TADA.Remove)
           out_data <- subset(out_data, select = -TADA.RemovalReason)
+          
+          # clean data by removing all columns that are not 'Required'
+          out_data <- EPATADA::TADA_RetainRequired(out_data);
 
           summary_things$temp_files <- c(datafile_name, progress_file_name)
           desc <- writeNarrativeDataFrame(tadat)
