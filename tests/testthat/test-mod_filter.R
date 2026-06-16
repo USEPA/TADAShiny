@@ -306,10 +306,10 @@ test_that("getValues returns empty data frame for null/missing/empty inputs", {
       expect_true("Count" %in% names(res))
     }
 
-    check_empty(getValues(NULL, "FieldA"))        # null .data
-    check_empty(getValues(d, NULL))               # null field
-    check_empty(getValues(d, "NoSuchField"))      # field absent
-    check_empty(getValues(d[0, ], "FieldA"))      # 0-row data frame
+    check_empty(getValues(NULL, "FieldA")) # null .data
+    check_empty(getValues(d, NULL)) # null field
+    check_empty(getValues(d, "NoSuchField")) # field absent
+    check_empty(getValues(d[0, ], "FieldA")) # 0-row data frame
   })
 })
 
@@ -346,12 +346,24 @@ test_that("keep_mask_for with fld excludes field-specific removal columns", {
     # (keep_mask_for reads tadat$removals through the module's reactive domain, which
     #  can differ from the test block's direct read in shiny testServer)
     rem2 <- shiny::isolate(tadat$removals)
-    d2   <- shiny::isolate(tadat$raw)
-    pref2 <- c("Filter (module): Exclude FieldA is ", "Filter: Exclude FieldA is ")
-    dc2  <- vapply(colnames(rem2), function(nm) any(startsWith(nm, pref2)), logical(1))
+    d2 <- shiny::isolate(tadat$raw)
+    pref2 <- c(
+      "Filter (module): Exclude FieldA is ",
+      "Filter: Exclude FieldA is "
+    )
+    dc2 <- vapply(
+      colnames(rem2),
+      function(nm) any(startsWith(nm, pref2)),
+      logical(1)
+    )
     rem2_dropped <- rem2[, !dc2, drop = FALSE]
-    keep_rem_manual <- if (ncol(rem2_dropped) == 0) rep(TRUE, nrow(d2)) else rowSums(rem2_dropped) == 0
-    rmv2 <- to_logical(d2$TADA.Remove); rmv2[is.na(rmv2)] <- FALSE
+    keep_rem_manual <- if (ncol(rem2_dropped) == 0) {
+      rep(TRUE, nrow(d2))
+    } else {
+      rowSums(rem2_dropped) == 0
+    }
+    rmv2 <- to_logical(d2$TADA.Remove)
+    rmv2[is.na(rmv2)] <- FALSE
     keep_manual <- (!rmv2) & keep_rem_manual
     # The prefix-drop logic correctly yields TRUE for row 1 (TADA.Remove=FALSE, column dropped)
     expect_true(keep_manual[1])
@@ -361,7 +373,7 @@ test_that("keep_mask_for with fld excludes field-specific removal columns", {
     # TADA.Remove filtering should work regardless of domain
     keep_no_field <- keep_mask_for("FieldA")
     expect_false(keep_no_field[3]) # TADA.Remove==TRUE still excluded
-    expect_true(keep_no_field[5])  # TADA.Remove==NA treated as FALSE -> kept
+    expect_true(keep_no_field[5]) # TADA.Remove==NA treated as FALSE -> kept
   })
 })
 
@@ -411,8 +423,10 @@ test_that("compute_selected_filter_counts handles null sf, missing fields, and v
 
     # Empty data frame -> integer(0)
     sf_empty <- data.frame(
-      Fields = character(), Value = character(),
-      Filter = character(), Count = integer(),
+      Fields = character(),
+      Value = character(),
+      Filter = character(),
+      Count = integer(),
       stringsAsFactors = FALSE
     )
     res_empty <- compute_selected_filter_counts(sf_empty)
@@ -586,7 +600,10 @@ test_that("Multiple field filters produce semicolon-separated TADA.RemovalReason
 
     ok1 <- wait_until(
       expr = function() {
-        any(startsWith(colnames(tadat$removals), paste0(prefix, "Exclude FieldA")))
+        any(startsWith(
+          colnames(tadat$removals),
+          paste0(prefix, "Exclude FieldA")
+        ))
       },
       session = session
     )
@@ -603,7 +620,10 @@ test_that("Multiple field filters produce semicolon-separated TADA.RemovalReason
 
     ok2 <- wait_until(
       expr = function() {
-        any(startsWith(colnames(tadat$removals), paste0(prefix, "Exclude FieldB")))
+        any(startsWith(
+          colnames(tadat$removals),
+          paste0(prefix, "Exclude FieldB")
+        ))
       },
       session = session
     )
@@ -620,7 +640,7 @@ test_that("Multiple field filters produce semicolon-separated TADA.RemovalReason
 
     reasons <- shiny::isolate(tadat$raw$TADA.RemovalReason)
     expect_false(is.na(reasons[1])) # removed by both FieldA and FieldB filters
-    expect_true(is.na(reasons[2]))  # not removed
+    expect_true(is.na(reasons[2])) # not removed
     expect_false(is.na(reasons[3])) # removed by FieldB filter
 
     # Row 1 references both removal columns (semicolon-separated)
@@ -638,7 +658,9 @@ test_that("Exclude then removeAllFilters with non-filter removals preserved in T
   tadat <- new_tadat(d)
 
   # Pre-populate a non-filter removal column (simulates flag module)
-  shiny::isolate(tadat$removals[["FlagModule: SomeFlag"]] <- c(TRUE, FALSE, FALSE))
+  shiny::isolate(
+    tadat$removals[["FlagModule: SomeFlag"]] <- c(TRUE, FALSE, FALSE)
+  )
 
   shiny::testServer(mod_filtering_server, args = list(tadat = tadat), {
     prefix <- "Filter: "
@@ -655,7 +677,10 @@ test_that("Exclude then removeAllFilters with non-filter removals preserved in T
 
     ok1 <- wait_until(
       expr = function() {
-        any(startsWith(colnames(tadat$removals), paste0(prefix, "Exclude FieldA")))
+        any(startsWith(
+          colnames(tadat$removals),
+          paste0(prefix, "Exclude FieldA")
+        ))
       },
       session = session
     )
@@ -667,7 +692,10 @@ test_that("Exclude then removeAllFilters with non-filter removals preserved in T
 
     ok2 <- wait_until(
       expr = function() {
-        !any(startsWith(colnames(tadat$removals), paste0(prefix, "Exclude FieldA")))
+        !any(startsWith(
+          colnames(tadat$removals),
+          paste0(prefix, "Exclude FieldA")
+        ))
       },
       session = session
     )
@@ -714,7 +742,7 @@ test_that("filterStep1_rows_selected observer sets selected_field for valid fiel
     # then set our custom tables$filter_fields without an intermediate flush, which
     # prevents the list observer from overwriting it before filterStep1_rows_selected fires.
     session$setInputs(field_sel = "key")
-    session$flushReact()  # list observer fires -> tables$filter_fields = empty (EPATADA absent)
+    session$flushReact() # list observer fires -> tables$filter_fields = empty (EPATADA absent)
 
     # Now replace tables$filter_fields; no reactive dep of list observer changed, so it
     # won't fire again until the next change in active_data() or input$field_sel.
