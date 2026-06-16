@@ -11,7 +11,10 @@ harm_restore_ns_fun <- function(patch) {
 new_harm_tadat <- function(raw_df) {
   rv <- shiny::reactiveValues()
   rv$raw <- raw_df
-  rv$removals <- data.frame(seed = rep(FALSE, nrow(raw_df)), stringsAsFactors = FALSE)
+  rv$removals <- data.frame(
+    seed = rep(FALSE, nrow(raw_df)),
+    stringsAsFactors = FALSE
+  )
   rv
 }
 
@@ -52,23 +55,29 @@ test_that("harm_go builds synonym table and download/apply UI", {
   tadat <- new_harm_tadat(raw)
 
   patches <- list(
-    harm_patch_ns_fun("EPATADA", "TADA_GetSynonymRef", function(df) make_harmonize_ref()),
+    harm_patch_ns_fun("EPATADA", "TADA_GetSynonymRef", function(df) {
+      make_harmonize_ref()
+    }),
     harm_patch_ns_fun("shinyjs", "disable", function(...) NULL)
   )
   on.exit(lapply(rev(patches), harm_restore_ns_fun), add = TRUE)
 
-  shiny::testServer(mod_harmonize_np_server, args = list(id = "harm_1", tadat = tadat), {
-    session$setInputs(harm_go = 1L)
-    session$flushReact()
+  shiny::testServer(
+    mod_harmonize_np_server,
+    args = list(id = "harm_1", tadat = tadat),
+    {
+      session$setInputs(harm_go = 1L)
+      session$flushReact()
 
-    expect_false(is.null(harm$ref))
-    expect_equal(nrow(harm$ref), 2)
+      expect_false(is.null(harm$ref))
+      expect_equal(nrow(harm$ref), 2)
 
-    # UI appears once ref exists
-    expect_false(is.null(output$harm_dwn))
-    expect_false(is.null(output$harm_apply))
-    expect_false(is.null(output$syn_table))
-  })
+      # UI appears once ref exists
+      expect_false(is.null(output$harm_dwn))
+      expect_false(is.null(output$harm_apply))
+      expect_false(is.null(output$syn_table))
+    }
+  )
 })
 
 test_that("harm_file upload accepts valid csv and rejects invalid csv", {
@@ -88,24 +97,30 @@ test_that("harm_file upload accepts valid csv and rejects invalid csv", {
   utils::write.csv(invalid, invalid_path, row.names = FALSE)
 
   modal_count <- 0L
-  patches <- list(
-    harm_patch_ns_fun("shiny", "showModal", function(...) {
-      modal_count <<- modal_count + 1L
-      invisible(NULL)
-    })
-  )
+  patches <- list(harm_patch_ns_fun("shiny", "showModal", function(...) {
+    modal_count <<- modal_count + 1L
+    invisible(NULL)
+  }))
   on.exit(lapply(rev(patches), harm_restore_ns_fun), add = TRUE)
 
-  shiny::testServer(mod_harmonize_np_server, args = list(id = "harm_1", tadat = tadat), {
-    session$setInputs(harm_file = list(datapath = valid_path, name = "valid.csv"))
-    session$flushReact()
-    expect_false(is.null(harm$ref))
-    expect_equal(nrow(harm$ref), nrow(valid))
+  shiny::testServer(
+    mod_harmonize_np_server,
+    args = list(id = "harm_1", tadat = tadat),
+    {
+      session$setInputs(
+        harm_file = list(datapath = valid_path, name = "valid.csv")
+      )
+      session$flushReact()
+      expect_false(is.null(harm$ref))
+      expect_equal(nrow(harm$ref), nrow(valid))
 
-    session$setInputs(harm_file = list(datapath = invalid_path, name = "invalid.csv"))
-    session$flushReact()
-    expect_gte(modal_count, 1)
-  })
+      session$setInputs(
+        harm_file = list(datapath = invalid_path, name = "invalid.csv")
+      )
+      session$flushReact()
+      expect_gte(modal_count, 1)
+    }
+  )
 })
 
 test_that("harm_apply success and undo restore original data", {
@@ -118,7 +133,9 @@ test_that("harm_apply success and undo restore original data", {
   tadat <- new_harm_tadat(raw)
 
   patches <- list(
-    harm_patch_ns_fun("EPATADA", "TADA_GetSynonymRef", function(df) make_harmonize_ref()),
+    harm_patch_ns_fun("EPATADA", "TADA_GetSynonymRef", function(df) {
+      make_harmonize_ref()
+    }),
     harm_patch_ns_fun("EPATADA", "TADA_HarmonizeSynonyms", function(dat, ref) {
       dat$TADA.Harmonized.Flag <- TRUE
       dat$HarmMarker <- "done"
@@ -133,23 +150,27 @@ test_that("harm_apply success and undo restore original data", {
   )
   on.exit(lapply(rev(patches), harm_restore_ns_fun), add = TRUE)
 
-  shiny::testServer(mod_harmonize_np_server, args = list(id = "harm_1", tadat = tadat), {
-    original_raw <- tadat$raw
+  shiny::testServer(
+    mod_harmonize_np_server,
+    args = list(id = "harm_1", tadat = tadat),
+    {
+      original_raw <- tadat$raw
 
-    session$setInputs(harm_go = 1L)
-    session$flushReact()
-    session$setInputs(harm_apply = 1L)
-    session$flushReact()
+      session$setInputs(harm_go = 1L)
+      session$flushReact()
+      session$setInputs(harm_apply = 1L)
+      session$flushReact()
 
-    expect_false(is.null(tadat$raw_unharmonized))
-    expect_true("HarmMarker" %in% names(tadat$raw))
-    expect_true(any(tadat$raw$HarmMarker == "done", na.rm = TRUE))
+      expect_false(is.null(tadat$raw_unharmonized))
+      expect_true("HarmMarker" %in% names(tadat$raw))
+      expect_true(any(tadat$raw$HarmMarker == "done", na.rm = TRUE))
 
-    session$setInputs(undo_harm_apply = 1L)
-    session$flushReact()
+      session$setInputs(undo_harm_apply = 1L)
+      session$flushReact()
 
-    expect_equal(tadat$raw, original_raw)
-  })
+      expect_equal(tadat$raw, original_raw)
+    }
+  )
 })
 
 test_that("harm_apply error path keeps data unchanged", {
@@ -161,8 +182,12 @@ test_that("harm_apply error path keeps data unchanged", {
   tadat <- new_harm_tadat(raw)
 
   patches <- list(
-    harm_patch_ns_fun("EPATADA", "TADA_GetSynonymRef", function(df) make_harmonize_ref()),
-    harm_patch_ns_fun("EPATADA", "TADA_HarmonizeSynonyms", function(dat, ref) stop("boom")),
+    harm_patch_ns_fun("EPATADA", "TADA_GetSynonymRef", function(df) {
+      make_harmonize_ref()
+    }),
+    harm_patch_ns_fun("EPATADA", "TADA_HarmonizeSynonyms", function(dat, ref) {
+      stop("boom")
+    }),
     harm_patch_ns_fun("shinybusy", "show_modal_spinner", function(...) NULL),
     harm_patch_ns_fun("shinybusy", "remove_modal_spinner", function(...) NULL),
     harm_patch_ns_fun("shinyjs", "disable", function(...) NULL),
@@ -171,20 +196,28 @@ test_that("harm_apply error path keeps data unchanged", {
   )
   on.exit(lapply(rev(patches), harm_restore_ns_fun), add = TRUE)
 
-  shiny::testServer(mod_harmonize_np_server, args = list(id = "harm_1", tadat = tadat), {
-    before <- tadat$raw
+  shiny::testServer(
+    mod_harmonize_np_server,
+    args = list(id = "harm_1", tadat = tadat),
+    {
+      before <- tadat$raw
 
-    session$setInputs(harm_go = 1L)
-    session$flushReact()
-    session$setInputs(harm_apply = 1L)
-    session$flushReact()
+      session$setInputs(harm_go = 1L)
+      session$flushReact()
+      session$setInputs(harm_apply = 1L)
+      session$flushReact()
 
-    expect_equal(tadat$raw, before)
-  })
+      expect_equal(tadat$raw, before)
+    }
+  )
 })
 
 test_that("sum_apply UI appears only when harmonized flag exists", {
-  d1 <- data.frame(ResultIdentifier = "r1", TADA.Remove = FALSE, stringsAsFactors = FALSE)
+  d1 <- data.frame(
+    ResultIdentifier = "r1",
+    TADA.Remove = FALSE,
+    stringsAsFactors = FALSE
+  )
   d2 <- data.frame(
     ResultIdentifier = "r1",
     TADA.Remove = FALSE,
@@ -193,16 +226,24 @@ test_that("sum_apply UI appears only when harmonized flag exists", {
   )
 
   tadat1 <- new_harm_tadat(d1)
-  shiny::testServer(mod_harmonize_np_server, args = list(id = "harm_a", tadat = tadat1), {
-    session$flushReact()
-    expect_null(output$sum_apply)
-  })
+  shiny::testServer(
+    mod_harmonize_np_server,
+    args = list(id = "harm_a", tadat = tadat1),
+    {
+      session$flushReact()
+      expect_null(output$sum_apply)
+    }
+  )
 
   tadat2 <- new_harm_tadat(d2)
-  shiny::testServer(mod_harmonize_np_server, args = list(id = "harm_b", tadat = tadat2), {
-    session$flushReact()
-    expect_false(is.null(output$sum_apply))
-  })
+  shiny::testServer(
+    mod_harmonize_np_server,
+    args = list(id = "harm_b", tadat = tadat2),
+    {
+      session$flushReact()
+      expect_false(is.null(output$sum_apply))
+    }
+  )
 })
 
 test_that("sum_apply computes totals and extends removals for new TADA rows", {
@@ -212,16 +253,23 @@ test_that("sum_apply computes totals and extends removals for new TADA rows", {
     stringsAsFactors = FALSE
   )
   tadat <- new_harm_tadat(raw)
-  tadat$removals <- data.frame(flag_a = c(FALSE, TRUE), stringsAsFactors = FALSE)
+  tadat$removals <- data.frame(
+    flag_a = c(FALSE, TRUE),
+    stringsAsFactors = FALSE
+  )
 
   patches <- list(
-    harm_patch_ns_fun("EPATADA", "TADA_CalculateTotalNP", function(dat, daily_agg = "max") {
-      new_row <- dat[1, , drop = FALSE]
-      new_row$ResultIdentifier <- "TADA-NEW-1"
-      new_row$TADA.NutrientSummation.Flag <- "New row added: Nutrient summation from one or more subspecies."
-      dat$TADA.NutrientSummation.Flag <- NA_character_
-      plyr::rbind.fill(dat, new_row)
-    }),
+    harm_patch_ns_fun(
+      "EPATADA",
+      "TADA_CalculateTotalNP",
+      function(dat, daily_agg = "max") {
+        new_row <- dat[1, , drop = FALSE]
+        new_row$ResultIdentifier <- "TADA-NEW-1"
+        new_row$TADA.NutrientSummation.Flag <- "New row added: Nutrient summation from one or more subspecies."
+        dat$TADA.NutrientSummation.Flag <- NA_character_
+        plyr::rbind.fill(dat, new_row)
+      }
+    ),
     harm_patch_ns_fun("EPATADA", "TADA_OrderCols", function(df) df),
     harm_patch_ns_fun("shinybusy", "show_modal_spinner", function(...) NULL),
     harm_patch_ns_fun("shinybusy", "remove_modal_spinner", function(...) NULL),
@@ -230,34 +278,47 @@ test_that("sum_apply computes totals and extends removals for new TADA rows", {
   )
   on.exit(lapply(rev(patches), harm_restore_ns_fun), add = TRUE)
 
-  shiny::testServer(mod_harmonize_np_server, args = list(id = "harm_1", tadat = tadat), {
-    before_n_raw <- nrow(tadat$raw)
-    before_n_rem <- nrow(tadat$removals)
+  shiny::testServer(
+    mod_harmonize_np_server,
+    args = list(id = "harm_1", tadat = tadat),
+    {
+      before_n_raw <- nrow(tadat$raw)
+      before_n_rem <- nrow(tadat$removals)
 
-    session$setInputs(sum_apply = 1L)
-    session$flushReact()
+      session$setInputs(sum_apply = 1L)
+      session$flushReact()
 
-    expect_gt(nrow(tadat$raw), before_n_raw)
-    expect_gt(nrow(tadat$removals), before_n_rem)
-    expect_true(any(grepl("TADA-", tadat$raw$ResultIdentifier)))
-    expect_equal(ncol(tadat$removals), 1)
-  })
+      expect_gt(nrow(tadat$raw), before_n_raw)
+      expect_gt(nrow(tadat$removals), before_n_rem)
+      expect_true(any(grepl("TADA-", tadat$raw$ResultIdentifier)))
+      expect_equal(ncol(tadat$removals), 1)
+    }
+  )
 })
 
 test_that("sum_dwn output is available", {
-  raw <- data.frame(ResultIdentifier = "r1", TADA.Remove = FALSE, stringsAsFactors = FALSE)
+  raw <- data.frame(
+    ResultIdentifier = "r1",
+    TADA.Remove = FALSE,
+    stringsAsFactors = FALSE
+  )
   tadat <- new_harm_tadat(raw)
 
-  patches <- list(
-    harm_patch_ns_fun("EPATADA", "TADA_GetNutrientSummationRef", function() {
+  patches <- list(harm_patch_ns_fun(
+    "EPATADA",
+    "TADA_GetNutrientSummationRef",
+    function() {
       data.frame(a = 1, b = 2)
-    })
-  )
+    }
+  ))
   on.exit(lapply(rev(patches), harm_restore_ns_fun), add = TRUE)
 
-  shiny::testServer(mod_harmonize_np_server, args = list(id = "harm_1", tadat = tadat), {
-    session$flushReact()
-    expect_false(is.null(output$sum_dwn))
-  })
+  shiny::testServer(
+    mod_harmonize_np_server,
+    args = list(id = "harm_1", tadat = tadat),
+    {
+      session$flushReact()
+      expect_false(is.null(output$sum_dwn))
+    }
+  )
 })
-

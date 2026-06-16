@@ -8,7 +8,11 @@ summary2_restore_ns_fun <- function(patch) {
   assignInNamespace(patch$fn, patch$old, ns = patch$ns)
 }
 
-new_summary2_tadat <- function(raw_df, removals_df = NULL, outfile = "tada_output_ut") {
+new_summary2_tadat <- function(
+  raw_df,
+  removals_df = NULL,
+  outfile = "tada_output_ut"
+) {
   rv <- shiny::reactiveValues()
   rv$raw <- raw_df
   rv$removals <- if (is.null(removals_df)) {
@@ -45,16 +49,20 @@ test_that("summary text outputs show zeros when tadat$raw is NULL", {
   )
   on.exit(lapply(rev(patches), summary2_restore_ns_fun), add = TRUE)
 
-  shiny::testServer(mod_TADA_summary_server, args = list(id = "summary2_1", tadat = tadat), {
-    session$flushReact()
+  shiny::testServer(
+    mod_TADA_summary_server,
+    args = list(id = "summary2_1", tadat = tadat),
+    {
+      session$flushReact()
 
-    expect_equal(output$rec_tot, "Total Results in Dataset: 0")
-    expect_equal(output$rec_rem, "Results Flagged for Removal: 0")
-    expect_equal(output$rec_clean, "Results Retained: 0")
-    expect_equal(output$site_tot, "Total Sites in Dataset: 0")
-    expect_equal(output$site_rem, "Total Sites Flagged for Removal: 0")
-    expect_equal(output$site_clean, "Total Sites Retained: 0")
-  })
+      expect_equal(output$rec_tot, "Total Results in Dataset: 0")
+      expect_equal(output$rec_rem, "Results Flagged for Removal: 0")
+      expect_equal(output$rec_clean, "Results Retained: 0")
+      expect_equal(output$site_tot, "Total Sites in Dataset: 0")
+      expect_equal(output$site_rem, "Total Sites Flagged for Removal: 0")
+      expect_equal(output$site_clean, "Total Sites Retained: 0")
+    }
+  )
 })
 
 test_that("summary text outputs compute expected values with data", {
@@ -78,16 +86,20 @@ test_that("summary text outputs compute expected values with data", {
   )
   on.exit(lapply(rev(patches), summary2_restore_ns_fun), add = TRUE)
 
-  shiny::testServer(mod_TADA_summary_server, args = list(id = "summary2_1", tadat = tadat), {
-    session$flushReact()
+  shiny::testServer(
+    mod_TADA_summary_server,
+    args = list(id = "summary2_1", tadat = tadat),
+    {
+      session$flushReact()
 
-    expect_equal(output$rec_tot, "Total Results in Dataset: 4")
-    expect_equal(output$rec_rem, "Results Flagged for Removal: 2")
-    expect_equal(output$rec_clean, "Results Retained: 2")
-    expect_equal(output$site_tot, "Total Sites in Dataset: 3")
-    expect_equal(output$site_clean, "Total Sites Retained: 2")
-    expect_equal(output$site_rem, "Total Sites Flagged for Removal: 1")
-  })
+      expect_equal(output$rec_tot, "Total Results in Dataset: 4")
+      expect_equal(output$rec_rem, "Results Flagged for Removal: 2")
+      expect_equal(output$rec_clean, "Results Retained: 2")
+      expect_equal(output$site_tot, "Total Sites in Dataset: 3")
+      expect_equal(output$site_clean, "Total Sites Retained: 2")
+      expect_equal(output$site_rem, "Total Sites Flagged for Removal: 1")
+    }
+  )
 })
 
 test_that("working download button path prepares files and triggers hidden download click", {
@@ -106,19 +118,31 @@ test_that("working download button path prepares files and triggers hidden downl
 
   patches <- list(
     summary2_patch_ns_fun("EPATADA", "TADA_OrderCols", function(df) df),
-    summary2_patch_ns_fun("TADAShiny", "writeNarrativeDataFrame", function(tadat) {
-      data.frame(Parameter = "x", Value = "y", stringsAsFactors = FALSE)
-    }),
+    summary2_patch_ns_fun(
+      "TADAShiny",
+      "writeNarrativeDataFrame",
+      function(tadat) {
+        data.frame(Parameter = "x", Value = "y", stringsAsFactors = FALSE)
+      }
+    ),
     summary2_patch_ns_fun("TADAShiny", "writeFile", function(tadat, file) {
       saved_progress_name <<- file
       invisible(NULL)
     }),
-    summary2_patch_ns_fun("writexl", "write_xlsx", function(x, path, use_zip64 = TRUE) {
-      write_xlsx_path <<- path
-      invisible(path)
+    summary2_patch_ns_fun(
+      "writexl",
+      "write_xlsx",
+      function(x, path, use_zip64 = TRUE) {
+        write_xlsx_path <<- path
+        invisible(path)
+      }
+    ),
+    summary2_patch_ns_fun("shinybusy", "show_modal_spinner", function(...) {
+      NULL
     }),
-    summary2_patch_ns_fun("shinybusy", "show_modal_spinner", function(...) NULL),
-    summary2_patch_ns_fun("shinybusy", "remove_modal_spinner", function(...) NULL),
+    summary2_patch_ns_fun("shinybusy", "remove_modal_spinner", function(...) {
+      NULL
+    }),
     summary2_patch_ns_fun("shinyjs", "click", function(id) {
       clicked <<- c(clicked, id)
       invisible(NULL)
@@ -128,18 +152,22 @@ test_that("working download button path prepares files and triggers hidden downl
   )
   on.exit(lapply(rev(patches), summary2_restore_ns_fun), add = TRUE)
 
-  shiny::testServer(mod_TADA_summary_server, args = list(id = "summary2_1", tadat = tadat), {
-    session$setInputs(download_working_button = 1L)
-    session$flushReact()
+  shiny::testServer(
+    mod_TADA_summary_server,
+    args = list(id = "summary2_1", tadat = tadat),
+    {
+      session$setInputs(download_working_button = 1L)
+      session$flushReact()
 
-    expect_true(any(clicked == "dwn_working"))
-    expect_true(grepl("_working\\.xlsx$", write_xlsx_path))
-    expect_true(grepl("_prog\\.RData$", saved_progress_name))
-    expect_equal(
-      paste0(tadat$default_outfile, "_working.zip"),
-      "tada_output_ut_working.zip"
-    )
-  })
+      expect_true(any(clicked == "dwn_working"))
+      expect_true(grepl("_working\\.xlsx$", write_xlsx_path))
+      expect_true(grepl("_prog\\.RData$", saved_progress_name))
+      expect_equal(
+        paste0(tadat$default_outfile, "_working.zip"),
+        "tada_output_ut_working.zip"
+      )
+    }
+  )
 })
 
 test_that("final download button filters removed rows and drops TADA removal columns", {
@@ -159,16 +187,30 @@ test_that("final download button filters removed rows and drops TADA removal col
   patches <- list(
     summary2_patch_ns_fun("EPATADA", "TADA_OrderCols", function(df) df),
     summary2_patch_ns_fun("EPATADA", "TADA_RetainRequired", function(df) df),
-    summary2_patch_ns_fun("TADAShiny", "writeNarrativeDataFrame", function(tadat) {
-      data.frame(Parameter = "x", Value = "y", stringsAsFactors = FALSE)
+    summary2_patch_ns_fun(
+      "TADAShiny",
+      "writeNarrativeDataFrame",
+      function(tadat) {
+        data.frame(Parameter = "x", Value = "y", stringsAsFactors = FALSE)
+      }
+    ),
+    summary2_patch_ns_fun("TADAShiny", "writeFile", function(tadat, file) {
+      invisible(NULL)
     }),
-    summary2_patch_ns_fun("TADAShiny", "writeFile", function(tadat, file) invisible(NULL)),
-    summary2_patch_ns_fun("writexl", "write_xlsx", function(x, path, use_zip64 = TRUE) {
-      captured_data_sheet <<- x$Data
-      invisible(path)
+    summary2_patch_ns_fun(
+      "writexl",
+      "write_xlsx",
+      function(x, path, use_zip64 = TRUE) {
+        captured_data_sheet <<- x$Data
+        invisible(path)
+      }
+    ),
+    summary2_patch_ns_fun("shinybusy", "show_modal_spinner", function(...) {
+      NULL
     }),
-    summary2_patch_ns_fun("shinybusy", "show_modal_spinner", function(...) NULL),
-    summary2_patch_ns_fun("shinybusy", "remove_modal_spinner", function(...) NULL),
+    summary2_patch_ns_fun("shinybusy", "remove_modal_spinner", function(...) {
+      NULL
+    }),
     summary2_patch_ns_fun("shinyjs", "click", function(id) {
       clicked <<- c(clicked, id)
       invisible(NULL)
@@ -178,19 +220,23 @@ test_that("final download button filters removed rows and drops TADA removal col
   )
   on.exit(lapply(rev(patches), summary2_restore_ns_fun), add = TRUE)
 
-  shiny::testServer(mod_TADA_summary_server, args = list(id = "summary2_1", tadat = tadat), {
-    session$setInputs(download_final_button = 1L)
-    session$flushReact()
+  shiny::testServer(
+    mod_TADA_summary_server,
+    args = list(id = "summary2_1", tadat = tadat),
+    {
+      session$setInputs(download_final_button = 1L)
+      session$flushReact()
 
-    expect_true(any(clicked == "dwn_final"))
-    expect_false("TADA.Remove" %in% names(captured_data_sheet))
-    expect_false("TADA.RemovalReason" %in% names(captured_data_sheet))
-    expect_equal(nrow(captured_data_sheet), 2)
-    expect_equal(
-      paste0(tadat$default_outfile, "_final.zip"),
-      "tada_output_ut_final.zip"
-    )
-  })
+      expect_true(any(clicked == "dwn_final"))
+      expect_false("TADA.Remove" %in% names(captured_data_sheet))
+      expect_false("TADA.RemovalReason" %in% names(captured_data_sheet))
+      expect_equal(nrow(captured_data_sheet), 2)
+      expect_equal(
+        paste0(tadat$default_outfile, "_final.zip"),
+        "tada_output_ut_final.zip"
+      )
+    }
+  )
 })
 
 test_that("disclaimer button shows modal", {
@@ -214,12 +260,16 @@ test_that("disclaimer button shows modal", {
   )
   on.exit(lapply(rev(patches), summary2_restore_ns_fun), add = TRUE)
 
-  shiny::testServer(mod_TADA_summary_server, args = list(id = "summary2_1", tadat = tadat), {
-    session$setInputs(disclaimer = 1L)
-    session$flushReact()
+  shiny::testServer(
+    mod_TADA_summary_server,
+    args = list(id = "summary2_1", tadat = tadat),
+    {
+      session$setInputs(disclaimer = 1L)
+      session$flushReact()
 
-    expect_equal(modal_count, 1L)
-  })
+      expect_equal(modal_count, 1L)
+    }
+  )
 })
 
 test_that("sort_removals returns expected reason buckets", {
@@ -244,4 +294,3 @@ test_that("sort_removals returns expected reason buckets", {
 test_that("sort_removals returns NULL for empty object", {
   expect_null(sort_removals(data.frame()))
 })
-
