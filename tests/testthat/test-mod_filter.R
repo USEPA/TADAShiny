@@ -1248,8 +1248,24 @@ test_that("keep_mask_for coerces character removals and applies non-field remova
 
   # Character removals to exercise to_logical inside keep_mask_for
   tadat$removals <- data.frame(
-    `Filter: Exclude FieldA is x` = c("TRUE", "FALSE", "TRUE", "FALSE", "FALSE", "FALSE", "FALSE"),
-    `Flag: QA` = c("FALSE", "TRUE", "FALSE", "FALSE", "FALSE", "FALSE", "FALSE"),
+    `Filter: Exclude FieldA is x` = c(
+      "TRUE",
+      "FALSE",
+      "TRUE",
+      "FALSE",
+      "FALSE",
+      "FALSE",
+      "FALSE"
+    ),
+    `Flag: QA` = c(
+      "FALSE",
+      "TRUE",
+      "FALSE",
+      "FALSE",
+      "FALSE",
+      "FALSE",
+      "FALSE"
+    ),
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
@@ -1274,8 +1290,24 @@ test_that("selected_filters empty branch removes current filter prefix but keeps
   tadat <- new_tadat(d)
 
   tadat$removals <- data.frame(
-    `Filter: Exclude FieldA is x` = c(TRUE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE),
-    `Filter (module): Exclude FieldA is x` = c(TRUE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE),
+    `Filter: Exclude FieldA is x` = c(
+      TRUE,
+      FALSE,
+      TRUE,
+      FALSE,
+      FALSE,
+      FALSE,
+      FALSE
+    ),
+    `Filter (module): Exclude FieldA is x` = c(
+      TRUE,
+      FALSE,
+      TRUE,
+      FALSE,
+      FALSE,
+      FALSE,
+      FALSE
+    ),
     `Flag: Keep` = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE),
     stringsAsFactors = FALSE,
     check.names = FALSE
@@ -1323,14 +1355,16 @@ test_that("field list observer adds fallback description and overrides TADA.Medi
   d <- tiny_data()
   tadat <- new_tadat(d)
 
-  patches <- list(
-    patch_ns_fun("EPATADA", "TADA_FieldCounts", function(raw, display = "key") {
+  patches <- list(patch_ns_fun(
+    "EPATADA",
+    "TADA_FieldCounts",
+    function(raw, display = "key") {
       data.frame(
         Fields = c("TADA.Media.Flag", "FieldA"),
         stringsAsFactors = FALSE
       )
-    })
-  )
+    }
+  ))
   on.exit(lapply(rev(patches), restore_ns_fun), add = TRUE)
 
   shiny::testServer(mod_filtering_server, args = list(tadat = tadat), {
@@ -1369,4 +1403,3 @@ test_that("filter_pie_chart render handles zero-row pie source without error", {
     })
   })
 })
-
