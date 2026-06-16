@@ -1193,3 +1193,152 @@ test_that("mod_filtering_server: field list observer is robust to empty/missing 
     }
   ))
 })
+
+test_that("add_filters_include_only selecting all baseline values creates no exclusions", {
+  skip_on_cran()
+  d <- tiny_data()
+  tadat <- new_tadat(d)
+
+  shiny::testServer(mod_filtering_server, args = list(tadat = tadat), {
+    values$selected_field <- "FieldA"
+    session$flushReact()
+
+    # Select all baseline labels from Step 2 (before any exclusions)
+    vals <- shiny::isolate(filter_values())
+    add_filters_include_only(rows = seq_len(nrow(vals)))
+    session$flushReact()
+
+    sf <- shiny::isolate(tadat$selected_filters)
+    expect_equal(nrow(sf), 0)
+  })
+})
+
+test_that("keep_mask_for coerces character removals and applies non-field removals", {
+  skip_on_cran()
+  d <- tiny_data()
+  tadat <- new_tadat(d)
+
+  # Character removals to exercise to_logical inside keep_mask_for
+  tadat$removals <- data.frame(
+    `Filter: Exclude FieldA is x` = c("TRUE", "FALSE", "TRUE", "FALSE", "FALSE", "FALSE", "FALSE"),
+    `Flag: QA` = c("FALSE", "TRUE", "FALSE", "FALSE", "FALSE", "FALSE", "FALSE"),
+    stringsAsFactors = FALSE,
+    check.names = FALSE
+  )
+
+  shiny::testServer(mod_filtering_server, args = list(tadat = tadat), {
+    keep_all <- keep_mask_for(NULL)
+    expect_false(keep_all[1]) # excluded by own-field filter column
+    expect_false(keep_all[2]) # excluded by Flag: QA character TRUE
+
+    keep_no_field <- keep_mask_for("FieldA")
+    expect_equal(length(keep_no_field), nrow(tadat$raw))
+    expect_false(keep_no_field[2]) # still excluded by Flag: QA
+
+    # Ignoring own-field columns should not reduce kept rows.
+    expect_gte(sum(keep_no_field, na.rm = TRUE), sum(keep_all, na.rm = TRUE))
+  })
+})
+
+test_that("selected_filters empty branch removes current filter prefix but keeps legacy prefix", {
+  skip_on_cran()
+  d <- tiny_data()
+  tadat <- new_tadat(d)
+
+  tadat$removals <- data.frame(
+    `Filter: Exclude FieldA is x` = c(TRUE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE),
+    `Filter (module): Exclude FieldA is x` = c(TRUE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE),
+    `Flag: Keep` = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE),
+    stringsAsFactors = FALSE,
+    check.names = FALSE
+  )
+
+  shiny::testServer(mod_filtering_server, args = list(tadat = tadat), {
+    # Make selected_filters non-empty, then empty, to trigger nrow == 0 cleanup branch
+    tadat$selected_filters <- data.frame(
+      Fields = "FieldA",
+      Value = "x",
+      Filter = "Exclude",
+      Count = 0L,
+      stringsAsFactors = FALSE
+    )
+    session$flushReact()
+
+    tadat$selected_filters <- data.frame(
+      Fields = character(),
+      Value = character(),
+      Filter = character(),
+      Count = integer(),
+      stringsAsFactors = FALSE
+    )
+    session$flushReact()
+
+    cn <- colnames(shiny::isolate(tadat$removals))
+    expect_false(any(startsWith(cn, "Filter: Exclude ")))
+    expect_true(any(startsWith(cn, "Filter (module): Exclude ")))
+    expect_true("Flag: Keep" %in% cn)
+  })
+})
+
+test_that("field list observer adds fallback description and overrides TADA.Media.Flag", {
+  skip_on_cran()
+
+  patch_ns_fun <- function(ns, fn_name, replacement) {
+    old <- get(fn_name, envir = asNamespace(ns))
+    assignInNamespace(fn_name, replacement, ns = ns)
+    list(ns = ns, fn = fn_name, old = old)
+  }
+  restore_ns_fun <- function(patch) {
+    assignInNamespace(patch$fn, patch$old, ns = patch$ns)
+  }
+
+  d <- tiny_data()
+  tadat <- new_tadat(d)
+
+  patches <- list(
+    patch_ns_fun("EPATADA", "TADA_FieldCounts", function(raw, display = "key") {
+      data.frame(
+        Fields = c("TADA.Media.Flag", "FieldA"),
+        stringsAsFactors = FALSE
+      )
+    })
+  )
+  on.exit(lapply(rev(patches), restore_ns_fun), add = TRUE)
+
+  shiny::testServer(mod_filtering_server, args = list(tadat = tadat), {
+    session$setInputs(field_sel = "key")
+    session$flushReact()
+
+    ff <- shiny::isolate(tables$filter_fields)
+    expect_true(all(c("Fields", "Description") %in% names(ff)))
+    expect_equal(
+      ff$Description[ff$Fields == "TADA.Media.Flag"],
+      "TADA-standardized media fields"
+    )
+    expect_equal(
+      ff$Description[ff$Fields == "FieldA"],
+      "No description available"
+    )
+  })
+})
+
+test_that("filter_pie_chart render handles zero-row pie source without error", {
+  skip_on_cran()
+  d <- data.frame(
+    FieldA = c("x", "y"),
+    TADA.Remove = c(TRUE, TRUE),
+    stringsAsFactors = FALSE
+  )
+  tadat <- new_tadat(d)
+
+  shiny::testServer(mod_filtering_server, args = list(tadat = tadat), {
+    values$selected_field <- "FieldA"
+    session$flushReact()
+
+    # keep_mask_for(NULL) yields zero rows so renderPlot should take "No data" path
+    expect_silent({
+      shiny::isolate(output$filter_pie_chart)
+    })
+  })
+})
+
