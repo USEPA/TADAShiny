@@ -9,15 +9,18 @@
 #' @return A shiny.appobj returned by [shiny::shinyApp()].
 #' @export
 run_app <- function(
-    onStart = NULL,
-    options = list(),
-    enableBookmarking = NULL,
-    uiPattern = "/",
-    ...
+  onStart = NULL,
+  options = list(),
+  enableBookmarking = NULL,
+  uiPattern = "/",
+  ...
 ) {
   limit_mb <- as.numeric(golem::get_golem_config("MB_LIMIT", default = 500))
-  timeout_sec <- as.numeric(golem::get_golem_config("TIMEOUT_SECONDS", default = 3600))
-  
+  timeout_sec <- as.numeric(golem::get_golem_config(
+    "TIMEOUT_SECONDS",
+    default = 3600
+  ))
+
   # Wrap onStart so we always apply the options, then call any user-provided onStart
   app_onStart <- function() {
     old <- options(
@@ -28,7 +31,7 @@ run_app <- function(
     try(shiny::onStop(function() options(old)), silent = TRUE)
     if (!is.null(onStart)) onStart()
   }
-  
+
   golem::with_golem_options(
     app = shiny::shinyApp(
       ui = app_ui,

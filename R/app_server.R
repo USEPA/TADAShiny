@@ -8,15 +8,19 @@
 app_server <- function(input, output, session) {
   # Create a reactiveValues object to hold shared data between modules
   tadat <- shiny::reactiveValues()
-  
+
   # Initialize reactive values
   # Initialize removals with the same number of rows as raw data, all FALSE
   shiny::observeEvent(tadat$raw, {
     if (!is.null(tadat$raw) && is.null(tadat$removals)) {
-      tadat$removals <- data.frame(matrix(FALSE, nrow = nrow(tadat$raw), ncol = 0))
+      tadat$removals <- data.frame(matrix(
+        FALSE,
+        nrow = nrow(tadat$raw),
+        ncol = 0
+      ))
     }
   })
-  
+
   # Update the master 'Remove' column anytime data is added to the 'removals' table
   shiny::observeEvent(tadat$removals, {
     if (dim(tadat$removals)[2] > 0) {
@@ -29,7 +33,7 @@ app_server <- function(input, output, session) {
       # print(tadat$raw$TADA.Remove)
     }
   })
-  
+
   # Module server calls
   mod_filtering_server("filtering_1", tadat)
   mod_query_data_server("query_data_1", tadat)
@@ -42,7 +46,7 @@ app_server <- function(input, output, session) {
   mod_review_data_server("review_data_1", tadat)
   mod_figures_server("figures_1", tadat)
   mod_TADA_summary_server("TADA_summary_1", tadat)
-  
+
   # Disable all tabs except Upload upon app start
   shinyjs::disable(selector = '.nav li a[data-value="Overview"]')
   shinyjs::disable(selector = '.nav li a[data-value="Flag"]')
@@ -52,7 +56,7 @@ app_server <- function(input, output, session) {
   shinyjs::disable(selector = '.nav li a[data-value="Depth"]')
   shinyjs::disable(selector = '.nav li a[data-value="Figures"]')
   shinyjs::disable(selector = '.nav li a[data-value="Review"]')
-  
+
   # Initialize other reactive values and configurations
   tadat$load_progress_file <- NA
   tadat$save_progress_file <- NA
@@ -60,7 +64,7 @@ app_server <- function(input, output, session) {
   job_id <- base::paste0("ts", format(Sys.time(), "%y%m%d%H%M%S"))
   tadat$default_outfile <- base::paste0("tada_output_", job_id)
   tadat$job_id <- job_id
-  
+
   # Switch to overview tab when tadat$new changes and show a modal dialog
   shiny::observeEvent(tadat$new, {
     shiny::showModal(shiny::modalDialog(
@@ -82,10 +86,14 @@ app_server <- function(input, output, session) {
       )),
       easyClose = TRUE
     ))
-    shiny::updateTabsetPanel(session = session, inputId = "tabbar", selected = "Overview")
+    shiny::updateTabsetPanel(
+      session = session,
+      inputId = "tabbar",
+      selected = "Overview"
+    )
     tadat$new <- NULL
   })
-  
+
   shiny::observe({
     tadat$tab <- input$tabbar
   })
