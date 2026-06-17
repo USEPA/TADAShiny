@@ -15,8 +15,8 @@ run_app <- function(
   uiPattern = "/",
   ...
 ) {
-  limit_mb <- as.numeric(golem::get_golem_config("MB_LIMIT", default = 500))
-  timeout_sec <- as.numeric(golem::get_golem_config(
+  limit_mb <- as.numeric(get_golem_config("MB_LIMIT", default = 500))
+  timeout_sec <- as.numeric(get_golem_config(
     "TIMEOUT_SECONDS",
     default = 3600
   ))
