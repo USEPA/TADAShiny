@@ -16,10 +16,7 @@ run_app <- function(
   ...
 ) {
   limit_mb <- as.numeric(get_golem_config("MB_LIMIT", default = 500))
-  timeout_sec <- as.numeric(get_golem_config(
-    "TIMEOUT_SECONDS",
-    default = 3600
-  ))
+  timeout_sec <- as.numeric(get_golem_config("TIMEOUT_SECONDS", default = 3600))
 
   # Wrap onStart so we always apply the options, then call any user-provided onStart
   app_onStart <- function() {
