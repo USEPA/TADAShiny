@@ -20,7 +20,7 @@
 app_sys <- function(..., package = "TADAShiny") {
   segs <- unlist(list(...), recursive = TRUE, use.names = FALSE)
   segs <- segs[!is.na(segs) & nzchar(segs)]
-  
+
   # Try installed package location first (mustWork = FALSE prevents errors)
   if (length(segs) == 0L) {
     p <- system.file(package = package, mustWork = FALSE)
@@ -30,27 +30,27 @@ app_sys <- function(..., package = "TADAShiny") {
       c(as.list(segs), list(package = package, mustWork = FALSE))
     )
   }
-  
+
   if (nzchar(p)) {
     return(p)
   }
-  
+
   # Fallbacks
   if (length(segs) == 0L) {
     # Root fallback: local project root
     return(normalizePath(".", winslash = "/", mustWork = FALSE))
   }
-  
+
   # Join segments into a relative path for local fallbacks
   rel <- do.call(file.path, as.list(segs))
   candidates <- c(file.path("inst", rel), rel)
-  
+
   for (cand in candidates) {
     if (file.exists(cand)) {
       return(normalizePath(cand, winslash = "/", mustWork = FALSE))
     }
   }
-  
+
   # If nothing exists, return the first candidate as a single string
   normalizePath(candidates[[1]], winslash = "/", mustWork = FALSE)
 }
@@ -77,17 +77,17 @@ app_sys <- function(..., package = "TADAShiny") {
 #' @keywords internal
 #' @noRd
 get_golem_config <- function(
-    value,
-    config = Sys.getenv(
-      "GOLEM_CONFIG_ACTIVE",
-      Sys.getenv("R_CONFIG_ACTIVE", "default")
-    ),
-    use_parent = TRUE,
-    default = NULL
+  value,
+  config = Sys.getenv(
+    "GOLEM_CONFIG_ACTIVE",
+    Sys.getenv("R_CONFIG_ACTIVE", "default")
+  ),
+  use_parent = TRUE,
+  default = NULL
 ) {
   # Resolve file via app_sys (installed or local) — guaranteed scalar
   f <- app_sys("golem-config.yml")
-  
+
   # If app_sys returns a non-empty path but the file doesn't exist, try local fallbacks
   if (!nzchar(f) || !file.exists(f)) {
     if (file.exists("golem-config.yml")) {
@@ -102,7 +102,7 @@ get_golem_config <- function(
       )
     }
   }
-  
+
   if (length(f) != 1L) {
     stop(
       "Internal error: resolved config path must be a single string, got length ",
@@ -110,10 +110,15 @@ get_golem_config <- function(
       "."
     )
   }
-  
+
   # Try to get the value; if missing and default is provided, return default
   tryCatch(
-    config::get(value = value, config = config, file = f, use_parent = use_parent),
+    config::get(
+      value = value,
+      config = config,
+      file = f,
+      use_parent = use_parent
+    ),
     error = function(e) {
       if (!is.null(default)) {
         return(default)
