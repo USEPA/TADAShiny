@@ -1,30 +1,18 @@
 #' The application server-side
 #'
-#' @param input,output,session Internal parameters for {shiny}.
-#'     DO NOT REMOVE.
+#' @param input,output,session Internal parameters for {shiny}. DO NOT REMOVE.
 #' @noRd
-#'
 
-# Increase the max data upload size from the Shiny default of 5MB per file to 400MB
-options(shiny.maxRequestSize = 400 * 1024^2)
-
-# Increase the timeout duration to 3600 seconds (1 hour)
-options(shiny.timeout = 3600)
-
-# Do NOT change the global 'warn' setting here.
-# If you need stricter warning handling during development or within a specific block,
-# use scoped patterns such as:
-# withr::with_options(list(warn = 2), { ... })
-# This ensures warn is restored automatically and avoids inconsistent behavior.
+# Do NOT set global options here. Upload size and timeouts are configured in run_app().
 
 app_server <- function(input, output, session) {
   # Create a reactiveValues object to hold shared data between modules
   tadat <- shiny::reactiveValues()
 
   # Initialize reactive values
+  # Initialize removals with the same number of rows as raw data, all FALSE
   shiny::observeEvent(tadat$raw, {
     if (!is.null(tadat$raw) && is.null(tadat$removals)) {
-      # Initialize removals with the same number of rows as raw data, all FALSE
       tadat$removals <- data.frame(matrix(
         FALSE,
         nrow = nrow(tadat$raw),
@@ -79,7 +67,6 @@ app_server <- function(input, output, session) {
 
   # Switch to overview tab when tadat$new changes and show a modal dialog
   shiny::observeEvent(tadat$new, {
-    # browser()
     shiny::showModal(shiny::modalDialog(
       title = "Data Loaded",
       shiny::HTML(paste0(
@@ -110,18 +97,4 @@ app_server <- function(input, output, session) {
   shiny::observe({
     tadat$tab <- input$tabbar
   })
-
-  # JCH - disabling this for now. I think progress files provide this functionality
-  # this observes when the user switches tabs and adds the current tab they're on as a column to their dataset.
-
-  # switch to tab user left off on when tadat$reup changes, which only happens when someone uploads a workbook with the column "Removed" in it
-  # shiny::observeEvent(tadat$reup, {
-  #  shiny::showModal(shiny::modalDialog(
-  #    title = "Data Loaded",
-  #    "Your working dataset has been uploaded and the app switched to the tab where you left off."
-  #  ))
-  #  # the switch tab command
-  #  shiny::updateTabsetPanel(session = session, inputId = "tabbar", selected = unique(tadat$raw$tab))
-  #  tadat$reup <- NULL
-  # })
 }

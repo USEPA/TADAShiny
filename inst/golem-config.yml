@@ -2,6 +2,8 @@ default:
   golem_name: TADAShiny
   golem_version: 0.5.1
   app_prod: false
+  MB_LIMIT: 500
+  TIMEOUT_SECONDS: 3600
 
 production:
   app_prod: true

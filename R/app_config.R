@@ -18,19 +18,19 @@
 #' @keywords internal
 #' @noRd
 app_sys <- function(..., package = "TADAShiny") {
-  # Flatten ... into a simple character vector of path segments
   segs <- unlist(list(...), recursive = TRUE, use.names = FALSE)
   segs <- segs[!is.na(segs) & nzchar(segs)]
 
-  args <- if (length(segs) == 0L) {
-    # No segments: request the package root
-    list(package = package, mustWork = FALSE)
+  # Try installed package location first (mustWork = FALSE prevents errors)
+  if (length(segs) == 0L) {
+    p <- system.file(package = package, mustWork = FALSE)
   } else {
-    # Segments: treat them as a path inside the package
-    c(as.list(segs), list(package = package, mustWork = FALSE))
+    p <- do.call(
+      system.file,
+      c(as.list(segs), list(package = package, mustWork = FALSE))
+    )
   }
 
-  p <- tryCatch(system.file(..., package = "TADAShiny"), error = function(e) "")
   if (nzchar(p)) {
     return(p)
   }
@@ -60,17 +60,18 @@ app_sys <- function(..., package = "TADAShiny") {
 #'
 #' Retrieve a value from golem-config.yml using robust file resolution:
 #' first via app_sys() (installed package), then local fallbacks
-#' (./golem-config.yml, inst/golem-config.yml). Errors if the file
-#' cannot be found in any location.
+#' (./golem-config.yml, inst/golem-config.yml). If the requested key is
+#' not found and `default` is provided, return `default`; otherwise error.
 #'
 #' @param value Value to retrieve from the config file.
 #' @param config Active configuration name. Defaults to GOLEM_CONFIG_ACTIVE,
 #'   then R_CONFIG_ACTIVE, and finally "default" if unset.
 #' @param use_parent Logical; whether to scan parent directories
 #'   for the config file (passed to config::get).
+#' @param default Optional default value to return if `value` is not found
+#'   in the active configuration. If NULL (the default), missing keys error.
 #'
-#' @return The value returned by config::get for the requested key and config.
-#'   Type depends on the YAML entry (character, numeric, list, etc.).
+#' @return The value from the config, or `default` if provided and key is missing.
 #'
 #' @seealso [config::get()]
 #' @keywords internal
@@ -81,7 +82,8 @@ get_golem_config <- function(
     "GOLEM_CONFIG_ACTIVE",
     Sys.getenv("R_CONFIG_ACTIVE", "default")
   ),
-  use_parent = TRUE
+  use_parent = TRUE,
+  default = NULL
 ) {
   # Resolve file via app_sys (installed or local) — guaranteed scalar
   f <- app_sys("golem-config.yml")
@@ -101,7 +103,6 @@ get_golem_config <- function(
     }
   }
 
-  # Defensive check (should always be length 1 here)
   if (length(f) != 1L) {
     stop(
       "Internal error: resolved config path must be a single string, got length ",
@@ -110,5 +111,19 @@ get_golem_config <- function(
     )
   }
 
-  config::get(value = value, config = config, file = f, use_parent = use_parent)
+  # Try to get the value; if missing and default is provided, return default
+  tryCatch(
+    config::get(
+      value = value,
+      config = config,
+      file = f,
+      use_parent = use_parent
+    ),
+    error = function(e) {
+      if (!is.null(default)) {
+        return(default)
+      }
+      stop(e)
+    }
+  )
 }
