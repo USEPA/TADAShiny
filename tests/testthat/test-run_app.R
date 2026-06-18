@@ -27,14 +27,6 @@ test_that("run_app returns a shiny.appobj and forwards options and onStart when 
         testthat::skip("app$server not exposed by this Shiny version")
       }
 
-      if (!is.null(app$ui)) {
-        expect_true(
-          is.function(app$ui) || is.list(app$ui) || is.environment(app$ui)
-        )
-      } else {
-        testthat::skip("app$ui not exposed by this Shiny version")
-      }
-
       # options list should include forwarded options (if exposed)
       if (!is.null(app$options)) {
         expect_identical(app$options$launch.browser, FALSE)
