@@ -214,25 +214,31 @@ mod_depth_ui <- function(id) {
 
 # Ensure plotly traces have explicit type/mode when x/y are present
 ensure_plotly_scatter_defaults <- function(p) {
-  if (!inherits(p, "plotly") || is.null(p$x$data)) return(p)
-  
+  if (!inherits(p, "plotly") || is.null(p$x$data)) {
+    return(p)
+  }
+
   kept <- list()
   for (i in seq_along(p$x$data)) {
     tr <- p$x$data[[i]]
     has_pos <- !is.null(tr$x) || !is.null(tr$y)
-    
+
     # Drop traces that have neither type nor positional attributes; they cause warnings
     if (!has_pos && is.null(tr$type)) {
       next
     }
-    
+
     # Fill in sensible defaults when positional attributes are present
-    if (has_pos && is.null(tr$type)) tr$type <- "scatter"
-    if (identical(tr$type, "scatter") && is.null(tr$mode)) tr$mode <- "markers"
-    
+    if (has_pos && is.null(tr$type)) {
+      tr$type <- "scatter"
+    }
+    if (identical(tr$type, "scatter") && is.null(tr$mode)) {
+      tr$mode <- "markers"
+    }
+
     kept[[length(kept) + 1]] <- tr
   }
-  
+
   p$x$data <- kept
   p
 }
@@ -300,9 +306,14 @@ mod_depth_server <- function(id, tadat) {
           yaxis = list(visible = FALSE, title = NULL, zeroline = FALSE),
           annotations = list(list(
             text = msg,
-            x = 0.5, xref = "paper", xanchor = "center",
-            y = 0.5, yref = "paper", yanchor = "middle",
-            showarrow = FALSE, font = list(size = 14)
+            x = 0.5,
+            xref = "paper",
+            xanchor = "center",
+            y = 0.5,
+            yref = "paper",
+            yanchor = "middle",
+            showarrow = FALSE,
+            font = list(size = 14)
           ))
         )
       plotly::config(p, displayModeBar = FALSE)
