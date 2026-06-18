@@ -154,6 +154,31 @@ testthat::test_that(".safe_fetch_county parses headerless census rows", {
   expect_identical(df$COUNTY_NAME, c("Autauga", "Baldwin"))
 })
 
+testthat::test_that(".format_wqp_query_error_message gives bbox guidance for timeout errors", {
+  msg <- .format_wqp_query_error_message("504 Gateway Timeout")
+
+  expect_match(msg, "timed out", ignore.case = TRUE)
+  expect_match(msg, "bounding box", ignore.case = TRUE)
+})
+
+testthat::test_that(".format_wqp_query_error_message preserves non-timeout details", {
+  msg <- .format_wqp_query_error_message("certificate verification failed")
+
+  expect_match(msg, "An error occurred while querying WQX \\(EPA\\):")
+  expect_match(msg, "certificate verification failed")
+})
+
+testthat::test_that(".format_wqp_query_error_message handles empty message safely", {
+  expect_identical(
+    .format_wqp_query_error_message(""),
+    "An error occurred while querying WQX (EPA). Please try again."
+  )
+  expect_identical(
+    .format_wqp_query_error_message(NULL),
+    "An error occurred while querying WQX (EPA). Please try again."
+  )
+})
+
 testthat::test_that("restrict_to_keep_cols preserves order, drops extras, and reports messages", {
   # Create a df with a mix of keep and extra columns
   keep_cols <- c("A", "B", "C", "D")
