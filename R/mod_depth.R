@@ -214,21 +214,26 @@ mod_depth_ui <- function(id) {
 
 # Ensure plotly traces have explicit type/mode when x/y are present
 ensure_plotly_scatter_defaults <- function(p) {
-  if (!inherits(p, "plotly") || is.null(p$x$data)) {
-    return(p)
-  }
+  if (!inherits(p, "plotly") || is.null(p$x$data)) return(p)
+  
+  kept <- list()
   for (i in seq_along(p$x$data)) {
     tr <- p$x$data[[i]]
-    has_xy <- !is.null(tr$x) || !is.null(tr$y)
-    if (is.null(tr$type) && has_xy) {
-      tr$type <- "scatter"
+    has_pos <- !is.null(tr$x) || !is.null(tr$y)
+    
+    # Drop traces that have neither type nor positional attributes; they cause warnings
+    if (!has_pos && is.null(tr$type)) {
+      next
     }
-    if (identical(tr$type, "scatter") && is.null(tr$mode)) {
-      # Choose a reasonable default; lines+markers works well for profiles
-      tr$mode <- "lines+markers"
-    }
-    p$x$data[[i]] <- tr
+    
+    # Fill in sensible defaults when positional attributes are present
+    if (has_pos && is.null(tr$type)) tr$type <- "scatter"
+    if (identical(tr$type, "scatter") && is.null(tr$mode)) tr$mode <- "markers"
+    
+    kept[[length(kept) + 1]] <- tr
   }
+  
+  p$x$data <- kept
   p
 }
 
@@ -288,24 +293,18 @@ mod_depth_server <- function(id, tadat) {
 
     # Safe message for plot area (plotly) — zero traces, no warnings
     safe_message_plot <- function(msg) {
-      p <- plotly::plot_ly() %>%
+      p <- plotly::plotly_empty(type = "scatter", mode = "markers") |>
         plotly::layout(
           title = list(text = msg),
           xaxis = list(visible = FALSE, title = NULL, zeroline = FALSE),
           yaxis = list(visible = FALSE, title = NULL, zeroline = FALSE),
           annotations = list(list(
             text = msg,
-            x = 0.5,
-            xref = "paper",
-            xanchor = "center",
-            y = 0.5,
-            yref = "paper",
-            yanchor = "middle",
-            showarrow = FALSE,
-            font = list(size = 14)
+            x = 0.5, xref = "paper", xanchor = "center",
+            y = 0.5, yref = "paper", yanchor = "middle",
+            showarrow = FALSE, font = list(size = 14)
           ))
         )
-      # Optional: cleaner look for message cards
       plotly::config(p, displayModeBar = FALSE)
     }
 
