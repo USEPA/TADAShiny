@@ -46,17 +46,26 @@ test_that("add_USGS_base wires expected WMS layers, hideGroup calls, and layer c
   calls$layers_control <- list()
 
   patches <- list(
-    patch_leaflet_fun("addWMSTiles", function(x, baseUrl, group, attribution = NULL,
-                                             layers = NULL, options = NULL) {
-      calls$wmstiles[[length(calls$wmstiles) + 1L]] <<- list(
-        url = baseUrl,
-        group = group,
-        attribution = attribution,
-        layers = layers,
-        options = options
-      )
-      x
-    }),
+    patch_leaflet_fun(
+      "addWMSTiles",
+      function(
+        x,
+        baseUrl,
+        group,
+        attribution = NULL,
+        layers = NULL,
+        options = NULL
+      ) {
+        calls$wmstiles[[length(calls$wmstiles) + 1L]] <<- list(
+          url = baseUrl,
+          group = group,
+          attribution = attribution,
+          layers = layers,
+          options = options
+        )
+        x
+      }
+    ),
     patch_leaflet_fun("hideGroup", function(x, group) {
       calls$hide <<- c(calls$hide, group)
       x
@@ -69,17 +78,24 @@ test_that("add_USGS_base wires expected WMS layers, hideGroup calls, and layer c
       calls$layers_opt <<- list(...)
       list(kind = "layers_control", ...)
     }),
-    patch_leaflet_fun("addLayersControl", function(x, baseGroups, overlayGroups,
-                                                    options = NULL,
-                                                    position = "topright") {
-      calls$layers_control <<- list(
-        baseGroups = baseGroups,
-        overlayGroups = overlayGroups,
-        options = options,
-        position = position
-      )
-      x
-    })
+    patch_leaflet_fun(
+      "addLayersControl",
+      function(
+        x,
+        baseGroups,
+        overlayGroups,
+        options = NULL,
+        position = "topright"
+      ) {
+        calls$layers_control <<- list(
+          baseGroups = baseGroups,
+          overlayGroups = overlayGroups,
+          options = options,
+          position = position
+        )
+        x
+      }
+    )
   )
   on.exit(lapply(rev(patches), restore_leaflet_fun), add = TRUE)
 
@@ -89,7 +105,10 @@ test_that("add_USGS_base wires expected WMS layers, hideGroup calls, and layer c
   expect_identical(out, sentinel_map)
 
   expect_length(calls$wmstiles, 5L)
-  expect_identical(vapply(calls$wmstiles[1:4], `[[`, character(1), "group"), grp[1:4])
+  expect_identical(
+    vapply(calls$wmstiles[1:4], `[[`, character(1), "group"),
+    grp[1:4]
+  )
   expect_identical(calls$wmstiles[[5]]$group, grp[5])
 
   expect_identical(calls$wmstiles[[1]]$url, GetURL("USGSTopo"))
@@ -98,7 +117,11 @@ test_that("add_USGS_base wires expected WMS layers, hideGroup calls, and layer c
   expect_identical(calls$wmstiles[[4]]$url, GetURL("USGSShadedReliefOnly"))
   expect_identical(calls$wmstiles[[5]]$url, GetURL("USGSHydroCached"))
 
-  expect_true(all(vapply(calls$wmstiles, function(z) identical(z$layers, "0"), logical(1))))
+  expect_true(all(vapply(
+    calls$wmstiles,
+    function(z) identical(z$layers, "0"),
+    logical(1)
+  )))
   expect_identical(calls$wmstiles[[1]]$attribution, att)
   expect_identical(calls$wmstiles[[4]]$attribution, att)
   expect_null(calls$wmstiles[[5]]$attribution)
@@ -113,4 +136,3 @@ test_that("add_USGS_base wires expected WMS layers, hideGroup calls, and layer c
   expect_identical(calls$layers_control$overlayGroups, grp[5])
   expect_identical(calls$layers_control$position, "topleft")
 })
-

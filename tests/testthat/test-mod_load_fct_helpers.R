@@ -91,9 +91,7 @@ test_that("getCounts returns expected records and site totals", {
 })
 
 test_that("checkFlagColumns returns FALSE when most active flag columns are missing", {
-  patches <- list(
-    patch_ns_obj("TADAShiny", "active_flags", c("A", "B", "C"))
-  )
+  patches <- list(patch_ns_obj("TADAShiny", "active_flags", c("A", "B", "C")))
   on.exit(lapply(rev(patches), restore_ns_obj), add = TRUE)
 
   mostly_missing <- data.frame(A = c(TRUE, FALSE), stringsAsFactors = FALSE)
@@ -150,16 +148,8 @@ test_that("applyFlags runs full EPATADA pipeline and includes QAPP step when col
       "TADA_FlagContinuousData",
       add_col("step_continuous")
     ),
-    patch_ns_fun(
-      "EPATADA",
-      "TADA_FlagAboveThreshold",
-      add_col("step_above")
-    ),
-    patch_ns_fun(
-      "EPATADA",
-      "TADA_FlagBelowThreshold",
-      add_col("step_below")
-    ),
+    patch_ns_fun("EPATADA", "TADA_FlagAboveThreshold", add_col("step_above")),
+    patch_ns_fun("EPATADA", "TADA_FlagBelowThreshold", add_col("step_below")),
     patch_ns_fun(
       "EPATADA",
       "TADA_FlagCoordinates",
@@ -229,16 +219,8 @@ test_that("applyFlags skips QAPP step when ProjectFileUrl column is absent", {
       "TADA_FlagContinuousData",
       add_col("step_continuous")
     ),
-    patch_ns_fun(
-      "EPATADA",
-      "TADA_FlagAboveThreshold",
-      add_col("step_above")
-    ),
-    patch_ns_fun(
-      "EPATADA",
-      "TADA_FlagBelowThreshold",
-      add_col("step_below")
-    ),
+    patch_ns_fun("EPATADA", "TADA_FlagAboveThreshold", add_col("step_above")),
+    patch_ns_fun("EPATADA", "TADA_FlagBelowThreshold", add_col("step_below")),
     patch_ns_fun(
       "EPATADA",
       "TADA_FlagCoordinates",
@@ -258,4 +240,3 @@ test_that("applyFlags skips QAPP step when ProjectFileUrl column is absent", {
   expect_false("step_qappdoc" %in% names(out))
   expect_true("step_media" %in% names(out))
 })
-

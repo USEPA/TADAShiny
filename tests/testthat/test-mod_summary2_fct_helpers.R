@@ -9,40 +9,43 @@ summary2_helpers_restore_ns_fun <- function(patch) {
 }
 
 new_summary2_helpers_tadat <- function() {
-  list2env(list(
-    original_source = "Query",
-    job_id = "job-123",
-    statecode = "06",
-    countycode = "001",
-    example_data = "example.csv",
-    siteid = c("S1"),
-    siteType = c("River", "Lake"),
-    characteristicName = c("Nitrate", "Phosphorus"),
-    characteristicType = c("Nutrient"),
-    sampleMedia = c("Water"),
-    project = c("P1"),
-    organization = c("ORG1"),
-    startDate = "2020-01-01",
-    endDate = "2020-12-31",
-    org_table = data.frame(
-      OrganizationFormalName = c("Org A", "Org B"),
-      stringsAsFactors = FALSE
+  list2env(
+    list(
+      original_source = "Query",
+      job_id = "job-123",
+      statecode = "06",
+      countycode = "001",
+      example_data = "example.csv",
+      siteid = c("S1"),
+      siteType = c("River", "Lake"),
+      characteristicName = c("Nitrate", "Phosphorus"),
+      characteristicType = c("Nutrient"),
+      sampleMedia = c("Water"),
+      project = c("P1"),
+      organization = c("ORG1"),
+      startDate = "2020-01-01",
+      endDate = "2020-12-31",
+      org_table = data.frame(
+        OrganizationFormalName = c("Org A", "Org B"),
+        stringsAsFactors = FALSE
+      ),
+      selected_flags = c("Flag A", "Flag B"),
+      m2f = "meters",
+      selected_filters = data.frame(
+        Fields = c("FieldA"),
+        Field = c("FieldA"),
+        Value = c("x"),
+        Filter = c("Exclude"),
+        stringsAsFactors = FALSE
+      ),
+      nd_method = "x times DL",
+      od_method = "x times RL",
+      nd_mult = "0.5",
+      od_mult = "1.5",
+      field_sel = "all"
     ),
-    selected_flags = c("Flag A", "Flag B"),
-    m2f = "meters",
-    selected_filters = data.frame(
-      Fields = c("FieldA"),
-      Field = c("FieldA"),
-      Value = c("x"),
-      Filter = c("Exclude"),
-      stringsAsFactors = FALSE
-    ),
-    nd_method = "x times DL",
-    od_method = "x times RL",
-    nd_mult = "0.5",
-    od_mult = "1.5",
-    field_sel = "all"
-  ), parent = emptyenv())
+    parent = emptyenv()
+  )
 }
 
 write_progress_file <- function(path, vals) {
@@ -116,12 +119,10 @@ test_that("writeNarrativeDataFrame covers Example branch and null multipliers", 
   expect_true(any(df$Parameter == "Example data file"))
   expect_true(any(df$Parameter == "Depth unit conversion" & df$Value == "None"))
   expect_true(any(
-    df$Parameter == "Non-Detect Handling Method" &
-      df$Value == "n/a times DL"
+    df$Parameter == "Non-Detect Handling Method" & df$Value == "n/a times DL"
   ))
   expect_true(any(
-    df$Parameter == "Over-Detect Handling Method" &
-      df$Value == "n/a times RL"
+    df$Parameter == "Over-Detect Handling Method" & df$Value == "n/a times RL"
   ))
 })
 
@@ -249,4 +250,3 @@ test_that("readFile keeps existing m2f and selected_flags when loaded values are
   expect_equal(tadat$job_id, "loaded-job-2")
   expect_equal(tadat$field_sel, "all")
 })
-
