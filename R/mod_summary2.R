@@ -371,7 +371,7 @@ sort_removals <- function(removal_table) {
       active_cols <- fields[dplyr::starts_with(prefix, vars = fields)]
       if (length(active_cols) > 0) {
         results[prefix] <- apply(
-          dplyr::select(removal_table, active_cols),
+          dplyr::select(removal_table, dplyr::any_of(active_cols)), # using any_of ignores missing columns
           1,
           any
         )
