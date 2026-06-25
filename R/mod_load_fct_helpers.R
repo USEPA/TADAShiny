@@ -52,52 +52,50 @@ args_create <- function(
   return(args)
 }
 
-### A function to construct the argument list for the NWIS function dataRetrieval::read_waterdata_samples(args_temp)
 nwis_args_create <- function(
-  stateFips = NULL,
-  countyFips = NULL,
-  # countrycode = NULL,
-  hydrologicUnit = NULL,
-  monitoringLocationIdentifier = NULL,
-  siteTypeName = NULL,
-  characteristic = NULL,
-  characteristicGroup = NULL,
-  activityMediaName = NULL,
-  projectIdentifier = NULL,
-  organizationIdentifier = NULL,
-  activityStartDateLower = NULL,
-  activityStartDateUpper = NULL,
-  dataType = NULL,
-  dataProfile = NULL,
-  # providers = NULL,
-  boundingBox = NULL
+    stateFips = NULL,
+    countyFips = NULL,
+    hydrologicUnit = NULL,
+    monitoringLocationIdentifier = NULL,
+    siteTypeName = NULL,
+    characteristic = NULL,
+    characteristicGroup = NULL,
+    activityMediaName = NULL,
+    projectIdentifier = NULL,
+    organizationIdentifier = NULL,
+    activityStartDateLower = NULL,
+    activityStartDateUpper = NULL,
+    dataType = NULL,
+    dataProfile = NULL,
+    boundingBox = NULL
 ) {
-  # Construct the arguments for downloads
   args <- list(
-    "stateFips" = stateFips,
-    "countyFips" = countyFips,
-    # "countrycode" = countrycode,
-    "hydrologicUnit" = hydrologicUnit,
-    "monitoringLocationIdentifier" = monitoringLocationIdentifier,
-    "siteTypeName" = siteTypeName,
-    "characteristic" = characteristic,
-    "characteristicGroup" = characteristicGroup,
-    "activityMediaName" = activityMediaName,
-    "projectIdentifier" = projectIdentifier,
-    # "organizationIdentifier" = organizationIdentifier,
-    "activityStartDateLower" = activityStartDateLower,
-    "activityStartDateUpper" = activityStartDateUpper,
-    "dataType" = dataType,
-    "dataProfile" = dataProfile,
-    # "providers" = providers,
-    "boundingBox" = boundingBox
+    stateFips = stateFips,
+    countyFips = countyFips,
+    hydrologicUnit = hydrologicUnit,
+    monitoringLocationIdentifier = monitoringLocationIdentifier,
+    siteTypeName = siteTypeName,
+    characteristic = characteristic,
+    characteristicGroup = characteristicGroup,
+    activityMediaName = activityMediaName,
+    projectIdentifier = projectIdentifier,
+    organizationIdentifier = organizationIdentifier,
+    activityStartDateLower = activityStartDateLower,
+    activityStartDateUpper = activityStartDateUpper,
+    dataType = dataType,
+    dataProfile = dataProfile,
+    boundingBox = boundingBox
   )
-
-  # Replace null with NULL
-  args[args %in% "null"] <- list(NULL)
-
-  # Remove NULL attribute
-  args <- args[purrr::map_lgl(args, function(x) !is.null(x))]
-
+  
+  is_bad <- function(x) {
+    is.null(x) ||
+      length(x) == 0 ||
+      all(is.na(x)) ||
+      identical(x, "NA") ||
+      identical(x, "null") ||
+      identical(x, "")
+  }
+  
+  args <- args[!vapply(args, is_bad, logical(1))]
   return(args)
 }
