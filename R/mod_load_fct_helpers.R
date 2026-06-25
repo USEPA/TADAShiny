@@ -53,21 +53,21 @@ args_create <- function(
 }
 
 nwis_args_create <- function(
-    stateFips = NULL,
-    countyFips = NULL,
-    hydrologicUnit = NULL,
-    monitoringLocationIdentifier = NULL,
-    siteTypeName = NULL,
-    characteristic = NULL,
-    characteristicGroup = NULL,
-    activityMediaName = NULL,
-    projectIdentifier = NULL,
-    organizationIdentifier = NULL,
-    activityStartDateLower = NULL,
-    activityStartDateUpper = NULL,
-    dataType = NULL,
-    dataProfile = NULL,
-    boundingBox = NULL
+  stateFips = NULL,
+  countyFips = NULL,
+  hydrologicUnit = NULL,
+  monitoringLocationIdentifier = NULL,
+  siteTypeName = NULL,
+  characteristic = NULL,
+  characteristicGroup = NULL,
+  activityMediaName = NULL,
+  projectIdentifier = NULL,
+  organizationIdentifier = NULL,
+  activityStartDateLower = NULL,
+  activityStartDateUpper = NULL,
+  dataType = NULL,
+  dataProfile = NULL,
+  boundingBox = NULL
 ) {
   args <- list(
     stateFips = stateFips,
@@ -86,7 +86,7 @@ nwis_args_create <- function(
     dataProfile = dataProfile,
     boundingBox = boundingBox
   )
-  
+
   is_bad <- function(x) {
     is.null(x) ||
       length(x) == 0 ||
@@ -95,7 +95,7 @@ nwis_args_create <- function(
       identical(x, "null") ||
       identical(x, "")
   }
-  
+
   args <- args[!vapply(args, is_bad, logical(1))]
   return(args)
 }
