@@ -322,18 +322,6 @@ mod_harmonize_np_server <- function(id, tadat) {
       shinyjs::disable(selector = '.nav li a[data-value="TNandTPSummation"]')
     })
 
-    output$sum_dwn <- shiny::downloadHandler(
-      filename = function() {
-        "TADA_NPSummationKey.csv"
-      },
-      content = function(file) {
-        utils::write.csv(
-          EPATADA::TADA_GetNutrientSummationRef(),
-          file,
-          row.names = FALSE
-        )
-      }
-    )
   })
 }
 

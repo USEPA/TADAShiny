@@ -1,6 +1,6 @@
 #' Summarize Total Nitrogen and Phosphorus UI Function
 #'
-#' @description A shiny Module.
+#' @description A shiny Module to manage creating sum values of Total Nitrogen and Total Phosphorus.
 #'
 #' @param id,input,output,session Internal parameters for {shiny}.
 #'
