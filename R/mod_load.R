@@ -2421,10 +2421,12 @@ initializeTable <- function(tadat, raw) {
     tadat$reup <- TRUE
     tadat$ovgo <- FALSE
     shinyjs::enable(selector = '.nav li a[data-value="Overview"]')
+    shinyjs::enable(selector = '.nav li a[data-value="Harmonize"]')    
+    shinyjs::enable(selector = '.nav li a[data-value="Censored"]')    
     shinyjs::enable(selector = '.nav li a[data-value="Flag"]')
     shinyjs::enable(selector = '.nav li a[data-value="Filter"]')
-    shinyjs::enable(selector = '.nav li a[data-value="Censored"]')
-    shinyjs::enable(selector = '.nav li a[data-value="Harmonize"]')
+    shinyjs::enable(selector = '.nav li a[data-value="TNandTPSummation"]') # new
+
     shinyjs::enable(selector = '.nav li a[data-value="Depth"]')
     shinyjs::enable(selector = '.nav li a[data-value="Figures"]')
     shinyjs::enable(selector = '.nav li a[data-value="Review"]')
@@ -2433,7 +2435,8 @@ initializeTable <- function(tadat, raw) {
     tadat$ovgo <- TRUE # load data into overview page
     shinyjs::enable(selector = '.nav li a[data-value="Overview"]')
     shinyjs::enable(selector = '.nav li a[data-value="Flag"]')
-    # shinyjs::enable(selector = '.nav li a[data-value="Figures"]')
+    shinyjs::enable(selector = '.nav li a[data-value="Harmonize"]')
+    shinyjs::enable(selector = '.nav li a[data-value="Censored"]')
     # Set flagging column to FALSE
     raw$TADA.Remove <- FALSE
   }

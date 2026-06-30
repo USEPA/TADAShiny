@@ -84,43 +84,50 @@ app_ui <- function(request) {
           mod_overview_ui("overview_1")
         ),
         shiny::tabPanel(
-          "3. Flag",
-          value = "Flag",
-          htmltools::br(),
-          mod_data_flagging_ui("data_flagging_1")
-        ),
-        shiny::tabPanel(
-          "4. Filter",
-          value = "Filter",
-          htmltools::br(),
-          mod_filtering_ui("filtering_1")
-        ),
-        shiny::tabPanel(
-          "5. Censored Data",
-          value = "Censored",
-          htmltools::br(),
-          mod_censored_data_ui("censored_data_1")
-        ),
-        shiny::tabPanel(
-          "6. Harmonize and Calculate",
+          "3. Harmonize Synonyms",
           value = "Harmonize",
           htmltools::br(),
           mod_harmonize_np_ui("harmonize_np_1")
         ),
         shiny::tabPanel(
-          "7. Depth",
+          "4. Censored Data",
+          value = "Censored",
+          htmltools::br(),
+          mod_censored_data_ui("censored_data_1")
+        ),
+        shiny::tabPanel(
+          "5. Flag",
+          value = "Flag",
+          htmltools::br(),
+          mod_data_flagging_ui("data_flagging_1")
+        ),
+        shiny::tabPanel(
+          "6. Filter",
+          value = "Filter",
+          htmltools::br(),
+          mod_filtering_ui("filtering_1")
+        ),
+        shiny::tabPanel(
+          "7. Sum TN and TP",
+          value = "TNandTPSummation",
+          htmltools::br(),
+          mod_TN_and_TP_summation_ui("TN_and_TP_summation_1")
+        ),
+
+        shiny::tabPanel(
+          "8. Depth",
           value = "Depth",
           htmltools::br(),
           mod_depth_ui("depth_1")
         ),
         shiny::tabPanel(
-          "8. Explore",
+          "9. Explore",
           value = "Figures",
           htmltools::br(),
           mod_figures_ui("figures_1")
         ),
         shiny::tabPanel(
-          "9. Review",
+          "10. Review",
           value = "Review",
           htmltools::br(),
           mod_review_data_ui("review_data_1")
