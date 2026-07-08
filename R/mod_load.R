@@ -135,6 +135,20 @@ example_data_map <- get_example_data_map()
     ))
   }
 
+  too_large_detected <- grepl(
+    "uri too long|url too long|request-uri too large|\\b414\\b",
+    normalized_message,
+    perl = TRUE
+  )
+
+  if (too_large_detected) {
+    return(paste(
+      "The query returned too many sites for the Water Quality Portal to fetch in one request",
+      "(the request URL exceeded the server length limit).",
+      "Try reducing the bounding box size or adding more filters, then run the query again."
+    ))
+  }
+
   if (!nzchar(message_text)) {
     return("An error occurred while querying WQX (EPA). Please try again.")
   }
@@ -2060,11 +2074,8 @@ mod_query_data_server <- function(id, tadat) {
                     session = shiny::getDefaultReactiveDomain()
                   )
                   shiny::showModal(shiny::modalDialog(
-                    title = "Error",
-                    paste(
-                      "An error occurred while querying WQX (EPA):",
-                      e$message
-                    ),
+                    title = "WQP Error",
+                    .format_wqp_query_error_message(conditionMessage(e)),
                     easyClose = TRUE
                   ))
                 }

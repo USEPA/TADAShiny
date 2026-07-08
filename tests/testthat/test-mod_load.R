@@ -161,6 +161,13 @@ testthat::test_that(".format_wqp_query_error_message gives bbox guidance for tim
   expect_match(msg, "bounding box", ignore.case = TRUE)
 })
 
+testthat::test_that(".format_wqp_query_error_message gives bbox guidance for URL-too-long errors", {
+  msg <- .format_wqp_query_error_message("HTTP 414 URI Too Long")
+
+  expect_match(msg, "too many sites", ignore.case = TRUE)
+  expect_match(msg, "bounding box", ignore.case = TRUE)
+})
+
 testthat::test_that(".format_wqp_query_error_message preserves non-timeout details", {
   msg <- .format_wqp_query_error_message("certificate verification failed")
 
