@@ -1546,8 +1546,8 @@ mod_query_data_server <- function(id, tadat) {
 
       # Clean -> order -> restrict -> initialize
       raw <- EPATADA::TADA_AutoClean(raw)
-      raw <- EPATADA::TADA_OrderCols(raw)
       raw <- EPATADA::TADA_IDCensoredData(raw)
+      raw <- EPATADA::TADA_OrderCols(raw)
       raw <- restrict_to_keep_cols(raw, keep_cols = all.cols, verbose = TRUE)
 
       initializeTable(tadat, raw)
