@@ -114,6 +114,49 @@ example_data_map <- get_example_data_map()
   as.data.frame(dt)
 }
 
+.format_wqp_query_error_message <- function(error_message) {
+  if (is.null(error_message)) {
+    return("An error occurred while querying WQX (EPA). Please try again.")
+  }
+
+  message_text <- gsub("\033\\[[0-9;]*m", "", as.character(error_message), perl = TRUE)  
+  
+  normalized_message <- tolower(message_text)
+
+  timeout_detected <- grepl(
+    "timeout|timed out|gateway timeout|\\b504\\b",
+    normalized_message,
+    perl = TRUE
+  )
+
+  if (timeout_detected) {
+    return(paste(
+      "The query timed out before the Water Quality Portal could return data.",
+      "Try reducing the bounding box size or adding more filters, then run the query again."
+    ))
+  }
+
+  too_large_detected <- grepl(
+    "uri too long|url too long|request-uri too large|\\b414\\b",
+    normalized_message,
+    perl = TRUE
+  )
+
+  if (too_large_detected) {
+    return(paste(
+      "The query returned too many sites for the Water Quality Portal to fetch in one request",
+      "(the request URL exceeded the server length limit).",
+      "Try reducing the bounding box size or adding more filters, then run the query again."
+    ))
+  }
+
+  if (!nzchar(message_text)) {
+    return("An error occurred while querying WQX (EPA). Please try again.")
+  }
+
+  paste("An error occurred while querying WQX (EPA):", message_text)
+}
+
 TADA_download_temp <- readRDS(system.file(
   "extdata",
   "TADA_download_temp.rds",
@@ -2239,10 +2282,8 @@ mod_query_data_server <- function(id, tadat) {
           error = function(e) {
             # Error handling: show error message and re-enable harmonize button
             nwis_error_message_text <<- paste(
-              shiny::tags$strong(
-                "An error occurred while querying NWIS (USGS):"
-              ),
-              shiny::tags$p(e$message)
+              "An error occurred while querying NWIS (USGS):",
+              gsub("\033\\[[0-9;]*m", "", as.character(e$message), perl = TRUE)
             )
 
             shinybusy::remove_modal_spinner(
