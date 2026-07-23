@@ -1733,7 +1733,6 @@ mod_query_data_server <- function(id, tadat) {
             shiny::isTruthy(input$tribe_name))
       ) {
         # display a modal and return because these are not compatible
-        # browser()
         shiny::showModal(shiny::modalDialog(
           title = "Input warning",
           shiny::HTML(paste0(
