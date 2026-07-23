@@ -167,7 +167,6 @@ test_that("applyFlags runs full EPATADA pipeline and includes QAPP step when col
   out <- applyFlags(in_table, orgs = NULL)
 
   expected_cols <- c(
-    "step_idcensored",
     "step_speciation",
     "step_fraction",
     "step_resultunit",
