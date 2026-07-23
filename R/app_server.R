@@ -37,21 +37,21 @@ app_server <- function(input, output, session) {
   # Module server calls
 
   mod_query_data_server("query_data_1", tadat)
-  mod_overview_server("overview_1", tadat)  
+  mod_overview_server("overview_1", tadat)
   mod_harmonize_np_server("harmonize_np_1", tadat)
-  mod_censored_data_server("censored_data_1", tadat)  
+  mod_censored_data_server("censored_data_1", tadat)
   mod_data_flagging_server("data_flagging_1", tadat)
-  mod_filtering_server("filtering_1", tadat)  
+  mod_filtering_server("filtering_1", tadat)
   mod_TN_and_TP_summation_server("TN_and_TP_summation_1", tadat)
   mod_depth_server("depth_1", tadat)
-  mod_review_data_server("review_data_1", tadat)  
+  mod_review_data_server("review_data_1", tadat)
   mod_summary_server("summary_1", tadat)
   mod_figures_server("figures_1", tadat)
   mod_TADA_summary_server("TADA_summary_1", tadat)
 
   # Disable all tabs except Upload upon app start
   shinyjs::disable(selector = '.nav li a[data-value="Overview"]')
-  shinyjs::disable(selector = '.nav li a[data-value="Harmonize"]')    
+  shinyjs::disable(selector = '.nav li a[data-value="Harmonize"]')
   shinyjs::disable(selector = '.nav li a[data-value="Censored"]')
 
   shinyjs::disable(selector = '.nav li a[data-value="Flag"]')

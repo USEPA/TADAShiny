@@ -2421,8 +2421,8 @@ initializeTable <- function(tadat, raw) {
     tadat$reup <- TRUE
     tadat$ovgo <- FALSE
     shinyjs::enable(selector = '.nav li a[data-value="Overview"]')
-    shinyjs::enable(selector = '.nav li a[data-value="Harmonize"]')    
-    shinyjs::enable(selector = '.nav li a[data-value="Censored"]')    
+    shinyjs::enable(selector = '.nav li a[data-value="Harmonize"]')
+    shinyjs::enable(selector = '.nav li a[data-value="Censored"]')
     shinyjs::enable(selector = '.nav li a[data-value="Flag"]')
     shinyjs::enable(selector = '.nav li a[data-value="Filter"]')
     shinyjs::enable(selector = '.nav li a[data-value="TNandTPSummation"]') # new

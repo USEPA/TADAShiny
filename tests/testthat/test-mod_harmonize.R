@@ -210,4 +210,3 @@ test_that("harm_apply error path keeps data unchanged", {
     }
   )
 })
-

@@ -23,7 +23,11 @@ test_that("mod_TN_and_TP_summation_ui renders expected controls", {
   golem::expect_shinytaglist(ui)
   ui_txt <- as.character(ui)
 
-  expect_true(grepl("Total Nitrogen and Phosphorus Summation", ui_txt, fixed = TRUE))
+  expect_true(grepl(
+    "Total Nitrogen and Phosphorus Summation",
+    ui_txt,
+    fixed = TRUE
+  ))
   expect_true(grepl("sum_1-sum_dwn", ui_txt, fixed = TRUE))
   expect_true(grepl("sum_1-sum_apply", ui_txt, fixed = TRUE))
 })
@@ -138,4 +142,3 @@ test_that("sum_dwn output is available", {
     }
   )
 })
-
