@@ -1546,6 +1546,7 @@ mod_query_data_server <- function(id, tadat) {
 
       # Clean -> order -> restrict -> initialize
       raw <- EPATADA::TADA_AutoClean(raw)
+      raw <- EPATADA::TADA_IDCensoredData(raw)
       raw <- EPATADA::TADA_OrderCols(raw)
       raw <- restrict_to_keep_cols(raw, keep_cols = all.cols, verbose = TRUE)
 
@@ -1732,7 +1733,6 @@ mod_query_data_server <- function(id, tadat) {
             shiny::isTruthy(input$tribe_name))
       ) {
         # display a modal and return because these are not compatible
-        # browser()
         shiny::showModal(shiny::modalDialog(
           title = "Input warning",
           shiny::HTML(paste0(
@@ -2421,10 +2421,12 @@ initializeTable <- function(tadat, raw) {
     tadat$reup <- TRUE
     tadat$ovgo <- FALSE
     shinyjs::enable(selector = '.nav li a[data-value="Overview"]')
+    shinyjs::enable(selector = '.nav li a[data-value="Harmonize"]')
+    shinyjs::enable(selector = '.nav li a[data-value="Censored"]')
     shinyjs::enable(selector = '.nav li a[data-value="Flag"]')
     shinyjs::enable(selector = '.nav li a[data-value="Filter"]')
-    shinyjs::enable(selector = '.nav li a[data-value="Censored"]')
-    shinyjs::enable(selector = '.nav li a[data-value="Harmonize"]')
+    shinyjs::enable(selector = '.nav li a[data-value="TNandTPSummation"]') # new
+
     shinyjs::enable(selector = '.nav li a[data-value="Depth"]')
     shinyjs::enable(selector = '.nav li a[data-value="Figures"]')
     shinyjs::enable(selector = '.nav li a[data-value="Review"]')
@@ -2433,7 +2435,8 @@ initializeTable <- function(tadat, raw) {
     tadat$ovgo <- TRUE # load data into overview page
     shinyjs::enable(selector = '.nav li a[data-value="Overview"]')
     shinyjs::enable(selector = '.nav li a[data-value="Flag"]')
-    # shinyjs::enable(selector = '.nav li a[data-value="Figures"]')
+    shinyjs::enable(selector = '.nav li a[data-value="Harmonize"]')
+    shinyjs::enable(selector = '.nav li a[data-value="Censored"]')
     # Set flagging column to FALSE
     raw$TADA.Remove <- FALSE
   }
