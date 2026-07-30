@@ -126,7 +126,6 @@ test_that("applyFlags runs full EPATADA pipeline and includes QAPP step when col
   }
 
   patches <- list(
-    patch_ns_fun("EPATADA", "TADA_IDCensoredData", add_col("step_idcensored")),
     patch_ns_fun("EPATADA", "TADA_FlagSpeciation", add_col("step_speciation")),
     patch_ns_fun("EPATADA", "TADA_FlagFraction", add_col("step_fraction")),
     patch_ns_fun("EPATADA", "TADA_FlagResultUnit", add_col("step_resultunit")),
@@ -168,7 +167,6 @@ test_that("applyFlags runs full EPATADA pipeline and includes QAPP step when col
   out <- applyFlags(in_table, orgs = NULL)
 
   expected_cols <- c(
-    "step_idcensored",
     "step_speciation",
     "step_fraction",
     "step_resultunit",
@@ -197,7 +195,6 @@ test_that("applyFlags skips QAPP step when ProjectFileUrl column is absent", {
   }
 
   patches <- list(
-    patch_ns_fun("EPATADA", "TADA_IDCensoredData", add_col("step_idcensored")),
     patch_ns_fun("EPATADA", "TADA_FlagSpeciation", add_col("step_speciation")),
     patch_ns_fun("EPATADA", "TADA_FlagFraction", add_col("step_fraction")),
     patch_ns_fun("EPATADA", "TADA_FlagResultUnit", add_col("step_resultunit")),

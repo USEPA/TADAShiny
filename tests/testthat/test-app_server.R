@@ -49,10 +49,11 @@ test_that("app_server initializes reactive state and disables expected tabs", {
     disabled_selectors,
     c(
       '.nav li a[data-value="Overview"]',
+      '.nav li a[data-value="Harmonize"]',
+      '.nav li a[data-value="Censored"]',
       '.nav li a[data-value="Flag"]',
       '.nav li a[data-value="Filter"]',
-      '.nav li a[data-value="Censored"]',
-      '.nav li a[data-value="Harmonize"]',
+      '.nav li a[data-value="TNandTPSummation"]',
       '.nav li a[data-value="Depth"]',
       '.nav li a[data-value="Figures"]',
       '.nav li a[data-value="Review"]'
