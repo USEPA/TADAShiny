@@ -36,17 +36,17 @@ golem::document_and_reload()
 # # options(rsconnect.packrat = TRUE) # already done
 
 # Deploy app to staging
-# https://rstudio-connect.dmap-stage.aws.epa.gov/content/814f987d-504f-48c0-b87f-89e73f9e1123/
+# https://rstudio-connect.dmap-stage.aws.epa.gov/content/08e5c894-ece9-4e4e-9e55-0683bef17a65/
 # install.packages("rsconnect") # update to latest
 # do not edit below
 rsconnect::deployApp(
   appDir = getwd(),
-  # appFiles = c("app.R", "DESCRIPTION", "NAMESPACE", "R/", "inst/"),
+  appFiles = c("DESCRIPTION", "NAMESPACE", "R/", "inst/", "man/", "app.R"),
   appName = "TADAShiny",
   appTitle = "TADAShiny Module 1 WQP Data Discovery and Cleaning",
   launch.browser = TRUE,
   forceUpdate = TRUE
-  # appId = 1473 8/12/26
+  # appId = 1652 8/17/26
 )
 
 # To deploy to EPA posit connect production (public)

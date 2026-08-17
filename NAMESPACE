@@ -19,7 +19,6 @@ importFrom(golem,
 )
 importFrom(jsonlite,fromJSON)
 importFrom(magrittr,"%>%")
-importFrom(pkgload,load_all)
 importFrom(shiny,
   HTML,
   NS,

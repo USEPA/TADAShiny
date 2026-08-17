@@ -16,7 +16,6 @@ Copyright: This software is in the public domain because it contains materials t
 Imports: 
     EPATADA,
     rExpertQuery,
-    golem,
     magrittr,
     shiny,
     DT,
@@ -53,14 +52,15 @@ Imports:
     leafem,
     graphics,
     withr,
-    pkgload,
-    httr2
+    httr2,
+    golem,
+    pkgload
 Suggests:
     spelling,
     testthat (>= 3.0.0),
     mockery,
-    rprojroot,
-    usethis
+    usethis,
+    rprojroot
 Remotes:
     USEPA/EPATADA@develop,
     USEPA/rExpertQuery@develop

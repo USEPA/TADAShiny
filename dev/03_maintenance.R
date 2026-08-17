@@ -40,6 +40,10 @@ devtools::test()
 # more robust test for releases (includes broken link check)
 devtools::check(manual = FALSE, remote = TRUE, incoming = TRUE)
 
+# Test package structure
+devtools::build()
+devtools::install()
+
 ##############
 
 # You're now set! ----
