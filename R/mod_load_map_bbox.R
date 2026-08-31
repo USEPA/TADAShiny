@@ -356,17 +356,6 @@ mod_map_bboxServer <- function(id, increment = 0.001, debounce_ms = 500) {
       leaflet::leafletProxy("map_bbox", session = session) |>
         leaflet::clearGroup("search_center")
 
-      # Offline/CI safety
-      offline <- tryCatch(isTRUE(.tadas_offline()), error = function(...) FALSE)
-      if (offline) {
-        shiny::showNotification(
-          "Address lookup is unavailable in offline mode.",
-          type = "warning",
-          duration = 5
-        )
-        return()
-      }
-
       # Geocode via Nominatim, then Census as fallback
       res <- geocode_nominatim(q)
       if (is.null(res)) {
