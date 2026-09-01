@@ -1,20 +1,20 @@
 # A function to construct the argument list
 args_create <- function(
-    statecode = NULL,
-    countycode = NULL,
-    countrycode = NULL,
-    huc = NULL,
-    siteid = NULL,
-    siteType = NULL,
-    characteristicName = NULL,
-    characteristicType = NULL,
-    sampleMedia = NULL,
-    project = NULL,
-    organization = NULL,
-    startDateLo = NULL,
-    startDateHi = NULL,
-    providers = NULL,
-    bBox = NULL
+  statecode = NULL,
+  countycode = NULL,
+  countrycode = NULL,
+  huc = NULL,
+  siteid = NULL,
+  siteType = NULL,
+  characteristicName = NULL,
+  characteristicType = NULL,
+  sampleMedia = NULL,
+  project = NULL,
+  organization = NULL,
+  startDateLo = NULL,
+  startDateHi = NULL,
+  providers = NULL,
+  bBox = NULL
 ) {
   # Construct the arguments for downloads
   args <- list(
@@ -34,32 +34,32 @@ args_create <- function(
     "providers" = providers,
     "bBox" = bBox
   )
-  
+
   # Replace null with NULL
   args[args %in% "null"] <- list(NULL)
-  
+
   # Remove NULL attribute
   args <- args[purrr::map_lgl(args, function(x) !is.null(x))]
-  
+
   return(args)
 }
 
 nwis_args_create <- function(
-    stateFips = NULL,
-    countyFips = NULL,
-    hydrologicUnit = NULL,
-    monitoringLocationIdentifier = NULL,
-    siteTypeName = NULL,
-    characteristic = NULL,
-    characteristicGroup = NULL,
-    activityMediaName = NULL,
-    projectIdentifier = NULL,
-    organizationIdentifier = NULL,
-    activityStartDateLower = NULL,
-    activityStartDateUpper = NULL,
-    dataType = NULL,
-    dataProfile = NULL,
-    boundingBox = NULL
+  stateFips = NULL,
+  countyFips = NULL,
+  hydrologicUnit = NULL,
+  monitoringLocationIdentifier = NULL,
+  siteTypeName = NULL,
+  characteristic = NULL,
+  characteristicGroup = NULL,
+  activityMediaName = NULL,
+  projectIdentifier = NULL,
+  organizationIdentifier = NULL,
+  activityStartDateLower = NULL,
+  activityStartDateUpper = NULL,
+  dataType = NULL,
+  dataProfile = NULL,
+  boundingBox = NULL
 ) {
   args <- list(
     stateFips = stateFips,
@@ -78,7 +78,7 @@ nwis_args_create <- function(
     dataProfile = dataProfile,
     boundingBox = boundingBox
   )
-  
+
   is_bad <- function(x) {
     is.null(x) ||
       length(x) == 0 ||
@@ -87,7 +87,7 @@ nwis_args_create <- function(
       identical(x, "null") ||
       identical(x, "")
   }
-  
+
   args <- args[!vapply(args, is_bad, logical(1))]
   return(args)
 }
@@ -125,14 +125,14 @@ tribal_list <- readRDS(system.file(
 
 # A function to return the tribal data frame with tribal name as an sf object
 return_tribal_sf <- function(
-    tribal_layer,
-    tribal_name,
-    tribal_list = tribal_list
+  tribal_layer,
+  tribal_name,
+  tribal_list = tribal_list
 ) {
   tribal_data2 <- tribal_list |>
     purrr::pluck(tribal_layer) |>
     dplyr::filter(TRIBE_NAME %in% tribal_name)
-  
+
   return(tribal_data2)
 }
 
@@ -462,7 +462,7 @@ mod_query_data_ui <- function(id) {
     .tada-metadata .tada-box > .control-label { display: block; margin-bottom: 8px; }
   "
     ))),
-    
+
     # Card 1 - Option A: Use example data
     htmltools::div(
       class = "tada-card",
@@ -492,7 +492,7 @@ mod_query_data_ui <- function(id) {
         )
       )
     ),
-    
+
     # Card 2 - Option B
     htmltools::div(
       class = "tada-card",
@@ -503,7 +503,7 @@ mod_query_data_ui <- function(id) {
         class = "tada-note",
         "Use the fields below to download a dataset directly from WQP. Fields with '(s)' in the label allow multiple selections. Be mindful that large queries may time out."
       ),
-      
+
       # Location Information
       htmltools::h4("Select Location Parameters"),
       htmltools::p(
@@ -514,11 +514,11 @@ mod_query_data_ui <- function(id) {
         "-results must fall within the overlap of all selected locations. ",
         "All location fields are optional."
       ),
-      
+
       # Subtle background wrapper for the location cluster
       htmltools::div(
         class = "tada-subsection-bg",
-        
+
         # State and County subgroup
         htmltools::tags$fieldset(
           class = "tada-fieldset",
@@ -539,7 +539,7 @@ mod_query_data_ui <- function(id) {
             )
           )
         ),
-        
+
         # Site ID(s) immediately after State/County (tooltip on label)
         shiny::fluidRow(
           class = "tada-field-row",
@@ -561,7 +561,7 @@ mod_query_data_ui <- function(id) {
             )
           )
         ),
-        
+
         # Site Type(s)
         shiny::fluidRow(
           class = "tada-field-row",
@@ -578,7 +578,7 @@ mod_query_data_ui <- function(id) {
             )
           )
         ),
-        
+
         # Bounding Box subgroup (map + coordinates; search pans only)
         shiny::fluidRow(
           class = "tada-field-row",
@@ -599,12 +599,12 @@ mod_query_data_ui <- function(id) {
           )
         )
       ), # end location cluster wrapper
-      
+
       # Metadata Filters (with subtle background like Location Parameters)
       htmltools::h4("Filter Results"),
       htmltools::div(
         class = "tada-metadata tada-subsection-bg",
-        
+
         # New description
         htmltools::p(
           class = "tada-note",
@@ -614,7 +614,7 @@ mod_query_data_ui <- function(id) {
           "-results must fall within the overlap of all selected filters. ",
           "Note: Adjusting the Date Range is required; the default dates (today) will return no results."
         ),
-        
+
         # Row 1: Sample Media, Characteristic Group
         shiny::fluidRow(
           class = "tada-field-row",
@@ -648,7 +648,7 @@ mod_query_data_ui <- function(id) {
             )
           )
         ),
-        
+
         # Characteristic(s) subgroup
         htmltools::tags$fieldset(
           class = "tada-fieldset",
@@ -689,7 +689,7 @@ mod_query_data_ui <- function(id) {
             )
           )
         ),
-        
+
         # Date Range subgroup (Required; tooltip on legend)
         htmltools::tags$fieldset(
           class = "tada-fieldset",
@@ -727,12 +727,12 @@ mod_query_data_ui <- function(id) {
           )
         )
       ),
-      
+
       # Data Source (with subtle background like Location Parameters)
       htmltools::h4("Data Source"),
       htmltools::div(
         class = "tada-subsection-bg",
-        
+
         shiny::fluidRow(
           class = "tada-field-row",
           shiny::column(
@@ -749,7 +749,7 @@ mod_query_data_ui <- function(id) {
             )
           )
         ),
-        
+
         # Hint when not WQX
         shiny::conditionalPanel(
           condition = sprintf("input['%s'] !== 'STORET'", ns("providers")),
@@ -760,7 +760,7 @@ mod_query_data_ui <- function(id) {
             )
           )
         ),
-        
+
         # Additional Filters (EPA WQX only)
         shiny::conditionalPanel(
           condition = sprintf("input['%s'] === 'STORET'", ns("providers")),
@@ -808,7 +808,7 @@ mod_query_data_ui <- function(id) {
                   )
                 )
               ),
-              
+
               # Tribal Data subgroup (match fieldset look)
               htmltools::tags$fieldset(
                 class = "tada-fieldset",
@@ -840,7 +840,7 @@ mod_query_data_ui <- function(id) {
           )
         )
       ),
-      
+
       # Run Query
       shiny::fluidRow(
         class = "tada-actions",
@@ -855,7 +855,7 @@ mod_query_data_ui <- function(id) {
         )
       )
     ),
-    
+
     # Card 3 - Option C (Upload) + Optional Progress File
     htmltools::div(
       class = "tada-card",
@@ -900,7 +900,7 @@ mod_query_data_ui <- function(id) {
           )
         )
       ),
-      
+
       # Optional: Upload Progress File
       htmltools::hr(),
       shiny::fluidRow(htmltools::h3("Optional: Upload Progress File")),
@@ -927,7 +927,7 @@ mod_query_data_ui <- function(id) {
         )
       )
     ),
-    
+
     # JavaScript implementing the stopwatch (client-side)
     shiny::tags$script(HTML(
       "
@@ -1300,15 +1300,23 @@ restrict_to_keep_cols <- function(df, keep_cols = all.cols, verbose = TRUE) {
   removed <- setdiff(orig_names, keep_cols)
   missing <- setdiff(keep_cols, orig_names)
   df_out <- df[, keep_ordered, drop = FALSE]
-  
+
   if (isTRUE(verbose)) {
     if (length(removed)) {
-      message("Removing ", length(removed), " column(s): ", paste(removed, collapse = ", "))
+      message(
+        "Removing ",
+        length(removed),
+        " column(s): ",
+        paste(removed, collapse = ", ")
+      )
     } else {
       message("No columns removed.")
     }
     if (length(missing)) {
-      message("Requested but not present in input (not added): ", paste(missing, collapse = ", "))
+      message(
+        "Requested but not present in input (not added): ",
+        paste(missing, collapse = ", ")
+      )
     }
   }
   df_out
@@ -1320,19 +1328,19 @@ restrict_to_keep_cols <- function(df, keep_cols = all.cols, verbose = TRUE) {
 mod_query_data_server <- function(id, tadat) {
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
-    
+
     # Increase timeout to 5 minutes
     withr::local_options(list(timeout = max(getOption("timeout"), 300)))
-    
+
     # Call the bbox map module and capture its return value
     bbox_data <- mod_map_bboxServer("BBox_map")
-    
+
     ## creates download template button used for importing data to TADAShiny - used in option C
     template_data <- shiny::reactive(EPATADA::TADA_GetTemplate())
-    
+
     # hold error message for NWIS queries in a reactive value so it can be displayed in a modal if needed
     nwis_error_message_text <- NULL
-    
+
     # return an ms excel file with the template columns
     output$download_template <- shiny::downloadHandler(
       filename = function() {
@@ -1345,7 +1353,7 @@ mod_query_data_server <- function(id, tadat) {
       },
       contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
-    
+
     ## greys out Load button for example data until file has been selected
     # https://stackoverflow.com/questions/24175997/force-no-default-selection-in-selectinput
     shiny::observeEvent(input$example_data, {
@@ -1355,9 +1363,9 @@ mod_query_data_server <- function(id, tadat) {
         shinyjs::disable("example_data_go")
       }
     })
-    
+
     ####################
-    
+
     # handles option C user data uploads
     shiny::observeEvent(input$file, {
       # extra safeguard for spinner removal even in unexpected control-flow issues
@@ -1374,9 +1382,9 @@ mod_query_data_server <- function(id, tadat) {
         text = "Uploading dataset from excel file ...",
         session = shiny::getDefaultReactiveDomain()
       )
-      
+
       success <- FALSE # Flag to track if the process completes successfully
-      
+
       tryCatch(
         {
           # only in interactive dev - withr will auto-restore at the end of this block
@@ -1384,32 +1392,32 @@ mod_query_data_server <- function(id, tadat) {
           if (interactive()) {
             withr::local_options(list(warn = 2))
           }
-          
+
           # Validate file input
           if (is.null(input$file)) {
             stop("No file uploaded.")
           }
-          
+
           # added this to make sure it is not null later
           tadat$original_source <- "Upload"
-          
+
           # user uploaded data
           raw <- readxl::read_excel(
             input$file$datapath,
             sheet = 1,
             col_types = "text"
           )
-          
+
           # Validate data structure
           if (!is.data.frame(raw)) {
             stop("Uploaded file is not a valid data frame.")
           }
-          
+
           # Check for multiple rows
           if (nrow(raw) <= 1) {
             stop("The uploaded file must contain more than one row.")
           }
-          
+
           # Define the required columns
           required_cols <- c(
             "ActivityMediaName",
@@ -1425,10 +1433,10 @@ mod_query_data_server <- function(id, tadat) {
             "LatitudeMeasure",
             "LongitudeMeasure"
           )
-          
+
           # Check for missing columns
           missing_cols <- setdiff(required_cols, names(raw))
-          
+
           # If any required columns are missing, stop processing and show an error
           if (length(missing_cols) > 0) {
             stop(paste(
@@ -1437,21 +1445,21 @@ mod_query_data_server <- function(id, tadat) {
               paste(missing_cols, collapse = ", ")
             ))
           }
-          
+
           # run autoclean
           raw <- EPATADA::TADA_AutoClean(raw)
-          
+
           # check for ALL required fields (after autoclean is run)
           if (!EPATADA::TADA_CheckRequiredFields(raw)) {
             stop("The uploaded file is missing required columns.")
           }
-          
+
           success <- TRUE # Set flag to true if all operations succeed
         },
         error = function(e) {
           # Log error details for debugging
           cat("Error: ", e$message, "\n")
-          
+
           # Show error notification to the user
           shiny::showNotification(
             ui = tagList(
@@ -1465,34 +1473,34 @@ mod_query_data_server <- function(id, tadat) {
           )
         }
       )
-      
+
       # Ensure spinner is removed regardless of success or error
       shinybusy::remove_modal_spinner(
         session = shiny::getDefaultReactiveDomain()
       )
-      
+
       # If successful, reduce columns then initialize
       if (success == TRUE) {
         # Standardize to TADA template order before restricting
         raw <- EPATADA::TADA_OrderCols(raw)
-        
+
         # Trim to keep list (prints removed columns to console)
         raw <- restrict_to_keep_cols(raw, keep_cols = all.cols, verbose = TRUE)
-        
+
         # Let initializeTable add TADA.Remove for new datasets
         raw$TADA.Remove <- NULL
-        
+
         initializeTable(tadat, raw)
-        
+
         tadat$original_source <- "Upload"
-        
+
         # Clear any existing notification with the same ID
         shiny::removeNotification("uploadError")
       }
     })
-    
+
     ####################
-    
+
     # Read the TADA progress file
     shiny::observe({
       shiny::req(input$progress_file)
@@ -1500,7 +1508,7 @@ mod_query_data_server <- function(id, tadat) {
       readFile(tadat, input$progress_file$datapath)
       # resumed session will not trim the users input dataset, extra columns they have would be carried through
     })
-    
+
     # if user presses example data button, make tadat$raw the one of the example_data contained within the TADA package.
     shiny::observeEvent(input$example_data_go, {
       # a modal that pops up showing it's working on loading the data
@@ -1526,31 +1534,31 @@ mod_query_data_server <- function(id, tadat) {
         ),
         session = shiny::getDefaultReactiveDomain()
       )
-      
+
       # get the data from the example_data_map based on the user's selection.
       # This is a named list of functions that each return a dataset, so we
       # call the function corresponding to the user's selection to get the dataset.
       raw <- example_data_map[[input$example_data]]()
-      
+
       # Clean -> order -> restrict -> initialize
       raw <- EPATADA::TADA_AutoClean(raw)
       raw <- EPATADA::TADA_IDCensoredData(raw)
       raw <- EPATADA::TADA_OrderCols(raw)
       raw <- restrict_to_keep_cols(raw, keep_cols = all.cols, verbose = TRUE)
-      
+
       initializeTable(tadat, raw)
-      
+
       shinybusy::remove_modal_spinner() # session = session)  # shiny::getDefaultReactiveDomain())
-      
+
       disableLoading(session)
     })
-    
+
     statecodes_df <- readRDS(system.file(
       "extdata",
       "statecodes_df.rds",
       package = "TADAShiny"
     ))
-    
+
     # this section has widget update commands for the selectizeinputs that have a lot of possible selections - shiny suggested hosting the choices server-side rather than ui-side
     shiny::updateSelectizeInput(
       session,
@@ -1575,11 +1583,11 @@ mod_query_data_server <- function(id, tadat) {
       options = list(placeholder = "Start typing or use drop down menu"),
       server = TRUE
     )
-    
+
     # A reactive expression that filters the choices based on the input pattern
     filtered_list <- shiny::reactive({
       text_string <- input$text_string
-      
+
       if (is.null(text_string) || text_string == "") {
         # If the text string is empty, return all choices
         return(chars)
@@ -1599,20 +1607,20 @@ mod_query_data_server <- function(id, tadat) {
           # contains
           grep_pattern <- text_string
         }
-        
+
         my_filtered_list <- chars[grep(grep_pattern, chars, ignore.case = TRUE)]
-        
+
         return(my_filtered_list)
       }
     })
-    
+
     # Observer to update the selectizeInput choices whenever the filtered_list changes
     shiny::observe({
       # using isolate() here is key to this whole thing working.
       # the value would be subject to an event when the updateSelectizeInput() happens below,
       # so you need to 'isolate' the current value before you run the update
       previous_selected <- shiny::isolate(input$characteristic_select)
-      
+
       shiny::updateSelectizeInput(
         session,
         "characteristic_select",
@@ -1621,7 +1629,7 @@ mod_query_data_server <- function(id, tadat) {
         selected = previous_selected
       )
     })
-    
+
     shiny::updateSelectizeInput(
       session,
       "characteristic",
@@ -1659,7 +1667,7 @@ mod_query_data_server <- function(id, tadat) {
       options = list(placeholder = "Select tribal data layer", maxItems = 1),
       server = TRUE
     )
-    
+
     # this observes when the user inputs a state into the drop down and subsets the choices for counties to only those counties within that state.
     shiny::observeEvent(input$state, {
       state_counties <- subset(counties, counties$STATE_CD == input$state)
@@ -1672,7 +1680,7 @@ mod_query_data_server <- function(id, tadat) {
         server = TRUE
       )
     })
-    
+
     # this observes when the user inputs a tribal data layer into the drop down and subsets the choices for data layer to only those tribes within that dataset.
     shiny::observeEvent(input$tribe_layer, {
       tribal_names <- sort(tribal_list[[input$tribe_layer]][["TRIBE_NAME"]])
@@ -1685,28 +1693,52 @@ mod_query_data_server <- function(id, tadat) {
         server = TRUE
       )
     })
-    
+
     # this event observer is triggered when the user hits the "Query Now" button, and then runs the TADA_dataRetrieval function
     shiny::observeEvent(input$querynow, {
       tadat$original_source <- "Query"
-      
-      tadat$providers <- if (is.null(input$providers)) "null" else input$providers
+
+      tadat$providers <- if (is.null(input$providers)) {
+        "null"
+      } else {
+        input$providers
+      }
       tadat$statecode <- if (input$state == "") "null" else input$state
       tadat$countycode <- if (input$county == "") "null" else input$county
-      tadat$countrycode <- if (is.null(input$countryocean)) "null" else input$countryocean
+      tadat$countrycode <- if (is.null(input$countryocean)) {
+        "null"
+      } else {
+        input$countryocean
+      }
       tadat$siteid <- if (is.null(input$siteid)) "null" else input$siteid
       tadat$siteType <- if (is.null(input$type)) "null" else input$type
-      tadat$characteristicType <- if (is.null(input$chargroup)) "null" else input$chargroup
-      tadat$characteristicName <- if (is.null(input$characteristic_select)) "null" else input$characteristic_select
+      tadat$characteristicType <- if (is.null(input$chargroup)) {
+        "null"
+      } else {
+        input$chargroup
+      }
+      tadat$characteristicName <- if (is.null(input$characteristic_select)) {
+        "null"
+      } else {
+        input$characteristic_select
+      }
       tadat$sampleMedia <- if (is.null(input$media)) "null" else input$media
       if (!is.null(input$media) && sum(grep("Water", input$media)) > 0) {
         tadat$sampleMedia <- append(tadat$sampleMedia, "water")
       }
       tadat$project <- if (is.null(input$project)) "null" else input$project
       tadat$organization <- if (is.null(input$org)) "null" else input$org
-      tadat$endDate <- if (length(input$endDate) == 0) "null" else as.character(input$endDate)
-      tadat$startDate <- if (length(input$startDate) == 0) "null" else as.character(input$startDate)
-      
+      tadat$endDate <- if (length(input$endDate) == 0) {
+        "null"
+      } else {
+        as.character(input$endDate)
+      }
+      tadat$startDate <- if (length(input$startDate) == 0) {
+        "null"
+      } else {
+        as.character(input$startDate)
+      }
+
       if (!input$tribe_layer %in% "" && !input$tribe_name %in% "") {
         tribal_sf_object <- return_tribal_sf(
           tribal_layer = input$tribe_layer,
@@ -1719,13 +1751,13 @@ mod_query_data_server <- function(id, tadat) {
         tadat$tribal_boundary <- "null"
         tadat$tribal_bBox <- "null"
       }
-      
+
       if (!is.null(bbox_data$bBox)) {
         tadat$bBox <- bbox_data$bBox
       } else {
         tadat$bBox <- "null"
       }
-      
+
       # If use tribal dataset, use the tribal dataset's bbox
       # Otherwise, use the bbox from tadat
       bbox_reactive <- shiny::reactive({
@@ -1735,14 +1767,14 @@ mod_query_data_server <- function(id, tadat) {
           tadat$tribal_bBox
         }
       })
-      
+
       if (
         (input$providers == "all" || input$providers == "NWIS") &&
-        (shiny::isTruthy(input$org) ||
-         shiny::isTruthy(input$project) ||
-         shiny::isTruthy(input$countryocean) ||
-         shiny::isTruthy(input$tribe_layer) ||
-         shiny::isTruthy(input$tribe_name))
+          (shiny::isTruthy(input$org) ||
+            shiny::isTruthy(input$project) ||
+            shiny::isTruthy(input$countryocean) ||
+            shiny::isTruthy(input$tribe_layer) ||
+            shiny::isTruthy(input$tribe_name))
       ) {
         # display a modal and return because these are not compatible
         shiny::showModal(shiny::modalDialog(
@@ -1757,11 +1789,11 @@ mod_query_data_server <- function(id, tadat) {
         ))
         return(NULL)
       }
-      
+
       STORET_results <- NULL
       NWIS_results <- NULL
       nwis_error_message_text <- NULL
-      
+
       # Provider-specific query: EPA/WQX
       if (input$providers %in% c("STORET", "all")) {
         shinybusy::show_modal_spinner(
@@ -1769,15 +1801,23 @@ mod_query_data_server <- function(id, tadat) {
           color = "#0071bc",
           text = tagList(
             shiny::tags$div(
-              shiny::tags$p("Querying Data Source", shiny::tags$br(), "EPA (WQX)"),
+              shiny::tags$p(
+                "Querying Data Source",
+                shiny::tags$br(),
+                "EPA (WQX)"
+              ),
               style = "text-align:center; padding: 12px;",
               shiny::tags$p(id = "js_time_display", "00:00:00")
             ),
-            shiny::tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
+            shiny::tags$input(
+              id = "js_elapsed_seconds",
+              type = "hidden",
+              value = "0"
+            )
           ),
           session = shiny::getDefaultReactiveDomain()
         )
-        
+
         # Build arguments using the WQP-style argument names for EPATADA::TADA_DataRetrieval
         args_temp <- args_create(
           statecode = tadat$statecode,
@@ -1795,7 +1835,7 @@ mod_query_data_server <- function(id, tadat) {
           providers = tadat$providers,
           bBox = bbox_reactive()
         )
-        
+
         STORET_results <- tryCatch(
           EPATADA::TADA_DataRetrieval(
             args_temp,
@@ -1805,7 +1845,9 @@ mod_query_data_server <- function(id, tadat) {
           ),
           error = function(e) {
             # Developer note: keep the spinner removal here so users do not get stuck
-            shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+            shinybusy::remove_modal_spinner(
+              session = shiny::getDefaultReactiveDomain()
+            )
             shiny::showModal(shiny::modalDialog(
               title = "Error",
               paste("An error occurred while querying WQX (EPA):", e$message),
@@ -1814,13 +1856,13 @@ mod_query_data_server <- function(id, tadat) {
             NULL
           }
         )
-        
+
         # Normalize EPA results with the same TADA cleaning path used elsewhere in the app
         if (!is.null(STORET_results) && nrow(STORET_results) > 0) {
           STORET_results <- EPATADA::TADA_AutoClean(STORET_results)
         }
       }
-      
+
       # Provider-specific query: USGS/NWIS
       if (input$providers %in% c("NWIS", "all")) {
         # Developer note: NWIS uses FIPS-style county/state arguments, so we derive them from the selected state/county.
@@ -1829,14 +1871,22 @@ mod_query_data_server <- function(id, tadat) {
           county_fips_arg <- NULL
         } else if (input$county == "") {
           state <- utils::head(counties[counties$STATE_CD == input$state, ], 1)
-          state_fips_arg <- paste("US", sprintf("%02d", state$STATE_FIPS), sep = ":")
+          state_fips_arg <- paste(
+            "US",
+            sprintf("%02d", state$STATE_FIPS),
+            sep = ":"
+          )
           county_fips_arg <- NULL
         } else {
           county <- counties[
             counties$STATE_CD == input$state &
               counties$COUNTY_NAME == input$county,
           ]
-          state_fips_arg <- paste("US", sprintf("%02d", county$STATE_FIPS), sep = ":")
+          state_fips_arg <- paste(
+            "US",
+            sprintf("%02d", county$STATE_FIPS),
+            sep = ":"
+          )
           county_fips_arg <- paste(
             "US",
             sprintf("%02d", county$STATE_FIPS),
@@ -1844,21 +1894,29 @@ mod_query_data_server <- function(id, tadat) {
             sep = ":"
           )
         }
-        
+
         shinybusy::show_modal_spinner(
           spin = "double-bounce",
           color = "#0071bc",
           text = tagList(
             shiny::tags$div(
-              shiny::tags$p("Querying Data Source", shiny::tags$br(), "USGS (Samples Data API)"),
+              shiny::tags$p(
+                "Querying Data Source",
+                shiny::tags$br(),
+                "USGS (Samples Data API)"
+              ),
               style = "text-align:center; padding: 12px;",
               shiny::tags$p(id = "js_time_display", "00:00:00")
             ),
-            shiny::tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
+            shiny::tags$input(
+              id = "js_elapsed_seconds",
+              type = "hidden",
+              value = "0"
+            )
           ),
           session = shiny::getDefaultReactiveDomain()
         )
-        
+
         # Developer note: call read_waterdata_samples() directly; no WQP summary/chunking is used anymore.
         nwis_results_raw <- tryCatch(
           dataRetrieval::read_waterdata_samples(
@@ -1880,38 +1938,47 @@ mod_query_data_server <- function(id, tadat) {
           error = function(e) {
             # Developer note: preserve message for downstream modal handling
             nwis_error_message_text <<- paste(
-              shiny::tags$strong("An error occurred while querying NWIS (USGS):"),
+              shiny::tags$strong(
+                "An error occurred while querying NWIS (USGS):"
+              ),
               shiny::tags$p(e$message)
             )
             NULL
           }
         )
-        
+
         # Required transformation chain for NWIS: legacy renaming -> autoclean
         if (!is.null(nwis_results_raw) && nrow(nwis_results_raw) > 0) {
           NWIS_results <- EPATADA::TADA_RenametoLegacy(nwis_results_raw)
-          
+
           # Developer note: keep this compatibility fix unless upstream NWIS output changes
           if ("SampleAquifer" %in% names(NWIS_results)) {
-            names(NWIS_results)[names(NWIS_results) == "SampleAquifer"] <- "AquiferName"
+            names(NWIS_results)[
+              names(NWIS_results) == "SampleAquifer"
+            ] <- "AquiferName"
           }
-          
+
           NWIS_results <- EPATADA::TADA_AutoClean(NWIS_results)
-          
+
           # Developer note: force these date/time fields to character to avoid bind_rows class conflicts.
-          NWIS_results$ActivityStartDate <- as.character(NWIS_results$ActivityStartDate)
-          NWIS_results$ActivityStartDateTime <- as.character(NWIS_results$ActivityStartDateTime)
+          NWIS_results$ActivityStartDate <- as.character(
+            NWIS_results$ActivityStartDate
+          )
+          NWIS_results$ActivityStartDateTime <- as.character(
+            NWIS_results$ActivityStartDateTime
+          )
           NWIS_results$ActivityStartTime.TimeZoneCode_offset <- as.character(
             NWIS_results$ActivityStartTime.TimeZoneCode_offset
           )
         }
       }
-      
+
       # If NWIS failed, show a dedicated modal. Otherwise combine whatever was successfully retrieved.
       if (
-        input$providers %in% c("NWIS", "all") &&
-        !is.null(nwis_error_message_text) &&
-        nzchar(nwis_error_message_text)
+        input$providers %in%
+          c("NWIS", "all") &&
+          !is.null(nwis_error_message_text) &&
+          nzchar(nwis_error_message_text)
       ) {
         shiny::showModal(shiny::modalDialog(
           title = "NWIS Error",
@@ -1930,12 +1997,12 @@ mod_query_data_server <- function(id, tadat) {
         } else {
           All_results_clean <- NULL
         }
-        
+
         # Developer note: guard against NULL before checking row count.
         if (is.null(All_results_clean) || nrow(All_results_clean) <= 0) {
           message_text <- "Your query returned zero results. Please adjust your search inputs and try again.
 Remember to update the start and end dates."
-          
+
           shiny::showModal(shiny::modalDialog(
             title = "Empty Query",
             shiny::tags$p(message_text),
@@ -1943,8 +2010,10 @@ Remember to update the start and end dates."
           ))
         } else {
           disableLoading(session)
-          shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
-          
+          shinybusy::remove_modal_spinner(
+            session = shiny::getDefaultReactiveDomain()
+          )
+
           # Developer note: all downstream logic expects the unified TADA column set.
           raw <- restrict_to_keep_cols(
             All_results_clean,
@@ -1955,12 +2024,12 @@ Remember to update the start and end dates."
         }
       }
     }) # end of observeEvent for querynow button
-    
+
     # Update the run parameters if example data is selected
     shiny::observeEvent(input$example_data_go, {
       tadat$original_source <- "Example"
     })
-    
+
     # Populate the boxes if a progress file is loaded
     shiny::observeEvent(tadat$load_progress_file, {
       if (!is.na(tadat$load_progress_file)) {

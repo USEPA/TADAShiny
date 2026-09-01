@@ -1,13 +1,17 @@
 # Basic wiring: run a minimal server check inside a test block
 testthat::test_that("mod_query_data_server basic NS wiring", {
   tadat <- shiny::reactiveValues()
-  
-  shiny::testServer(mod_query_data_server, args = list(id = "test", tadat = tadat), {
-    ns <- session$ns
-    expect_true(inherits(ns, "function"))
-    expect_true(grepl("test", ns("")))
-    expect_true(grepl("test", ns("test")))
-  })
+
+  shiny::testServer(
+    mod_query_data_server,
+    args = list(id = "test", tadat = tadat),
+    {
+      ns <- session$ns
+      expect_true(inherits(ns, "function"))
+      expect_true(grepl("test", ns("")))
+      expect_true(grepl("test", ns("test")))
+    }
+  )
 })
 
 testthat::test_that("module ui works", {
@@ -253,7 +257,7 @@ testthat::test_that("disableLoading calls shiny update functions and attempts to
   )
   mockery::stub(disableLoading, "shinyjs::disable", mock_shinyjs_disable)
   mockery::stub(disableLoading, "shiny::insertUI", mock_insertUI)
-  
+
   # Call disableLoading with a fake session object (not used by our mocks, but keep something sensible)
   fake_session <- list(user = "fake")
   testthat::expect_silent(disableLoading(fake_session))

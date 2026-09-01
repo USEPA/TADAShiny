@@ -211,13 +211,13 @@ test_that("flagCensus handles keep/NA/unknown-column branches", {
     )
   )
   on.exit(lapply(rev(patches), restore_ns_obj), add = TRUE)
-  
+
   raw <- data.frame(
     col1 = c("X", "Q", NA),
     col2 = c(NA, "A", NA),
     stringsAsFactors = FALSE
   )
-  
+
   out <- flagCensus(raw)
   expect_s3_class(out, "data.frame")
   expect_identical(names(out), c("TypeA"))
@@ -242,10 +242,10 @@ test_that("flagCensus prints no-tests message for flag types without rules", {
     )
   )
   on.exit(lapply(rev(patches), restore_ns_obj), add = TRUE)
-  
+
   raw <- data.frame(col1 = c("x", "y"), stringsAsFactors = FALSE)
   expect_output(flagCensus(raw), "No tests found for flag TypeB", fixed = TRUE)
-  
+
   out <- flagCensus(raw)
   expect_true("TypeB" %in% names(out))
   expect_true(all(is.na(out$TypeB)))
@@ -254,9 +254,9 @@ test_that("flagCensus prints no-tests message for flag types without rules", {
 test_that("getCounts returns expected records and site totals", {
   sites <- c("S1", "S1", "S2", "S3")
   removed <- c(FALSE, TRUE, TRUE, FALSE)
-  
+
   out <- getCounts(sites, removed)
-  
+
   expect_s3_class(out, "data.frame")
   expect_identical(
     rownames(out),
@@ -269,10 +269,10 @@ test_that("getCounts returns expected records and site totals", {
 test_that("checkFlagColumns returns FALSE when most active flag columns are missing", {
   patches <- list(patch_ns_obj("TADAShiny", "active_flags", c("A", "B", "C")))
   on.exit(lapply(rev(patches), restore_ns_obj), add = TRUE)
-  
+
   mostly_missing <- data.frame(A = c(TRUE, FALSE), stringsAsFactors = FALSE)
   expect_false(checkFlagColumns(mostly_missing))
-  
+
   mostly_found <- data.frame(
     A = c(TRUE, FALSE),
     B = c(FALSE, FALSE),
@@ -283,7 +283,7 @@ test_that("checkFlagColumns returns FALSE when most active flag columns are miss
     "Missing the following fields that are in the csv files:",
     fixed = TRUE
   )
-  
+
   complete <- data.frame(
     A = FALSE,
     B = FALSE,
@@ -300,7 +300,7 @@ test_that("applyFlags runs full EPATADA pipeline and includes QAPP step when col
       df
     }
   }
-  
+
   patches <- list(
     patch_ns_fun("EPATADA", "TADA_FlagSpeciation", add_col("step_speciation")),
     patch_ns_fun("EPATADA", "TADA_FlagFraction", add_col("step_fraction")),
@@ -333,15 +333,15 @@ test_that("applyFlags runs full EPATADA pipeline and includes QAPP step when col
     patch_ns_fun("EPATADA", "TADA_MediaFilter", add_col("step_media"))
   )
   on.exit(lapply(rev(patches), restore_ns_fun), add = TRUE)
-  
+
   in_table <- data.frame(
     ResultIdentifier = c("r1", "r2"),
     ProjectFileUrl = c("http://x", "http://y"),
     stringsAsFactors = FALSE
   )
-  
+
   out <- applyFlags(in_table, orgs = NULL)
-  
+
   expected_cols <- c(
     "step_speciation",
     "step_fraction",
@@ -357,7 +357,7 @@ test_that("applyFlags runs full EPATADA pipeline and includes QAPP step when col
     "step_coordinates",
     "step_media"
   )
-  
+
   expect_true(all(expected_cols %in% names(out)))
   expect_true(all(vapply(out[expected_cols], all, logical(1))))
 })
@@ -369,7 +369,7 @@ test_that("applyFlags skips QAPP step when ProjectFileUrl column is absent", {
       df
     }
   }
-  
+
   patches <- list(
     patch_ns_fun("EPATADA", "TADA_FlagSpeciation", add_col("step_speciation")),
     patch_ns_fun("EPATADA", "TADA_FlagFraction", add_col("step_fraction")),
@@ -402,14 +402,14 @@ test_that("applyFlags skips QAPP step when ProjectFileUrl column is absent", {
     patch_ns_fun("EPATADA", "TADA_MediaFilter", add_col("step_media"))
   )
   on.exit(lapply(rev(patches), restore_ns_fun), add = TRUE)
-  
+
   in_table <- data.frame(
     ResultIdentifier = c("r1", "r2"),
     stringsAsFactors = FALSE
   )
-  
+
   out <- applyFlags(in_table, orgs = NULL)
-  
+
   expect_false("step_qappdoc" %in% names(out))
   expect_true("step_media" %in% names(out))
 })
