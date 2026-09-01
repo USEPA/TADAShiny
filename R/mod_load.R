@@ -1796,30 +1796,23 @@ mod_query_data_server <- function(id, tadat) {
 
       # Provider-specific query: EPA/WQX
       if (input$providers %in% c("STORET", "all")) {
+        message("Entering STORET branch")
+        
         shinybusy::show_modal_spinner(
           spin = "double-bounce",
           color = "#0071bc",
           text = tagList(
             shiny::tags$div(
-              shiny::tags$p(
-                "Querying Data Source",
-                shiny::tags$br(),
-                "EPA (WQX)"
-              ),
+              shiny::tags$p("Querying Data Source", shiny::tags$br(), "EPA (WQX)"),
               style = "text-align:center; padding: 12px;",
               shiny::tags$p(id = "js_time_display", "00:00:00")
             ),
-            shiny::tags$input(
-              id = "js_elapsed_seconds",
-              type = "hidden",
-              value = "0"
-            )
+            shiny::tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
           ),
           session = shiny::getDefaultReactiveDomain()
         )
-
-        # Build arguments using the WQP-style argument names for EPATADA::TADA_DataRetrieval
-        storet_args <- list(
+        
+        storet_args <- args_create(
           statecode = tadat$statecode,
           countycode = tadat$countycode,
           countrycode = tadat$countrycode,
@@ -1836,15 +1829,6 @@ mod_query_data_server <- function(id, tadat) {
           bBox = bbox_reactive()
         )
         
-        storet_args <- storet_args[!vapply(storet_args, function(v) {
-          is.null(v) ||
-            length(v) == 0 ||
-            all(is.na(v)) ||
-            identical(v, "NA") ||
-            identical(v, "null") ||
-            identical(v, "")
-        }, logical(1))]
-        
         STORET_results <- tryCatch(
           EPATADA::TADA_DataRetrieval(
             storet_args,
@@ -1852,7 +1836,6 @@ mod_query_data_server <- function(id, tadat) {
             ask = FALSE
           ),
           error = function(e) {
-            # Developer note: keep the spinner removal here so users do not get stuck
             shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
             shiny::showModal(shiny::modalDialog(
               title = "Error",
@@ -1863,7 +1846,6 @@ mod_query_data_server <- function(id, tadat) {
           }
         )
         
-        # Normalize EPA results with the same TADA cleaning path used elsewhere in the app
         if (!is.null(STORET_results) && nrow(STORET_results) > 0) {
           STORET_results <- EPATADA::TADA_AutoClean(STORET_results)
         }
