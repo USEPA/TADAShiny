@@ -55,12 +55,12 @@ add_USGS_base <- function(x) {
     attribution = att,
     layers = "0"
   )
-  
+
   # Show only one base by default (e.g., USGS Topo)
   x <- leaflet::hideGroup(x, grp[2])
   x <- leaflet::hideGroup(x, grp[3])
   x <- leaflet::hideGroup(x, grp[4])
-  
+
   # Add the tiled overlay for the National Hydrography Dataset to the map widget:
   opt <- leaflet::WMSTileOptions(format = "image/png", transparent = TRUE)
   x <- leaflet::addWMSTiles(
@@ -71,7 +71,7 @@ add_USGS_base <- function(x) {
     layers = "0"
   )
   x <- leaflet::hideGroup(x, grp[5])
-  
+
   # Add layer control
   opt2 <- leaflet::layersControlOptions(collapsed = FALSE)
   x <- leaflet::addLayersControl(
@@ -81,7 +81,7 @@ add_USGS_base <- function(x) {
     options = opt2,
     position = "topleft"
   )
-  
+
   return(x)
 }
 
