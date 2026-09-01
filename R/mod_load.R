@@ -1819,7 +1819,7 @@ mod_query_data_server <- function(id, tadat) {
         )
 
         # Build arguments using the WQP-style argument names for EPATADA::TADA_DataRetrieval
-        args_temp <- args_create(
+        storet_args <- list(
           statecode = tadat$statecode,
           countycode = tadat$countycode,
           countrycode = tadat$countrycode,
@@ -1835,19 +1835,25 @@ mod_query_data_server <- function(id, tadat) {
           providers = tadat$providers,
           bBox = bbox_reactive()
         )
-
+        
+        storet_args <- storet_args[!vapply(storet_args, function(v) {
+          is.null(v) ||
+            length(v) == 0 ||
+            all(is.na(v)) ||
+            identical(v, "NA") ||
+            identical(v, "null") ||
+            identical(v, "")
+        }, logical(1))]
+        
         STORET_results <- tryCatch(
           EPATADA::TADA_DataRetrieval(
-            args_temp,
+            storet_args,
             provider = "STORET",
-            ask = FALSE,
-            applyautoclean = FALSE # this is done later as a separate step
+            ask = FALSE
           ),
           error = function(e) {
             # Developer note: keep the spinner removal here so users do not get stuck
-            shinybusy::remove_modal_spinner(
-              session = shiny::getDefaultReactiveDomain()
-            )
+            shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
             shiny::showModal(shiny::modalDialog(
               title = "Error",
               paste("An error occurred while querying WQX (EPA):", e$message),
@@ -1856,7 +1862,7 @@ mod_query_data_server <- function(id, tadat) {
             NULL
           }
         )
-
+        
         # Normalize EPA results with the same TADA cleaning path used elsewhere in the app
         if (!is.null(STORET_results) && nrow(STORET_results) > 0) {
           STORET_results <- EPATADA::TADA_AutoClean(STORET_results)
@@ -1917,28 +1923,38 @@ mod_query_data_server <- function(id, tadat) {
           session = shiny::getDefaultReactiveDomain()
         )
 
-        # Developer note: call read_waterdata_samples() directly; no WQP summary/chunking is used anymore.
+        # Call read_waterdata_samples() directly
+        nwis_args <- list(
+          stateFips = state_fips_arg,
+          countyFips = county_fips_arg,
+          monitoringLocationIdentifier = tadat$siteid,
+          siteTypeName = tadat$siteType,
+          characteristic = tadat$characteristicName,
+          characteristicGroup = tadat$characteristicType,
+          activityMediaName = tadat$sampleMedia,
+          projectIdentifier = tadat$project,
+          activityStartDateLower = tadat$startDate,
+          activityStartDateUpper = tadat$endDate,
+          dataType = "results",
+          dataProfile = "fullphyschem",
+          boundingBox = bbox_reactive()
+        )
+        
+        nwis_args <- nwis_args[!vapply(nwis_args, function(v) {
+          is.null(v) ||
+            length(v) == 0 ||
+            all(is.na(v)) ||
+            identical(v, "NA") ||
+            identical(v, "null") ||
+            identical(v, "")
+        }, logical(1))]
+        
         nwis_results_raw <- tryCatch(
-          dataRetrieval::read_waterdata_samples(
-            stateFips = state_fips_arg,
-            countyFips = county_fips_arg,
-            monitoringLocationIdentifier = tadat$siteid,
-            siteTypeName = tadat$siteType,
-            characteristic = tadat$characteristicName,
-            characteristicGroup = tadat$characteristicType,
-            activityMediaName = tadat$sampleMedia,
-            projectIdentifier = tadat$project,
-            activityStartDateLower = tadat$startDate,
-            activityStartDateUpper = tadat$endDate,
-            dataType = "results",
-            dataProfile = "fullphyschem",
-            boundingBox = bbox_reactive()
-          ),
+          do.call(dataRetrieval::read_waterdata_samples, nwis_args),
           error = function(e) {
+            # Developer note: preserve message for downstream modal handling
             nwis_error_message_text <<- paste(
-              shiny::tags$strong(
-                "An error occurred while querying NWIS (USGS):"
-              ),
+              shiny::tags$strong("An error occurred while querying NWIS (USGS):"),
               shiny::tags$p(e$message)
             )
             NULL
