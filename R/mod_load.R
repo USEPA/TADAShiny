@@ -1,11 +1,98 @@
-# Minimal safe helpers to avoid failing on install/lazy load/CI
-.tadas_offline <- function() {
-  nzchar(Sys.getenv("TADAS_OFFLINE", "")) # set TADAS_OFFLINE=true in CI to force offline
+# A function to construct the argument list
+args_create <- function(
+    statecode = NULL,
+    countycode = NULL,
+    countrycode = NULL,
+    huc = NULL,
+    siteid = NULL,
+    siteType = NULL,
+    characteristicName = NULL,
+    characteristicType = NULL,
+    sampleMedia = NULL,
+    project = NULL,
+    organization = NULL,
+    startDateLo = NULL,
+    startDateHi = NULL,
+    providers = NULL,
+    bBox = NULL
+) {
+  # Construct the arguments for downloads
+  args <- list(
+    "statecode" = statecode,
+    "countycode" = countycode,
+    "countrycode" = countrycode,
+    "huc" = huc,
+    "siteid" = siteid,
+    "siteType" = siteType,
+    "characteristicName" = characteristicName,
+    "characteristicType" = characteristicType,
+    "sampleMedia" = sampleMedia,
+    "project" = project,
+    "organization" = organization,
+    "startDateLo" = startDateLo,
+    "startDateHi" = startDateHi,
+    "providers" = providers,
+    "bBox" = bBox
+  )
+  
+  # Replace null with NULL
+  args[args %in% "null"] <- list(NULL)
+  
+  # Remove NULL attribute
+  args <- args[purrr::map_lgl(args, function(x) !is.null(x))]
+  
+  return(args)
 }
 
-# source of Example UI options and then loaded data frames
-# for the example datasets.  These are used to populate the
-# example dataset dropdown and load the data when selected.
+nwis_args_create <- function(
+    stateFips = NULL,
+    countyFips = NULL,
+    hydrologicUnit = NULL,
+    monitoringLocationIdentifier = NULL,
+    siteTypeName = NULL,
+    characteristic = NULL,
+    characteristicGroup = NULL,
+    activityMediaName = NULL,
+    projectIdentifier = NULL,
+    organizationIdentifier = NULL,
+    activityStartDateLower = NULL,
+    activityStartDateUpper = NULL,
+    dataType = NULL,
+    dataProfile = NULL,
+    boundingBox = NULL
+) {
+  args <- list(
+    stateFips = stateFips,
+    countyFips = countyFips,
+    hydrologicUnit = hydrologicUnit,
+    monitoringLocationIdentifier = monitoringLocationIdentifier,
+    siteTypeName = siteTypeName,
+    characteristic = characteristic,
+    characteristicGroup = characteristicGroup,
+    activityMediaName = activityMediaName,
+    projectIdentifier = projectIdentifier,
+    organizationIdentifier = organizationIdentifier,
+    activityStartDateLower = activityStartDateLower,
+    activityStartDateUpper = activityStartDateUpper,
+    dataType = dataType,
+    dataProfile = dataProfile,
+    boundingBox = boundingBox
+  )
+  
+  is_bad <- function(x) {
+    is.null(x) ||
+      length(x) == 0 ||
+      all(is.na(x)) ||
+      identical(x, "NA") ||
+      identical(x, "null") ||
+      identical(x, "")
+  }
+  
+  args <- args[!vapply(args, is_bad, logical(1))]
+  return(args)
+}
+
+# source of example data options in the UI
 get_example_data_map <- function() {
   m <- list(
     "Utah Nutrients (15k results)" = function() EPATADA::Data_Nutrients_UT,
@@ -16,109 +103,19 @@ get_example_data_map <- function() {
   )
   m
 }
-
-# Build map lazily so objects are only touched when selected
 example_data_map <- get_example_data_map()
 
-.safe_req_string <- function(u, timeout = 30, max_tries = 3) {
-  if (.tadas_offline()) {
-    return(NULL)
-  }
-  tryCatch(
-    {
-      httr2::request(u) |>
-        httr2::req_timeout(timeout) |>
-        httr2::req_retry(max_tries = max_tries) |>
-        httr2::req_error(is_error = function(resp) FALSE) |>
-        httr2::req_perform() |>
-        httr2::resp_body_string()
-    },
-    error = function(e) NULL
-  )
-}
-
-# Generic: fetch a CSV and return a unique vector from a column; else default
-.safe_fetch_csv_column <- function(u, column, default = character()) {
-  txt <- .safe_req_string(u)
-  if (is.null(txt)) {
-    return(default)
-  }
-  dt <- tryCatch(
-    data.table::fread(txt, showProgress = FALSE),
-    error = function(e) NULL
-  )
-  if (is.null(dt) || !column %in% names(dt)) {
-    return(default)
-  }
-  unique(dt[[column]])
-}
-
-# Projects: return ProjectIdentifier vector; else empty
-.safe_fetch_projects <- function(u) {
-  txt <- .safe_req_string(u)
-  if (is.null(txt)) {
-    return(character())
-  }
-  dt <- tryCatch(
-    data.table::fread(txt, showProgress = FALSE),
-    error = function(e) NULL
-  )
-  if (is.null(dt) || !"ProjectIdentifier" %in% names(dt)) {
-    return(character())
-  }
-  unique(dt$ProjectIdentifier)
-}
-
-# County: census file has no header; on failure return empty data.frame with expected columns
-.safe_fetch_county <- function(u) {
-  txt <- .safe_req_string(u)
-  cols <- c(
-    "STATE_CD",
-    "STATE_FIPS",
-    "COUNTY_FIPS",
-    "COUNTY_NAME",
-    "COUNTY_FOOBAR"
-  )
-  # dataRetrieval::read_waterdata_samples needs "US:{STATE_FIPS}"
-  # and "US:{STATE_FIPS}:{COUNTY_FIPS}"
-  # and EPATADA::TADA_DataRetrieval needs "STATE_CD" and COUNTY_NAME
-  if (is.null(txt)) {
-    return(data.frame(
-      STATE_CD = character(),
-      STATE_FIPS = character(),
-      COUNTY_FIPS = character(),
-      COUNTY_NAME = character(),
-      COUNTY_FOOBAR = character(),
-      stringsAsFactors = FALSE
-    ))
-  }
-  dt <- tryCatch(
-    data.table::fread(
-      txt,
-      header = FALSE,
-      col.names = cols,
-      showProgress = FALSE
-    ),
-    error = function(e) NULL
-  )
-  if (is.null(dt)) {
-    return(data.frame(
-      STATE_CD = character(),
-      STATE_FIPS = character(),
-      COUNTY_FIPS = character(),
-      COUNTY_NAME = character(),
-      COUNTY_FOOBAR = character(),
-      stringsAsFactors = FALSE
-    ))
-  }
-  as.data.frame(dt)
-}
-
+# Example TADA data format/template
 TADA_download_temp <- readRDS(system.file(
   "extdata",
   "TADA_download_temp.rds",
   package = "TADAShiny"
 ))
+
+##############################################################################
+# WQP query drop downs
+
+# EPA tribal land boundaries used for filtering WQP data by tribal name and location
 tribal_list <- readRDS(system.file(
   "extdata",
   "tribal_list.rds",
@@ -127,14 +124,14 @@ tribal_list <- readRDS(system.file(
 
 # A function to return the tribal data frame with tribal name as an sf object
 return_tribal_sf <- function(
-  tribal_layer,
-  tribal_name,
-  tribal_list = tribal_list
+    tribal_layer,
+    tribal_name,
+    tribal_list = tribal_list
 ) {
   tribal_data2 <- tribal_list |>
     purrr::pluck(tribal_layer) |>
     dplyr::filter(TRIBE_NAME %in% tribal_name)
-
+  
   return(tribal_data2)
 }
 
@@ -145,54 +142,60 @@ countryocean_choices <- readRDS(system.file(
   package = "TADAShiny"
 ))
 
-# Fetch Project choices (safe)
+# Fetch Project choices directly
 project_url <- "https://www.waterqualitydata.us/data/Project/search?mimeType=csv&zip=no&providers=NWIS&providers=STORET"
-projects <- .safe_fetch_projects(project_url)
+dt <- data.table::fread(project_url, showProgress = FALSE)
+if (!"ProjectIdentifier" %in% names(dt)) {
+  projects <- character()
+} else {
+  projects <- unique(dt$ProjectIdentifier)
+}
 
-# Fetch County choices
-# Beware that some of the counties are historic, see: https://github.com/DOI-USGS/dataRetrieval/issues/711
-# Using USGS counties from dataRetrieval does not resolve https://github.com/USEPA/TADAShiny/issues/231
-# Fetch County choices (safe)
-counties <- .safe_fetch_county(
-  "https://www2.census.gov/geo/docs/reference/codes/files/national_county.txt"
+# Fetch County choices directly
+counties <- data.table::fread(
+  "https://www2.census.gov/geo/docs/reference/codes/files/national_county.txt",
+  header = FALSE,
+  col.names = c(
+    "STATE_CD",
+    "STATE_FIPS",
+    "COUNTY_FIPS",
+    "COUNTY_NAME",
+    "COUNTY_FOOBAR"
+  ),
+  showProgress = FALSE
 )
 
-# Fetch orgs, chars, chargroup, media choices (safe)
-orgs <- .safe_fetch_csv_column(
+# Fetch orgs, chars, chargroup, media choices directly
+orgs <- data.table::fread(
   "https://cdx.epa.gov/wqx/download/DomainValues/Organization.CSV",
-  "ID",
-  default = character()
-)
+  showProgress = FALSE
+)$ID
 
-chars <- .safe_fetch_csv_column(
+chars <- data.table::fread(
   "https://cdx.epa.gov/wqx/download/DomainValues/Characteristic.CSV",
-  "Name",
-  default = character()
-)
+  showProgress = FALSE
+)$Name
 
-chargroup <- .safe_fetch_csv_column(
+chargroup <- data.table::fread(
   "https://cdx.epa.gov/wqx/download/DomainValues/CharacteristicGroup.CSV",
-  "Name",
-  default = character()
-)
+  showProgress = FALSE
+)$Name
 
 media <- c(
-  .safe_fetch_csv_column(
+  data.table::fread(
     "https://cdx.epa.gov/wqx/download/DomainValues/ActivityMedia.CSV",
-    "Name",
-    default = character()
-  ),
+    showProgress = FALSE
+  )$Name,
   "Biological Tissue",
   "No media"
 )
 
 # sitetype <- c(
-#       unique(utils::read.csv(url(
-#         "https://cdx.epa.gov/wqx/download/DomainValues/MonitoringLocationType.CSV"
-#       ))$Name),
-#       "Glacier", "Aggregate water-use establishment", "Not Assigned", "Subsurface"
-#       )
-
+#   unique(utils::read.csv(url(
+#     "https://cdx.epa.gov/wqx/download/DomainValues/MonitoringLocationType.CSV"
+#   ))$Name),
+#   "Glacier", "Aggregate water-use establishment", "Not Assigned", "Subsurface"
+# )
 sitetype <- c(
   "Aggregate groundwater use",
   "Aggregate surface-water-use",
@@ -212,7 +215,7 @@ sitetype <- c(
   "Wetland"
 )
 
-# these are the types of text matches used in searching the Characteristic(s) list
+# These are the types of text matches used in searching the Characteristic(s) list
 match_types <- c(
   "Starts With" = "starts_with",
   "Ends With" = "ends_with",
@@ -220,9 +223,10 @@ match_types <- c(
   "Equals" = "matches"
 )
 
-# start of UI
-# Updated UI with lighter subgroup styling, subtle background clusters,
-# reworded location guidance, reordered Site ID(s), and consistent Tribal Data styling
+#############################################################################
+# START OF UI
+#############################################################################
+
 mod_query_data_ui <- function(id) {
   ns <- NS(id)
   tagList(
@@ -1698,13 +1702,10 @@ mod_query_data_server <- function(id, tadat) {
       )
     })
 
-    # not sure why this is here
-    # remove the modal once the dataset has been pulled
-    # shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
-
-    # this event observer is triggered when the user hits the "Query Now" button, and then runs the TADAdataRetrieval function
+    # this event observer is triggered when the user hits the "Query Now" button, and then runs the TADA_dataRetrieval function
     shiny::observeEvent(input$querynow, {
       tadat$original_source <- "Query"
+      
       # convert to null when needed
       if (input$state == "") {
         # changing inputs of "" or NULL to "null"
@@ -1754,11 +1755,7 @@ mod_query_data_server <- function(id, tadat) {
         tadat$providers <- input$providers
         providers_arg <- c(input$providers)
       }
-      # if (input$huc == "") {
-      #   tadat$huc <- "null"
-      # } else {
-      #   tadat$huc <- gsub("\\s", "", input$huc)
-      # }
+
       if (is.null(input$siteid)) {
         tadat$siteid <- "null"
       } else {
@@ -1889,8 +1886,10 @@ mod_query_data_server <- function(id, tadat) {
         )
 
         # Get the data summary
-        # does this have recent USGS data????
-        result_summary <- dataRetrieval::whatWQPdata(args_temp)
+        # This only has WQP legacy/production statistics and is missing USGS 
+        # data after March 2024. It should only be used for provider = "STORET"
+        result_summary <- dataRetrieval::whatWQPdata(args_temp,
+                                                     provider = "STORET")
 
         # Check if anything is outside the tribal's shapefile boundary
         if (inherits(tadat$tribal_boundary, "sf")) {
@@ -1992,19 +1991,13 @@ mod_query_data_server <- function(id, tadat) {
 
               TADAprofile_smallsites_temp <- NULL
 
-              ## start of changes for using WQX3
               tryCatch(
                 {
-                  # Download the WQP data using the WQX3 and the full Physical Chemistry profile
-                  TADAprofile_smallsites_temp <- dataRetrieval::readWQPdata(
+                  # Download only WQX (STORET) data using TADA data retrieval
+                  TADAprofile_smallsites_temp <- EPATADA::TADA_DataRetrieval(
                     args_temp_small,
-                    service = "ResultWQX3",
-                    dataProfile = "fullPhysChem",
-                    ignore_attributes = TRUE
-                  )
-                  # revert names to the legacy
-                  TADAprofile_smallsites_temp <- EPATADA::TADA_RenametoLegacy(
-                    TADAprofile_smallsites_temp
+                    provider = "STORET",
+                    ask = FALSE
                   )
                 },
                 error = function(e) {
@@ -2022,7 +2015,6 @@ mod_query_data_server <- function(id, tadat) {
                   ))
                 }
               )
-              ## end of changes for using WQX3
 
               # Assign the data to the list
               if (
@@ -2072,24 +2064,18 @@ mod_query_data_server <- function(id, tadat) {
 
               args_temp_big[["siteid"]] <- bsitesvec[i]
 
-              ## start of changes for using WQX3
-
-              # Download the WQP data using the WQX3 and the full Physical Chemistry profile
+              # Download only WQX (STORET) data using dataRetrieval::readWQPdata
               bigsites_result_temp <- dataRetrieval::readWQPdata(
                 args_temp_big,
-                service = "ResultWQX3",
-                dataProfile = "fullPhysChem",
-                ignore_attributes = TRUE
-              )
-              # revert names to the legacy
-              TADAprofile_bigsites_temp <- EPATADA::TADA_RenametoLegacy(
-                bigsites_result_temp
+                service = "Result",
+                dataProfile = "resultPhysChem",
+                ignore_attributes = TRUE,
+                provider = "STORET"
               )
 
               # Assign the data to the list
-              bigsites_list[[i]] <- TADAprofile_bigsites_temp
+              bigsites_list[[i]] <- bigsites_result_temp
 
-              ## end of changes for using WQX3
             }
           })
 
