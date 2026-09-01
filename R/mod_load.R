@@ -1844,7 +1844,7 @@ mod_query_data_server <- function(id, tadat) {
             logical(1)
           )
         ]
-        
+
         # for debugging
         str(storet_args)
         message(paste(names(storet_args), collapse = ", "))
@@ -1866,7 +1866,7 @@ mod_query_data_server <- function(id, tadat) {
             NULL
           }
         )
-        
+
         # for debugging
         print(class(STORET_results))
         print(dim(STORET_results))
