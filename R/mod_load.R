@@ -1870,7 +1870,6 @@ mod_query_data_server <- function(id, tadat) {
             characteristicGroup = tadat$characteristicType,
             activityMediaName = tadat$sampleMedia,
             projectIdentifier = tadat$project,
-            organizationIdentifier = tadat$organization,
             activityStartDateLower = tadat$startDate,
             activityStartDateUpper = tadat$endDate,
             dataType = "results",
@@ -1878,7 +1877,6 @@ mod_query_data_server <- function(id, tadat) {
             boundingBox = bbox_reactive()
           ),
           error = function(e) {
-            # Developer note: preserve message for downstream modal handling
             nwis_error_message_text <<- paste(
               shiny::tags$strong("An error occurred while querying NWIS (USGS):"),
               shiny::tags$p(e$message)
