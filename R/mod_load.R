@@ -1698,11 +1698,6 @@ mod_query_data_server <- function(id, tadat) {
     shiny::observeEvent(input$querynow, {
       tadat$original_source <- "Query"
 
-      tadat$providers <- if (is.null(input$providers)) {
-        "null"
-      } else {
-        input$providers
-      }
       tadat$statecode <- if (input$state == "") "null" else input$state
       tadat$countycode <- if (input$county == "") "null" else input$county
       tadat$countrycode <- if (is.null(input$countryocean)) {
@@ -1830,9 +1825,8 @@ mod_query_data_server <- function(id, tadat) {
           sampleMedia = tadat$sampleMedia,
           project = tadat$project,
           organization = tadat$organization,
-          startDateLo = tadat$startDate,
-          startDateHi = tadat$endDate,
-          providers = tadat$providers,
+          startDate = tadat$startDate,
+          endDate = tadat$endDate,
           bBox = bbox_reactive()
         )
 
@@ -1850,15 +1844,17 @@ mod_query_data_server <- function(id, tadat) {
             logical(1)
           )
         ]
+        
+        # for debugging
+        str(storet_args)
+        message(paste(names(storet_args), collapse = ", "))
 
         STORET_results <- tryCatch(
-          EPATADA::TADA_DataRetrieval(
-            storet_args,
-            provider = "STORET",
-            ask = FALSE
+          do.call(
+            EPATADA::TADA_DataRetrieval,
+            c(storet_args, list(provider = "STORET", ask = FALSE))
           ),
           error = function(e) {
-            # Developer note: keep the spinner removal here so users do not get stuck
             shinybusy::remove_modal_spinner(
               session = shiny::getDefaultReactiveDomain()
             )
@@ -1870,10 +1866,16 @@ mod_query_data_server <- function(id, tadat) {
             NULL
           }
         )
+        
+        # for debugging
+        print(class(STORET_results))
+        print(dim(STORET_results))
+        print(head(STORET_results))
 
         # Normalize EPA results with the same TADA cleaning path used elsewhere in the app
         if (!is.null(STORET_results) && nrow(STORET_results) > 0) {
-          STORET_results <- EPATADA::TADA_AutoClean(STORET_results)
+          STORET_results <- EPATADA::TADA_AutoClean(STORET_results) |>
+            EPATADA::TADA_CorrectColType()
         }
       }
 
@@ -1988,18 +1990,8 @@ mod_query_data_server <- function(id, tadat) {
             ] <- "AquiferName"
           }
 
-          NWIS_results <- EPATADA::TADA_AutoClean(NWIS_results)
-
-          # Developer note: force these date/time fields to character to avoid bind_rows class conflicts.
-          NWIS_results$ActivityStartDate <- as.character(
-            NWIS_results$ActivityStartDate
-          )
-          NWIS_results$ActivityStartDateTime <- as.character(
-            NWIS_results$ActivityStartDateTime
-          )
-          NWIS_results$ActivityStartTime.TimeZoneCode_offset <- as.character(
-            NWIS_results$ActivityStartTime.TimeZoneCode_offset
-          )
+          NWIS_results <- EPATADA::TADA_AutoClean(NWIS_results) |>
+            EPATADA::TADA_CorrectColType()
         }
       }
 
