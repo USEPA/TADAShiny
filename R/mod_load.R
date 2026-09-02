@@ -1931,7 +1931,11 @@ Remember to update the start and end dates."
             All_results_clean,
             keep_cols = all.cols,
             verbose = TRUE
-          )
+          ) |>
+            EPATADA::TADA_IDCensoredData() |>
+            EPATADA::TADA_OrderCols()
+          
+          
           initializeTable(tadat, raw)
         }
       }
