@@ -1925,7 +1925,7 @@ Remember to update the start and end dates."
           shinybusy::remove_modal_spinner(
             session = shiny::getDefaultReactiveDomain()
           )
-          
+
           # modal spinner for data prep
           shinybusy::show_modal_spinner(
             spin = "double-bounce",
