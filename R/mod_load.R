@@ -1698,6 +1698,11 @@ mod_query_data_server <- function(id, tadat) {
     shiny::observeEvent(input$querynow, {
       tadat$original_source <- "Query"
 
+      tadat$providers <- if (is.null(input$providers)) {
+        "null"
+      } else {
+        input$providers
+      }
       tadat$statecode <- if (input$state == "") "null" else input$state
       tadat$countycode <- if (input$county == "") "null" else input$county
       tadat$countrycode <- if (is.null(input$countryocean)) {
@@ -1826,39 +1831,20 @@ mod_query_data_server <- function(id, tadat) {
           sampleMedia = tadat$sampleMedia,
           project = tadat$project,
           organization = tadat$organization,
-          startDate = tadat$startDate,
-          endDate = tadat$endDate,
+          startDateLo = tadat$startDate,
+          startDateHi = tadat$endDate,
+          providers = tadat$providers,
           bBox = bbox_reactive()
         )
-
-        storet_args <- storet_args[
-          !vapply(
-            storet_args,
-            function(v) {
-              is.null(v) ||
-                length(v) == 0 ||
-                all(is.na(v)) ||
-                identical(v, "NA") ||
-                identical(v, "null") ||
-                identical(v, "")
-            },
-            logical(1)
-          )
-        ]
-
-        # for debugging
-        str(storet_args)
-        message(paste(names(storet_args), collapse = ", "))
-
+        
         STORET_results <- tryCatch(
-          do.call(
-            EPATADA::TADA_DataRetrieval,
-            c(storet_args, list(provider = "STORET", ask = FALSE))
+          EPATADA::TADA_DataRetrieval(
+            storet_args,
+            provider = "STORET",
+            ask = FALSE
           ),
           error = function(e) {
-            shinybusy::remove_modal_spinner(
-              session = shiny::getDefaultReactiveDomain()
-            )
+            shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
             shiny::showModal(shiny::modalDialog(
               title = "Error",
               paste("An error occurred while querying WQX (EPA):", e$message),
@@ -1867,16 +1853,9 @@ mod_query_data_server <- function(id, tadat) {
             NULL
           }
         )
-
-        # for debugging
-        print(class(STORET_results))
-        print(dim(STORET_results))
-        print(head(STORET_results))
-
-        # Normalize EPA results with the same TADA cleaning path used elsewhere in the app
+        
         if (!is.null(STORET_results) && nrow(STORET_results) > 0) {
-          STORET_results <- EPATADA::TADA_AutoClean(STORET_results) |>
-            EPATADA::TADA_CorrectColType()
+          STORET_results <- EPATADA::TADA_AutoClean(STORET_results)
         }
       }
 
@@ -1950,30 +1929,22 @@ mod_query_data_server <- function(id, tadat) {
           dataProfile = "fullphyschem",
           boundingBox = bbox_reactive()
         )
-
-        nwis_args <- nwis_args[
-          !vapply(
-            nwis_args,
-            function(v) {
-              is.null(v) ||
-                length(v) == 0 ||
-                all(is.na(v)) ||
-                identical(v, "NA") ||
-                identical(v, "null") ||
-                identical(v, "")
-            },
-            logical(1)
-          )
-        ]
-
+        
+        nwis_args <- nwis_args[!vapply(nwis_args, function(v) {
+          is.null(v) ||
+            length(v) == 0 ||
+            all(is.na(v)) ||
+            identical(v, "NA") ||
+            identical(v, "null") ||
+            identical(v, "")
+        }, logical(1))]
+        
         nwis_results_raw <- tryCatch(
           do.call(dataRetrieval::read_waterdata_samples, nwis_args),
           error = function(e) {
             # Developer note: preserve message for downstream modal handling
             nwis_error_message_text <<- paste(
-              shiny::tags$strong(
-                "An error occurred while querying NWIS (USGS):"
-              ),
+              shiny::tags$strong("An error occurred while querying NWIS (USGS):"),
               shiny::tags$p(e$message)
             )
             NULL
@@ -1991,8 +1962,18 @@ mod_query_data_server <- function(id, tadat) {
             ] <- "AquiferName"
           }
 
-          NWIS_results <- EPATADA::TADA_AutoClean(NWIS_results) |>
-            EPATADA::TADA_CorrectColType()
+          NWIS_results <- EPATADA::TADA_AutoClean(NWIS_results)
+
+          # Developer note: force these date/time fields to character to avoid bind_rows class conflicts.
+          NWIS_results$ActivityStartDate <- as.character(
+            NWIS_results$ActivityStartDate
+          )
+          NWIS_results$ActivityStartDateTime <- as.character(
+            NWIS_results$ActivityStartDateTime
+          )
+          NWIS_results$ActivityStartTime.TimeZoneCode_offset <- as.character(
+            NWIS_results$ActivityStartTime.TimeZoneCode_offset
+          )
         }
       }
 
