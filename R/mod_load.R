@@ -1792,21 +1792,29 @@ mod_query_data_server <- function(id, tadat) {
       # Provider-specific query: EPA/WQX
       if (input$providers %in% c("STORET", "all")) {
         message("Entering STORET branch")
-        
+
         shinybusy::show_modal_spinner(
           spin = "double-bounce",
           color = "#0071bc",
           text = tagList(
             shiny::tags$div(
-              shiny::tags$p("Querying Data Source", shiny::tags$br(), "EPA (WQX)"),
+              shiny::tags$p(
+                "Querying Data Source",
+                shiny::tags$br(),
+                "EPA (WQX)"
+              ),
               style = "text-align:center; padding: 12px;",
               shiny::tags$p(id = "js_time_display", "00:00:00")
             ),
-            shiny::tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
+            shiny::tags$input(
+              id = "js_elapsed_seconds",
+              type = "hidden",
+              value = "0"
+            )
           ),
           session = shiny::getDefaultReactiveDomain()
         )
-        
+
         storet_args <- args_create(
           statecode = tadat$statecode,
           countycode = tadat$countycode,
