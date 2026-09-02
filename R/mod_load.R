@@ -1602,12 +1602,13 @@ mod_query_data_server <- function(id, tadat) {
 
     # this event observer is triggered when the user hits the "Query Now" button, and then runs the TADA_dataRetrieval function
     shiny::observeEvent(input$querynow, {
-      
       on.exit(
-        shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain()),
+        shinybusy::remove_modal_spinner(
+          session = shiny::getDefaultReactiveDomain()
+        ),
         add = TRUE
       )
-      
+
       tadat$original_source <- "Query"
 
       tadat$providers <- if (is.null(input$providers)) {
@@ -1708,7 +1709,6 @@ mod_query_data_server <- function(id, tadat) {
 
       # Provider-specific query: EPA/WQX
       if (input$providers %in% c("STORET", "all")) {
-
         shinybusy::show_modal_spinner(
           spin = "double-bounce",
           color = "#0071bc",
@@ -1751,10 +1751,15 @@ mod_query_data_server <- function(id, tadat) {
         STORET_results <- tryCatch(
           do.call(
             EPATADA::TADA_DataRetrieval,
-            c(storet_args, list(providers = "STORET", ask = FALSE, applyautoclean = FALSE))
+            c(
+              storet_args,
+              list(providers = "STORET", ask = FALSE, applyautoclean = FALSE)
+            )
           ),
           error = function(e) {
-            shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+            shinybusy::remove_modal_spinner(
+              session = shiny::getDefaultReactiveDomain()
+            )
             shiny::showModal(shiny::modalDialog(
               title = "Error",
               paste("An error occurred while querying WQX (EPA):", e$message),
@@ -1763,7 +1768,7 @@ mod_query_data_server <- function(id, tadat) {
             NULL
           }
         )
-        
+
         if (!is.null(STORET_results) && nrow(STORET_results) > 0) {
           STORET_results <- EPATADA::TADA_AutoClean(STORET_results)
         }
