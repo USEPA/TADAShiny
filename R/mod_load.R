@@ -1934,8 +1934,7 @@ Remember to update the start and end dates."
           ) |>
             EPATADA::TADA_IDCensoredData() |>
             EPATADA::TADA_OrderCols()
-          
-          
+
           initializeTable(tadat, raw)
         }
       }
