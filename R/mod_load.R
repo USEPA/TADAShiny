@@ -1,98 +1,4 @@
-# A function to construct the argument list
-args_create <- function(
-  statecode = NULL,
-  countycode = NULL,
-  countrycode = NULL,
-  huc = NULL,
-  siteid = NULL,
-  siteType = NULL,
-  characteristicName = NULL,
-  characteristicType = NULL,
-  sampleMedia = NULL,
-  project = NULL,
-  organization = NULL,
-  startDateLo = NULL,
-  startDateHi = NULL,
-  providers = NULL,
-  bBox = NULL
-) {
-  # Construct the arguments for downloads
-  args <- list(
-    "statecode" = statecode,
-    "countycode" = countycode,
-    "countrycode" = countrycode,
-    "huc" = huc,
-    "siteid" = siteid,
-    "siteType" = siteType,
-    "characteristicName" = characteristicName,
-    "characteristicType" = characteristicType,
-    "sampleMedia" = sampleMedia,
-    "project" = project,
-    "organization" = organization,
-    "startDateLo" = startDateLo,
-    "startDateHi" = startDateHi,
-    "providers" = providers,
-    "bBox" = bBox
-  )
-
-  # Replace null with NULL
-  args[args %in% "null"] <- list(NULL)
-
-  # Remove NULL attribute
-  args <- args[purrr::map_lgl(args, function(x) !is.null(x))]
-
-  return(args)
-}
-
-nwis_args_create <- function(
-  stateFips = NULL,
-  countyFips = NULL,
-  hydrologicUnit = NULL,
-  monitoringLocationIdentifier = NULL,
-  siteTypeName = NULL,
-  characteristic = NULL,
-  characteristicGroup = NULL,
-  activityMediaName = NULL,
-  projectIdentifier = NULL,
-  organizationIdentifier = NULL,
-  activityStartDateLower = NULL,
-  activityStartDateUpper = NULL,
-  dataType = NULL,
-  dataProfile = NULL,
-  boundingBox = NULL
-) {
-  args <- list(
-    stateFips = stateFips,
-    countyFips = countyFips,
-    hydrologicUnit = hydrologicUnit,
-    monitoringLocationIdentifier = monitoringLocationIdentifier,
-    siteTypeName = siteTypeName,
-    characteristic = characteristic,
-    characteristicGroup = characteristicGroup,
-    activityMediaName = activityMediaName,
-    projectIdentifier = projectIdentifier,
-    organizationIdentifier = organizationIdentifier,
-    activityStartDateLower = activityStartDateLower,
-    activityStartDateUpper = activityStartDateUpper,
-    dataType = dataType,
-    dataProfile = dataProfile,
-    boundingBox = boundingBox
-  )
-
-  is_bad <- function(x) {
-    is.null(x) ||
-      length(x) == 0 ||
-      all(is.na(x)) ||
-      identical(x, "NA") ||
-      identical(x, "null") ||
-      identical(x, "")
-  }
-
-  args <- args[!vapply(args, is_bad, logical(1))]
-  return(args)
-}
-
-# source of example data options in the UI
+# Source of example data options in the UI
 get_example_data_map <- function() {
   m <- list(
     "Utah Nutrients (15k results)" = function() EPATADA::Data_Nutrients_UT,
@@ -105,7 +11,7 @@ get_example_data_map <- function() {
 }
 example_data_map <- get_example_data_map()
 
-# Example TADA data format/template
+# Source of example TADA data template
 TADA_download_temp <- readRDS(system.file(
   "extdata",
   "TADA_download_temp.rds",
@@ -113,7 +19,7 @@ TADA_download_temp <- readRDS(system.file(
 ))
 
 ##############################################################################
-# WQP query drop downs
+# WQP Data Retrieval
 ##############################################################################
 
 # EPA tribal land boundaries used for filtering WQP data by tribal name and location
@@ -1632,7 +1538,7 @@ mod_query_data_server <- function(id, tadat) {
 
     shiny::updateSelectizeInput(
       session,
-      "characteristic",
+      "characteristic_select",
       choices = c(chars),
       server = TRUE
     )
@@ -1696,6 +1602,12 @@ mod_query_data_server <- function(id, tadat) {
 
     # this event observer is triggered when the user hits the "Query Now" button, and then runs the TADA_dataRetrieval function
     shiny::observeEvent(input$querynow, {
+      
+      on.exit(
+        shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain()),
+        add = TRUE
+      )
+      
       tadat$original_source <- "Query"
 
       tadat$providers <- if (is.null(input$providers)) {
@@ -1796,7 +1708,6 @@ mod_query_data_server <- function(id, tadat) {
 
       # Provider-specific query: EPA/WQX
       if (input$providers %in% c("STORET", "all")) {
-        message("Entering STORET branch")
 
         shinybusy::show_modal_spinner(
           spin = "double-bounce",
@@ -1820,33 +1731,30 @@ mod_query_data_server <- function(id, tadat) {
           session = shiny::getDefaultReactiveDomain()
         )
 
-        storet_args <- args_create(
-          statecode = tadat$statecode,
-          countycode = tadat$countycode,
+        storet_args <- list(
+          startDate = tadat$startDate,
+          endDate = tadat$endDate,
           countrycode = tadat$countrycode,
+          countycode = tadat$countycode,
           siteid = tadat$siteid,
           siteType = tadat$siteType,
           characteristicName = tadat$characteristicName,
           characteristicType = tadat$characteristicType,
           sampleMedia = tadat$sampleMedia,
-          project = tadat$project,
+          statecode = tadat$statecode,
           organization = tadat$organization,
-          startDateLo = tadat$startDate,
-          startDateHi = tadat$endDate,
+          project = tadat$project,
           providers = tadat$providers,
           bBox = bbox_reactive()
         )
 
         STORET_results <- tryCatch(
-          EPATADA::TADA_DataRetrieval(
-            storet_args,
-            provider = "STORET",
-            ask = FALSE
+          do.call(
+            EPATADA::TADA_DataRetrieval,
+            c(storet_args, list(providers = "STORET", ask = FALSE, applyautoclean = FALSE))
           ),
           error = function(e) {
-            shinybusy::remove_modal_spinner(
-              session = shiny::getDefaultReactiveDomain()
-            )
+            shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
             shiny::showModal(shiny::modalDialog(
               title = "Error",
               paste("An error occurred while querying WQX (EPA):", e$message),
@@ -1855,7 +1763,7 @@ mod_query_data_server <- function(id, tadat) {
             NULL
           }
         )
-
+        
         if (!is.null(STORET_results) && nrow(STORET_results) > 0) {
           STORET_results <- EPATADA::TADA_AutoClean(STORET_results)
         }
@@ -2020,7 +1928,7 @@ Remember to update the start and end dates."
           shiny::showModal(shiny::modalDialog(
             title = "Empty Query",
             shiny::tags$p(message_text),
-            HTML(nwis_error_message_text)
+            shiny::HTML(nwis_error_message_text)
           ))
         } else {
           disableLoading(session)
@@ -2076,7 +1984,7 @@ Remember to update the start and end dates."
           )
           shiny::updateSelectizeInput(
             session,
-            "characteristic",
+            "characteristic_select",
             selected = tadat$characteristicName
           )
           shiny::updateSelectizeInput(
