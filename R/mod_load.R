@@ -1611,11 +1611,6 @@ mod_query_data_server <- function(id, tadat) {
 
       tadat$original_source <- "Query"
 
-      tadat$providers <- if (is.null(input$providers)) {
-        "null"
-      } else {
-        input$providers
-      }
       tadat$statecode <- if (input$state == "") "null" else input$state
       tadat$countycode <- if (input$county == "") "null" else input$county
       tadat$countrycode <- if (is.null(input$countryocean)) {
