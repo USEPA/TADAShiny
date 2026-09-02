@@ -1836,7 +1836,7 @@ mod_query_data_server <- function(id, tadat) {
           providers = tadat$providers,
           bBox = bbox_reactive()
         )
-        
+
         STORET_results <- tryCatch(
           EPATADA::TADA_DataRetrieval(
             storet_args,
@@ -1844,7 +1844,9 @@ mod_query_data_server <- function(id, tadat) {
             ask = FALSE
           ),
           error = function(e) {
-            shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+            shinybusy::remove_modal_spinner(
+              session = shiny::getDefaultReactiveDomain()
+            )
             shiny::showModal(shiny::modalDialog(
               title = "Error",
               paste("An error occurred while querying WQX (EPA):", e$message),
@@ -1853,7 +1855,7 @@ mod_query_data_server <- function(id, tadat) {
             NULL
           }
         )
-        
+
         if (!is.null(STORET_results) && nrow(STORET_results) > 0) {
           STORET_results <- EPATADA::TADA_AutoClean(STORET_results)
         }
@@ -1929,22 +1931,30 @@ mod_query_data_server <- function(id, tadat) {
           dataProfile = "fullphyschem",
           boundingBox = bbox_reactive()
         )
-        
-        nwis_args <- nwis_args[!vapply(nwis_args, function(v) {
-          is.null(v) ||
-            length(v) == 0 ||
-            all(is.na(v)) ||
-            identical(v, "NA") ||
-            identical(v, "null") ||
-            identical(v, "")
-        }, logical(1))]
-        
+
+        nwis_args <- nwis_args[
+          !vapply(
+            nwis_args,
+            function(v) {
+              is.null(v) ||
+                length(v) == 0 ||
+                all(is.na(v)) ||
+                identical(v, "NA") ||
+                identical(v, "null") ||
+                identical(v, "")
+            },
+            logical(1)
+          )
+        ]
+
         nwis_results_raw <- tryCatch(
           do.call(dataRetrieval::read_waterdata_samples, nwis_args),
           error = function(e) {
             # Developer note: preserve message for downstream modal handling
             nwis_error_message_text <<- paste(
-              shiny::tags$strong("An error occurred while querying NWIS (USGS):"),
+              shiny::tags$strong(
+                "An error occurred while querying NWIS (USGS):"
+              ),
               shiny::tags$p(e$message)
             )
             NULL
