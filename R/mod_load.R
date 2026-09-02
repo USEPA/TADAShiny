@@ -1739,7 +1739,6 @@ mod_query_data_server <- function(id, tadat) {
           statecode = tadat$statecode,
           organization = tadat$organization,
           project = tadat$project,
-          providers = tadat$providers,
           bBox = bbox_reactive()
         )
 
@@ -1765,7 +1764,8 @@ mod_query_data_server <- function(id, tadat) {
         )
 
         if (!is.null(STORET_results) && nrow(STORET_results) > 0) {
-          STORET_results <- EPATADA::TADA_AutoClean(STORET_results)
+          STORET_results <- EPATADA::TADA_AutoClean(STORET_results) |>
+            EPATADA::TADA_CorrectColType()
         }
       }
 
@@ -1880,18 +1880,8 @@ mod_query_data_server <- function(id, tadat) {
             ] <- "AquiferName"
           }
 
-          NWIS_results <- EPATADA::TADA_AutoClean(NWIS_results)
-
-          # Developer note: force these date/time fields to character to avoid bind_rows class conflicts.
-          NWIS_results$ActivityStartDate <- as.character(
-            NWIS_results$ActivityStartDate
-          )
-          NWIS_results$ActivityStartDateTime <- as.character(
-            NWIS_results$ActivityStartDateTime
-          )
-          NWIS_results$ActivityStartTime.TimeZoneCode_offset <- as.character(
-            NWIS_results$ActivityStartTime.TimeZoneCode_offset
-          )
+          NWIS_results <- EPATADA::TADA_AutoClean(NWIS_results) |>
+            EPATADA::TADA_CorrectColType()
         }
       }
 
