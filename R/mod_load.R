@@ -1925,6 +1925,29 @@ Remember to update the start and end dates."
           shinybusy::remove_modal_spinner(
             session = shiny::getDefaultReactiveDomain()
           )
+          
+          # modal spinner for data prep
+          shinybusy::show_modal_spinner(
+            spin = "double-bounce",
+            color = "#0071bc",
+            text = tagList(
+              shiny::tags$div(
+                shiny::tags$p(
+                  "Preparing Data",
+                  shiny::tags$br(),
+                  "for TADAShiny"
+                ),
+                style = "text-align:center; padding: 12px;",
+                shiny::tags$p(id = "js_time_display", "00:00:00")
+              ),
+              shiny::tags$input(
+                id = "js_elapsed_seconds",
+                type = "hidden",
+                value = "0"
+              )
+            ),
+            session = shiny::getDefaultReactiveDomain()
+          )
 
           # Developer note: all downstream logic expects the unified TADA column set.
           raw <- restrict_to_keep_cols(
@@ -1934,7 +1957,6 @@ Remember to update the start and end dates."
           ) |>
             EPATADA::TADA_IDCensoredData() |>
             EPATADA::TADA_OrderCols()
-          
           
           initializeTable(tadat, raw)
         }
