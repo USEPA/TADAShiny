@@ -1649,11 +1649,13 @@ mod_query_data_server <- function(id, tadat) {
       }
       # Normalize sample media once for all branches
       sample_media_ui <- input$media
-      sample_media_query <- if (is.null(sample_media_ui) || length(sample_media_ui) == 0) {
+      sample_media_query <- if (
+        is.null(sample_media_ui) || length(sample_media_ui) == 0
+      ) {
         "null"
       } else {
         sample_media_ui <- unique(sample_media_ui)
-        
+
         if (any(grepl("Water", sample_media_ui, ignore.case = TRUE))) {
           unique(c(sample_media_ui, "water"))
         } else {
