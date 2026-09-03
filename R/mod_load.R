@@ -1763,11 +1763,13 @@ mod_query_data_server <- function(id, tadat) {
           }
         )
 
+        
         if (!is.null(STORET_results) && nrow(STORET_results) > 0) {
           STORET_results <- EPATADA::TADA_AutoClean(STORET_results) |>
             EPATADA::TADA_CorrectColType()
         } else {
           STORET_results <- NULL
+        }
       }
 
       # Provider-specific query: USGS/NWIS
