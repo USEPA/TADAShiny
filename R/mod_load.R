@@ -1600,16 +1600,26 @@ mod_query_data_server <- function(id, tadat) {
       )
     })
 
-    # this event observer is triggered when the user hits the "Query Now" button, and then runs the TADA_dataRetrieval function
+    # event observer triggered when the user hits the "Query Now" button
     shiny::observeEvent(input$querynow, {
-      on.exit(
-        shinybusy::remove_modal_spinner(
-          session = shiny::getDefaultReactiveDomain()
-        ),
-        add = TRUE
-      )
-
+      session <- shiny::getDefaultReactiveDomain()
+      on.exit(try(shinybusy::remove_modal_spinner(session = session), silent = TRUE), add = TRUE)
+      
       tadat$original_source <- "Query"
+      
+      shinybusy::show_modal_spinner(
+        spin = "double-bounce",
+        color = "#0071bc",
+        text = tagList(
+          shiny::tags$div(
+            shiny::tags$p("Querying data...", shiny::tags$br(), "Please wait"),
+            style = "text-align:center; padding: 12px;",
+            shiny::tags$p(id = "js_time_display", "00:00:00")
+          ),
+          shiny::tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
+        ),
+        session = session
+      )
 
       tadat$statecode <- if (input$state == "") "null" else input$state
       tadat$countycode <- if (input$county == "") "null" else input$county
@@ -1704,28 +1714,7 @@ mod_query_data_server <- function(id, tadat) {
 
       # Provider-specific query: EPA/WQX
       if (input$providers %in% c("STORET", "all")) {
-        shinybusy::show_modal_spinner(
-          spin = "double-bounce",
-          color = "#0071bc",
-          text = tagList(
-            shiny::tags$div(
-              shiny::tags$p(
-                "Querying Data Source",
-                shiny::tags$br(),
-                "EPA (WQX)"
-              ),
-              style = "text-align:center; padding: 12px;",
-              shiny::tags$p(id = "js_time_display", "00:00:00")
-            ),
-            shiny::tags$input(
-              id = "js_elapsed_seconds",
-              type = "hidden",
-              value = "0"
-            )
-          ),
-          session = shiny::getDefaultReactiveDomain()
-        )
-
+        
         storet_args <- list(
           startDate = tadat$startDate,
           endDate = tadat$endDate,
@@ -1751,9 +1740,6 @@ mod_query_data_server <- function(id, tadat) {
             )
           ),
           error = function(e) {
-            shinybusy::remove_modal_spinner(
-              session = shiny::getDefaultReactiveDomain()
-            )
             shiny::showModal(shiny::modalDialog(
               title = "Error",
               paste("An error occurred while querying WQX (EPA):", e$message),
@@ -1802,28 +1788,6 @@ mod_query_data_server <- function(id, tadat) {
             sep = ":"
           )
         }
-
-        shinybusy::show_modal_spinner(
-          spin = "double-bounce",
-          color = "#0071bc",
-          text = tagList(
-            shiny::tags$div(
-              shiny::tags$p(
-                "Querying Data Source",
-                shiny::tags$br(),
-                "USGS (Samples Data API)"
-              ),
-              style = "text-align:center; padding: 12px;",
-              shiny::tags$p(id = "js_time_display", "00:00:00")
-            ),
-            shiny::tags$input(
-              id = "js_elapsed_seconds",
-              type = "hidden",
-              value = "0"
-            )
-          ),
-          session = shiny::getDefaultReactiveDomain()
-        )
 
         # Call read_waterdata_samples() directly
         nwis_args <- list(
@@ -1923,33 +1887,9 @@ Remember to update the start and end dates."
             shiny::HTML(nwis_error_message_text)
           ))
         } else {
+          
+          try(shinybusy::remove_modal_spinner(session = session), silent = TRUE)
           disableLoading(session)
-          shinybusy::remove_modal_spinner(
-            session = shiny::getDefaultReactiveDomain()
-          )
-
-          # modal spinner for data prep
-          shinybusy::show_modal_spinner(
-            spin = "double-bounce",
-            color = "#0071bc",
-            text = tagList(
-              shiny::tags$div(
-                shiny::tags$p(
-                  "Preparing Data",
-                  shiny::tags$br(),
-                  "for TADAShiny"
-                ),
-                style = "text-align:center; padding: 12px;",
-                shiny::tags$p(id = "js_time_display", "00:00:00")
-              ),
-              shiny::tags$input(
-                id = "js_elapsed_seconds",
-                type = "hidden",
-                value = "0"
-              )
-            ),
-            session = shiny::getDefaultReactiveDomain()
-          )
 
           # Developer note: all downstream logic expects the unified TADA column set.
           raw <- restrict_to_keep_cols(
