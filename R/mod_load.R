@@ -1647,9 +1647,18 @@ mod_query_data_server <- function(id, tadat) {
       } else {
         input$characteristic_select
       }
-      tadat$sampleMedia <- if (is.null(input$media)) "null" else input$media
-      if (!is.null(input$media) && sum(grep("Water", input$media)) > 0) {
-        tadat$sampleMedia <- append(tadat$sampleMedia, "water")
+      # Normalize sample media once for all branches
+      sample_media_ui <- input$media
+      sample_media_query <- if (is.null(sample_media_ui) || length(sample_media_ui) == 0) {
+        "null"
+      } else {
+        sample_media_ui <- unique(sample_media_ui)
+        
+        if (any(grepl("Water", sample_media_ui, ignore.case = TRUE))) {
+          unique(c(sample_media_ui, "water"))
+        } else {
+          sample_media_ui
+        }
       }
       tadat$project <- if (is.null(input$project)) "null" else input$project
       tadat$organization <- if (is.null(input$org)) "null" else input$org
@@ -1730,7 +1739,7 @@ mod_query_data_server <- function(id, tadat) {
           siteType = tadat$siteType,
           characteristicName = tadat$characteristicName,
           characteristicType = tadat$characteristicType,
-          sampleMedia = tadat$sampleMedia,
+          sampleMedia = sample_media_query,
           statecode = tadat$statecode,
           organization = tadat$organization,
           project = tadat$project,
@@ -1803,7 +1812,7 @@ mod_query_data_server <- function(id, tadat) {
           siteTypeName = tadat$siteType,
           characteristic = tadat$characteristicName,
           characteristicGroup = tadat$characteristicType,
-          activityMediaName = tadat$sampleMedia,
+          activityMediaName = sample_media_query,
           projectIdentifier = tadat$project,
           activityStartDateLower = tadat$startDate,
           activityStartDateUpper = tadat$endDate,
@@ -1893,10 +1902,7 @@ Remember to update the start and end dates."
             shiny::HTML(nwis_error_message_text)
           ))
         } else {
-          try(shinybusy::remove_modal_spinner(session = session), silent = TRUE)
-          disableLoading(session)
-
-          # Developer note: all downstream logic expects the unified TADA column set.
+          # All downstream logic expects the unified TADA column set
           raw <- restrict_to_keep_cols(
             All_results_clean,
             keep_cols = all.cols,
@@ -1961,7 +1967,7 @@ Remember to update the start and end dates."
           shiny::updateSelectizeInput(
             session,
             "media",
-            selected = tadat$sampleMedia
+            selected = sample_media_query
           )
           shiny::updateSelectizeInput(
             session,
