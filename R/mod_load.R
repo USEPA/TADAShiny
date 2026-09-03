@@ -1893,7 +1893,6 @@ Remember to update the start and end dates."
             shiny::HTML(nwis_error_message_text)
           ))
         } else {
-
           try(shinybusy::remove_modal_spinner(session = session), silent = TRUE)
           disableLoading(session)
 
@@ -1907,7 +1906,7 @@ Remember to update the start and end dates."
             EPATADA::TADA_OrderCols()
 
           initializeTable(tadat, raw)
-          
+
           try(shinybusy::remove_modal_spinner(session = session), silent = TRUE)
           disableLoading(session)
         }
