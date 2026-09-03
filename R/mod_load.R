@@ -1887,10 +1887,6 @@ Remember to update the start and end dates."
             shiny::HTML(nwis_error_message_text)
           ))
         } else {
-          
-          try(shinybusy::remove_modal_spinner(session = session), silent = TRUE)
-          disableLoading(session)
-
           # Developer note: all downstream logic expects the unified TADA column set.
           raw <- restrict_to_keep_cols(
             All_results_clean,
@@ -1901,6 +1897,9 @@ Remember to update the start and end dates."
             EPATADA::TADA_OrderCols()
 
           initializeTable(tadat, raw)
+          
+          try(shinybusy::remove_modal_spinner(session = session), silent = TRUE)
+          disableLoading(session)
         }
       }
     }) # end of observeEvent for querynow button
