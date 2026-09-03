@@ -1603,10 +1603,13 @@ mod_query_data_server <- function(id, tadat) {
     # event observer triggered when the user hits the "Query Now" button
     shiny::observeEvent(input$querynow, {
       session <- shiny::getDefaultReactiveDomain()
-      on.exit(try(shinybusy::remove_modal_spinner(session = session), silent = TRUE), add = TRUE)
-      
+      on.exit(
+        try(shinybusy::remove_modal_spinner(session = session), silent = TRUE),
+        add = TRUE
+      )
+
       tadat$original_source <- "Query"
-      
+
       shinybusy::show_modal_spinner(
         spin = "double-bounce",
         color = "#0071bc",
@@ -1616,7 +1619,11 @@ mod_query_data_server <- function(id, tadat) {
             style = "text-align:center; padding: 12px;",
             shiny::tags$p(id = "js_time_display", "00:00:00")
           ),
-          shiny::tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
+          shiny::tags$input(
+            id = "js_elapsed_seconds",
+            type = "hidden",
+            value = "0"
+          )
         ),
         session = session
       )
@@ -1714,7 +1721,6 @@ mod_query_data_server <- function(id, tadat) {
 
       # Provider-specific query: EPA/WQX
       if (input$providers %in% c("STORET", "all")) {
-        
         storet_args <- list(
           startDate = tadat$startDate,
           endDate = tadat$endDate,
@@ -1887,7 +1893,6 @@ Remember to update the start and end dates."
             shiny::HTML(nwis_error_message_text)
           ))
         } else {
-          
           try(shinybusy::remove_modal_spinner(session = session), silent = TRUE)
           disableLoading(session)
 
