@@ -1,3 +1,90 @@
+#' map
+#'
+#' @description A fct function: Helper function to add USGS topo map
+#'
+#' @return The return value, if any, from executing the function.
+#'
+#' @noRd
+# Stored USGS map element names
+grp <- c(
+  "USGS Topo",
+  "USGS Imagery Only",
+  "USGS Imagery Topo",
+  "USGS Shaded Relief",
+  "Hydrography"
+)
+
+att <- base::paste0(
+  "<a href='https://www.usgs.gov/'>",
+  "U.S. Geological Survey</a> | ",
+  "<a href='https://www.usgs.gov/laws/policies_notices.html'>",
+  "Policies</a>"
+)
+
+# Get the base map
+GetURL <- function(service, host = "basemap.nationalmap.gov") {
+  sprintf("https://%s/arcgis/services/%s/MapServer/WMSServer", host, service)
+}
+
+add_USGS_base <- function(x) {
+  x <- leaflet::addWMSTiles(
+    x,
+    GetURL("USGSTopo"),
+    group = grp[1],
+    attribution = att,
+    layers = "0"
+  )
+  x <- leaflet::addWMSTiles(
+    x,
+    GetURL("USGSImageryOnly"),
+    group = grp[2],
+    attribution = att,
+    layers = "0"
+  )
+  x <- leaflet::addWMSTiles(
+    x,
+    GetURL("USGSImageryTopo"),
+    group = grp[3],
+    attribution = att,
+    layers = "0"
+  )
+  x <- leaflet::addWMSTiles(
+    x,
+    GetURL("USGSShadedReliefOnly"),
+    group = grp[4],
+    attribution = att,
+    layers = "0"
+  )
+
+  # Show only one base by default (e.g., USGS Topo)
+  x <- leaflet::hideGroup(x, grp[2])
+  x <- leaflet::hideGroup(x, grp[3])
+  x <- leaflet::hideGroup(x, grp[4])
+
+  # Add the tiled overlay for the National Hydrography Dataset to the map widget:
+  opt <- leaflet::WMSTileOptions(format = "image/png", transparent = TRUE)
+  x <- leaflet::addWMSTiles(
+    x,
+    GetURL("USGSHydroCached"),
+    group = grp[5],
+    options = opt,
+    layers = "0"
+  )
+  x <- leaflet::hideGroup(x, grp[5])
+
+  # Add layer control
+  opt2 <- leaflet::layersControlOptions(collapsed = FALSE)
+  x <- leaflet::addLayersControl(
+    x,
+    baseGroups = grp[1:4],
+    overlayGroups = grp[5],
+    options = opt2,
+    position = "topleft"
+  )
+
+  return(x)
+}
+
 #' map_bbox UI Function (two-click drawing; no leaflet.extras)
 #'
 #' @description A shiny Module with address search and three-decimal rounding.
@@ -355,17 +442,6 @@ mod_map_bboxServer <- function(id, increment = 0.001, debounce_ms = 500) {
       # Clear previous search marker
       leaflet::leafletProxy("map_bbox", session = session) |>
         leaflet::clearGroup("search_center")
-
-      # Offline/CI safety
-      offline <- tryCatch(isTRUE(.tadas_offline()), error = function(...) FALSE)
-      if (offline) {
-        shiny::showNotification(
-          "Address lookup is unavailable in offline mode.",
-          type = "warning",
-          duration = 5
-        )
-        return()
-      }
 
       # Geocode via Nominatim, then Census as fallback
       res <- geocode_nominatim(q)

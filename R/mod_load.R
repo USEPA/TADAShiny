@@ -1,11 +1,4 @@
-# Minimal safe helpers to avoid failing on install/lazy load/CI
-.tadas_offline <- function() {
-  nzchar(Sys.getenv("TADAS_OFFLINE", "")) # set TADAS_OFFLINE=true in CI to force offline
-}
-
-# source of Example UI options and then loaded data frames
-# for the example datasets.  These are used to populate the
-# example dataset dropdown and load the data when selected.
+# Source of example data options in the UI
 get_example_data_map <- function() {
   m <- list(
     "Utah Nutrients (15k results)" = function() EPATADA::Data_Nutrients_UT,
@@ -16,109 +9,20 @@ get_example_data_map <- function() {
   )
   m
 }
-
-# Build map lazily so objects are only touched when selected
 example_data_map <- get_example_data_map()
 
-.safe_req_string <- function(u, timeout = 30, max_tries = 3) {
-  if (.tadas_offline()) {
-    return(NULL)
-  }
-  tryCatch(
-    {
-      httr2::request(u) |>
-        httr2::req_timeout(timeout) |>
-        httr2::req_retry(max_tries = max_tries) |>
-        httr2::req_error(is_error = function(resp) FALSE) |>
-        httr2::req_perform() |>
-        httr2::resp_body_string()
-    },
-    error = function(e) NULL
-  )
-}
-
-# Generic: fetch a CSV and return a unique vector from a column; else default
-.safe_fetch_csv_column <- function(u, column, default = character()) {
-  txt <- .safe_req_string(u)
-  if (is.null(txt)) {
-    return(default)
-  }
-  dt <- tryCatch(
-    data.table::fread(txt, showProgress = FALSE),
-    error = function(e) NULL
-  )
-  if (is.null(dt) || !column %in% names(dt)) {
-    return(default)
-  }
-  unique(dt[[column]])
-}
-
-# Projects: return ProjectIdentifier vector; else empty
-.safe_fetch_projects <- function(u) {
-  txt <- .safe_req_string(u)
-  if (is.null(txt)) {
-    return(character())
-  }
-  dt <- tryCatch(
-    data.table::fread(txt, showProgress = FALSE),
-    error = function(e) NULL
-  )
-  if (is.null(dt) || !"ProjectIdentifier" %in% names(dt)) {
-    return(character())
-  }
-  unique(dt$ProjectIdentifier)
-}
-
-# County: census file has no header; on failure return empty data.frame with expected columns
-.safe_fetch_county <- function(u) {
-  txt <- .safe_req_string(u)
-  cols <- c(
-    "STATE_CD",
-    "STATE_FIPS",
-    "COUNTY_FIPS",
-    "COUNTY_NAME",
-    "COUNTY_FOOBAR"
-  )
-  # dataRetrieval::read_waterdata_samples needs "US:{STATE_FIPS}"
-  # and "US:{STATE_FIPS}:{COUNTY_FIPS}"
-  # and EPATADA::TADA_DataRetrieval needs "STATE_CD" and COUNTY_NAME
-  if (is.null(txt)) {
-    return(data.frame(
-      STATE_CD = character(),
-      STATE_FIPS = character(),
-      COUNTY_FIPS = character(),
-      COUNTY_NAME = character(),
-      COUNTY_FOOBAR = character(),
-      stringsAsFactors = FALSE
-    ))
-  }
-  dt <- tryCatch(
-    data.table::fread(
-      txt,
-      header = FALSE,
-      col.names = cols,
-      showProgress = FALSE
-    ),
-    error = function(e) NULL
-  )
-  if (is.null(dt)) {
-    return(data.frame(
-      STATE_CD = character(),
-      STATE_FIPS = character(),
-      COUNTY_FIPS = character(),
-      COUNTY_NAME = character(),
-      COUNTY_FOOBAR = character(),
-      stringsAsFactors = FALSE
-    ))
-  }
-  as.data.frame(dt)
-}
-
+# Source of example TADA data template
 TADA_download_temp <- readRDS(system.file(
   "extdata",
   "TADA_download_temp.rds",
   package = "TADAShiny"
 ))
+
+##############################################################################
+# WQP Data Retrieval
+##############################################################################
+
+# EPA tribal land boundaries used for filtering WQP data by tribal name and location
 tribal_list <- readRDS(system.file(
   "extdata",
   "tribal_list.rds",
@@ -145,53 +49,60 @@ countryocean_choices <- readRDS(system.file(
   package = "TADAShiny"
 ))
 
-# Fetch Project choices (safe)
+# Fetch Project choices directly
 project_url <- "https://www.waterqualitydata.us/data/Project/search?mimeType=csv&zip=no&providers=NWIS&providers=STORET"
-projects <- .safe_fetch_projects(project_url)
+dt <- data.table::fread(project_url, showProgress = FALSE)
+if (!"ProjectIdentifier" %in% names(dt)) {
+  projects <- character()
+} else {
+  projects <- unique(dt$ProjectIdentifier)
+}
 
-# Fetch County choices
-# Beware that some of the counties are historic, see: https://github.com/DOI-USGS/dataRetrieval/issues/711
-# Using USGS counties from dataRetrieval does not resolve https://github.com/USEPA/TADAShiny/issues/231
-# Fetch County choices (safe)
-counties <- .safe_fetch_county(
-  "https://www2.census.gov/geo/docs/reference/codes/files/national_county.txt"
+# Fetch County choices directly
+counties <- data.table::fread(
+  "https://www2.census.gov/geo/docs/reference/codes/files/national_county.txt",
+  header = FALSE,
+  col.names = c(
+    "STATE_CD",
+    "STATE_FIPS",
+    "COUNTY_FIPS",
+    "COUNTY_NAME",
+    "COUNTY_FOOBAR"
+  ),
+  showProgress = FALSE
 )
 
-# Fetch orgs, chars, chargroup, media choices (safe)
-orgs <- .safe_fetch_csv_column(
+# Fetch orgs, chars, chargroup, media choices directly
+orgs <- data.table::fread(
   "https://cdx.epa.gov/wqx/download/DomainValues/Organization.CSV",
-  "ID",
-  default = character()
-)
+  showProgress = FALSE
+)$ID
 
-chars <- .safe_fetch_csv_column(
+chars <- data.table::fread(
   "https://cdx.epa.gov/wqx/download/DomainValues/Characteristic.CSV",
-  "Name",
-  default = character()
-)
+  showProgress = FALSE
+)$Name
 
-chargroup <- .safe_fetch_csv_column(
+chargroup <- data.table::fread(
   "https://cdx.epa.gov/wqx/download/DomainValues/CharacteristicGroup.CSV",
-  "Name",
-  default = character()
-)
+  showProgress = FALSE
+)$Name
 
 media <- c(
-  .safe_fetch_csv_column(
+  data.table::fread(
     "https://cdx.epa.gov/wqx/download/DomainValues/ActivityMedia.CSV",
-    "Name",
-    default = character()
-  ),
+    showProgress = FALSE
+  )$Name,
   "Biological Tissue",
   "No media"
 )
 
 # sitetype <- c(
-#       unique(utils::read.csv(url(
-#         "https://cdx.epa.gov/wqx/download/DomainValues/MonitoringLocationType.CSV"
-#       ))$Name),
-#       "Glacier", "Aggregate water-use establishment", "Not Assigned", "Subsurface"
-#       )
+#   unique(utils::read.csv(url(
+#     "https://cdx.epa.gov/wqx/download/DomainValues/MonitoringLocationType.CSV"
+#   ))$Name),
+#   "Glacier", "Aggregate water-use establishment", "Not Assigned", "Subsurface"
+# )
 
 sitetype <- c(
   "Aggregate groundwater use",
@@ -212,7 +123,7 @@ sitetype <- c(
   "Wetland"
 )
 
-# these are the types of text matches used in searching the Characteristic(s) list
+# These are the types of text matches used in searching the Characteristic(s) list
 match_types <- c(
   "Starts With" = "starts_with",
   "Ends With" = "ends_with",
@@ -220,9 +131,10 @@ match_types <- c(
   "Equals" = "matches"
 )
 
-# start of UI
-# Updated UI with lighter subgroup styling, subtle background clusters,
-# reworded location guidance, reordered Site ID(s), and consistent Tribal Data styling
+#############################################################################
+# START OF UI
+#############################################################################
+
 mod_query_data_ui <- function(id) {
   ns <- NS(id)
   tagList(
@@ -404,7 +316,7 @@ mod_query_data_ui <- function(id) {
       /* Slightly larger base type on small screens for readability */
       :root { --tada-font-size-base: 17px; }
     }
-    
+
     /* Bounding box UI: responsive polish */
     .tada-bbox .leaflet-container {
       height: 420px !important; /* desktop/tablet default */
@@ -1040,7 +952,6 @@ mod_query_data_ui <- function(id) {
     ))
   )
 }
-# end of UI
 
 all.cols <- c(
   "ResultIdentifier",
@@ -1289,20 +1200,11 @@ all.cols <- c(
   "geometry"
 )
 
-# Keep only the columns in 'keep_cols' (in order); print removed and missing
 restrict_to_keep_cols <- function(df, keep_cols = all.cols, verbose = TRUE) {
   orig_names <- names(df)
-
-  # Preserve the order you provided in keep_cols (skip those not in df)
   keep_ordered <- keep_cols[keep_cols %in% orig_names]
-
-  # Columns to remove (present in df but not in keep list)
   removed <- setdiff(orig_names, keep_cols)
-
-  # Columns requested but not present in df (informational only)
   missing <- setdiff(keep_cols, orig_names)
-
-  # Subset and return
   df_out <- df[, keep_ordered, drop = FALSE]
 
   if (isTRUE(verbose)) {
@@ -1636,7 +1538,7 @@ mod_query_data_server <- function(id, tadat) {
 
     shiny::updateSelectizeInput(
       session,
-      "characteristic",
+      "characteristic_select",
       choices = c(chars),
       server = TRUE
     )
@@ -1698,31 +1600,109 @@ mod_query_data_server <- function(id, tadat) {
       )
     })
 
-    # not sure why this is here
-    # remove the modal once the dataset has been pulled
-    # shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
-
-    # this event observer is triggered when the user hits the "Query Now" button, and then runs the TADAdataRetrieval function
+    # event observer triggered when the user hits the "Query Now" button
     shiny::observeEvent(input$querynow, {
+      session <- shiny::getDefaultReactiveDomain()
+      on.exit(
+        try(shinybusy::remove_modal_spinner(session = session), silent = TRUE),
+        add = TRUE
+      )
+
       tadat$original_source <- "Query"
-      # convert to null when needed
-      if (input$state == "") {
-        # changing inputs of "" or NULL to "null"
-        tadat$statecode <- "null"
+
+      shinybusy::show_modal_spinner(
+        spin = "double-bounce",
+        color = "#0071bc",
+        text = tagList(
+          shiny::tags$div(
+            shiny::tags$p("Querying data...", shiny::tags$br(), "Please wait"),
+            style = "text-align:center; padding: 12px;",
+            shiny::tags$p(id = "js_time_display", "00:00:00")
+          ),
+          shiny::tags$input(
+            id = "js_elapsed_seconds",
+            type = "hidden",
+            value = "0"
+          )
+        ),
+        session = session
+      )
+
+      tadat$statecode <- if (input$state == "") "null" else input$state
+      tadat$countycode <- if (input$county == "") "null" else input$county
+      tadat$countrycode <- if (is.null(input$countryocean)) {
+        "null"
       } else {
-        tadat$statecode <- input$state
+        input$countryocean
       }
-      if (input$county == "") {
-        tadat$countycode <- "null"
+      tadat$siteid <- if (is.null(input$siteid)) "null" else input$siteid
+      tadat$siteType <- if (is.null(input$type)) "null" else input$type
+      tadat$characteristicType <- if (is.null(input$chargroup)) {
+        "null"
       } else {
-        tadat$countycode <- input$county
+        input$chargroup
       }
-      # this is an overloaded field which can be 2-character Country or Ocean
-      if (is.null(input$countryocean)) {
-        tadat$countrycode <- "null"
+      tadat$characteristicName <- if (is.null(input$characteristic_select)) {
+        "null"
       } else {
-        tadat$countrycode <- input$countryocean
+        input$characteristic_select
       }
+      # Normalize sample media once for all branches
+      sample_media_ui <- input$media
+      sample_media_query <- if (
+        is.null(sample_media_ui) || length(sample_media_ui) == 0
+      ) {
+        "null"
+      } else {
+        sample_media_ui <- unique(sample_media_ui)
+
+        if (any(grepl("Water", sample_media_ui, ignore.case = TRUE))) {
+          unique(c(sample_media_ui, "water"))
+        } else {
+          sample_media_ui
+        }
+      }
+      tadat$project <- if (is.null(input$project)) "null" else input$project
+      tadat$organization <- if (is.null(input$org)) "null" else input$org
+      tadat$endDate <- if (length(input$endDate) == 0) {
+        "null"
+      } else {
+        as.character(input$endDate)
+      }
+      tadat$startDate <- if (length(input$startDate) == 0) {
+        "null"
+      } else {
+        as.character(input$startDate)
+      }
+
+      if (!input$tribe_layer %in% "" && !input$tribe_name %in% "") {
+        tribal_sf_object <- return_tribal_sf(
+          tribal_layer = input$tribe_layer,
+          tribal_name = input$tribe_name,
+          tribal_list = tribal_list
+        )
+        tadat$tribal_boundary <- tribal_sf_object
+        tadat$tribal_bBox <- unname(sf::st_bbox(tribal_sf_object))
+      } else {
+        tadat$tribal_boundary <- "null"
+        tadat$tribal_bBox <- "null"
+      }
+
+      if (!is.null(bbox_data$bBox)) {
+        tadat$bBox <- bbox_data$bBox
+      } else {
+        tadat$bBox <- "null"
+      }
+
+      # If use tribal dataset, use the tribal dataset's bbox
+      # Otherwise, use the bbox from tadat
+      bbox_reactive <- shiny::reactive({
+        if (!inherits(tadat$tribal_boundary, "sf")) {
+          tadat$bBox
+        } else {
+          tadat$tribal_bBox
+        }
+      })
 
       if (
         (input$providers == "all" || input$providers == "NWIS") &&
@@ -1746,403 +1726,57 @@ mod_query_data_server <- function(id, tadat) {
         return(NULL)
       }
 
-      # this is used for toggling retrievals for 1 or both or the services
-      providers_arg <- c("NWIS", "STORET")
-      if (is.null(input$providers) | input$providers == "all") {
-        tadat$providers <- "null"
-      } else {
-        tadat$providers <- input$providers
-        providers_arg <- c(input$providers)
-      }
-      # if (input$huc == "") {
-      #   tadat$huc <- "null"
-      # } else {
-      #   tadat$huc <- gsub("\\s", "", input$huc)
-      # }
-      if (is.null(input$siteid)) {
-        tadat$siteid <- "null"
-      } else {
-        tadat$siteid <- input$siteid
-      }
-      if (is.null(input$type)) {
-        tadat$siteType <- "null"
-      } else {
-        tadat$siteType <- input$type
-      }
-      if (is.null(input$chargroup)) {
-        tadat$characteristicType <- "null"
-      } else {
-        tadat$characteristicType <- input$chargroup
-      }
-      if (is.null(input$characteristic_select)) {
-        tadat$characteristicName <- "null"
-      } else {
-        tadat$characteristicName <- input$characteristic_select
-      }
-      if (is.null(input$media)) {
-        tadat$sampleMedia <- "null"
-      } else {
-        tadat$sampleMedia <- input$media
-        # "If 'Water' found in input$media then add 'water' to tadat$sampleMedia
-        # this is used for some older USGS data only
-        if (sum(grep("Water", input$media)) > 0) {
-          tadat$sampleMedia <- append(tadat$sampleMedia, "water")
-        }
-      }
-      if (is.null(input$project)) {
-        tadat$project <- "null"
-      } else {
-        tadat$project <- input$project
-      }
-      if (is.null(input$org)) {
-        tadat$organization <- "null"
-      } else {
-        tadat$organization <- input$org
-      }
+      STORET_results <- NULL
+      NWIS_results <- NULL
+      nwis_error_message_text <- NULL
 
-      if (length(input$endDate) == 0) {
-        # ensure if date is empty, the query receives a proper input ("null")
-        tadat$endDate <- "null"
-      } else {
-        tadat$endDate <- as.character(input$endDate)
-      }
-      if (length(input$startDate) == 0) {
-        # ensure if date is empty, the query receives a proper input ("null")
-        tadat$startDate <- "null"
-      } else {
-        tadat$startDate <- as.character(input$startDate)
-      }
-
-      # If there are tribal information, get the tribal as a polygon
-      if (!input$tribe_layer %in% "" & !input$tribe_name %in% "") {
-        # ensure if date is empty, the query receives a proper input ("null")
-        tribal_sf_object <- return_tribal_sf(
-          tribal_layer = input$tribe_layer,
-          tribal_name = input$tribe_name,
-          tribal_list = tribal_list
-        )
-        tadat$tribal_boundary <- tribal_sf_object
-        tadat$tribal_bBox <- unname(sf::st_bbox(tribal_sf_object))
-      } else {
-        tadat$tribal_boundary <- "null"
-        tadat$tribal_bBox <- "null"
-      }
-
-      # Handle bounding box data
-      if (!is.null(bbox_data$bBox)) {
-        tadat$bBox <- bbox_data$bBox
-      } else {
-        tadat$bBox <- "null"
-      }
-
-      # If use tribal dataset, use the tribal dataset's bbox
-      # Otherwise, use the bbox from tadat
-      bbox_reactive <- shiny::reactive({
-        if (!inherits(tadat$tribal_boundary, "sf")) {
-          tadat$bBox
-        } else {
-          tadat$tribal_bBox
-        }
-      })
-
-      if ("STORET" %in% providers_arg) {
-        # a modal that pops up showing it's working on querying the portal
-        shinybusy::show_modal_spinner(
-          spin = "double-bounce",
-          color = "#0071bc",
-          text = tagList(
-            shiny::tags$div(
-              shiny::tags$p(
-                "Querying Data Source",
-                shiny::tags$br(),
-                "EPA (WQX)"
-              ),
-              style = "text-align:center; padding: 12px;",
-              shiny::tags$p(id = "js_time_display", "00:00:00")
-            ),
-            # Hidden input to hold elapsed seconds for server (JS updates it)
-            shiny::tags$input(
-              id = "js_elapsed_seconds",
-              type = "hidden",
-              value = "0"
-            )
-          ),
-          session = shiny::getDefaultReactiveDomain()
-        )
-
-        # Create the list of input arguments for dataRetrieval::readWQPsummary
-        args_temp <- args_create(
-          statecode = tadat$statecode,
-          countycode = tadat$countycode,
+      # Provider-specific query: EPA/WQX
+      if (input$providers %in% c("STORET", "all")) {
+        storet_args <- list(
+          startDate = tadat$startDate,
+          endDate = tadat$endDate,
           countrycode = tadat$countrycode,
+          countycode = tadat$countycode,
           siteid = tadat$siteid,
           siteType = tadat$siteType,
           characteristicName = tadat$characteristicName,
           characteristicType = tadat$characteristicType,
-          sampleMedia = tadat$sampleMedia,
-          project = tadat$project,
+          sampleMedia = sample_media_query,
+          statecode = tadat$statecode,
           organization = tadat$organization,
-          startDateLo = tadat$startDate,
-          startDateHi = tadat$endDate,
-          providers = tadat$providers,
+          project = tadat$project,
           bBox = bbox_reactive()
         )
 
-        # Get the data summary
-        # does this have recent USGS data????
-        result_summary <- dataRetrieval::whatWQPdata(args_temp)
-
-        # Check if anything is outside the tribal's shapefile boundary
-        if (inherits(tadat$tribal_boundary, "sf")) {
-          # Convert result_summary to sf object
-          result_summary_sf <- result_summary |>
-            sf::st_as_sf(coords = c("lon", "lat"), crs = 4326) |>
-            sf::st_transform(crs = sf::st_crs(tadat$tribal_boundary))
-
-          # Filter the sites within the tribal boundary
-          result_summary_sf_filter <- result_summary_sf |>
-            sf::st_filter(tadat$tribal_boundary)
-
-          result_summary <- result_summary_sf_filter |>
-            sf::st_set_geometry(NULL)
-        }
-
-        # A warning section to show if the sample size is zero
-        if (nrow(result_summary) == 0) {
-          shiny::showModal(shiny::modalDialog(
-            title = "Empty Query",
-            "Your query returned zero results. Please adjust your search inputs and try again.
-              Remember to update the Start Date and End Date."
-          ))
-          return()
-        }
-
-        tot_sites <- result_summary |>
-          dplyr::group_by(MonitoringLocationIdentifier) |>
-          dplyr::summarise(tot_n = sum(resultCount)) |>
-          dplyr::filter(tot_n > 0) |>
-          dplyr::arrange(tot_n)
-
-        # A warning section to show if the sample size is zero
-        if (nrow(tot_sites) == 0) {
-          shiny::showModal(shiny::modalDialog(
-            title = "Empty Query",
-            "Your query returned zero results. Please adjust your search inputs and try again.
-              Remember to update the start and end dates."
-          ))
-          return()
-        }
-
-        # Separate the sites into small and big sites
-
-        # Set the cut point to decide the small or big sites
-        maxrecs <- 100000
-        pretty_maxrecs <- prettyNum(maxrecs, big.mark = ",", scientific = FALSE)
-
-        smallsites <- tot_sites |> dplyr::filter(tot_n <= maxrecs)
-        bigsites <- tot_sites |> dplyr::filter(tot_n > maxrecs)
-
-        # Set other location inputs to be NULL as site ID is available
-        args_temp2 <- args_temp
-
-        args_temp2[["statecode"]] <- NULL
-        args_temp2[["countycode"]] <- NULL
-        args_temp2[["countrycode"]] <- NULL
-        args_temp2[["bBox"]] <- NULL
-
-        # Download the data for water quality monitoring locations with less than 'maxrec' records.
-        if (nrow(smallsites) > 0) {
-          smallsitesgrp <- smallsites |>
-            dplyr::mutate(
-              group = MESS::cumsumbinning(
-                x = tot_n,
-                threshold = maxrecs,
-                maxgroupsize = 100 # 100 # changed from 300 after Warning: Error in httr2::req_perform: HTTP 414 URI Too Long.
-              )
+        STORET_results <- tryCatch(
+          do.call(
+            EPATADA::TADA_DataRetrieval,
+            c(
+              storet_args,
+              list(providers = "STORET", ask = FALSE, applyautoclean = FALSE)
             )
-
-          smallsites_list <- list()
-
-          small_title <- base::paste0(
-            "Downloading EPA Water Quality eXchange (WQX) data from ",
-            scales::comma(nrow(smallsites)),
-            " sites with less than or equal to ",
-            pretty_maxrecs,
-            " results."
-          )
-
-          shiny::withProgress(message = small_title, detail = "0%", value = 0, {
-            for (i in 1:max(smallsitesgrp$group)) {
-              shiny::incProgress(
-                1 / max(smallsitesgrp$group),
-                detail = base::paste0(
-                  round(i / max(smallsitesgrp$group) * 100),
-                  "%"
-                )
-              )
-
-              small_site_chunk <- subset(
-                smallsitesgrp$MonitoringLocationIdentifier,
-                smallsitesgrp$group == i
-              )
-
-              args_temp_small <- args_temp2
-
-              args_temp_small[["siteid"]] <- small_site_chunk
-
-              TADAprofile_smallsites_temp <- NULL
-
-              ## start of changes for using WQX3
-              tryCatch(
-                {
-                  # Download the WQP data using the WQX3 and the full Physical Chemistry profile
-                  TADAprofile_smallsites_temp <- dataRetrieval::readWQPdata(
-                    args_temp_small,
-                    service = "ResultWQX3",
-                    dataProfile = "fullPhysChem",
-                    ignore_attributes = TRUE
-                  )
-                  # revert names to the legacy
-                  TADAprofile_smallsites_temp <- EPATADA::TADA_RenametoLegacy(
-                    TADAprofile_smallsites_temp
-                  )
-                },
-                error = function(e) {
-                  # Error handling: show error message and re-enable harmonize button
-                  shinybusy::remove_modal_spinner(
-                    session = shiny::getDefaultReactiveDomain()
-                  )
-                  shiny::showModal(shiny::modalDialog(
-                    title = "Error",
-                    paste(
-                      "An error occurred while querying WQX (EPA):",
-                      e$message
-                    ),
-                    easyClose = TRUE
-                  ))
-                }
-              )
-              ## end of changes for using WQX3
-
-              # Assign the data to the list
-              if (
-                "PreparationStartDate" %in% names(TADAprofile_smallsites_temp)
-              ) {
-                TADAprofile_smallsites_temp$PreparationStartDate <- as.character(
-                  TADAprofile_smallsites_temp$PreparationStartDate
-                )
-              }
-              TADAprofile_smallsites_temp <- EPATADA::TADA_AutoClean(
-                TADAprofile_smallsites_temp
-              )
-
-              smallsites_list[[i]] <- TADAprofile_smallsites_temp
-            }
-          })
-          # Combine the data
-          TADA_smallsites <- dplyr::bind_rows(smallsites_list)
-
-          # Apply TADA_autoclean
-          TADA_smallsites_clean <- EPATADA::TADA_AutoClean(TADA_smallsites) |>
-            dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
-        } else {
-          TADA_smallsites_clean <- TADA_download_temp
-        }
-
-        # Download the data for water quality monitoring locations with more than 'maxrec' records.
-        if (nrow(bigsites) > 0) {
-          bigsites_list <- list()
-
-          bsitesvec <- unique(bigsites$MonitoringLocationIdentifier)
-
-          big_title <- base::paste0(
-            "Downloading STORET data from sites with greater than ",
-            pretty_maxrecs,
-            " results."
-          )
-
-          shiny::withProgress(message = big_title, detail = "0%", value = 0, {
-            for (i in 1:length(bsitesvec)) {
-              shiny::incProgress(
-                1 / length(bsitesvec),
-                detail = base::paste0(round(i / length(bsitesvec) * 100), "%")
-              )
-
-              args_temp_big <- args_temp2
-
-              args_temp_big[["siteid"]] <- bsitesvec[i]
-
-              ## start of changes for using WQX3
-
-              # Download the WQP data using the WQX3 and the full Physical Chemistry profile
-              bigsites_result_temp <- dataRetrieval::readWQPdata(
-                args_temp_big,
-                service = "ResultWQX3",
-                dataProfile = "fullPhysChem",
-                ignore_attributes = TRUE
-              )
-              # revert names to the legacy
-              TADAprofile_bigsites_temp <- EPATADA::TADA_RenametoLegacy(
-                bigsites_result_temp
-              )
-
-              # Assign the data to the list
-              bigsites_list[[i]] <- TADAprofile_bigsites_temp
-
-              ## end of changes for using WQX3
-            }
-          })
-
-          # Combine the data
-          TADA_bigsites <- dplyr::bind_rows(bigsites_list)
-
-          # Apply TADA_autoclean
-          TADA_bigsites_clean <- EPATADA::TADA_AutoClean(TADA_bigsites) |>
-            dplyr::mutate(dplyr::across(tidyselect::everything(), as.character))
-        } else {
-          TADA_bigsites_clean <- TADA_download_temp
-        }
-
-        # Combine the Small and Big sites
-        STORET_results <- dplyr::bind_rows(
-          TADA_smallsites_clean,
-          TADA_bigsites_clean
+          ),
+          error = function(e) {
+            shiny::showModal(shiny::modalDialog(
+              title = "Error",
+              paste("An error occurred while querying WQX (EPA):", e$message),
+              easyClose = TRUE
+            ))
+            NULL
+          }
         )
 
-        # Convert the column types
-        type_template <- readRDS(system.file(
-          "extdata",
-          "TADA_download_temp_type.rds",
-          package = "TADAShiny"
-        ))
-        STORET_results <- STORET_results |>
-          dplyr::mutate(dplyr::across(
-            tidyselect::everything(),
-            ~ {
-              col_name <- dplyr::cur_column()
-              target_class <- class(type_template[[col_name]])[1]
-              switch(
-                target_class,
-                integer = as.integer(.x),
-                numeric = as.numeric(.x),
-                logical = as.logical(.x),
-                Date = as.Date(.x),
-                factor = as.factor(.x),
-                as.character(.x)
-              )
-            }
-          ))
-
-        # remove the modal once the dataset has been pulled
-        shinybusy::remove_modal_spinner(
-          session = shiny::getDefaultReactiveDomain()
-        )
+        if (!is.null(STORET_results) && nrow(STORET_results) > 0) {
+          STORET_results <- EPATADA::TADA_AutoClean(STORET_results) |>
+            EPATADA::TADA_CorrectColType()
+        } else {
+          STORET_results <- NULL
+        }
       }
 
-      if ("NWIS" %in% providers_arg) {
-        # use this to show the user something while they are waiting
-        query_text_string <- NULL
-
+      # Provider-specific query: USGS/NWIS
+      if (input$providers %in% c("NWIS", "all")) {
+        # Developer note: NWIS uses FIPS-style county/state arguments, so we derive them from the selected state/county.
         if (input$state == "") {
           state_fips_arg <- NULL
           county_fips_arg <- NULL
@@ -2154,7 +1788,6 @@ mod_query_data_server <- function(id, tadat) {
             sep = ":"
           )
           county_fips_arg <- NULL
-          query_text_string <- input$state
         } else {
           county <- counties[
             counties$STATE_CD == input$state &
@@ -2171,177 +1804,119 @@ mod_query_data_server <- function(id, tadat) {
             sprintf("%03d", county$COUNTY_FIPS),
             sep = ":"
           )
-          query_text_string <- paste(
-            input$state,
-            "and",
-            county$COUNTY_NAME,
-            sep = " "
-          )
         }
-        # a modal that pops up showing it's working on querying the portal
-        shinybusy::show_modal_spinner(
-          spin = "double-bounce",
-          color = "#0071bc",
-          text = tagList(
-            shiny::tags$div(
-              shiny::tags$p(
-                "Querying Data Source",
-                shiny::tags$br(),
-                "USGS (Samples Data API)"
-              ),
-              style = "text-align:center; padding: 12px;",
-              shiny::tags$p(id = "js_time_display", "00:00:00")
-            ),
-            # Hidden input to hold elapsed seconds for server (JS updates it)
-            shiny::tags$input(
-              id = "js_elapsed_seconds",
-              type = "hidden",
-              value = "0"
-            )
-          ),
-          session = shiny::getDefaultReactiveDomain()
-        )
 
-        # Create the list of input arguments for dataRetrieval::read_waterdata_samples
-        args_temp <- nwis_args_create(
+        # Call read_waterdata_samples() directly
+        nwis_args <- list(
           stateFips = state_fips_arg,
           countyFips = county_fips_arg,
-          # countrycode = tadat$countrycode,
           monitoringLocationIdentifier = tadat$siteid,
           siteTypeName = tadat$siteType,
-          # hydrologicUnit = TBD,
           characteristic = tadat$characteristicName,
           characteristicGroup = tadat$characteristicType,
-          activityMediaName = tadat$sampleMedia,
+          activityMediaName = sample_media_query,
           projectIdentifier = tadat$project,
-          organizationIdentifier = tadat$organization,
           activityStartDateLower = tadat$startDate,
           activityStartDateUpper = tadat$endDate,
-          # providers = tadat$providers,
           dataType = "results",
           dataProfile = "fullphyschem",
-          boundingBox = bbox_reactive(),
+          boundingBox = bbox_reactive()
         )
 
-        NWIS_results <- NULL
-        got_NWIS_data <- FALSE
-        nwis_error_message_text <- NULL
+        nwis_args <- nwis_args[
+          !vapply(
+            nwis_args,
+            function(v) {
+              is.null(v) ||
+                length(v) == 0 ||
+                all(is.na(v)) ||
+                identical(v, "NA") ||
+                identical(v, "null") ||
+                identical(v, "")
+            },
+            logical(1)
+          )
+        ]
 
-        tryCatch(
-          {
-            # stop("random error is NWIS")
-            NWIS_results <- do.call(
-              dataRetrieval::read_waterdata_samples,
-              args_temp
-            )
-            got_NWIS_data <- TRUE
-          },
+        nwis_results_raw <- tryCatch(
+          do.call(dataRetrieval::read_waterdata_samples, nwis_args),
           error = function(e) {
-            # Error handling: show error message and re-enable harmonize button
+            # Developer note: preserve message for downstream modal handling
             nwis_error_message_text <<- paste(
               shiny::tags$strong(
                 "An error occurred while querying NWIS (USGS):"
               ),
               shiny::tags$p(e$message)
             )
-
-            shinybusy::remove_modal_spinner(
-              session = shiny::getDefaultReactiveDomain()
-            )
+            NULL
           }
         )
 
-        if (got_NWIS_data && nrow(NWIS_results) > 0) {
-          NWIS_results_rename <- EPATADA::TADA_RenametoLegacy(NWIS_results)
+        # Required transformation chain for NWIS: legacy renaming -> autoclean
+        if (!is.null(nwis_results_raw) && nrow(nwis_results_raw) > 0) {
+          NWIS_results <- EPATADA::TADA_RenametoLegacy(nwis_results_raw)
 
-          # TEMP FIX!!!!!!!!!
-          # NWIS uses SampleAquifer and STORET and TADA use AquiferName  Change to AquiferName
-          colnames(NWIS_results_rename)[
-            colnames(NWIS_results_rename) == "SampleAquifer"
-          ] <- "AquiferName"
+          # Developer note: keep this compatibility fix unless upstream NWIS output changes
+          if ("SampleAquifer" %in% names(NWIS_results)) {
+            names(NWIS_results)[
+              names(NWIS_results) == "SampleAquifer"
+            ] <- "AquiferName"
+          }
 
-          # also getting non-fatal error from NWIS only data
-          # [1] "Missing the following fields that are in the csv files:"
-          # [1] "TADA.QAPPDocAvailable"
-
-          # this will not run if the df is empty
-          NWIS_results_clean <- EPATADA::TADA_AutoClean(NWIS_results_rename)
-
-          NWIS_results <- EPATADA::TADA_OrderCols(NWIS_results_clean)
-
-          # this field is all NA but still needs to be recast as date
-          # NWIS_results_ordered$Activity_EndDate <- as.Date(NWIS_results_ordered$Activity_EndDate)
-
-          # his this one later
-          # Warning: Error in dplyr::bind_rows:
-          # Can't combine ..1$ActivityStartDate <character> and ..2$ActivityStartDate <date>.
-          NWIS_results$ActivityStartDate <- as.character(
-            NWIS_results$ActivityStartDate
-          )
-          NWIS_results$ActivityStartDateTime <- as.character(
-            NWIS_results$ActivityStartDateTime
-          )
-          NWIS_results$ActivityStartTime.TimeZoneCode_offset <- as.character(
-            NWIS_results$ActivityStartTime.TimeZoneCode_offset
-          )
+          NWIS_results <- EPATADA::TADA_AutoClean(NWIS_results) |>
+            EPATADA::TADA_CorrectColType()
         }
-      } # end of NWIS query section
+      }
 
-      # show a modal dialog box when tadat$raw is empty and the query didn't return any records.
-      # but if tadat$raw isn't empty, perform some initial QC of data that aren't media type water
-      # or have NA Resultvalue and no detection limit data
+      # If NWIS failed, show a dedicated modal. Otherwise combine whatever was successfully retrieved.
       if (
-        !is.null(nwis_error_message_text) && nzchar(nwis_error_message_text)
+        input$providers %in%
+          c("NWIS", "all") &&
+          !is.null(nwis_error_message_text) &&
+          nzchar(nwis_error_message_text)
       ) {
         shiny::showModal(shiny::modalDialog(
           title = "NWIS Error",
           shiny::HTML(nwis_error_message_text),
-          easyClose = FALSE, # Set to FALSE to force user to use a button to close
+          easyClose = FALSE,
           footer = tagList(shiny::modalButton("Dismiss"))
         ))
       } else {
-        if (exists("STORET_results") && exists("NWIS_results")) {
-          if (got_NWIS_data == TRUE && nrow(NWIS_results) > 0) {
-            # merge them together
-            All_results <- dplyr::bind_rows(STORET_results, NWIS_results)
-          } else {
-            # if the NWIS query resulted in no rows, then just include these results
-            All_results <- STORET_results
-          }
-
-          All_results_clean <- EPATADA::TADA_AutoClean(All_results)
-
-          All_results_clean <- EPATADA::TADA_OrderCols(All_results_clean)
-        } else if (exists("NWIS_results")) {
-          # && !is.null(NWIS_results())) {
-          All_results_clean <- NWIS_results
-        } else if (exists("STORET_results")) {
+        # Developer note: allow either provider alone or both together.
+        if (!is.null(STORET_results) && !is.null(NWIS_results)) {
+          All_results_clean <- dplyr::bind_rows(STORET_results, NWIS_results)
+        } else if (!is.null(STORET_results)) {
           All_results_clean <- STORET_results
+        } else if (!is.null(NWIS_results)) {
+          All_results_clean <- NWIS_results
+        } else {
+          All_results_clean <- NULL
         }
 
-        # using the NWIS retrieval this returns 0 x 181 - a list of the columns.
-        if (dim(All_results_clean)[1] <= 0) {
+        # Developer note: guard against NULL before checking row count.
+        if (is.null(All_results_clean) || nrow(All_results_clean) <= 0) {
           message_text <- "Your query returned zero results. Please adjust your search inputs and try again.
-            Remember to update the start and end dates."
+Remember to update the start and end dates."
 
           shiny::showModal(shiny::modalDialog(
             title = "Empty Query",
             shiny::tags$p(message_text),
-            HTML(nwis_error_message_text)
+            shiny::HTML(nwis_error_message_text)
           ))
         } else {
-          disableLoading(session)
-          shinybusy::remove_modal_spinner(
-            session = shiny::getDefaultReactiveDomain()
-          )
-
-          # Reduce to your keep list and print removed columns
+          # All downstream logic expects the unified TADA column set
           raw <- restrict_to_keep_cols(
             All_results_clean,
             keep_cols = all.cols,
             verbose = TRUE
-          )
+          ) |>
+            EPATADA::TADA_IDCensoredData() |>
+            EPATADA::TADA_OrderCols()
+
           initializeTable(tadat, raw)
+
+          try(shinybusy::remove_modal_spinner(session = session), silent = TRUE)
+          disableLoading(session)
         }
       }
     }) # end of observeEvent for querynow button
@@ -2383,7 +1958,7 @@ mod_query_data_server <- function(id, tadat) {
           )
           shiny::updateSelectizeInput(
             session,
-            "characteristic",
+            "characteristic_select",
             selected = tadat$characteristicName
           )
           shiny::updateSelectizeInput(
@@ -2394,7 +1969,7 @@ mod_query_data_server <- function(id, tadat) {
           shiny::updateSelectizeInput(
             session,
             "media",
-            selected = tadat$sampleMedia
+            selected = sample_media_query
           )
           shiny::updateSelectizeInput(
             session,
@@ -2426,25 +2001,21 @@ initializeTable <- function(tadat, raw) {
     shinyjs::enable(selector = '.nav li a[data-value="Flag"]')
     shinyjs::enable(selector = '.nav li a[data-value="Filter"]')
     shinyjs::enable(selector = '.nav li a[data-value="TNandTPSummation"]') # new
-
     shinyjs::enable(selector = '.nav li a[data-value="Depth"]')
     shinyjs::enable(selector = '.nav li a[data-value="Figures"]')
     shinyjs::enable(selector = '.nav li a[data-value="Review"]')
   } else {
-    tadat$new <- TRUE # this is used to determine if the app should go to the overview page first - only for datasets that are new to TADAShiny
-    tadat$ovgo <- TRUE # load data into overview page
+    tadat$new <- TRUE
+    tadat$ovgo <- TRUE
     shinyjs::enable(selector = '.nav li a[data-value="Overview"]')
     shinyjs::enable(selector = '.nav li a[data-value="Flag"]')
     shinyjs::enable(selector = '.nav li a[data-value="Harmonize"]')
     shinyjs::enable(selector = '.nav li a[data-value="Censored"]')
-    # Set flagging column to FALSE
     raw$TADA.Remove <- FALSE
   }
   removals <- data.frame(matrix(nrow = nrow(raw), ncol = 0))
   tadat$raw <- raw
   tadat$removals <- removals
-
-  # display the download buttons
   tadat$ready_for_download <- TRUE
 }
 
