@@ -77,33 +77,32 @@ mod_TADA_summary_ui <- function(id) {
 #' @noRd
 mod_TADA_summary_server <- function(id, tadat) {
   shiny::moduleServer(id, function(input, output, session) {
-    
     summary_things <- shiny::reactiveValues()
-    
+
     # Helper to create the download zip
     make_download_zip <- function(zipfile, mode = c("working", "final")) {
       mode <- match.arg(mode)
-      
+
       # Create a unique temp folder for this download
       tmpdir <- file.path(tempdir(), paste0("TADA_", as.integer(Sys.time())))
       dir.create(tmpdir, recursive = TRUE, showWarnings = FALSE)
-      
+
       oldwd <- getwd()
       on.exit(setwd(oldwd), add = TRUE)
-      
+
       # Work inside the temp folder so zip has flat file names
       setwd(tmpdir)
-      
+
       base_name <- tadat$default_outfile
-      
+
       xlsx_name <- if (mode == "working") {
         paste0(base_name, "_working.xlsx")
       } else {
         paste0(base_name, "_final.xlsx")
       }
-      
+
       prog_name <- paste0(base_name, "_prog.RData")
-      
+
       # Build the dataset
       if (mode == "working") {
         out_data <- EPATADA::TADA_OrderCols(tadat$raw)
@@ -114,44 +113,48 @@ mod_TADA_summary_server <- function(id, tadat) {
         } else {
           out_data <- tadat$raw
         }
-        
+
         out_data <- EPATADA::TADA_OrderCols(out_data)
-        
+
         # Safely drop optional columns if present
         out_data <- dplyr::select(
           out_data,
           -dplyr::any_of(c("TADA.Remove", "TADA.RemovalReason"))
         )
-        
+
         out_data <- EPATADA::TADA_RetainRequired(out_data)
       }
-      
+
       desc <- writeNarrativeDataFrame(tadat)
       dfs <- list(Data = out_data, Parameterization = desc)
-      
+
       # Write the supporting files into tmpdir
       writeFile(tadat, prog_name)
       writexl::write_xlsx(dfs, path = xlsx_name, use_zip64 = TRUE)
-      
+
       # Optional debug checks
       print(file.exists(xlsx_name))
       print(file.exists(prog_name))
-      
+
       # Create zip with flat file structure
       utils::zip(
         zipfile = zipfile,
         files = c(basename(xlsx_name), basename(prog_name))
       )
     }
-    
+
     # Enable download buttons when raw data exists
-    shiny::observeEvent(tadat$raw, {
-      if (!is.null(tadat$raw)) {
-        shinyjs::enable("dwn_working")
-        shinyjs::enable("dwn_final")
-      }
-    }, ignoreInit = TRUE)
-    
+    shiny::observeEvent(
+      tadat$raw,
+      {
+        if (!is.null(tadat$raw)) {
+          shinyjs::enable("dwn_working")
+          shinyjs::enable("dwn_final")
+        }
+      },
+      ignoreInit = TRUE
+    )
+
     # Working dataset download
     output$dwn_working <- shiny::downloadHandler(
       filename = function() {
@@ -174,7 +177,7 @@ mod_TADA_summary_server <- function(id, tadat) {
       },
       contentType = "application/zip"
     )
-    
+
     # Final dataset download
     output$dwn_final <- shiny::downloadHandler(
       filename = function() {
@@ -197,58 +200,64 @@ mod_TADA_summary_server <- function(id, tadat) {
       },
       contentType = "application/zip"
     )
-    
+
     # Summary statistics
     shiny::observe({
       shiny::req(tadat$raw)
-      
+
       summary_things$rem_rec <- length(tadat$raw$ResultIdentifier[
         tadat$raw$TADA.Remove == TRUE
       ])
-      
+
       summary_things$clean_rec <- length(tadat$raw$ResultIdentifier[
         tadat$raw$TADA.Remove == FALSE
       ])
-      
+
       clean_sites <- unique(tadat$raw$MonitoringLocationIdentifier[
         tadat$raw$TADA.Remove == FALSE
       ])
-      
+
       summary_things$clean_site <- length(clean_sites)
-      
+
       summary_things$rem_site <- length(unique(tadat$raw$MonitoringLocationIdentifier[
         !tadat$raw$MonitoringLocationIdentifier %in% clean_sites
       ]))
-      
+
       summary_things$removals <- sort_removals(tadat$removals)
-      
+
       shinyjs::enable("dwn_working")
       shinyjs::enable("dwn_final")
     })
-    
+
     summary_things$removals <- data.frame(matrix(
       ncol = 2,
       nrow = 0,
       dimnames = list(NULL, c("Reason", "Count"))
     ))
-    
+
     # Text outputs
     output$rec_tot <- shiny::renderText({
       if (is.null(tadat$raw)) {
         "Total Results in Dataset: 0"
       } else {
-        paste0("Total Results in Dataset: ", scales::comma(length(tadat$raw$ResultIdentifier)))
+        paste0(
+          "Total Results in Dataset: ",
+          scales::comma(length(tadat$raw$ResultIdentifier))
+        )
       }
     })
-    
+
     output$rec_rem <- shiny::renderText({
       if (is.null(tadat$raw)) {
         "Results Flagged for Removal: 0"
       } else {
-        paste0("Results Flagged for Removal: ", scales::comma(summary_things$rem_rec))
+        paste0(
+          "Results Flagged for Removal: ",
+          scales::comma(summary_things$rem_rec)
+        )
       }
     })
-    
+
     output$rec_clean <- shiny::renderText({
       if (is.null(tadat$raw)) {
         "Results Retained: 0"
@@ -256,38 +265,47 @@ mod_TADA_summary_server <- function(id, tadat) {
         paste0("Results Retained: ", scales::comma(summary_things$clean_rec))
       }
     })
-    
+
     output$site_tot <- shiny::renderText({
       if (is.null(tadat$raw)) {
         "Total Sites in Dataset: 0"
       } else {
-        paste0("Total Sites in Dataset: ", scales::comma(length(unique(tadat$raw$MonitoringLocationIdentifier))))
+        paste0(
+          "Total Sites in Dataset: ",
+          scales::comma(length(unique(tadat$raw$MonitoringLocationIdentifier)))
+        )
       }
     })
-    
+
     output$site_rem <- shiny::renderText({
       if (is.null(tadat$raw)) {
         "Total Sites Flagged for Removal: 0"
       } else {
-        paste0("Total Sites Flagged for Removal: ", scales::comma(summary_things$rem_site))
+        paste0(
+          "Total Sites Flagged for Removal: ",
+          scales::comma(summary_things$rem_site)
+        )
       }
     })
-    
+
     output$site_clean <- shiny::renderText({
       if (is.null(tadat$raw)) {
         "Total Sites Retained: 0"
       } else {
-        paste0("Total Sites Retained: ", scales::comma(summary_things$clean_site))
+        paste0(
+          "Total Sites Retained: ",
+          scales::comma(summary_things$clean_site)
+        )
       }
     })
-    
+
     shiny::observeEvent(input$disclaimer, {
       shiny::showModal(shiny::modalDialog(
         title = "Disclaimer",
         "This United States Environmental Protection Agency (EPA) GitHub project code is provided on an 'as is' basis and the user assumes responsibility for its use. EPA has relinquished control of the information and no longer has responsibility to protect the integrity, confidentiality, or availability of the information. Any reference to specific commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply their endorsement, recommendation or favoring by EPA. The EPA seal and logo shall not be used in any manner to imply endorsement of any commercial product or activity by EPA or the United States Government."
       ))
     })
-    
+
     # Initially disabled until data exists
     shinyjs::disable("dwn_working")
     shinyjs::disable("dwn_final")
@@ -309,7 +327,7 @@ sort_removals <- function(removal_table) {
     ))
     colnames(results) <- prefixes
     results[is.na(results)] <- FALSE
-    
+
     for (prefix in prefixes) {
       active_cols <- fields[dplyr::starts_with(prefix, vars = fields)]
       if (length(active_cols) > 0) {
