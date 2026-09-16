@@ -84,14 +84,25 @@ mod_TADA_summary_server <- function(id, tadat) {
     make_download_zip <- function(zipfile, mode = c("working", "final")) {
       mode <- match.arg(mode)
       
-      tmpdir <- tempdir()
+      # Create a unique temp folder for this download
+      tmpdir <- file.path(tempdir(), paste0("TADA_", as.integer(Sys.time())))
+      dir.create(tmpdir, recursive = TRUE, showWarnings = FALSE)
+      
+      oldwd <- getwd()
+      on.exit(setwd(oldwd), add = TRUE)
+      
+      # Work inside the temp folder so zip has flat file names
+      setwd(tmpdir)
+      
       base_name <- tadat$default_outfile
       
-      xlsx_name <- file.path(
-        tmpdir,
-        paste0(base_name, if (mode == "working") "_working.xlsx" else "_final.xlsx")
-      )
-      prog_name <- file.path(tmpdir, paste0(base_name, "_prog.RData"))
+      xlsx_name <- if (mode == "working") {
+        paste0(base_name, "_working.xlsx")
+      } else {
+        paste0(base_name, "_final.xlsx")
+      }
+      
+      prog_name <- paste0(base_name, "_prog.RData")
       
       # Build the dataset
       if (mode == "working") {
@@ -118,14 +129,18 @@ mod_TADA_summary_server <- function(id, tadat) {
       desc <- writeNarrativeDataFrame(tadat)
       dfs <- list(Data = out_data, Parameterization = desc)
       
-      # Write supporting files
+      # Write the supporting files into tmpdir
       writeFile(tadat, prog_name)
       writexl::write_xlsx(dfs, path = xlsx_name, use_zip64 = TRUE)
       
-      # Zip them into the final download file
+      # Optional debug checks
+      print(file.exists(xlsx_name))
+      print(file.exists(prog_name))
+      
+      # Create zip with flat file structure
       utils::zip(
         zipfile = zipfile,
-        files = c(xlsx_name, prog_name)
+        files = c(basename(xlsx_name), basename(prog_name))
       )
     }
     
