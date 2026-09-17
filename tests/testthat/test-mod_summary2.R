@@ -9,9 +9,9 @@ summary2_restore_ns_fun <- function(patch) {
 }
 
 new_summary2_tadat <- function(
-    raw_df,
-    removals_df = NULL,
-    outfile = "tada_output_ut"
+  raw_df,
+  removals_df = NULL,
+  outfile = "tada_output_ut"
 ) {
   rv <- shiny::reactiveValues()
   rv$raw <- raw_df
@@ -28,7 +28,7 @@ test_that("mod_TADA_summary_ui renders expected controls", {
   ui <- mod_TADA_summary_ui("summary2_1")
   golem::expect_shinytaglist(ui)
   ui_txt <- as.character(ui)
-  
+
   expect_true(grepl("Results Summary", ui_txt, fixed = TRUE))
   expect_true(grepl("summary2_1-dwn_working", ui_txt, fixed = TRUE))
   expect_true(grepl("summary2_1-dwn_final", ui_txt, fixed = TRUE))
@@ -40,19 +40,19 @@ test_that("summary text outputs show zeros when tadat$raw is NULL", {
   tadat$raw <- NULL
   tadat$removals <- data.frame(matrix(nrow = 0, ncol = 0))
   tadat$default_outfile <- "x"
-  
+
   patches <- list(
     summary2_patch_ns_fun("shinyjs", "disable", function(...) NULL),
     summary2_patch_ns_fun("shinyjs", "enable", function(...) NULL)
   )
   on.exit(lapply(rev(patches), summary2_restore_ns_fun), add = TRUE)
-  
+
   shiny::testServer(
     mod_TADA_summary_server,
     args = list(id = "summary2_1", tadat = tadat),
     {
       session$flushReact()
-      
+
       expect_equal(output$rec_tot, "Total Results in Dataset: 0")
       expect_equal(output$rec_rem, "Results Flagged for Removal: 0")
       expect_equal(output$rec_clean, "Results Retained: 0")
@@ -77,19 +77,19 @@ test_that("summary text outputs compute expected values with data", {
     stringsAsFactors = FALSE
   )
   tadat <- new_summary2_tadat(raw, rem)
-  
+
   patches <- list(
     summary2_patch_ns_fun("shinyjs", "disable", function(...) NULL),
     summary2_patch_ns_fun("shinyjs", "enable", function(...) NULL)
   )
   on.exit(lapply(rev(patches), summary2_restore_ns_fun), add = TRUE)
-  
+
   shiny::testServer(
     mod_TADA_summary_server,
     args = list(id = "summary2_1", tadat = tadat),
     {
       session$flushReact()
-      
+
       expect_equal(output$rec_tot, "Total Results in Dataset: 4")
       expect_equal(output$rec_rem, "Results Flagged for Removal: 2")
       expect_equal(output$rec_clean, "Results Retained: 2")
@@ -109,9 +109,9 @@ test_that("working download logic retains all rows and all columns", {
     Value = c(10, 20),
     stringsAsFactors = FALSE
   )
-  
+
   out_data <- EPATADA::TADA_OrderCols(raw)
-  
+
   expect_equal(nrow(out_data), 2)
   expect_true("TADA.Remove" %in% names(out_data))
   expect_true("TADA.RemovalReason" %in% names(out_data))
@@ -127,12 +127,15 @@ test_that("final download logic removes flagged rows and drops removal columns",
     TADA.ResultMeasureValue = c(10, 20, 30),
     stringsAsFactors = FALSE
   )
-  
+
   out_data <- raw[raw$TADA.Remove == FALSE, ]
   out_data <- EPATADA::TADA_OrderCols(out_data)
-  out_data <- dplyr::select(out_data, -dplyr::any_of(c("TADA.Remove", "TADA.RemovalReason")))
+  out_data <- dplyr::select(
+    out_data,
+    -dplyr::any_of(c("TADA.Remove", "TADA.RemovalReason"))
+  )
   out_data <- EPATADA::TADA_RetainRequired(out_data)
-  
+
   expect_equal(nrow(out_data), 2)
   expect_false("TADA.Remove" %in% names(out_data))
   expect_false("TADA.RemovalReason" %in% names(out_data))
@@ -148,7 +151,7 @@ test_that("disclaimer button shows modal", {
     stringsAsFactors = FALSE
   )
   tadat <- new_summary2_tadat(raw)
-  
+
   modal_count <- 0L
   patches <- list(
     summary2_patch_ns_fun("shiny", "showModal", function(...) {
@@ -159,14 +162,14 @@ test_that("disclaimer button shows modal", {
     summary2_patch_ns_fun("shinyjs", "enable", function(...) NULL)
   )
   on.exit(lapply(rev(patches), summary2_restore_ns_fun), add = TRUE)
-  
+
   shiny::testServer(
     mod_TADA_summary_server,
     args = list(id = "summary2_1", tadat = tadat),
     {
       session$setInputs(disclaimer = 1L)
       session$flushReact()
-      
+
       expect_equal(modal_count, 1L)
     }
   )
@@ -178,12 +181,12 @@ test_that("sort_removals returns expected reason buckets", {
     `Filter: b` = c(FALSE, TRUE, TRUE, FALSE, FALSE),
     stringsAsFactors = FALSE
   )
-  
+
   out <- sort_removals(rem)
-  
+
   expect_s3_class(out, "data.frame")
   expect_true(all(c("Reason", "Count") %in% names(out)))
-  
+
   out_map <- stats::setNames(out$Count, out$Reason)
   expect_equal(unname(out_map["Flag only"]), 1)
   expect_equal(unname(out_map["Filter only"]), 1)
