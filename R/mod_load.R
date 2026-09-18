@@ -19,7 +19,16 @@ TADA_download_temp <- readRDS(system.file(
 ))
 
 ##############################################################################
-# WQP Data Retrieval
+
+# These are the types of text matches used in searching the Characteristic(s) 
+# list in the TADAShiny UI
+match_types <- c(
+  "Starts With" = "starts_with",
+  "Ends With" = "ends_with",
+  "Contains" = "contains",
+  "Equals" = "matches"
+)
+
 ##############################################################################
 
 # EPA tribal land boundaries used for filtering WQP data by tribal name and location
@@ -42,14 +51,31 @@ return_tribal_sf <- function(
   return(tribal_data2)
 }
 
-# Load Country/Ocean(s) choice list
+##############################################################################
+# These internal files should be updated routinely by running the script
+# make_extdata.R in the dev folder
+# Last done on 9/18/26
+
+# Load Country/Ocean(s) choice list created from WQX domain list
 countryocean_choices <- readRDS(system.file(
   "extdata",
   "countryocean.rds",
   package = "TADAShiny"
 ))
 
-# Fetch Project choices directly
+# Load state choice list
+statecodes_df <- readRDS(system.file(
+  "extdata",
+  "statecodes_df.rds",
+  package = "TADAShiny"
+))
+
+# Fetch monitoring location choices
+mlids <- readRDS(system.file("extdata", "mlids.rds", package = "TADAShiny"))
+
+##############################################################################
+
+# Fetch Project choices directly from WQX domain list
 project_url <- "https://www.waterqualitydata.us/data/Project/search?mimeType=csv&zip=no&providers=NWIS&providers=STORET"
 dt <- data.table::fread(project_url, showProgress = FALSE)
 if (!"ProjectIdentifier" %in% names(dt)) {
@@ -58,7 +84,7 @@ if (!"ProjectIdentifier" %in% names(dt)) {
   projects <- unique(dt$ProjectIdentifier)
 }
 
-# Fetch County choices directly
+# Fetch County choices directly from WQX domain list
 counties <- data.table::fread(
   "https://www2.census.gov/geo/docs/reference/codes/files/national_county.txt",
   header = FALSE,
@@ -72,7 +98,7 @@ counties <- data.table::fread(
   showProgress = FALSE
 )
 
-# Fetch orgs, chars, chargroup, media choices directly
+# Fetch orgs, chars, chargroup, media choices directly from WQX domain list
 orgs <- data.table::fread(
   "https://cdx.epa.gov/wqx/download/DomainValues/Organization.CSV",
   showProgress = FALSE
@@ -97,38 +123,45 @@ media <- c(
   "No media"
 )
 
-# sitetype <- c(
-#   unique(utils::read.csv(url(
-#     "https://cdx.epa.gov/wqx/download/DomainValues/MonitoringLocationType.CSV"
-#   ))$Name),
-#   "Glacier", "Aggregate water-use establishment", "Not Assigned", "Subsurface"
-# )
-
+# Generate a site type drop down list for the TADA Shiny UI. This is a 
+# combination of WQP/WQX and USGS Samples API site types.
 sitetype <- c(
-  "Aggregate groundwater use",
-  "Aggregate surface-water-use",
-  "Aggregate water-use establishment",
+  # These are the only ones that are exact matches in WQP & USGS samples API
+  "Glacier",  
+  "Wetland",
+  "Land",  
   "Atmosphere",
-  "Estuary",
-  "Facility",
-  "Glacier",
-  "Lake, Reservoir, Impoundment",
-  "Land",
-  "Not Assigned",
   "Ocean",
-  "Spring",
   "Stream",
-  "Subsurface",
-  "Well",
-  "Wetland"
-)
+  "Spring",
+  "Well"
+  
+  # WQP/WQX but not USGS Samples
+  # "Aggregate groundwater use",
+  # "Aggregate surface-water-use",
+  # "Lake, Reservoir, Impoundment",  
+  
+  # USGS Samples but not WQP/WQX
+  # "Agg GW WU",
+  # "Agg SW WU",
+  # "Lake",
 
-# These are the types of text matches used in searching the Characteristic(s) list
-match_types <- c(
-  "Starts With" = "starts_with",
-  "Ends With" = "ends_with",
-  "Contains" = "contains",
-  "Equals" = "matches"
+  # WQP but not WQX (only STEWARDS or USGS)
+  # "Aggregate water-use establishment",
+  # "Estuary",
+  # "Facility",
+  # "Not Assigned",
+  # "Subsurface"
+  
+  # Samples data API choices are different
+  # dataRetrieval::check_waterdata_sample_params("sitetype")$typeName
+  
+  # All WQX options
+  # sitetype <- c(
+  #   unique(utils::read.csv(url(
+  #     "https://cdx.epa.gov/wqx/download/DomainValues/MonitoringLocationType.CSV"
+  #   ))$Name)
+  # )
 )
 
 #############################################################################
@@ -1244,7 +1277,7 @@ mod_query_data_server <- function(id, tadat) {
     ## creates download template button used for importing data to TADAShiny - used in option C
     template_data <- shiny::reactive(EPATADA::TADA_GetTemplate())
 
-    # hold error message for NWIS queries in a reactive value so it can be displayed in a modal if needed
+    # hold error message for USGS NWIS queries in a reactive value so it can be displayed in a modal if needed
     nwis_error_message_text <- NULL
 
     # return an ms excel file with the template columns
@@ -1459,12 +1492,6 @@ mod_query_data_server <- function(id, tadat) {
       disableLoading(session)
     })
 
-    statecodes_df <- readRDS(system.file(
-      "extdata",
-      "statecodes_df.rds",
-      package = "TADAShiny"
-    ))
-
     # this section has widget update commands for the selectizeinputs that have a lot of possible selections - shiny suggested hosting the choices server-side rather than ui-side
     shiny::updateSelectizeInput(
       session,
@@ -1549,7 +1576,6 @@ mod_query_data_server <- function(id, tadat) {
       options = list(placeholder = "Start typing or use drop down menu"),
       server = TRUE
     )
-    mlids <- readRDS(system.file("extdata", "mlids.rds", package = "TADAShiny"))
     shiny::updateSelectizeInput(
       session,
       "siteid",
@@ -1574,7 +1600,8 @@ mod_query_data_server <- function(id, tadat) {
       server = TRUE
     )
 
-    # this observes when the user inputs a state into the drop down and subsets the choices for counties to only those counties within that state.
+    # this observes when the user inputs a state into the drop down and subsets
+    # the choices for counties to only those counties within that state.
     shiny::observeEvent(input$state, {
       state_counties <- subset(counties, counties$STATE_CD == input$state)
       shiny::updateSelectizeInput(
@@ -1587,7 +1614,8 @@ mod_query_data_server <- function(id, tadat) {
       )
     })
 
-    # this observes when the user inputs a tribal data layer into the drop down and subsets the choices for data layer to only those tribes within that dataset.
+    # this observes when the user inputs a tribal data layer into the drop 
+    # down and subsets the choices for data layer to only those tribes within that dataset.
     shiny::observeEvent(input$tribe_layer, {
       tribal_names <- sort(tribal_list[[input$tribe_layer]][["TRIBE_NAME"]])
       shiny::updateSelectizeInput(
@@ -1704,8 +1732,7 @@ mod_query_data_server <- function(id, tadat) {
         }
       })
 
-      if (
-        (input$providers == "all" || input$providers == "NWIS") &&
+      if (input$providers == "NWIS" &&
           (shiny::isTruthy(input$org) ||
             shiny::isTruthy(input$project) ||
             shiny::isTruthy(input$countryocean) ||
@@ -1726,6 +1753,9 @@ mod_query_data_server <- function(id, tadat) {
         return(NULL)
       }
 
+      ####################################################################
+      # Start of USGS and WQX API queries 
+      
       STORET_results <- NULL
       NWIS_results <- NULL
       nwis_error_message_text <- NULL
