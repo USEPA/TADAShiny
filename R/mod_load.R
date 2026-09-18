@@ -20,7 +20,7 @@ TADA_download_temp <- readRDS(system.file(
 
 ##############################################################################
 
-# These are the types of text matches used in searching the Characteristic(s) 
+# These are the types of text matches used in searching the Characteristic(s)
 # list in the TADAShiny UI
 match_types <- c(
   "Starts With" = "starts_with",
@@ -123,24 +123,24 @@ media <- c(
   "No media"
 )
 
-# Generate a site type drop down list for the TADA Shiny UI. This is a 
+# Generate a site type drop down list for the TADA Shiny UI. This is a
 # combination of WQP/WQX and USGS Samples API site types.
 sitetype <- c(
   # These are the only ones that are exact matches in WQP & USGS samples API
-  "Glacier",  
+  "Glacier",
   "Wetland",
-  "Land",  
+  "Land",
   "Atmosphere",
   "Ocean",
   "Stream",
   "Spring",
   "Well"
-  
+
   # WQP/WQX but not USGS Samples
   # "Aggregate groundwater use",
   # "Aggregate surface-water-use",
-  # "Lake, Reservoir, Impoundment",  
-  
+  # "Lake, Reservoir, Impoundment",
+
   # USGS Samples but not WQP/WQX
   # "Agg GW WU",
   # "Agg SW WU",
@@ -152,10 +152,10 @@ sitetype <- c(
   # "Facility",
   # "Not Assigned",
   # "Subsurface"
-  
+
   # Samples data API choices are different
   # dataRetrieval::check_waterdata_sample_params("sitetype")$typeName
-  
+
   # All WQX options
   # sitetype <- c(
   #   unique(utils::read.csv(url(
@@ -1614,7 +1614,7 @@ mod_query_data_server <- function(id, tadat) {
       )
     })
 
-    # this observes when the user inputs a tribal data layer into the drop 
+    # this observes when the user inputs a tribal data layer into the drop
     # down and subsets the choices for data layer to only those tribes within that dataset.
     shiny::observeEvent(input$tribe_layer, {
       tribal_names <- sort(tribal_list[[input$tribe_layer]][["TRIBE_NAME"]])
@@ -1732,7 +1732,8 @@ mod_query_data_server <- function(id, tadat) {
         }
       })
 
-      if (input$providers == "NWIS" &&
+      if (
+        input$providers == "NWIS" &&
           (shiny::isTruthy(input$org) ||
             shiny::isTruthy(input$project) ||
             shiny::isTruthy(input$countryocean) ||
@@ -1754,8 +1755,8 @@ mod_query_data_server <- function(id, tadat) {
       }
 
       ####################################################################
-      # Start of USGS and WQX API queries 
-      
+      # Start of USGS and WQX API queries
+
       STORET_results <- NULL
       NWIS_results <- NULL
       nwis_error_message_text <- NULL
