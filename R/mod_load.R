@@ -1764,7 +1764,7 @@ mod_query_data_server <- function(id, tadat) {
       # Provider-specific query: EPA/WQX
       if (input$providers %in% c("STORET", "all")) {
         message("Running WQX query...")
-        
+
         storet_args <- list(
           startDate = tadat$startDate,
           endDate = tadat$endDate,
@@ -1780,7 +1780,7 @@ mod_query_data_server <- function(id, tadat) {
           project = tadat$project,
           bBox = bbox_reactive()
         )
-        
+
         message("WQX args prepared")
 
         STORET_results <- tryCatch(
@@ -1800,7 +1800,7 @@ mod_query_data_server <- function(id, tadat) {
             NULL
           }
         )
-        
+
         message(
           "WQX result rows: ",
           if (is.null(STORET_results)) "NULL" else nrow(STORET_results)
@@ -1817,7 +1817,7 @@ mod_query_data_server <- function(id, tadat) {
       # Provider-specific query: USGS/NWIS
       if (input$providers %in% c("NWIS", "all")) {
         message("Running NWIS query...")
-        
+
         # Developer note: NWIS uses FIPS-style county/state arguments, so we derive them from the selected state/county.
         if (input$state == "") {
           state_fips_arg <- NULL
@@ -1881,7 +1881,7 @@ mod_query_data_server <- function(id, tadat) {
         ]
 
         message("NWIS args prepared")
-        
+
         nwis_results_raw <- tryCatch(
           do.call(dataRetrieval::read_waterdata_samples, nwis_args),
           error = function(e) {
@@ -1895,7 +1895,7 @@ mod_query_data_server <- function(id, tadat) {
             NULL
           }
         )
-        
+
         message(
           "NWIS result rows: ",
           if (is.null(nwis_results_raw)) "NULL" else nrow(nwis_results_raw)
