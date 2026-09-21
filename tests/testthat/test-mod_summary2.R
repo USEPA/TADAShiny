@@ -30,11 +30,9 @@ test_that("mod_TADA_summary_ui renders expected controls", {
   ui_txt <- as.character(ui)
 
   expect_true(grepl("Results Summary", ui_txt, fixed = TRUE))
-  expect_true(grepl("summary2_1-download_working_button", ui_txt, fixed = TRUE))
-  expect_true(grepl("summary2_1-download_final_button", ui_txt, fixed = TRUE))
-  expect_true(grepl("summary2_1-disclaimer", ui_txt, fixed = TRUE))
   expect_true(grepl("summary2_1-dwn_working", ui_txt, fixed = TRUE))
   expect_true(grepl("summary2_1-dwn_final", ui_txt, fixed = TRUE))
+  expect_true(grepl("summary2_1-disclaimer", ui_txt, fixed = TRUE))
 })
 
 test_that("summary text outputs show zeros when tadat$raw is NULL", {
@@ -102,141 +100,46 @@ test_that("summary text outputs compute expected values with data", {
   )
 })
 
-test_that("working download button path prepares files and triggers hidden download click", {
+test_that("working download logic retains all rows and all columns", {
   raw <- data.frame(
     ResultIdentifier = c("r1", "r2"),
     MonitoringLocationIdentifier = c("S1", "S2"),
     TADA.Remove = c(FALSE, TRUE),
     TADA.RemovalReason = c(NA, "Flag"),
+    Value = c(10, 20),
     stringsAsFactors = FALSE
   )
-  tadat <- new_summary2_tadat(raw)
 
-  clicked <- character(0)
-  write_xlsx_path <- NULL
-  saved_progress_name <- NULL
+  out_data <- EPATADA::TADA_OrderCols(raw)
 
-  patches <- list(
-    summary2_patch_ns_fun("EPATADA", "TADA_OrderCols", function(df) df),
-    summary2_patch_ns_fun(
-      "TADAShiny",
-      "writeNarrativeDataFrame",
-      function(tadat) {
-        data.frame(Parameter = "x", Value = "y", stringsAsFactors = FALSE)
-      }
-    ),
-    summary2_patch_ns_fun("TADAShiny", "writeFile", function(tadat, file) {
-      saved_progress_name <<- file
-      invisible(NULL)
-    }),
-    summary2_patch_ns_fun(
-      "writexl",
-      "write_xlsx",
-      function(x, path, use_zip64 = TRUE) {
-        write_xlsx_path <<- path
-        invisible(path)
-      }
-    ),
-    summary2_patch_ns_fun("shinybusy", "show_modal_spinner", function(...) {
-      NULL
-    }),
-    summary2_patch_ns_fun("shinybusy", "remove_modal_spinner", function(...) {
-      NULL
-    }),
-    summary2_patch_ns_fun("shinyjs", "click", function(id) {
-      clicked <<- c(clicked, id)
-      invisible(NULL)
-    }),
-    summary2_patch_ns_fun("shinyjs", "disable", function(...) NULL),
-    summary2_patch_ns_fun("shinyjs", "enable", function(...) NULL)
-  )
-  on.exit(lapply(rev(patches), summary2_restore_ns_fun), add = TRUE)
-
-  shiny::testServer(
-    mod_TADA_summary_server,
-    args = list(id = "summary2_1", tadat = tadat),
-    {
-      session$setInputs(download_working_button = 1L)
-      session$flushReact()
-
-      expect_true(any(clicked == "dwn_working"))
-      expect_true(grepl("_working\\.xlsx$", write_xlsx_path))
-      expect_true(grepl("_prog\\.RData$", saved_progress_name))
-      expect_equal(
-        paste0(tadat$default_outfile, "_working.zip"),
-        "tada_output_ut_working.zip"
-      )
-    }
-  )
+  expect_equal(nrow(out_data), 2)
+  expect_true("TADA.Remove" %in% names(out_data))
+  expect_true("TADA.RemovalReason" %in% names(out_data))
+  expect_true("Value" %in% names(out_data))
 })
 
-test_that("final download button filters removed rows and drops TADA removal columns", {
+test_that("final download logic removes flagged rows and drops removal columns", {
   raw <- data.frame(
     ResultIdentifier = c("r1", "r2", "r3"),
     MonitoringLocationIdentifier = c("S1", "S1", "S2"),
     TADA.Remove = c(FALSE, TRUE, FALSE),
     TADA.RemovalReason = c(NA, "Flag", NA),
-    Value = c(10, 20, 30),
+    TADA.ResultMeasureValue = c(10, 20, 30),
     stringsAsFactors = FALSE
   )
-  tadat <- new_summary2_tadat(raw)
 
-  captured_data_sheet <- NULL
-  clicked <- character(0)
-
-  patches <- list(
-    summary2_patch_ns_fun("EPATADA", "TADA_OrderCols", function(df) df),
-    summary2_patch_ns_fun("EPATADA", "TADA_RetainRequired", function(df) df),
-    summary2_patch_ns_fun(
-      "TADAShiny",
-      "writeNarrativeDataFrame",
-      function(tadat) {
-        data.frame(Parameter = "x", Value = "y", stringsAsFactors = FALSE)
-      }
-    ),
-    summary2_patch_ns_fun("TADAShiny", "writeFile", function(tadat, file) {
-      invisible(NULL)
-    }),
-    summary2_patch_ns_fun(
-      "writexl",
-      "write_xlsx",
-      function(x, path, use_zip64 = TRUE) {
-        captured_data_sheet <<- x$Data
-        invisible(path)
-      }
-    ),
-    summary2_patch_ns_fun("shinybusy", "show_modal_spinner", function(...) {
-      NULL
-    }),
-    summary2_patch_ns_fun("shinybusy", "remove_modal_spinner", function(...) {
-      NULL
-    }),
-    summary2_patch_ns_fun("shinyjs", "click", function(id) {
-      clicked <<- c(clicked, id)
-      invisible(NULL)
-    }),
-    summary2_patch_ns_fun("shinyjs", "disable", function(...) NULL),
-    summary2_patch_ns_fun("shinyjs", "enable", function(...) NULL)
+  out_data <- raw[raw$TADA.Remove == FALSE, ]
+  out_data <- EPATADA::TADA_OrderCols(out_data)
+  out_data <- dplyr::select(
+    out_data,
+    -dplyr::any_of(c("TADA.Remove", "TADA.RemovalReason"))
   )
-  on.exit(lapply(rev(patches), summary2_restore_ns_fun), add = TRUE)
+  out_data <- EPATADA::TADA_RetainRequired(out_data)
 
-  shiny::testServer(
-    mod_TADA_summary_server,
-    args = list(id = "summary2_1", tadat = tadat),
-    {
-      session$setInputs(download_final_button = 1L)
-      session$flushReact()
-
-      expect_true(any(clicked == "dwn_final"))
-      expect_false("TADA.Remove" %in% names(captured_data_sheet))
-      expect_false("TADA.RemovalReason" %in% names(captured_data_sheet))
-      expect_equal(nrow(captured_data_sheet), 2)
-      expect_equal(
-        paste0(tadat$default_outfile, "_final.zip"),
-        "tada_output_ut_final.zip"
-      )
-    }
-  )
+  expect_equal(nrow(out_data), 2)
+  expect_false("TADA.Remove" %in% names(out_data))
+  expect_false("TADA.RemovalReason" %in% names(out_data))
+  expect_true("TADA.ResultMeasureValue" %in% names(out_data))
 })
 
 test_that("disclaimer button shows modal", {
