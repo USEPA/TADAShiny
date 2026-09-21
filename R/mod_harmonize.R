@@ -9,15 +9,15 @@
 mod_harmonize_np_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    htmltools::h3("1. Synonym Harmonization"),
+    htmltools::h3("1. Harmonize Synonyms"),
     htmltools::HTML(
-      "Use this section to harmonize characteristic-fraction-speciation synonyms.
-                    Click 'Compose Synonym Table' and the table will appear below.
-                    The table shows the characteristic-fraction-speciation combinations in your dataset
+      "Use this section to Harmonize characteristic-fraction-speciation Synonyms.
+                    Click 'Generate Synonym Table' and a table will appear below that
+                    shows the characteristic-fraction-speciation combinations in your dataset
                     (original columns highlighted blue), as well as any changes that will be made to TADA metadata
-                    to allow synonyms to be grouped appropriately (denoted by 'Target' and 'Conversion' columns).
+                    to allow synonyms to be grouped appropriately (denoted by 'Target Speciation' and 'Speciation Conversion Factor...' columns).
                     Many of these harmonization decisions have been made and documented by the TADA Team
-                    in the 'Assumptions' columns. You may edit this table manually and re-upload it (optional) in the
+                    in the 'Speciation Assumptions' and 'Fraction Assumptions' columns. You may edit this table manually and re-upload it (optional) in the
                     file upload widget below."
     ),
     shiny::fluidRow(shiny::column(
@@ -25,7 +25,7 @@ mod_harmonize_np_ui <- function(id) {
       htmltools::div(style = "margin-top:20px"),
       shiny::actionButton(
         ns("harm_go"),
-        "Compose Synonym Table",
+        "Generate Synonym Table",
         style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
       )
     )),
@@ -72,35 +72,6 @@ mod_harmonize_np_ui <- function(id) {
         shiny::uiOutput(ns("undo_harm_apply"))
       ) # Undo button output
     ),
-    htmltools::br(),
-    htmltools::h3("2. Total Nitrogen and Phosphorus Summation"),
-    htmltools::p(
-      "Data generators commonly monitor for several nutrient subspecies that, when added together,
-                 can be used to estimate a total nitrogen or phosphorus value. TADA uses the logic provided in
-                 ECHO's Nurient Aggregation page (see: https://echo.epa.gov/trends/loading-tool/resources/nutrient-aggregation)
-                 to rank and sum subspecies for a given day, location, depth, activity media subdivision, and unit.
-                 Total Nitrogen and Total Phosphorus values are added as new results in the dataset.
-                 Users may view the nutrient aggregation reference sheet by clicking 'See Summation Reference'.
-                 Once data are harmonized, the user may then summarize total N and P.",
-      htmltools::strong("NOTE: "),
-      "When two or more measurements of the same substance occur on the same day at the same location,
-                 the function uses the maximum of the group of values to calculate a total nutrient value."
-    ),
-    shiny::fluidRow(shiny::column(
-      3,
-      htmltools::div(style = "margin-top:20px"),
-      shiny::downloadButton(
-        ns("sum_dwn"),
-        "See Summation Reference (.csv)",
-        style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
-      )
-    )),
-    htmltools::br(),
-    shiny::fluidRow(shiny::column(
-      3,
-      htmltools::div(style = "margin-top:20px"),
-      shiny::uiOutput(ns("sum_apply"))
-    )),
     htmltools::br()
   )
 }
@@ -311,6 +282,7 @@ mod_harmonize_np_server <- function(id, tadat) {
             ),
             easyClose = TRUE
           ))
+          shinyjs::enable(selector = '.nav li a[data-value="TNandTPSummation"]')
         },
         error = function(e) {
           # Error handling: show error message and re-enable harmonize button
@@ -347,78 +319,7 @@ mod_harmonize_np_server <- function(id, tadat) {
 
       # Disable the undo button after action
       shinyjs::disable("undo_harm_apply")
-    })
-
-    output$sum_dwn <- shiny::downloadHandler(
-      filename = function() {
-        "TADA_NPSummationKey.csv"
-      },
-      content = function(file) {
-        utils::write.csv(
-          EPATADA::TADA_GetNutrientSummationRef(),
-          file,
-          row.names = FALSE
-        )
-      }
-    )
-
-    output$sum_apply <- shiny::renderUI({
-      if ("TADA.Harmonized.Flag" %in% names(tadat$raw)) {
-        shiny::actionButton(
-          ns("sum_apply"),
-          "Perform Total N and P Summations",
-          style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
-        )
-      }
-    })
-
-    shiny::observeEvent(input$sum_apply, {
-      # a modal that pops up showing it's working on calculating Total N and P
-      shinybusy::show_modal_spinner(
-        spin = "double-bounce",
-        color = "#0071bc",
-        text = "Calculating Total N and P...",
-        session = shiny::getDefaultReactiveDomain()
-      )
-
-      dat <- subset(tadat$raw, tadat$raw$TADA.Remove == FALSE)
-      rem <- subset(tadat$raw, tadat$raw$TADA.Remove == TRUE)
-      dat <- EPATADA::TADA_CalculateTotalNP(dat, daily_agg = "max")
-      dat$TADA.Remove[is.na(dat$TADA.Remove)] <- FALSE
-
-      # add new measurements to tadat$removals, all equal FALSE
-      ## NOTE THAT THIS ASSUMES NEWLY CREATED RESULTS FROM TOTAL NP WILL NECESSARILY BE ADDED TO END OF TADAT$RAW DATA FRAME
-      ncols <- ncol(tadat$removals)
-      nrows <- length(dat$ResultIdentifier[grepl(
-        "TADA-",
-        dat$ResultIdentifier
-      )])
-      new_df <- as.data.frame(matrix(FALSE, ncol = ncols, nrow = nrows))
-      names(new_df) <- names(tadat$removals)
-      tadat$removals <- plyr::rbind.fill(tadat$removals, new_df)
-      tadat$raw <- plyr::rbind.fill(dat, rem)
-      tadat$raw <- EPATADA::TADA_OrderCols(tadat$raw)
-      # Need to update TADA.NutrientSummation.Flag outputs in EPATADA R package function to differentiate TN and TP
-      # nitrolen <- length(dat$TADA.NutrientSummation.Flag[dat$TADA.NutrientSummation.Flag %in% c("New row added: Nutrient summation from one or more subspecies.")])
-      # phoslen <- length(dat$TADA.NutrientSummation.Flag[dat$TADA.NutrientSummation.Flag %in% c("New row added: Nutrient summation from one or more subspecies.")])
-      newrowlen <- length(dat$TADA.NutrientSummation.Flag[
-        dat$TADA.NutrientSummation.Flag %in%
-          c("New row added: Nutrient summation from one or more subspecies.")
-      ])
-      # remove the modal once the dataset has been harmonized
-      shinybusy::remove_modal_spinner(
-        session = shiny::getDefaultReactiveDomain()
-      )
-
-      shiny::showModal(shiny::modalDialog(
-        title = "Success! Calculations Complete.",
-        # base::paste0(scales::comma(nitrolen), " Total Nitrogen results calculated and ", scales::comma(phoslen), " Total Phosphorus results calculated.")
-        base::paste0(
-          scales::comma(newrowlen),
-          " Total Nitrogen and/or Total Phosphorus results calculated."
-        )
-      ))
-      shinyjs::disable("sum_apply")
+      shinyjs::disable(selector = '.nav li a[data-value="TNandTPSummation"]')
     })
   })
 }

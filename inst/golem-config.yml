@@ -1,13 +1,11 @@
 default:
   golem_name: TADAShiny
   golem_version: 0.5.1
-  app_prod: false
+  app_prod: no
   MB_LIMIT: 500
   TIMEOUT_SECONDS: 3600
-
 production:
-  app_prod: true
-
+  app_prod: yes
 dev:
   golem_wd: !expr golem::pkg_path()
-  app_prod: false
+  app_prod: no
