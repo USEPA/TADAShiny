@@ -35,17 +35,17 @@ app_sys <- function(..., package = "TADAShiny") {
 #' @keywords internal
 #' @noRd
 get_golem_config <- function(
-    value,
-    config = Sys.getenv(
-      "GOLEM_CONFIG_ACTIVE",
-      Sys.getenv("R_CONFIG_ACTIVE", "default")
-    ),
-    use_parent = TRUE,
-    default = NULL
+  value,
+  config = Sys.getenv(
+    "GOLEM_CONFIG_ACTIVE",
+    Sys.getenv("R_CONFIG_ACTIVE", "default")
+  ),
+  use_parent = TRUE,
+  default = NULL
 ) {
   # Resolve file via app_sys (installed or local) — guaranteed scalar
   f <- app_sys("golem-config.yml")
-  
+
   # If app_sys returns a non-empty path but the file doesn't exist, try local fallbacks
   if (!nzchar(f) || !file.exists(f)) {
     if (file.exists("golem-config.yml")) {
@@ -60,7 +60,7 @@ get_golem_config <- function(
       )
     }
   }
-  
+
   if (length(f) != 1L) {
     stop(
       "Internal error: resolved config path must be a single string, got length ",
@@ -68,7 +68,7 @@ get_golem_config <- function(
       "."
     )
   }
-  
+
   tryCatch(
     config::get(
       value = value,
