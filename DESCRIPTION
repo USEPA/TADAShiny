@@ -52,8 +52,9 @@ Imports:
     withr,
     httr2,
     golem,
-    pkgload
+    pkgload 
 Suggests:
+    TADACommunityHub,
     spelling,
     testthat (>= 3.0.0),
     mockery,
@@ -61,7 +62,8 @@ Suggests:
     rprojroot
 Remotes:
     USEPA/EPATADA@develop,
-    USEPA/rExpertQuery@develop
+    USEPA/rExpertQuery@develop,
+    USEPA/TADACommunityHub@main
 Depends: 
     R (>= 4.1.0)
 Encoding: UTF-8
