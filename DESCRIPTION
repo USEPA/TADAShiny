@@ -6,7 +6,9 @@ Authors@R: c(
     person("Cristina", "Mullin", , "mywaterway@epa.gov", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-0615-6087")),
     person("Trip", "Hook", role = "aut"),
-    person("Elise", "Hinman", role = "aut")
+    person("Elise", "Hinman", role = "aut"),
+    person("Jimmy", "Bisese", role = "ctr"),
+    person("Yu-Chen", "Wang", role = "ctr")
   )
 Description: Assists data partners in retrieving, wrangling, quality checking, and harmonizing data from the Water Quality Portal for subsequent analyses.
 License: CC0
@@ -14,7 +16,6 @@ Copyright: This software is in the public domain because it contains materials t
 Imports: 
     EPATADA,
     rExpertQuery,
-    golem,
     magrittr,
     shiny,
     DT,
@@ -25,9 +26,7 @@ Imports:
     grDevices,
     htmltools,
     leaflet,
-    leaflet.extras,
     lubridate,
-    MESS,
     plotly,
     plyr,
     purrr,
@@ -40,7 +39,6 @@ Imports:
     shinyjs,
     shinyWidgets,
     tidyr,
-    tidyselect,
     utils,
     writexl,
     stringr,
@@ -52,26 +50,20 @@ Imports:
     leafem,
     graphics,
     withr,
-    pkgload,
-    httr2
+    httr2,
+    golem,
+    pkgload 
 Suggests:
-    httr,
-    covr,
-    devtools,
-    knitr,
+    TADACommunityHub,
     spelling,
-    styler,
     testthat (>= 3.0.0),
-    roxygen2,
-    rsconnect,
-    rstudioapi,
-    geojsonsf,
-    packrat,
-    remotes,
+    mockery,
+    usethis,
     rprojroot
 Remotes:
     USEPA/EPATADA@develop,
-    USEPA/rExpertQuery
+    USEPA/rExpertQuery@develop,
+    USEPA/TADACommunityHub@main
 Depends: 
     R (>= 4.1.0)
 Encoding: UTF-8
@@ -81,5 +73,6 @@ Config/testthat/load-all: list(export_all = FALSE, helpers = FALSE)
 LazyData: true
 URL: https://github.com/USEPA/TADAShiny
 BugReports: https://github.com/USEPA/TADAShiny/issues
-RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)
+Config/roxygen2/version: 8.1.0
+StagedInstall: FALSE

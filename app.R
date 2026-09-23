@@ -4,7 +4,8 @@
 # Suppress Shiny support autoloading (extra safety; not strictly necessary if inst/app has no R/)
 options(shiny.autoload.r = FALSE)
 
-pkgload::load_all(export_all = FALSE,helpers = FALSE,attach_testthat = FALSE)
+# Keep pkgload in imports in description
+pkgload::load_all(export_all = FALSE, helpers = FALSE, attach_testthat = FALSE)
 
 # Golem production mode
 options(golem.app.prod = TRUE)

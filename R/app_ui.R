@@ -46,7 +46,8 @@ app_ui <- function(request) {
     shiny::fluidPage(
       tags$html(class = "no-js", lang = "en"),
       # standardized Go to Top button appears on lower-right corner when window is scrolled down 100 pixels
-      gotop::use_gotop( # add it inside the ui
+      gotop::use_gotop(
+        # add it inside the ui
         src = "fas fa-chevron-circle-up", # css class from Font Awesome
         opacity = 0.8, # transparency
         width = 60, # size
@@ -63,46 +64,70 @@ app_ui <- function(request) {
       shinyjs::useShinyjs(),
       shinyjs::inlineCSS(css),
       htmltools::br(),
-      shiny::headerPanel(title = "Tools for Automated Data Analysis (TADA) Module 1: Water Quality Portal Data Discovery and Cleaning"),
+      shiny::headerPanel(
+        title = "Tools for Automated Data Analysis (TADA) Module 1: Water Quality Portal Data Discovery and Cleaning"
+      ),
       htmltools::br(),
-      shiny::tabsetPanel( # create a navbar page with tabs at the top
+      shiny::tabsetPanel(
+        # create a navbar page with tabs at the top
         id = "tabbar",
-        shiny::tabPanel("1. Load",
+        shiny::tabPanel(
+          "1. Load",
           value = "Load", # each tabPanel represents a tab page at the top of the navbar
           htmltools::br(),
           mod_query_data_ui("query_data_1")
         ), # ,
-        shiny::tabPanel("2. Overview",
+        shiny::tabPanel(
+          "2. Overview",
           value = "Overview",
           htmltools::br(),
           mod_overview_ui("overview_1")
         ),
-        shiny::tabPanel("3. Flag",
-          value = "Flag",
-          htmltools::br(),
-          mod_data_flagging_ui("data_flagging_1")
-        ),
-        shiny::tabPanel("4. Filter",
-          value = "Filter",
-          htmltools::br(),
-          mod_filtering_ui("filtering_1")
-        ),
-        shiny::tabPanel("5. Censored Data",
-          value = "Censored",
-          htmltools::br(),
-          mod_censored_data_ui("censored_data_1")
-        ),
-        shiny::tabPanel("6. Harmonize and Calculate",
+        shiny::tabPanel(
+          "3. Harmonize Synonyms",
           value = "Harmonize",
           htmltools::br(),
           mod_harmonize_np_ui("harmonize_np_1")
         ),
-        shiny::tabPanel("7. Explore",
+        shiny::tabPanel(
+          "4. Censored Data",
+          value = "Censored",
+          htmltools::br(),
+          mod_censored_data_ui("censored_data_1")
+        ),
+        shiny::tabPanel(
+          "5. Flag",
+          value = "Flag",
+          htmltools::br(),
+          mod_data_flagging_ui("data_flagging_1")
+        ),
+        shiny::tabPanel(
+          "6. Filter",
+          value = "Filter",
+          htmltools::br(),
+          mod_filtering_ui("filtering_1")
+        ),
+        shiny::tabPanel(
+          "7. Sum TN and TP",
+          value = "TNandTPSummation",
+          htmltools::br(),
+          mod_TN_and_TP_summation_ui("TN_and_TP_summation_1")
+        ),
+
+        shiny::tabPanel(
+          "8. Depth",
+          value = "Depth",
+          htmltools::br(),
+          mod_depth_ui("depth_1")
+        ),
+        shiny::tabPanel(
+          "9. Explore",
           value = "Figures",
           htmltools::br(),
           mod_figures_ui("figures_1")
         ),
-        shiny::tabPanel("8. Review",
+        shiny::tabPanel(
+          "10. Review",
           value = "Review",
           htmltools::br(),
           mod_review_data_ui("review_data_1")
@@ -125,16 +150,10 @@ app_ui <- function(request) {
 #' @noRd
 #'
 golem_add_external_resources <- function() {
-  add_resource_path(
-    "www",
-    app_sys("app/www")
-  )
+  add_resource_path("www", app_sys("app", "www"))
 
   tags$head(
     favicon(),
-    bundle_resources(
-      path = app_sys("app/www"),
-      app_title = "TADAShiny"
-    )
+    bundle_resources(path = app_sys("app", "www"), app_title = "TADAShiny")
   )
 }

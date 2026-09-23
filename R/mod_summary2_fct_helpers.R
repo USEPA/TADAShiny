@@ -90,15 +90,24 @@ readFile <- function(tadat, filename) {
   # newVals$huc <- load_attribute(huc, 'huc')
   newVals$siteid <- load_attribute(siteid, "siteid")
   newVals$siteType <- load_attribute(siteType, "siteType")
-  newVals$characteristicName <- load_attribute(characteristicName, "characteristicName")
-  newVals$characteristicType <- load_attribute(characteristicType, "characteristicType")
+  newVals$characteristicName <- load_attribute(
+    characteristicName,
+    "characteristicName"
+  )
+  newVals$characteristicType <- load_attribute(
+    characteristicType,
+    "characteristicType"
+  )
   newVals$sampleMedia <- load_attribute(sampleMedia, "sampleMedia")
   newVals$project <- load_attribute(project, "project")
   newVals$organization <- load_attribute(organization, "organization")
   newVals$startDate <- load_attribute(startDate, "startDate")
   newVals$endDate <- load_attribute(endDate, "endDate")
   newVals$org_table <- load_attribute(org_table, "org_table")
-  newVals$selected_filters <- load_attribute(selected_filters, "selected_filters")
+  newVals$selected_filters <- load_attribute(
+    selected_filters,
+    "selected_filters"
+  )
   newVals$nd_method <- load_attribute(nd_method, "nd_method")
   newVals$od_method <- load_attribute(od_method, "od_method")
   newVals$nd_mult <- load_attribute(nd_mult, "nd_mult")
@@ -114,7 +123,10 @@ readFile <- function(tadat, filename) {
       ui = tagList(
         htmltools::h4(htmltools::strong("Error")),
         htmltools::hr(style = "margin-top: 5px; margin-bottom: 5px;"), # Adds a separator line
-        paste("Unable to load progress file. Missing fields: ", critical_missing)
+        paste(
+          "Unable to load progress file. Missing fields: ",
+          critical_missing
+        )
       ),
       type = "error",
       duration = NULL,
@@ -189,15 +201,16 @@ writeNarrativeDataFrame <- function(tadat) {
 
   # Overview Tab
   for (row in 1:nrow(tadat$org_table)) {
-    df[nrow(df) + 1, ] <- c(base::paste0("Organization Rank ", row), tadat$org_table[row, "OrganizationFormalName"])
+    df[nrow(df) + 1, ] <- c(
+      base::paste0("Organization Rank ", row),
+      tadat$org_table[row, "OrganizationFormalName"]
+    )
   }
-
 
   # Flagging Tab
   for (flag in tadat$selected_flags) {
     df[nrow(df) + 1, ] <- c("Selected Flag", flag)
   }
-
 
   if (!is.null(tadat$m2f)) {
     df[nrow(df) + 1, ] <- c("Depth unit conversion", tadat$m2f)

@@ -10,8 +10,10 @@ flag_types <- prompt_table$flagType
 flag_prefix <- "Flag: "
 
 flagCensus <- function(raw) {
-  tabular_results <-
-    data.frame(matrix(ncol = length(flag_types), nrow = nrow(raw)))
+  tabular_results <- data.frame(matrix(
+    ncol = length(flag_types),
+    nrow = nrow(raw)
+  ))
   colnames(tabular_results) <- flag_types
 
   test_table <- subset(test_table, test_table$remove == 1)
@@ -28,8 +30,7 @@ flagCensus <- function(raw) {
           if (!is.na(test_val)) {
             rawt_col <- raw[, test_col]
             rawt_col[is.na(rawt_col)] <- "NA"
-            test_results <-
-              as.integer(as.logical(rawt_col == test_val))
+            test_results <- as.integer(as.logical(rawt_col == test_val))
           } else {
             test_results <- as.integer(as.logical(is.na(raw[test_col])))
           }
@@ -74,11 +75,8 @@ getCounts <- function(sites, removed_records) {
 }
 # Settings for each flag function in flag page mock up
 applyFlags <- function(in_table, orgs) {
-  # Missing metadata for censored results
-  out <- EPATADA::TADA_IDCensoredData(in_table)
-
   # Suspect Speciation
-  out <- EPATADA::TADA_FlagSpeciation(out, clean = "none")
+  out <- EPATADA::TADA_FlagSpeciation(in_table, clean = "none")
 
   # Suspect fraction
   out <- EPATADA::TADA_FlagFraction(out, clean = FALSE)
@@ -90,7 +88,11 @@ applyFlags <- function(in_table, orgs) {
   out <- EPATADA::TADA_FindQCActivities(out, clean = FALSE, flaggedonly = FALSE)
 
   # Result is flagged as suspect by data submitter
-  out <- EPATADA::TADA_FlagMeasureQualifierCode(out, clean = FALSE, define = TRUE)
+  out <- EPATADA::TADA_FlagMeasureQualifierCode(
+    out,
+    clean = FALSE,
+    define = TRUE
+  )
 
   # Suspect analytical method
   out <- EPATADA::TADA_FlagMethod(out, clean = FALSE)
@@ -112,7 +114,8 @@ applyFlags <- function(in_table, orgs) {
   }
 
   # Continuous data
-  out <- EPATADA::TADA_FlagContinuousData(out,
+  out <- EPATADA::TADA_FlagContinuousData(
+    out,
     clean = FALSE,
     flaggedonly = FALSE
   )
@@ -124,19 +127,14 @@ applyFlags <- function(in_table, orgs) {
   out <- EPATADA::TADA_FlagBelowThreshold(out, clean = FALSE)
 
   # Suspect coordinates
-  out <-
-    EPATADA::TADA_FlagCoordinates(
-      out,
-      clean_outsideUSA = "no",
-      clean_imprecise = FALSE,
-      flaggedonly = FALSE
-    )
+  out <- EPATADA::TADA_FlagCoordinates(
+    out,
+    clean_outsideUSA = "no",
+    clean_imprecise = FALSE,
+    flaggedonly = FALSE
+  )
 
-  out <-
-    EPATADA::TADA_MediaFilter(
-      out,
-      clean = FALSE
-    )
+  out <- EPATADA::TADA_MediaFilter(out, clean = FALSE)
 
   return(out)
 }

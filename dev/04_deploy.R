@@ -16,13 +16,15 @@
 # This is how to add the shiny sever file needed for any deployment
 # golem::add_shinyserver_file() # already exists
 
-# This is how to setup deployment to EPA's Posit Connect
+# This is how to setup deployment to Posit Connect
 # golem::add_positconnect_file() # already exists see rsconnect folder
 
-# This is how to setup deployment to TetraTech's shinyappsio
+# This is how to setup deployment to shinyappsio
 # golem::add_shinyappsio_file() # already exists see rsconnect folder
 
 # This is how to deploy, works for both TT shinyappsio and EPA posit connect
+
+# First, run the code in make_extdata.R to update the Load tab WQP query options
 
 # Detach all loaded packages and clean your environment
 golem::detach_all_attached()
@@ -33,18 +35,21 @@ golem::document_and_reload()
 # # Use packrat
 # # options(rsconnect.packrat = TRUE) # already done
 
+# remove before deployment
+remove.packages("TADAShiny")
+
 # Deploy app to staging
-# https://rstudio-connect.dmap-stage.aws.epa.gov/content/ca684b5d-fa77-4ac3-aacf-966b92d84e13/
+# https://rstudio-connect.dmap-stage.aws.epa.gov/content/963edc7d-77af-4e4d-ae7d-75d04ff6430e/
 # install.packages("rsconnect") # update to latest
 # do not edit below
 rsconnect::deployApp(
-  appDir = getwd(), # or try this? appDir = "inst/app",
-  # appFiles = c("app.R", "DESCRIPTION", "NAMESPACE", "R/", "inst/"),
+  appDir = getwd(),
+  appFiles = c("DESCRIPTION", "NAMESPACE", "R/", "inst/", "man/", "app.R"),
   appName = "TADAShiny",
   appTitle = "TADAShiny Module 1 WQP Data Discovery and Cleaning",
   launch.browser = TRUE,
-  forceUpdate = TRUE,
-  appId = 1024
+  forceUpdate = TRUE
+  # appId = 1724 9/21/26
 )
 
 # To deploy to EPA posit connect production (public)

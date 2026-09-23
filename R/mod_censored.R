@@ -5,12 +5,11 @@
 #' @param id,input,output,session Internal parameters for {shiny}.
 #'
 #' @noRd
-nd_method_options <-
-  c(
-    "Multiply detection limit by x",
-    "Random number between 0 and detection limit",
-    "No change"
-  )
+nd_method_options <- c(
+  "Multiply detection limit by x",
+  "Random number between 0 and detection limit",
+  "No change"
+)
 od_method_options <- c("Multiply detection limit by x", "No change")
 
 mod_censored_data_ui <- function(id) {
@@ -54,30 +53,23 @@ mod_censored_data_ui <- function(id) {
       ),
       shiny::column(3, shiny::uiOutput(ns("od_mult")))
     ),
-    shiny::fluidRow(
-      shiny::column(
-        3,
-        shiny::actionButton(
-          ns("apply_methods"),
-          "Apply Methods to Dataset",
-          disabled = TRUE,
-          style = "color: #fff; background-color: #337ab7; border-color: #2e6da4; margin-bottom: 10px;"
-        )
+    shiny::fluidRow(shiny::column(
+      3,
+      shiny::actionButton(
+        ns("apply_methods"),
+        "Apply Methods to Dataset",
+        disabled = TRUE,
+        style = "color: #fff; background-color: #337ab7; border-color: #2e6da4; margin-bottom: 10px;"
       )
-    ),
+    )),
     htmltools::br(), # Add a line break for spacing
-    shiny::fluidRow(
-      shiny::column(
-        3,
-        shiny::uiOutput(ns("undo_methods"))
-      )
-    ),
+    shiny::fluidRow(shiny::column(3, shiny::uiOutput(ns("undo_methods")))),
     htmltools::br(),
     shiny::fluidRow(shiny::column(12, DT::DTOutput(ns("see_det")))),
     htmltools::br(),
-    shiny::fluidRow(
-      htmltools::h3("Consider More Complex Censored Data Handling Methods")
-    ),
+    shiny::fluidRow(htmltools::h3(
+      "Consider More Complex Censored Data Handling Methods"
+    )),
     shiny::fluidRow(
       "Use the picker list below to select grouping columns to create summary table. The summary table shows the number of non- and over-detects in each group, the total number of results in each group, the number of detection limit types (censoring levels) and the percentage of the dataset that is censored. These numbers are then used to suggest a potential statistical censored data method to use. Currently, the user must perform more complex analyses outside of TADAShiny."
     ),
@@ -114,8 +106,7 @@ mod_censored_data_server <- function(id, tadat) {
     shiny::observeEvent(tadat$tab, {
       shiny::req(tadat$raw)
       if (tadat$tab == "Censored") {
-        censdat$dat <-
-          subset(tadat$raw, tadat$raw$TADA.Remove == FALSE)
+        censdat$dat <- subset(tadat$raw, tadat$raw$TADA.Remove == FALSE)
       }
     })
 
@@ -131,21 +122,27 @@ mod_censored_data_server <- function(id, tadat) {
             TADA.CensoredData.Flag == "Non-Detect" ~ "Non-Detect",
             TADA.CensoredData.Flag == "Over-Detect" ~ "Over-Detect",
             TADA.CensoredData.Flag == "Uncensored" ~ "Uncensored",
-            TADA.CensoredData.Flag == "Other Condition/Limit Populated" ~ "Other",
-            TADA.CensoredData.Flag == "Conflict between Condition and Limit" ~ "Conflict",
-            TADA.CensoredData.Flag == "Detection condition or detection limit is not documented in TADA reference tables." ~ "Not documented",
-            TADA.CensoredData.Flag == "Detection condition is missing and required for censored data ID." ~ "Missing",
-            (TADA.CensoredData.Flag == "" | is.na(TADA.CensoredData.Flag)) ~ "Mixed",
+            TADA.CensoredData.Flag ==
+              "Other Condition/Limit Populated" ~ "Other",
+            TADA.CensoredData.Flag ==
+              "Conflict between Condition and Limit" ~ "Conflict",
+            TADA.CensoredData.Flag ==
+              "Detection condition or detection limit is not documented in TADA reference tables." ~ "Not documented",
+            TADA.CensoredData.Flag ==
+              "Detection condition is missing and required for censored data ID." ~ "Missing",
+            (TADA.CensoredData.Flag == "" |
+              is.na(TADA.CensoredData.Flag)) ~ "Mixed",
             TRUE ~ "Unknown Shiny Category"
           )
         )
 
-      ggplot2::ggplot(bardat, ggplot2::aes(x = flag_simple, y = num, fill = flag_simple)) +
-        ggplot2::geom_col(
-          width = 0.75,
-          color = "black"
-        ) +
-        ggplot2::geom_text(ggplot2::aes(label = num_chr),
+      ggplot2::ggplot(
+        bardat,
+        ggplot2::aes(x = flag_simple, y = num, fill = flag_simple)
+      ) +
+        ggplot2::geom_col(width = 0.75, color = "black") +
+        ggplot2::geom_text(
+          ggplot2::aes(label = num_chr),
           vjust = -0.5,
           size = 5
         ) +
@@ -174,7 +171,8 @@ mod_censored_data_server <- function(id, tadat) {
         init_val <- 0.5
       }
       if (input$nd_method == "Multiply detection limit by x") {
-        shiny::numericInput(ns("nd_mult"),
+        shiny::numericInput(
+          ns("nd_mult"),
           "Non-Detect Multiplier (x)",
           value = init_val,
           min = 0
@@ -189,7 +187,8 @@ mod_censored_data_server <- function(id, tadat) {
         init_val <- 0.5
       }
       if (input$od_method == "Multiply detection limit by x") {
-        shiny::numericInput(ns("od_mult"),
+        shiny::numericInput(
+          ns("od_mult"),
           "Over-Detect Multiplier (x)",
           value = init_val,
           min = 0
@@ -202,12 +201,14 @@ mod_censored_data_server <- function(id, tadat) {
 
     shiny::observeEvent(tadat$load_progress_file, {
       if (!is.na(tadat$load_progress_file)) {
-        shiny::updateSelectizeInput(session,
+        shiny::updateSelectizeInput(
+          session,
           "nd_method",
           choices = nd_method_options,
           selected = tadat$nd_method
         )
-        shiny::updateSelectizeInput(session,
+        shiny::updateSelectizeInput(
+          session,
           "od_method",
           choices = od_method_options,
           selected = tadat$od_method
@@ -221,8 +222,11 @@ mod_censored_data_server <- function(id, tadat) {
     shiny::observeEvent(input$nd_method, {
       tadat$nd_method <- input$nd_method
 
-      if ((input$nd_method == "Multiply detection limit by x" && !is.numeric(input$nd_mult)) ||
-        (input$nd_method == "No change" && input$od_method == "No change")) {
+      if (
+        (input$nd_method == "Multiply detection limit by x" &&
+          !is.numeric(input$nd_mult)) ||
+          (input$nd_method == "No change" && input$od_method == "No change")
+      ) {
         shinyjs::disable("apply_methods")
       } else {
         shinyjs::enable("apply_methods")
@@ -232,7 +236,10 @@ mod_censored_data_server <- function(id, tadat) {
     shiny::observeEvent(input$nd_mult, {
       tadat$nd_mult <- input$nd_mult
 
-      if (input$nd_method == "Multiply detection limit by x" && !is.numeric(input$nd_mult)) {
+      if (
+        input$nd_method == "Multiply detection limit by x" &&
+          !is.numeric(input$nd_mult)
+      ) {
         shinyjs::disable("apply_methods")
       } else {
         shinyjs::enable("apply_methods")
@@ -242,8 +249,11 @@ mod_censored_data_server <- function(id, tadat) {
     shiny::observeEvent(input$od_method, {
       tadat$od_method <- input$od_method
 
-      if ((input$od_method == "Multiply detection limit by x" && !is.numeric(input$od_mult)) ||
-        (input$nd_method == "No change" && input$od_method == "No change")) {
+      if (
+        (input$od_method == "Multiply detection limit by x" &&
+          !is.numeric(input$od_mult)) ||
+          (input$nd_method == "No change" && input$od_method == "No change")
+      ) {
         shinyjs::disable("apply_methods")
       } else {
         shinyjs::enable("apply_methods")
@@ -253,7 +263,10 @@ mod_censored_data_server <- function(id, tadat) {
     shiny::observeEvent(input$od_mult, {
       tadat$od_mult <- input$od_mult
 
-      if (input$od_method == "Multiply detection limit by x" && !is.numeric(input$od_mult)) {
+      if (
+        input$od_method == "Multiply detection limit by x" &&
+          !is.numeric(input$od_mult)
+      ) {
         shinyjs::disable("apply_methods")
       } else {
         shinyjs::enable("apply_methods")
@@ -268,15 +281,12 @@ mod_censored_data_server <- function(id, tadat) {
         text = "Applying selected methods...",
         session = shiny::getDefaultReactiveDomain()
       )
-      removed <-
-        subset(tadat$raw, tadat$raw$TADA.Remove == TRUE)
-      good <-
-        subset(tadat$raw, tadat$raw$TADA.Remove == FALSE)
-      trans <-
-        data.frame(
-          input = nd_method_options,
-          actual = c("multiplier", "randombelowlimit", "as-is")
-        )
+      removed <- subset(tadat$raw, tadat$raw$TADA.Remove == TRUE)
+      good <- subset(tadat$raw, tadat$raw$TADA.Remove == FALSE)
+      trans <- data.frame(
+        input = nd_method_options,
+        actual = c("multiplier", "randombelowlimit", "as-is")
+      )
       if (is.null(input$nd_mult)) {
         nd_multiplier <- "null"
       } else {
@@ -287,38 +297,34 @@ mod_censored_data_server <- function(id, tadat) {
       } else {
         od_multiplier <- input$od_mult
       }
-      good <-
-        EPATADA::TADA_SimpleCensoredMethods(
-          good,
-          nd_method = trans$actual[trans$input == input$nd_method],
-          nd_multiplier = nd_multiplier,
-          od_method = trans$actual[trans$input == input$od_method],
-          od_multiplier = od_multiplier
-        )
-      tadat$raw <-
-        plyr::rbind.fill(removed, good)
+      good <- EPATADA::TADA_SimpleCensoredMethods(
+        good,
+        nd_method = trans$actual[trans$input == input$nd_method],
+        nd_multiplier = nd_multiplier,
+        od_method = trans$actual[trans$input == input$od_method],
+        od_multiplier = od_multiplier
+      )
+      tadat$raw <- plyr::rbind.fill(removed, good)
       tadat$raw <- EPATADA::TADA_OrderCols(tadat$raw)
 
       # create dataset displayed in table below
-      dat <-
-        subset(
-          good,
-          good$TADA.CensoredData.Flag %in% c("Non-Detect", "Over-Detect")
-        )
-      dat <-
-        dat[, c(
-          "ResultIdentifier",
-          "TADA.CharacteristicName",
-          "ResultDetectionConditionText",
-          "DetectionQuantitationLimitTypeName",
-          "DetectionQuantitationLimitMeasure.MeasureValue",
-          "DetectionQuantitationLimitMeasure.MeasureUnitCode",
-          "TADA.ResultMeasureValue",
-          "TADA.ResultMeasure.MeasureUnitCode"
-        )]
+      dat <- subset(
+        good,
+        good$TADA.CensoredData.Flag %in% c("Non-Detect", "Over-Detect")
+      )
+      dat <- dat[, c(
+        "ResultIdentifier",
+        "TADA.CharacteristicName",
+        "ResultDetectionConditionText",
+        "DetectionQuantitationLimitTypeName",
+        "DetectionQuantitationLimitMeasure.MeasureValue",
+        "DetectionQuantitationLimitMeasure.MeasureUnitCode",
+        "TADA.ResultMeasureValue",
+        "TADA.ResultMeasure.MeasureUnitCode"
+      )]
 
-      dat <-
-        dat %>% dplyr::rename(
+      dat <- dat %>%
+        dplyr::rename(
           "Original Detection Limit Value" = DetectionQuantitationLimitMeasure.MeasureValue,
           "Original Unit" = DetectionQuantitationLimitMeasure.MeasureUnitCode,
           "Estimated Detection Limit Value" = TADA.ResultMeasureValue,
@@ -328,7 +334,9 @@ mod_censored_data_server <- function(id, tadat) {
       # create censored data table
       censdat$exdat <- dat
 
-      shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+      shinybusy::remove_modal_spinner(
+        session = shiny::getDefaultReactiveDomain()
+      )
       tadat$censor_applied <- TRUE
 
       # disable the button so the user can not redo the handling
@@ -353,14 +361,16 @@ mod_censored_data_server <- function(id, tadat) {
     # executes the undo if undo methods button is pressed.
     shiny::observeEvent(input$undo_methods, {
       censdat$exdat <- NULL # reset exdat
-      tadat$raw$TADA.ResultMeasureValue <-
-        ifelse(
-          tadat$raw$TADA.ResultMeasureValueDataTypes.Flag == "Result Value/Unit Estimated from Detection Limit",
-          tadat$raw$TADA.DetectionQuantitationLimitMeasure.MeasureValue,
-          tadat$raw$TADA.ResultMeasureValue
-        )
-      tadat$raw$TADA.ResultMeasureValueDataTypes.Flag[tadat$raw$TADA.ResultMeasureValueDataTypes.Flag == "Result Value/Unit Estimated from Detection Limit"] <-
-        "Result Value/Unit Copied from Detection Limit"
+      tadat$raw$TADA.ResultMeasureValue <- ifelse(
+        tadat$raw$TADA.ResultMeasureValueDataTypes.Flag ==
+          "Result Value/Unit Estimated from Detection Limit",
+        tadat$raw$TADA.DetectionQuantitationLimitMeasure.MeasureValue,
+        tadat$raw$TADA.ResultMeasureValue
+      )
+      tadat$raw$TADA.ResultMeasureValueDataTypes.Flag[
+        tadat$raw$TADA.ResultMeasureValueDataTypes.Flag ==
+          "Result Value/Unit Estimated from Detection Limit"
+      ] <- "Result Value/Unit Copied from Detection Limit"
       tadat$raw <- tadat$raw %>% dplyr::select(-TADA.CensoredMethod)
       tadat$censor_applied <- FALSE
 
@@ -379,11 +389,7 @@ mod_censored_data_server <- function(id, tadat) {
         censdat$exdat,
         class = "cell-border stripe",
         filter = "top",
-        options = list(
-          dom = "Blftipr",
-          scrollX = TRUE,
-          pageLength = 10
-        ),
+        options = list(dom = "Blftipr", scrollX = TRUE, pageLength = 10),
         selection = "none",
         rownames = FALSE
       ) |>
@@ -398,15 +404,18 @@ mod_censored_data_server <- function(id, tadat) {
     # from the clean dataset, get all of the column names someone might want to group by
     output$cens_groups <- shiny::renderUI({
       shiny::req(censdat$dat)
-      ccols <- names(tadat$raw)[!names(tadat$raw) %in% c(
-        "TADA.Remove",
-        "TADAShiny.tab",
-        "TADA.ResultMeasureValue",
-        "ResultMeasureValue",
-        "ResultIdentifier",
-        "TADA.DetectionQuantitationLimitMeasure.MeasureValue",
-        "DetectionQuantitationLimitMeasure.MeasureValue"
-      )]
+      ccols <- names(tadat$raw)[
+        !names(tadat$raw) %in%
+          c(
+            "TADA.Remove",
+            "TADAShiny.tab",
+            "TADA.ResultMeasureValue",
+            "ResultMeasureValue",
+            "ResultIdentifier",
+            "TADA.DetectionQuantitationLimitMeasure.MeasureValue",
+            "DetectionQuantitationLimitMeasure.MeasureValue"
+          )
+      ]
       tcols <- ccols[grepl("TADA.", ccols)]
       ucols <- ccols[!grepl("TADA.", ccols)]
       ccols <- c(tcols, ucols)
@@ -421,25 +430,29 @@ mod_censored_data_server <- function(id, tadat) {
 
     # runs the summary function when cens button is pushed following group selection
     shiny::observeEvent(input$cens_sumbutton, {
-      summary <-
-        EPATADA::TADA_Stats(censdat$dat, group_cols = input$cens_groups)
-      censdat$summary <-
-        summary[, !names(summary) %in% c(
-          "UpperFence",
-          "LowerFence",
-          "Min",
-          "Max",
-          "Mean",
-          "Percentile_5th",
-          "Percentile_10th",
-          "Percentile_15th",
-          "Percentile_25th",
-          "Percentile_50th_Median",
-          "Percentile_75th",
-          "Percentile_85th",
-          "Percentile_95th",
-          "Percentile_98th"
-        )]
+      summary <- EPATADA::TADA_Stats(
+        censdat$dat,
+        group_cols = input$cens_groups
+      )
+      censdat$summary <- summary[,
+        !names(summary) %in%
+          c(
+            "UpperFence",
+            "LowerFence",
+            "Min",
+            "Max",
+            "Mean",
+            "Percentile_5th",
+            "Percentile_10th",
+            "Percentile_15th",
+            "Percentile_25th",
+            "Percentile_50th_Median",
+            "Percentile_75th",
+            "Percentile_85th",
+            "Percentile_95th",
+            "Percentile_98th"
+          )
+      ]
     })
 
     # creates summary table complete with csv button

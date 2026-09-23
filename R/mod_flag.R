@@ -10,12 +10,14 @@ mod_data_flagging_ui <- function(id) {
   ns <- shiny::NS(id)
   tagList(
     # Add CSS directly in the UI module to disable interaction for required switches
-    tags$style(HTML("
+    tags$style(HTML(
+      "
       .disabled-switch {
         pointer-events: none; /* Disable mouse events */
         opacity: 0.5; /* Make it visually clear it's disabled */
       }
-    ")),
+    "
+    )),
     tags$div(
       style = "display: none;",
       shinyWidgets::prettySwitch("dummy", label = NULL)
@@ -25,9 +27,10 @@ mod_data_flagging_ui <- function(id) {
       "Click the button below to run a series of tests that check for quality control issues or data formats not compatible with TADA. When the tests are finished running, a table will appear below. Each row describes an evaluation test, reports the number of results affected, and contains a switch users may toggle on/off to decide whether to flag results for removal. However, evaluation tests marked as <B>Required</B> have permanently 'ON' light blue switches that cannot be changed. <B>Recommended</B> tests are automatically switched 'ON' (darker blue), and <B>Optional</B> tests are automatically switched 'OFF' (gray)."
     ),
     htmltools::div(style = "margin-bottom:10px"),
-    shiny::fluidRow(column(
+    shiny::fluidRow(shiny::column(
       3,
-      shiny::actionButton(ns("runFlags"),
+      shiny::actionButton(
+        ns("runFlags"),
         "Run Tests",
         style = "color: #fff; background-color: #337ab7; border-color: #2e6da4"
       )
@@ -39,7 +42,7 @@ mod_data_flagging_ui <- function(id) {
     htmltools::HTML(
       "Depth units in the dataset are automatically converted to <B>meters</B> upon data retrieval. Click the radio buttons below to convert depth units to feet, inches, or back to meters."
     ),
-    shiny::fluidRow(column(
+    shiny::fluidRow(shiny::column(
       6,
       shiny::radioButtons(
         ns("m2f"),
@@ -68,27 +71,26 @@ mod_data_flagging_server <- function(id, tadat) {
       for (i in seq_len(len)) {
         switch_name <- base::paste0("switch_", i)
         if (!(i %in% which(unlist(switch_disabled)))) {
-          inputs[i] <- as.character(
-            shinyWidgets::prettySwitch(
-              ns(switch_name),
-              label = NULL,
-              value = tadat$switch_defaults[i],
-              status = "primary",
-              fill = TRUE
-            )
-          )
+          inputs[i] <- as.character(shinyWidgets::prettySwitch(
+            ns(switch_name),
+            label = NULL,
+            value = tadat$switch_defaults[i],
+            status = "primary",
+            fill = TRUE
+          ))
         } else {
-          inputs[i] <- as.character(
-            shinyWidgets::prettySwitch(
-              ns(switch_name),
-              label = NULL,
-              value = TRUE, # Required flags are always TRUE
-              status = "primary",
-              fill = TRUE
-            )
-          )
+          inputs[i] <- as.character(shinyWidgets::prettySwitch(
+            ns(switch_name),
+            label = NULL,
+            value = TRUE, # Required flags are always TRUE
+            status = "primary",
+            fill = TRUE
+          ))
           # Use JavaScript to add a CSS class that disables interaction
-          shinyjs::runjs(sprintf("$('#%s').addClass('disabled-switch');", ns(switch_name)))
+          shinyjs::runjs(sprintf(
+            "$('#%s').addClass('disabled-switch');",
+            ns(switch_name)
+          ))
         }
       }
       inputs
@@ -163,27 +165,40 @@ mod_data_flagging_server <- function(id, tadat) {
       # Build TADA.RemovalReason
       if (is.null(tadat$raw) == FALSE) {
         # Update TADA.RemovalReason (fast guard paths)
-        # this is the code cut-and-pasted from mod_filter.R - it should be the same process        
+        # this is the code cut-and-pasted from mod_filter.R - it should be the same process
         removals_df <- tadat$removals
 
-        if (is.data.frame(removals_df) &&
-          nrow(removals_df) == nrow(tadat$raw) &&
-          ncol(removals_df) > 0) {
+        if (
+          is.data.frame(removals_df) &&
+            nrow(removals_df) == nrow(tadat$raw) &&
+            ncol(removals_df) > 0
+        ) {
           # Coerce to logical to avoid surprises
-          rem_log <- as.data.frame(lapply(removals_df, 
-                                          function(col) if (is.logical(col)) col else as.logical(col)), 
-                                   optional = TRUE) # added this to preserve column names for use in TADA.RemovalReason
+          rem_log <- as.data.frame(
+            lapply(removals_df, function(col) {
+              if (is.logical(col)) col else as.logical(col)
+            }),
+            optional = TRUE
+          ) # added this to preserve column names for use in TADA.RemovalReason
           cn <- colnames(rem_log)
           mat <- as.matrix(rem_log)
 
           any_true <- rowSums(mat, na.rm = TRUE) > 0
           reasons <- rep(NA_character_, nrow(mat))
           if (any(any_true)) {
-            idx_list <- apply(mat[any_true, , drop = FALSE], 1L, function(row) which(row))
-            if (is.integer(idx_list)) idx_list <- list(idx_list)
+            idx_list <- apply(mat[any_true, , drop = FALSE], 1L, function(row) {
+              which(row)
+            })
+            if (is.integer(idx_list)) {
+              idx_list <- list(idx_list)
+            }
             # joins the strings using a semi-colon, which (I think) is not a valid character in
             # the field names so they can be parsed more easily by users
-            reasons[any_true] <- vapply(idx_list, function(idx) paste(cn[idx], collapse = "; "), character(1))
+            reasons[any_true] <- vapply(
+              idx_list,
+              function(idx) paste(cn[idx], collapse = "; "),
+              character(1)
+            )
           }
           tadat$raw$TADA.RemovalReason <- reasons
         } else if (is.data.frame(removals_df)) {
@@ -242,10 +257,11 @@ mod_data_flagging_server <- function(id, tadat) {
             )
           )
         )
-
-        shinyjs::enable(selector = '.nav li a[data-value="Filter"]')
-        shinyjs::enable(selector = '.nav li a[data-value="Censored"]')
         shinyjs::enable(selector = '.nav li a[data-value="Harmonize"]')
+        shinyjs::enable(selector = '.nav li a[data-value="Censored"]')
+        shinyjs::enable(selector = '.nav li a[data-value="Filter"]')
+
+        shinyjs::enable(selector = '.nav li a[data-value="Depth"]')
         shinyjs::enable(selector = '.nav li a[data-value="Figures"]')
         shinyjs::enable(selector = '.nav li a[data-value="Review"]')
       }
@@ -255,12 +271,23 @@ mod_data_flagging_server <- function(id, tadat) {
       shinybusy::show_modal_spinner(
         spin = "double-bounce",
         color = "#0071bc",
-        text = "Running flagging functions...",
+        # text = "Running flagging functions...",
+        text = tagList(
+          tags$div(
+            tags$p("Running flagging functions", tags$br(), input$example_data),
+            style = "text-align:center; padding: 12px;",
+            tags$p(id = "js_time_display", "00:00:00")
+          ),
+          # Hidden input to hold elapsed seconds for server (JS updates it)
+          tags$input(id = "js_elapsed_seconds", type = "hidden", value = "0")
+        ),
         session = shiny::getDefaultReactiveDomain()
       )
 
       tadat$raw <- applyFlags(tadat$raw, tadat$orgs)
-      shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+      shinybusy::remove_modal_spinner(
+        session = shiny::getDefaultReactiveDomain()
+      )
     })
 
     shiny::observeEvent(tadat$m2f, {
@@ -297,7 +324,9 @@ mod_data_flagging_server <- function(id, tadat) {
         )
         tadat$raw <- EPATADA::TADA_ConvertDepthUnits(tadat$raw, unit = "m")
       }
-      shinybusy::remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
+      shinybusy::remove_modal_spinner(
+        session = shiny::getDefaultReactiveDomain()
+      )
     })
   })
 }
