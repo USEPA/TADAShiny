@@ -1,5 +1,3 @@
-############
-
 # WQX only from WQP via DR (legacy/production)
 test <- dataRetrieval::readWQPdata(
   sampleMedia = c("Water", "water"),
@@ -24,13 +22,15 @@ test2 <- EPATADA::TADA_DataRetrieval(
 
 # USGS only from DR (WQX 3.0/beta)
 test3 = dataRetrieval::read_waterdata_samples(
-  activityMediaName = c("Water"),
+  # activityMediaName = c("Water"),
   activityStartDateLower = "01-01-1991",
   activityStartDateUpper = "12-31-2005",
   boundingBox = c(-110.495, 45.192, -109.693, 45.911),
   dataType = "results",
   dataProfile = "fullphyschem"
 )
+# https://api.waterdata.usgs.gov/samples-data/results/fullphyschem?mimeType=text%2Fcsv&activityMediaName=Water&activityStartDateLower=1991-01-01&activityStartDateUpper=2005-12-31&boundingBox=-110.495,45.192,-109.693,45.911
+# https://api.waterdata.usgs.gov/samples-data/results/fullphyschem?mimeType=text%2Fcsv&&activityStartDateLower=1991-01-01&activityStartDateUpper=2005-12-31&boundingBox=-110.495,45.192,-109.693,45.911
 
 # both USGS and WQX from DR (WQX 3.0/beta)
 test4 <- dataRetrieval::readWQPdata(
@@ -42,6 +42,12 @@ test4 <- dataRetrieval::readWQPdata(
   ignore_attributes = TRUE,
   bBox = c(-110.495, 45.192, -109.693, 45.911)
 )
+
+test_that("test4 matches test2 + test3 combined", {
+  combined <- dplyr::bind_rows(test2, test3)
+  
+  expect_equal(test4, combined)
+})
 
 ############
 
