@@ -695,6 +695,8 @@ mod_filtering_server <- function(id, tadat) {
 
     # button: Reset all Filters
     shiny::observeEvent(input$removeAllFilters, {
+      tadat$removals <- sync_removals(tadat$raw, tadat$removals)
+      
       # remove all row filters added via tadat$selected_filters
       if (
         is.data.frame(tadat$removals) &&
@@ -826,16 +828,7 @@ mod_filtering_server <- function(id, tadat) {
             }
 
             # Ensure removals exists and has correct nrow
-            if (
-              is.null(tadat$removals) ||
-                !is.data.frame(tadat$removals) ||
-                nrow(tadat$removals) != nrow(tadat$raw)
-            ) {
-              tadat$removals <- data.frame(matrix(
-                nrow = nrow(tadat$raw),
-                ncol = 0
-              ))
-            }
+            tadat$removals <- sync_removals(tadat$raw, tadat$removals)
 
             # Apply per-field excludes: remove prior module columns for that field, then add/update new one
 
