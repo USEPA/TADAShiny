@@ -696,7 +696,7 @@ mod_filtering_server <- function(id, tadat) {
     # button: Reset all Filters
     shiny::observeEvent(input$removeAllFilters, {
       tadat$removals <- sync_removals(tadat$raw, tadat$removals)
-      
+
       # remove all row filters added via tadat$selected_filters
       if (
         is.data.frame(tadat$removals) &&
