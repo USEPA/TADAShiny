@@ -9,30 +9,40 @@ app_server <- function(input, output, session) {
   # Create a reactiveValues object to hold shared data between modules
   tadat <- shiny::reactiveValues()
 
-  # Initialize reactive values
-  # Initialize removals with the same number of rows as raw data, all FALSE
-  shiny::observeEvent(tadat$raw, {
-    if (!is.null(tadat$raw) && is.null(tadat$removals)) {
-      tadat$removals <- data.frame(matrix(
-        FALSE,
-        nrow = nrow(tadat$raw),
-        ncol = 0
-      ))
-    }
-  })
+  # Handle removals
+  shiny::observeEvent(
+    tadat$raw,
+    {
+      req(tadat$raw)
 
-  # Update the master 'Remove' column anytime data is added to the 'removals' table
-  shiny::observeEvent(tadat$removals, {
-    if (dim(tadat$removals)[2] > 0) {
-      # Ensure tadat$removals contains logical (TRUE/FALSE) values for each record
-      tadat$raw$TADA.Remove <- apply(tadat$removals, 1, any)
-      # # Debugging: Print the removals table and the resulting TADA.Remove column
-      # print("Removals Table:")
-      # print(tadat$removals)
-      # print("Updated TADA.Remove:")
-      # print(tadat$raw$TADA.Remove)
-    }
-  })
+      old_removals <- tadat$removals
+      tadat$removals <- sync_removals(tadat$raw, old_removals)
+    },
+    ignoreInit = TRUE
+  )
+
+  shiny::observeEvent(
+    tadat$removals,
+    {
+      req(tadat$raw, tadat$removals)
+
+      if (nrow(tadat$raw) == nrow(tadat$removals)) {
+        if (ncol(tadat$removals) > 0) {
+          tadat$raw$TADA.Remove <- apply(tadat$removals, 1, any)
+        } else {
+          tadat$raw$TADA.Remove <- FALSE
+        }
+      } else {
+        message(
+          "Row mismatch: raw=",
+          nrow(tadat$raw),
+          ", removals=",
+          nrow(tadat$removals)
+        )
+      }
+    },
+    ignoreInit = TRUE
+  )
 
   # Module server calls
 

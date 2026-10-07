@@ -72,7 +72,6 @@ mod_TN_and_TP_summation_server <- function(id, tadat) {
     })
 
     shiny::observeEvent(input$sum_apply, {
-      # a modal that pops up showing it's working on calculating Total N and P
       shinybusy::show_modal_spinner(
         spin = "double-bounce",
         color = "#0071bc",
@@ -80,50 +79,64 @@ mod_TN_and_TP_summation_server <- function(id, tadat) {
         session = shiny::getDefaultReactiveDomain()
       )
 
-      dat <- subset(tadat$raw, tadat$raw$TADA.Remove == FALSE)
-      rem <- subset(tadat$raw, tadat$raw$TADA.Remove == TRUE)
-      dat <- EPATADA::TADA_CalculateTotalNP(dat, daily_agg = "max")
-      dat$TADA.Remove[is.na(dat$TADA.Remove)] <- FALSE
+      out <- tryCatch(
+        {
+          # Split current data into rows to keep and rows removed
+          dat <- subset(tadat$raw, tadat$raw$TADA.Remove == FALSE)
+          rem <- subset(tadat$raw, tadat$raw$TADA.Remove == TRUE)
 
-      # add new measurements to tadat$removals, all equal FALSE
-      ## NOTE THAT THIS ASSUMES NEWLY CREATED RESULTS FROM TOTAL NP WILL NECESSARILY BE ADDED TO END OF TADAT$RAW DATA FRAME
-      ncols <- ncol(tadat$removals)
-      nrows <- length(dat$ResultIdentifier[grepl(
-        "TADA-",
-        dat$ResultIdentifier
-      )])
-      new_df <- as.data.frame(matrix(FALSE, ncol = ncols, nrow = nrows))
-      names(new_df) <- names(tadat$removals)
-      tadat$removals <- plyr::rbind.fill(tadat$removals, new_df)
-      tadat$raw <- plyr::rbind.fill(dat, rem)
-      tadat$raw <- EPATADA::TADA_OrderCols(tadat$raw)
-      # Need to update TADA.NutrientSummation.Flag outputs in EPATADA R package function to differentiate TN and TP
-      # nitrolen <- length(dat$TADA.NutrientSummation.Flag[dat$TADA.NutrientSummation.Flag %in% c("New row added: Nutrient summation from one or more subspecies.")])
-      # phoslen <- length(dat$TADA.NutrientSummation.Flag[dat$TADA.NutrientSummation.Flag %in% c("New row added: Nutrient summation from one or more subspecies.")])
-      newrowlen <- length(dat$TADA.NutrientSummation.Flag[
-        dat$TADA.NutrientSummation.Flag %in%
-          c("New row added: Nutrient summation from one or more subspecies.")
-      ])
-      # remove the modal once the dataset has been harmonized
+          # Run the nutrient summation on keepable rows
+          dat <- EPATADA::TADA_CalculateTotalNP(dat, daily_agg = "max")
+          dat$TADA.Remove[is.na(dat$TADA.Remove)] <- FALSE
+
+          # Count newly created rows for the success message
+          newrowlen <- sum(
+            dat$TADA.NutrientSummation.Flag %in%
+              "New row added: Nutrient summation from one or more subspecies.",
+            na.rm = TRUE
+          )
+
+          list(dat = dat, rem = rem, newrowlen = newrowlen)
+        },
+        error = function(e) {
+          message("TN/TP summation error: ", conditionMessage(e))
+          NULL
+        }
+      )
+
       shinybusy::remove_modal_spinner(
         session = shiny::getDefaultReactiveDomain()
       )
 
+      if (is.null(out)) {
+        shiny::showModal(shiny::modalDialog(
+          title = "TN/TP Summation Error",
+          "An error occurred while calculating Total N and P. Check server logs."
+        ))
+        return()
+      }
+
+      # Rebuild raw from the updated kept data + removed rows
+      tadat$raw <- plyr::rbind.fill(out$dat, out$rem)
+      tadat$raw <- EPATADA::TADA_OrderCols(tadat$raw)
+
+      # Rebuild removals so row count matches the new raw
+      tadat$removals <- sync_removals(tadat$raw, tadat$removals)
+
+      # Optional: ensure removal reason exists after raw changes
+      if (!"TADA.RemovalReason" %in% names(tadat$raw)) {
+        tadat$raw$TADA.RemovalReason <- NA_character_
+      }
+
       shiny::showModal(shiny::modalDialog(
         title = "Success! Calculations Complete.",
-        # base::paste0(scales::comma(nitrolen), " Total Nitrogen results calculated and ", scales::comma(phoslen), " Total Phosphorus results calculated.")
-        base::paste0(
-          scales::comma(newrowlen),
+        paste0(
+          scales::comma(out$newrowlen),
           " Total Nitrogen and/or Total Phosphorus results calculated."
         )
       ))
+
       shinyjs::disable("sum_apply")
     })
   })
 }
-
-## To be copied in the UI
-# mod_TN_and_TP_summation_ui("TN_and_TP_summation_1")
-
-## To be copied in the server
-# mod_TN_and_TP_summation_server("TN_and_TP_summation_1")
