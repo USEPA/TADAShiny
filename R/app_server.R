@@ -8,30 +8,8 @@
 app_server <- function(input, output, session) {
   # Create a reactiveValues object to hold shared data between modules
   tadat <- shiny::reactiveValues()
-
-  sync_removals <- function(raw_df, removals_df = NULL) {
-    req_rows <- nrow(raw_df)
-    
-    if (is.null(removals_df) || !is.data.frame(removals_df)) {
-      return(as.data.frame(matrix(FALSE, nrow = req_rows, ncol = 0)))
-    }
-    
-    old_names <- names(removals_df)
-    
-    new_removals <- as.data.frame(
-      matrix(FALSE, nrow = req_rows, ncol = ncol(removals_df))
-    )
-    names(new_removals) <- old_names
-    
-    if (nrow(removals_df) > 0 && ncol(removals_df) > 0) {
-      n_copy <- min(nrow(removals_df), req_rows)
-      new_removals[seq_len(n_copy), seq_len(ncol(removals_df))] <-
-        removals_df[seq_len(n_copy), seq_len(ncol(removals_df)), drop = FALSE]
-    }
-    
-    new_removals
-  }
   
+  # Handle removals
   shiny::observeEvent(tadat$raw, {
     req(tadat$raw)
     
