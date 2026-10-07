@@ -8,29 +8,41 @@
 app_server <- function(input, output, session) {
   # Create a reactiveValues object to hold shared data between modules
   tadat <- shiny::reactiveValues()
-  
+
   # Handle removals
-  shiny::observeEvent(tadat$raw, {
-    req(tadat$raw)
-    
-    old_removals <- tadat$removals
-    tadat$removals <- sync_removals(tadat$raw, old_removals)
-  }, ignoreInit = TRUE)
-  
-  shiny::observeEvent(tadat$removals, {
-    req(tadat$raw, tadat$removals)
-    
-    if (nrow(tadat$raw) == nrow(tadat$removals)) {
-      if (ncol(tadat$removals) > 0) {
-        tadat$raw$TADA.Remove <- apply(tadat$removals, 1, any)
+  shiny::observeEvent(
+    tadat$raw,
+    {
+      req(tadat$raw)
+
+      old_removals <- tadat$removals
+      tadat$removals <- sync_removals(tadat$raw, old_removals)
+    },
+    ignoreInit = TRUE
+  )
+
+  shiny::observeEvent(
+    tadat$removals,
+    {
+      req(tadat$raw, tadat$removals)
+
+      if (nrow(tadat$raw) == nrow(tadat$removals)) {
+        if (ncol(tadat$removals) > 0) {
+          tadat$raw$TADA.Remove <- apply(tadat$removals, 1, any)
+        } else {
+          tadat$raw$TADA.Remove <- FALSE
+        }
       } else {
-        tadat$raw$TADA.Remove <- FALSE
+        message(
+          "Row mismatch: raw=",
+          nrow(tadat$raw),
+          ", removals=",
+          nrow(tadat$removals)
+        )
       }
-    } else {
-      message("Row mismatch: raw=", nrow(tadat$raw),
-              ", removals=", nrow(tadat$removals))
-    }
-  }, ignoreInit = TRUE)
+    },
+    ignoreInit = TRUE
+  )
 
   # Module server calls
 
