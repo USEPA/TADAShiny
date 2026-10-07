@@ -9,30 +9,50 @@ app_server <- function(input, output, session) {
   # Create a reactiveValues object to hold shared data between modules
   tadat <- shiny::reactiveValues()
 
-  # Initialize reactive values
-  # Initialize removals with the same number of rows as raw data, all FALSE
+  sync_removals <- function(raw_df, removals_df = NULL) {
+    req_rows <- nrow(raw_df)
+    
+    if (is.null(removals_df) || !is.data.frame(removals_df)) {
+      return(as.data.frame(matrix(FALSE, nrow = req_rows, ncol = 0)))
+    }
+    
+    old_names <- names(removals_df)
+    
+    new_removals <- as.data.frame(
+      matrix(FALSE, nrow = req_rows, ncol = ncol(removals_df))
+    )
+    names(new_removals) <- old_names
+    
+    if (nrow(removals_df) > 0 && ncol(removals_df) > 0) {
+      n_copy <- min(nrow(removals_df), req_rows)
+      new_removals[seq_len(n_copy), seq_len(ncol(removals_df))] <-
+        removals_df[seq_len(n_copy), seq_len(ncol(removals_df)), drop = FALSE]
+    }
+    
+    new_removals
+  }
+  
   shiny::observeEvent(tadat$raw, {
-    if (!is.null(tadat$raw) && is.null(tadat$removals)) {
-      tadat$removals <- data.frame(matrix(
-        FALSE,
-        nrow = nrow(tadat$raw),
-        ncol = 0
-      ))
-    }
-  })
-
-  # Update the master 'Remove' column anytime data is added to the 'removals' table
+    req(tadat$raw)
+    
+    old_removals <- tadat$removals
+    tadat$removals <- sync_removals(tadat$raw, old_removals)
+  }, ignoreInit = TRUE)
+  
   shiny::observeEvent(tadat$removals, {
-    if (dim(tadat$removals)[2] > 0) {
-      # Ensure tadat$removals contains logical (TRUE/FALSE) values for each record
-      tadat$raw$TADA.Remove <- apply(tadat$removals, 1, any)
-      # # Debugging: Print the removals table and the resulting TADA.Remove column
-      # print("Removals Table:")
-      # print(tadat$removals)
-      # print("Updated TADA.Remove:")
-      # print(tadat$raw$TADA.Remove)
+    req(tadat$raw, tadat$removals)
+    
+    if (nrow(tadat$raw) == nrow(tadat$removals)) {
+      if (ncol(tadat$removals) > 0) {
+        tadat$raw$TADA.Remove <- apply(tadat$removals, 1, any)
+      } else {
+        tadat$raw$TADA.Remove <- FALSE
+      }
+    } else {
+      message("Row mismatch: raw=", nrow(tadat$raw),
+              ", removals=", nrow(tadat$removals))
     }
-  })
+  }, ignoreInit = TRUE)
 
   # Module server calls
 
