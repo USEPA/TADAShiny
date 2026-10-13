@@ -1416,17 +1416,16 @@ mod_query_data_server <- function(id, tadat) {
       if (isTRUE(success)) {
         raw <- EPATADA::TADA_OrderCols(raw)
         raw <- restrict_to_keep_cols(raw, keep_cols = all.cols, verbose = TRUE)
-        raw$TADA.Remove <- NULL
-
+        
         message("Preparing to initialize table...")
         message("Final rows: ", nrow(raw), " Final cols: ", ncol(raw))
         message("Final column names:")
         print(names(raw))
-
+        
         initializeTable(tadat, raw)
-
+        
         tadat$original_source <- "Upload"
-
+        
         shiny::removeNotification("uploadError")
       }
     })
