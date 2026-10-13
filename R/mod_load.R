@@ -818,7 +818,7 @@ mod_query_data_ui <- function(id) {
             shiny::fileInput(
               ns("file"),
               "",
-              multiple = TRUE,
+              multiple = FALSE,
               accept = c(".xlsx", ".xls"),
               width = "100%"
             )
@@ -849,7 +849,7 @@ mod_query_data_ui <- function(id) {
       shiny::fluidRow(
         class = "tada-field-row",
         htmltools::HTML(
-          "Upload a progress file from your computer. This upload feature only accepts data in the .RData format. The TADA Shiny application keeps track of all user selections, and makes a .RData file available for download at any time. If you saved a progress file you generated during a previous use of the TADA Shiny application, then it can be uploaded here and used to automatically parameterize the TADA Shiny app with the same selections. This file can be used to regenerate a dataset with the same decisions as before, or can be used to apply the same user selections to a new dataset."
+          "Optional: after you upload a dataset, you may upload a progress file (.RData) to restore saved TADA selections onto that dataset. Upload the dataset first, then upload the progress file. A progress file can be used to reproduce prior analysis settings or apply the same selections to a new dataset."
         )
       ),
       shiny::fluidRow(
@@ -861,7 +861,7 @@ mod_query_data_ui <- function(id) {
             shiny::fileInput(
               ns("progress_file"),
               "",
-              multiple = TRUE,
+              multiple = FALSE,
               accept = c(".RData"),
               width = "100%"
             )
@@ -1673,6 +1673,7 @@ mod_query_data_server <- function(id, tadat) {
       }
       # Normalize sample media once for all branches
       sample_media_ui <- input$media
+      tadat$media <- input$media
       sample_media_query <- if (
         is.null(sample_media_ui) || length(sample_media_ui) == 0
       ) {
@@ -2014,7 +2015,7 @@ Remember to update the start and end dates."
           shiny::updateSelectizeInput(
             session,
             "media",
-            selected = sample_media_query
+            selected = tadat$media
           )
           shiny::updateSelectizeInput(
             session,
