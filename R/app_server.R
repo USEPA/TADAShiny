@@ -13,7 +13,7 @@ app_server <- function(input, output, session) {
   shiny::observeEvent(
     tadat$raw,
     {
-      req(tadat$raw)
+      shiny::req(tadat$raw)
 
       old_removals <- tadat$removals
       tadat$removals <- sync_removals(tadat$raw, old_removals)
@@ -24,7 +24,7 @@ app_server <- function(input, output, session) {
   shiny::observeEvent(
     tadat$removals,
     {
-      req(tadat$raw, tadat$removals)
+      shiny::req(tadat$raw, tadat$removals)
 
       if (nrow(tadat$raw) == nrow(tadat$removals)) {
         if (ncol(tadat$removals) > 0) {
