@@ -2012,11 +2012,7 @@ Remember to update the start and end dates."
             "chargroup",
             selected = tadat$characteristicType
           )
-          shiny::updateSelectizeInput(
-            session,
-            "media",
-            selected = tadat$media
-          )
+          shiny::updateSelectizeInput(session, "media", selected = tadat$media)
           shiny::updateSelectizeInput(
             session,
             "project",
