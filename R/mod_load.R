@@ -98,12 +98,15 @@ counties <- data.table::fread(
   showProgress = FALSE
 )
 
-# Fetch orgs, chars, chargroup, media choices directly from WQX domain list
-orgs <- data.table::fread(
-  "https://cdx.epa.gov/wqx/download/DomainValues/Organization.CSV",
-  showProgress = FALSE
-)$ID
+# Fetch orgs from WQP codes service
+orgs <- sort(unique(
+  data.table::fread(
+    "https://www.waterqualitydata.us/data/Organization/search?mimeType=csv&zip=no",
+    showProgress = FALSE
+  )$OrganizationIdentifier
+))
 
+# Fetch chars, chargroup, media choices directly from WQX domain list
 chars <- data.table::fread(
   "https://cdx.epa.gov/wqx/download/DomainValues/Characteristic.CSV",
   showProgress = FALSE
@@ -815,7 +818,7 @@ mod_query_data_ui <- function(id) {
             shiny::fileInput(
               ns("file"),
               "",
-              multiple = TRUE,
+              multiple = FALSE,
               accept = c(".xlsx", ".xls"),
               width = "100%"
             )
@@ -846,7 +849,7 @@ mod_query_data_ui <- function(id) {
       shiny::fluidRow(
         class = "tada-field-row",
         htmltools::HTML(
-          "Upload a progress file from your computer. This upload feature only accepts data in the .RData format. The TADA Shiny application keeps track of all user selections, and makes a .RData file available for download at any time. If you saved a progress file you generated during a previous use of the TADA Shiny application, then it can be uploaded here and used to automatically parameterize the TADA Shiny app with the same selections. This file can be used to regenerate a dataset with the same decisions as before, or can be used to apply the same user selections to a new dataset."
+          "Optional: after you upload a dataset, you may upload a progress file (.RData) to restore saved TADA selections onto that dataset. Upload the dataset first, then upload the progress file. A progress file can be used to reproduce prior analysis settings or apply the same selections to a new dataset."
         )
       ),
       shiny::fluidRow(
@@ -858,7 +861,7 @@ mod_query_data_ui <- function(id) {
             shiny::fileInput(
               ns("progress_file"),
               "",
-              multiple = TRUE,
+              multiple = FALSE,
               accept = c(".RData"),
               width = "100%"
             )
@@ -1308,19 +1311,22 @@ mod_query_data_server <- function(id, tadat) {
     # handles option C user data uploads
     shiny::observeEvent(input$file, {
       message("=== FILE UPLOAD STARTED ===")
-      message("input$file is null? ", is.null(input$file))
-      if (!is.null(input$file)) {
-        message("Uploaded name: ", input$file$name)
-        message("Uploaded datapath: ", input$file$datapath)
+
+      if (is.null(input$file) || nrow(input$file) == 0) {
+        message("No file uploaded.")
+        return(NULL)
       }
-      # extra safeguard for spinner removal even in unexpected control-flow issues
+
+      message("Uploaded file name: ", input$file$name[1])
+      message("Uploaded file path: ", input$file$datapath[1])
+
       on.exit(
         shinybusy::remove_modal_spinner(
           session = shiny::getDefaultReactiveDomain()
         ),
         add = TRUE
       )
-      # a modal that pops up showing it's working on uploading the dataset from the users file
+
       shinybusy::show_modal_spinner(
         spin = "double-bounce",
         color = "#0071bc",
@@ -1328,119 +1334,68 @@ mod_query_data_server <- function(id, tadat) {
         session = shiny::getDefaultReactiveDomain()
       )
 
-      success <- FALSE # Flag to track if the process completes successfully
+      success <- FALSE
 
       tryCatch(
         {
-          # only in interactive dev - withr will auto-restore at the end of this block
-          # Consider whether you want warn = 2 to apply in Shiny deployments. If yes, remove the interactive() guard
           if (interactive()) {
             withr::local_options(list(warn = 2))
           }
 
-          # Validate file input
-          if (is.null(input$file)) {
-            stop("No file uploaded.")
-          }
-
-          # added this to make sure it is not null later
           tadat$original_source <- "Upload"
 
           message("About to read Excel file...")
           raw <- readxl::read_excel(
-            input$file$datapath,
+            input$file$datapath[1],
             sheet = 1,
             col_types = "text"
           )
 
-          # user uploaded data
-          raw <- readxl::read_excel(
-            input$file$datapath,
-            sheet = 1,
-            col_types = "text"
-          )
+          names(raw) <- trimws(names(raw))
 
           message("Excel file read successfully.")
           message("Rows: ", nrow(raw), " Cols: ", ncol(raw))
           message("Column names:")
           print(names(raw))
 
-          # Validate data structure
           if (!is.data.frame(raw)) {
             stop("Uploaded file is not a valid data frame.")
           }
 
-          # Check for multiple rows
           if (nrow(raw) <= 1) {
             stop("The uploaded file must contain more than one row.")
           }
 
-          # Define the required columns
-          required_cols <- c(
-            "ActivityMediaName",
-            "ResultMeasureValue",
-            "ResultMeasure.MeasureUnitCode",
-            "CharacteristicName",
-            "ResultSampleFractionText",
-            "MethodSpeciationName",
-            "DetectionQuantitationLimitMeasure.MeasureUnitCode",
-            "ResultDetectionConditionText",
-            "ResultIdentifier",
-            "DetectionQuantitationLimitMeasure.MeasureValue",
-            "LatitudeMeasure",
-            "LongitudeMeasure"
-          )
+          is_working_tada <- "TADA.MonitoringLocationIdentifier" %in% names(raw)
 
-          # Check for missing columns
-          missing_cols <- setdiff(required_cols, names(raw))
-
-          if (length(missing_cols) == 0) {
-            message("Required column check passed.")
-          }
-
-          # If any required columns are missing, stop processing and show an error
-          if (length(missing_cols) > 0) {
-            stop(paste(
-              "Data upload is missing required column(s).",
-              "Please make sure the following columns are included:",
-              paste(missing_cols, collapse = ", ")
-            ))
-          }
-
-          message("Running TADA_AutoClean...")
-
-          # run autoclean
-          if ("TADA.MonitoringLocationIdentifier" %in% names(raw)) {
-            message(
-              "Detected pre-processed TADA file; skipping TADA_AutoClean()."
-            )
+          if (is_working_tada) {
+            message("Detected working TADA dataset; skipping TADA_AutoClean().")
             raw <- EPATADA::TADA_CorrectColType(raw)
+            message("TADA_CorrectColType completed.")
           } else {
+            message("Detected raw dataset; running TADA_AutoClean().")
             raw <- EPATADA::TADA_AutoClean(raw)
             message("TADA_AutoClean completed.")
           }
 
-          message("TADA_AutoClean completed.")
-          message("Rows after autoclean: ", nrow(raw), " Cols: ", ncol(raw))
-          message("Column names after autoclean:")
+          message("Rows after processing: ", nrow(raw), " Cols: ", ncol(raw))
+          message("Column names after processing:")
           print(names(raw))
 
-          # check for ALL required fields (after autoclean is run)
           message("Running TADA_CheckRequiredFields...")
           check_result <- EPATADA::TADA_CheckRequiredFields(raw)
           message("TADA_CheckRequiredFields result: ", check_result)
+
           if (!isTRUE(check_result)) {
             stop("The uploaded file is missing required columns.")
           }
 
-          success <- TRUE # Set flag to true if all operations succeed
+          success <- TRUE
         },
         error = function(e) {
-          # Log error details for debugging
           message("UPLOAD ERROR: ", e$message)
           message("Class: ", paste(class(e), collapse = ", "))
 
-          # Show error notification to the user
           shiny::showNotification(
             ui = tagList(
               htmltools::h4(htmltools::strong("Error")),
@@ -1454,21 +1409,13 @@ mod_query_data_server <- function(id, tadat) {
         }
       )
 
-      # Ensure spinner is removed regardless of success or error
       shinybusy::remove_modal_spinner(
         session = shiny::getDefaultReactiveDomain()
       )
 
-      # If successful, reduce columns then initialize
-      if (success == TRUE) {
-        # Standardize to TADA template order before restricting
+      if (isTRUE(success)) {
         raw <- EPATADA::TADA_OrderCols(raw)
-
-        # Trim to keep list (prints removed columns to console)
         raw <- restrict_to_keep_cols(raw, keep_cols = all.cols, verbose = TRUE)
-
-        # Let initializeTable add TADA.Remove for new datasets
-        raw$TADA.Remove <- NULL
 
         message("Preparing to initialize table...")
         message("Final rows: ", nrow(raw), " Final cols: ", ncol(raw))
@@ -1479,7 +1426,6 @@ mod_query_data_server <- function(id, tadat) {
 
         tadat$original_source <- "Upload"
 
-        # Clear any existing notification with the same ID
         shiny::removeNotification("uploadError")
       }
     })
@@ -1487,10 +1433,13 @@ mod_query_data_server <- function(id, tadat) {
     ####################
 
     # Read the TADA progress file
-    shiny::observe({
+    shiny::observeEvent(input$progress_file, {
       shiny::req(input$progress_file)
+      message("=== PROGRESS FILE UPLOAD STARTED ===")
+      message("Progress file name: ", input$progress_file$name[1])
+      message("Progress file path: ", input$progress_file$datapath[1])
       # user uploaded data
-      readFile(tadat, input$progress_file$datapath)
+      readFile(tadat, input$progress_file$datapath[1])
       # resumed session will not trim the users input dataset, extra columns they have would be carried through
     })
 
@@ -1723,6 +1672,7 @@ mod_query_data_server <- function(id, tadat) {
       }
       # Normalize sample media once for all branches
       sample_media_ui <- input$media
+      tadat$media <- input$media
       sample_media_query <- if (
         is.null(sample_media_ui) || length(sample_media_ui) == 0
       ) {
@@ -2061,11 +2011,7 @@ Remember to update the start and end dates."
             "chargroup",
             selected = tadat$characteristicType
           )
-          shiny::updateSelectizeInput(
-            session,
-            "media",
-            selected = sample_media_query
-          )
+          shiny::updateSelectizeInput(session, "media", selected = tadat$media)
           shiny::updateSelectizeInput(
             session,
             "project",
@@ -2126,7 +2072,6 @@ disableLoading <- function(session) {
   shinyjs::disable("example_data")
   shinyjs::disable("querynow")
   shinyjs::disable("file")
-  shinyjs::disable("progress_file")
   shiny::insertUI(
     selector = "#query_data_1-example_data_go", # Insert relative to the button
     where = "afterEnd", # Place it immediately after the button
@@ -2148,14 +2093,6 @@ disableLoading <- function(session) {
     where = "afterEnd", # Place it immediately after the wrapper div
     ui = shiny::tags$span(
       "Reload the TADAShiny app to upload a new dataset",
-      style = "margin-left: 10px; color: red;"
-    )
-  )
-  shiny::insertUI(
-    selector = "#progress-file-wrapper", # Insert relative to the button
-    where = "afterEnd", # Place it immediately after the button
-    ui = shiny::tags$span(
-      "Reload the TADAShiny app to upload a new progress file",
       style = "margin-left: 10px; color: red;"
     )
   )

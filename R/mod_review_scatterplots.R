@@ -173,7 +173,7 @@ mod_figures_server <- function(id, tadat) {
     # select 1-2 unique groups drop down menu AND button to display on map and plots
     output$mapplotgroup <- shiny::renderUI({
       # this companion to the uiOutput in the UI appears when react$done exists
-      # req(react$done)
+      # shiny::req(react$done)
       # this line gets all the unique concatenated group values from react$dat
       if ("groupname" %in% names(react$dat)) {
         choices <- unique(react$dat$groupname)
