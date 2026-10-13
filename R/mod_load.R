@@ -1352,14 +1352,14 @@ mod_query_data_server <- function(id, tadat) {
             sheet = 1,
             col_types = "text"
           )
-          
+
           # user uploaded data
           raw <- readxl::read_excel(
             input$file$datapath,
             sheet = 1,
             col_types = "text"
           )
-          
+
           message("Excel file read successfully.")
           message("Rows: ", nrow(raw), " Cols: ", ncol(raw))
           message("Column names:")
@@ -1393,8 +1393,8 @@ mod_query_data_server <- function(id, tadat) {
 
           # Check for missing columns
           missing_cols <- setdiff(required_cols, names(raw))
-          
-          if (length(missing_cols) == 0){
+
+          if (length(missing_cols) == 0) {
             message("Required column check passed.")
           }
 
@@ -1406,18 +1406,20 @@ mod_query_data_server <- function(id, tadat) {
               paste(missing_cols, collapse = ", ")
             ))
           }
-          
+
           message("Running TADA_AutoClean...")
 
           # run autoclean
           if ("TADA.MonitoringLocationIdentifier" %in% names(raw)) {
-            message("Detected pre-processed TADA file; skipping TADA_AutoClean().")
+            message(
+              "Detected pre-processed TADA file; skipping TADA_AutoClean()."
+            )
             raw <- EPATADA::TADA_CorrectColType(raw)
           } else {
             raw <- EPATADA::TADA_AutoClean(raw)
             message("TADA_AutoClean completed.")
           }
-          
+
           message("TADA_AutoClean completed.")
           message("Rows after autoclean: ", nrow(raw), " Cols: ", ncol(raw))
           message("Column names after autoclean:")
@@ -1467,7 +1469,7 @@ mod_query_data_server <- function(id, tadat) {
 
         # Let initializeTable add TADA.Remove for new datasets
         raw$TADA.Remove <- NULL
-        
+
         message("Preparing to initialize table...")
         message("Final rows: ", nrow(raw), " Final cols: ", ncol(raw))
         message("Final column names:")
