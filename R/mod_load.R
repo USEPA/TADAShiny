@@ -1311,63 +1311,63 @@ mod_query_data_server <- function(id, tadat) {
     # handles option C user data uploads
     shiny::observeEvent(input$file, {
       message("=== FILE UPLOAD STARTED ===")
-      
+
       if (is.null(input$file) || nrow(input$file) == 0) {
         message("No file uploaded.")
         return(NULL)
       }
-      
+
       message("Uploaded file name: ", input$file$name[1])
       message("Uploaded file path: ", input$file$datapath[1])
-      
+
       on.exit(
         shinybusy::remove_modal_spinner(
           session = shiny::getDefaultReactiveDomain()
         ),
         add = TRUE
       )
-      
+
       shinybusy::show_modal_spinner(
         spin = "double-bounce",
         color = "#0071bc",
         text = "Uploading dataset from excel file ...",
         session = shiny::getDefaultReactiveDomain()
       )
-      
+
       success <- FALSE
-      
+
       tryCatch(
         {
           if (interactive()) {
             withr::local_options(list(warn = 2))
           }
-          
+
           tadat$original_source <- "Upload"
-          
+
           message("About to read Excel file...")
           raw <- readxl::read_excel(
             input$file$datapath[1],
             sheet = 1,
             col_types = "text"
           )
-          
+
           names(raw) <- trimws(names(raw))
-          
+
           message("Excel file read successfully.")
           message("Rows: ", nrow(raw), " Cols: ", ncol(raw))
           message("Column names:")
           print(names(raw))
-          
+
           if (!is.data.frame(raw)) {
             stop("Uploaded file is not a valid data frame.")
           }
-          
+
           if (nrow(raw) <= 1) {
             stop("The uploaded file must contain more than one row.")
           }
-          
+
           is_working_tada <- "TADA.MonitoringLocationIdentifier" %in% names(raw)
-          
+
           if (is_working_tada) {
             message("Detected working TADA dataset; skipping TADA_AutoClean().")
             raw <- EPATADA::TADA_CorrectColType(raw)
@@ -1377,25 +1377,25 @@ mod_query_data_server <- function(id, tadat) {
             raw <- EPATADA::TADA_AutoClean(raw)
             message("TADA_AutoClean completed.")
           }
-          
+
           message("Rows after processing: ", nrow(raw), " Cols: ", ncol(raw))
           message("Column names after processing:")
           print(names(raw))
-          
+
           message("Running TADA_CheckRequiredFields...")
           check_result <- EPATADA::TADA_CheckRequiredFields(raw)
           message("TADA_CheckRequiredFields result: ", check_result)
-          
+
           if (!isTRUE(check_result)) {
             stop("The uploaded file is missing required columns.")
           }
-          
+
           success <- TRUE
         },
         error = function(e) {
           message("UPLOAD ERROR: ", e$message)
           message("Class: ", paste(class(e), collapse = ", "))
-          
+
           shiny::showNotification(
             ui = tagList(
               htmltools::h4(htmltools::strong("Error")),
@@ -1408,25 +1408,25 @@ mod_query_data_server <- function(id, tadat) {
           )
         }
       )
-      
+
       shinybusy::remove_modal_spinner(
         session = shiny::getDefaultReactiveDomain()
       )
-      
+
       if (isTRUE(success)) {
         raw <- EPATADA::TADA_OrderCols(raw)
         raw <- restrict_to_keep_cols(raw, keep_cols = all.cols, verbose = TRUE)
         raw$TADA.Remove <- NULL
-        
+
         message("Preparing to initialize table...")
         message("Final rows: ", nrow(raw), " Final cols: ", ncol(raw))
         message("Final column names:")
         print(names(raw))
-        
+
         initializeTable(tadat, raw)
-        
+
         tadat$original_source <- "Upload"
-        
+
         shiny::removeNotification("uploadError")
       }
     })
