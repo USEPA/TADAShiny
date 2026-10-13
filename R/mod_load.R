@@ -98,12 +98,13 @@ counties <- data.table::fread(
   showProgress = FALSE
 )
 
-# Fetch orgs, chars, chargroup, media choices directly from WQX domain list
-orgs <- data.table::fread(
-  "https://cdx.epa.gov/wqx/download/DomainValues/Organization.CSV",
+# Fetch orgs from WQP codes service
+orgs <- sort(unique(data.table::fread(
+  "https://www.waterqualitydata.us/data/Organization/search?mimeType=csv&zip=no",
   showProgress = FALSE
-)$ID
+)$OrganizationIdentifier))
 
+# Fetch chars, chargroup, media choices directly from WQX domain list
 chars <- data.table::fread(
   "https://cdx.epa.gov/wqx/download/DomainValues/Characteristic.CSV",
   showProgress = FALSE
